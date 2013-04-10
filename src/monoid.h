@@ -20,13 +20,13 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
  */
-#ifndef BTL_MONOID_H
-#define BTL_MONOID_H
+#ifndef FTL_MONOID_H
+#define FTL_MONOID_H
 
 #include <type_traits>
 #include <tuple>
 
-namespace btl {
+namespace ftl {
 	/**
 	 * \interface monoid
 	 *
