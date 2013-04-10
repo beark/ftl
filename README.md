@@ -18,6 +18,8 @@ A few examples of what the monoid-part of the library can be used for (in its pr
  */
 template<typename T>
 T monoidExample(T m1, T m2) {
+    // This operator is provided for convenience only, you do not have to bring
+    // it into scope unless you want to. The alternative is to use ftl::mappend.
     using ftl::operator^;
 
     return m1 ^ m1 ^ m2 ^ m2;
