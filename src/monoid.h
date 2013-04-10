@@ -301,6 +301,8 @@ namespace btl {
 	 *       ...,
 	 *       monoid<tN>::id());
 	 * \endcode
+	 *
+	 * \tparam Ts Each of the types must be an instance of monoid.
 	 *   
 	 */
 	template<typename...Ts>
