@@ -8,6 +8,7 @@ Monoids
 A few examples of what the monoid-part of the library can be used for (in its present state):
 ```cpp
 #include <ftl/monoid.h>
+#include <ftl/list.h>	// Used instead of <list> when ftl-features are desired
 
 /* Note that this function will work on any type that can act as a monoid.
    Default instances for monoid are:
@@ -19,7 +20,8 @@ A few examples of what the monoid-part of the library can be used for (in its pr
 template<typename T>
 T monoidExample(T m1, T m2) {
     // This operator is provided for convenience only, you do not have to bring
-    // it into scope unless you want to. The alternative is to use ftl::mappend.
+    // it into scope unless you want to. The alternative is to use
+    // ftl::monoid<T>::append
     using ftl::operator^;
 
     return m1 ^ m1 ^ m2 ^ m2;
