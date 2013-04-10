@@ -33,10 +33,10 @@ namespace ftl {
 	 * Monoid abstraction.
 	 *
 	 * In addition to the methods listed here, an instance of Monoid must also
-	 * implement \c mappend, and its equivalent \c operator^. These should have
+	 * implement \c append, and its equivalent \c operator^. These should have
 	 * the signatures:
 	 * \code
-	 *   monoid_instance mappend(const monoid_instance&, const monoid_instance&);
+	 *   monoid_instance append(const monoid_instance&, const monoid_instance&);
 	 *   monoid_instance operator^ (const monoid_instance&, const monoid_instance&);
 	 * \endcode
 	 *
@@ -57,7 +57,7 @@ namespace ftl {
 		 *   a + 0 = a
 		 *   0 + a = a
 		 * \endcode
-		 * and + is the definition of mappend / operator^ for sums.
+		 * and + is the definition of append / operator^ for sums.
 		 */
 		static M id();
 	};
@@ -144,7 +144,9 @@ namespace ftl {
 	}
 
 	/**
-	 * Implementation of monoid identity for sums.
+	 * Actual implementation of monoid for sums.
+	 *
+	 * The identity is 0 and the combining operation is +.
 	 */
 	template<typename N>
 	struct monoid<sum_monoid<N>> {
@@ -152,18 +154,14 @@ namespace ftl {
 		noexcept(std::is_nothrow_constructible<sum_monoid<N>,N>::value) {
 			return sum(N(0));
 		}
+
+		static constexpr sum_monoid<N> append(
+				const sum_monoid<N>& n1,
+				const sum_monoid<N>& n2) {
+
+			return n1 + n2;
+		}
 	};
-
-	/**
-	 * monoid::mappend implementation for sums of numbers.
-	 */
-	template<typename N>
-	constexpr sum_monoid<N> mappend(
-			const sum_monoid<N>& n1,
-			const sum_monoid<N>& n2) {
-
-		return n1 + n2;
-	}
 
 	/**
 	 * monoid::operator^ implementation for sums of numbers.
@@ -173,11 +171,11 @@ namespace ftl {
 			const sum_monoid<N>& n1,
 			const sum_monoid<N>& n2) {
 
-		return mappend(n1, n2);
+		return monoid<sum_monoid<N>>::append(n1, n2);
 	}
 
 	/**
-	 * Implementatino of monoid for numbers, when interpreted as products.
+	 * Implementatin of monoid for numbers, when interpreted as products.
 	 *
 	 * The reason behind this struct is exactly the same as with sum_monoid.
 	 *
@@ -253,7 +251,9 @@ namespace ftl {
 	}
 
 	/**
-	 * Implementation of monoid identity for products.
+	 * Actual implementation of monoid for products.
+	 *
+	 * Identity is 1 and comnining operation is *.
 	 */
 	template<typename N>
 	struct monoid<prod_monoid<N>> {
@@ -261,18 +261,14 @@ namespace ftl {
 		noexcept(std::is_nothrow_constructible<prod_monoid<N>,N>::value) {
 			return prod(N(1));
 		}
+
+		static constexpr prod_monoid<N> append(
+				const prod_monoid<N>& n1,
+				const prod_monoid<N>& n2) {
+
+			return n1 * n2;
+		}
 	};
-
-	/**
-	 * monoid::mappend implementation for products of numbers.
-	 */
-	template<typename N>
-	constexpr prod_monoid<N> mappend(
-			const prod_monoid<N>& n1,
-			const prod_monoid<N>& n2) {
-
-		return n1 * n2;
-	}
 
 	/**
 	 * monoid::operator^ implementation for products of numbers.
@@ -282,37 +278,10 @@ namespace ftl {
 			const prod_monoid<N>& n1,
 			const prod_monoid<N>& n2) {
 
-		return mappend(n1, n2);
+		return monoid<prod_monoid<N>>::append(n1, n2);
 	}
 
-	/**
-	 * Implementation of monoid::id for tuples.
-	 *
-	 * Basically, id will simply generate a tuple of id:s. That is, a call
-	 * to
-	 * \code
-	 *   monoid<std::tuple<t1, t2, ..., tN>>::id();
-	 * \endcode
-	 * is equivalent to
-	 * \code
-	 *   std::make_tuple(
-	 *       monoid<t1>::id(),
-	 *       monoid<t2>::id(),
-	 *       ...,
-	 *       monoid<tN>::id());
-	 * \endcode
-	 *
-	 * \tparam Ts Each of the types must be an instance of monoid.
-	 *   
-	 */
-	template<typename...Ts>
-	struct monoid<std::tuple<Ts...>> {
-		static std::tuple<Ts...> id() {
-			return std::make_tuple(monoid<Ts>::id()...);
-		}
-	};
-
-	// Unnamed private namespace for tuple mappend implementation
+	// Unnamed private namespace for tuple append implementation
 	namespace {
 		template<std::size_t N, typename T>
 		struct tupMappend {
@@ -331,25 +300,56 @@ namespace ftl {
 	}
 
 	/**
-	 * Implementation of monoid::mappend for tuples.
+	 * Implementation of monoid for tuples.
 	 *
-	 * The semantics are that mappend:ing two tuples is equivalent to
-	 * mappend:ing every component of tuple 1 to its corresponding component
-	 * in tuple 2, and then creating a resulting tuple out of all those values.
+	 * Basically, id will simply generate a tuple of id:s. That is, a call
+	 * to
+	 * \code
+	 *   monoid<std::tuple<t1, t2, ..., tN>>::id();
+	 * \endcode
+	 * is equivalent to
+	 * \code
+	 *   std::make_tuple(
+	 *       monoid<t1>::id(),
+	 *       monoid<t2>::id(),
+	 *       ...,
+	 *       monoid<tN>::id());
+	 * \endcode
+	 *
+	 * In a similar fashion, the combining operation is applied to all the
+	 * fields in the tuples, like so:
+	 * \code
+	 *   tuple1 ^ tuple2
+	 *   <=>
+	 *   std::make_tuple(
+	 *       std::get<0>(tuple1) ^ std::get<0>(tuple2),
+	 *       std::get<1>(tuple1) ^ std::get<1>(tuple2),
+	 *       ...,
+	 *       std::get<N>(tuple1) ^ std::get<N>(tuple2))
+	 * \endcode
+	 *
+	 * \tparam Ts Each of the types must be an instance of monoid.
+	 *   
 	 */
 	template<typename...Ts>
-	std::tuple<Ts...> mappend(
-			const std::tuple<Ts...>& t1,
-			const std::tuple<Ts...>& t2) {
+	struct monoid<std::tuple<Ts...>> {
+		static std::tuple<Ts...> id() {
+			return std::make_tuple(monoid<Ts>::id()...);
+		}
 
-		auto ret = t1;
-		tupMappend<sizeof...(Ts)-1, std::tuple<Ts...>>::apply(ret, t2);
-		return ret;
-	}
+		static std::tuple<Ts...> append(
+				const std::tuple<Ts...>& t1,
+				const std::tuple<Ts...>& t2) {
+
+			auto ret = t1;
+			tupMappend<sizeof...(Ts)-1, std::tuple<Ts...>>::apply(ret, t2);
+			return ret;
+		}
+	};
 
 	template<typename...Ts>
 	std::tuple<Ts...> operator^ (const std::tuple<Ts...>& t1, const std::tuple<Ts...>& t2) {
-		return mappend(t1, t2);
+		return monoid<std::tuple<Ts...>>::append(t1, t2);
 	}
 
 }

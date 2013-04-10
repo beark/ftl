@@ -175,32 +175,31 @@ namespace ftl {
 	}
 
 	/**
-	 * Implementation of monoid::mappend for lists.
+	 * Implementation of monoid for lists.
 	 *
-	 * When dealing with lists, the default mappend action is to simply
-	 * append the second list to the first and return the result.
-	 */
-	template<typename...Ps>
-	std::list<Ps...> mappend(const std::list<Ps...>& l1, const std::list<Ps...>& l2) {
-		auto l3 = l1;
-		l3.insert(l3.end(), l2.begin(), l2.end());
-		return l3;
-	}
-
-	template<typename...Ps>
-	std::list<Ps...> operator^(const std::list<Ps...>& l1, const std::list<Ps...>& l2) {
-		return mappend(l1, l2);
-	}
-
-	/**
-	 * Implementation of monoid::id for lists.
+	 * The identity element is (naturally) the empty list, and the append
+	 * operation is (again, naturally) to append the second list to the first..
 	 */
 	template<typename...Ps>
 	struct monoid<std::list<Ps...>> {
 		static std::list<Ps...> id() {
 			return std::list<Ps...>();
 		}
+
+		static std::list<Ps...> append(
+				const std::list<Ps...>& l1,
+				const std::list<Ps...>& l2) {
+			auto l3 = l1;
+			l3.insert(l3.end(), l2.begin(), l2.end());
+			return l3;
+		}
 	};
+
+	template<typename...Ps>
+	std::list<Ps...> operator^(const std::list<Ps...>& l1, const std::list<Ps...>& l2) {
+		return monoid<std::list<Ps...>>::append(l1, l2);
+	}
+
 
 }
 
