@@ -36,9 +36,11 @@ int main(int argc, char** argv) {
 }
 ```
 Output:
+```
     user@home:~/ftl_example$ ./ex
     6
     36
+```
 
 The significance of the above is perhaps not apparent yet, but as the library grows and more monoid implementors are added, the use of this abstraction should become clear. To get a preview of what will be available, read up on the Monoid type class in Haskell.
 
