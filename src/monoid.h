@@ -77,7 +77,7 @@ namespace ftl {
 	 *   operator^ => N::operator+
 	 * \endcode
 	 *
-	 * \tparam N Any integer of floating point primitive type, \em or a type
+	 * \tparam N Any integer or floating point primitive type, \em or a type
 	 *           that is an instance of Number and can be implicitly casted to
 	 *           from the literal \c 0.
 	 */
@@ -187,7 +187,7 @@ namespace ftl {
 	 *   operator^ => N::operator*
 	 * \endcode
 	 *
-	 * \tparam N Any integer of floating point primitive type, \em or a type
+	 * \tparam N Any integer or floating point primitive type, \em or a type
 	 *           that is an instance of Number and can be implicitly casted to
 	 *           from the literal \c 1.
 	 */
