@@ -49,7 +49,7 @@ namespace ftl {
 		typename...AllocArgs>
 	auto map(const F& f, const std::list<A, Alloc<A, AllocArgs...>>& l)
 	-> std::list<B, Alloc<B, AllocArgs...>> {
-		std::list<B, Alloc<B>> result;
+		std::list<B, Alloc<B, AllocArgs...>> result;
 		for(const auto& e : l)
 			result.push_back(f(e));
 
