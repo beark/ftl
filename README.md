@@ -3,6 +3,47 @@ ftl - The Functional Template Library
 
 C++ template library for fans of functional programming. The goal of this project is to implement a useful subset of the Haskell Prelude (and a couple of other libraries) in C++. To date, this subset is very minimal, but there are plans to expand.
 
+Maybe
+-----
+The `maybe<T>` datatype simply implements the idea that you may have an optional function parameter, or a function that _maybe_ returns a value. It is very similar to Boost.Optional&mdash;and in certain syntactical aspects, gets its inspiration from there&mdash;but its true origin is the `Maybe` data type of Haskell. Similarly to Haskell's `Maybe`, `maybe<T>` implements a number of useful concepts (type classes in Haskell), such as `Monoid`, `Functor`, etc. These are not always _exactly_ the same in _ftl_ as in Haskell, but they're always founded on the same ideas and express the same abstractions (or as similar as is possible in C++).
+
+On to some examples. The following shows how you can define a function that might return an integer, or it might return nothing.
+```cpp
+ftl::maybe<int> possiblyGetAnInt() {
+    if(someCondition) {
+        // ftl::value is a convenience function that constructs a maybe with the
+        // inner type of its argument.
+        return ftl::value(getAnInt());
+    }
+
+    else {
+        // If you prefer, you may simply also use maybe's default c-tor, which
+        // is equivalent.
+        return ftl::maybe<int>::nothing();
+    }
+}
+```
+Here, we see how we can access the value of a `maybe<T>`:
+```cpp
+void foo(const maybe<std::string>& m) {
+    // Use operator bool to check for nothingness
+    if(m) {
+        // Dereference operator to read or write the value
+        std::cout << *m << std::endl;
+
+        // Member access operator also works
+        std::cout << m->size() << std::endl;
+    }
+
+   // Finally, we can use maybe's Functor instance to work with its value
+   // The given lambda (or function object) is only invoked if the maybe
+   // instance is a value, never if it's nothing.
+   ftl::fmap(
+       [](const std::string& s) { std::cout << s << std::endl; return s},
+       m);
+}
+```
+
 Monoids
 -------
 A few examples of what the monoid-part of the library can be used for (in its present state):
