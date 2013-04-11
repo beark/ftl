@@ -16,6 +16,7 @@ A few examples of what the monoid-part of the library can be used for (in its pr
      respectively)
    * Tuples where all member types are already monoids.
    * std::lists, regardless of contained type.
+   * maybe<T>, if T is a monoid.
  */
 template<typename T>
 T monoidExample(T m1, T m2) {
@@ -54,11 +55,44 @@ int main(int argc, char** argv) {
 ```
 Output:
 ```
-    user@home:~/ftl_example$ ./ex
-    6
-    36
-    1 2 1 2 3 4 3 4
+user@home:~/ftl_example$ ./ex
+6
+36
+1 2 1 2 3 4 3 4
+```
+Another example, demonstrating the composability of monoids.
+```cpp
+#include <ftl/maybe.h>
+
+template<typename M>
+M compose(M m1, M m2, M m3) {
+    using ftl::operator^;
+    return m1 ^ m2 ^ m3;
+}
+
+int main(int argc, char** argv) {
+    using ftl::sum;
+    using ftl::value;
+
+    auto x = value(sum(2));
+    auto y = value(sum(3));
+    auto z = ftl::maybe<ftl::sum_monoid<int>>::nothing();
+
+    // Because maybe is a monoid if its value_type is, this works--and exactly
+    // as you'd expect: Nothings are ignored, values are append:ed.
+    // Hence, this is equivalent of value(sum(2 + 3))
+    auto result = compose(x, y, z);
+    if(result)
+        std::cout << (int)*result << std::endl;
+
+    return 0;
+}
+```
+Output:
+```
+user@home:~/ftl_example$ ./ex
+5
 ```
 
-The significance of the above is perhaps not apparent yet, but as the library grows and more monoid implementors are added, the use of this abstraction should become clear. To get a preview of what will be available, read up on the Monoid type class in Haskell.
+The significance of the above is perhaps not apparent yet, but as the library grows and more monoid implementations are added, the use of this abstraction should become clear. To get a preview of what will be available, read up on the Monoid type class in Haskell.
 
