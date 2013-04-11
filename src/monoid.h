@@ -281,6 +281,80 @@ namespace ftl {
 		return monoid<prod_monoid<N>>::append(n1, n2);
 	}
 
+	/**
+	 * Wrapper for booleans to get one monoid implementation.
+	 *
+	 * This particular version of bools as monoids means that:
+	 * \code
+	 *   monoid<any>::id() <=> false
+	 *   monoid<any>::append() <=> ||
+	 * \endcode
+	 */
+	struct any {
+		constexpr any(bool bl) noexcept : b(bl) {}
+
+		constexpr operator bool() noexcept {
+			return b;
+		}
+
+		bool b;
+	};
+
+	/**
+	 * Monoid implementation for bools as an OR-operation.
+	 */
+	template<>
+	struct monoid<any> {
+		static constexpr any id() noexcept {
+			return false;
+		}
+
+		static constexpr any append(any a1, any a2) noexcept {
+			return a1.b || a2.b;
+		}
+	};
+
+	constexpr any operator^ (any a1, any a2) noexcept {
+		return monoid<any>::append(a1, a2);
+	}
+
+	/**
+	 * Wrapper for booleans to get a monoid implementation.
+	 *
+	 * This particular version of bools as monoids means that:
+	 * \code
+	 *   monoid<any>::id() <=> true
+	 *   monoid<any>::append() <=> &&
+	 * \endcode
+	 */
+	struct all {
+		constexpr all(bool bl) noexcept : b(bl) {}
+
+		constexpr operator bool() noexcept {
+			return b;
+		}
+
+		bool b;
+	};
+
+	/**
+	 * Monoid implementation for bools as an AND-operation.
+	 */
+	template<>
+	struct monoid<all> {
+		static constexpr all id() noexcept {
+			return true;
+		}
+
+		static constexpr all append(all a1, all a2) noexcept {
+			return a1 && a2;
+		}
+	};
+
+	constexpr all operator^ (all a1, all a2) noexcept {
+		return monoid<all>::append(a1, a2);
+	}
+
 	// Unnamed private namespace for tuple append implementation
 	namespace {
 		template<std::size_t N, typename T>
