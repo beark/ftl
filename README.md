@@ -60,6 +60,7 @@ F<float, Rem...> example(const F<int, Rem...>& f) {
      * float: */
     return ftl::fmap([] (int x) { return (float)x; }, f);
 }
+```
 
 Maybe
 -----
