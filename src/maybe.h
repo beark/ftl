@@ -235,7 +235,8 @@ namespace ftl {
 	 * Convenience function to create maybe:s.
 	 */
 	template<typename A>
-	maybe<A> value(const A& a) {
+	constexpr maybe<A> value(const A& a)
+	noexcept(std::is_nothrow_copy_constructible<A>::value) {
 		return maybe<A>(a);
 	}
 
@@ -243,8 +244,9 @@ namespace ftl {
 	 * \overload
 	 */
 	template<typename A>
-	maybe<A> value(A&& a) {
-		return maybe<A>(a);
+	constexpr maybe<A> value(A&& a)
+	noexcept(std::is_nothrow_move_constructible<A>::value) {
+		return maybe<A>(std::move(a));
 	}
 
 	/**
