@@ -3,6 +3,33 @@ ftl - The Functional Template Library
 
 C++ template library for fans of functional programming. The goal of this project is to implement a useful subset of the Haskell Prelude (and a couple of other libraries) in C++. To date, this subset is very minimal, but there are plans to expand.
 
+Either
+------
+The `either<L,R>` datatype is used when a parameter, return value, or variable may be _either_ one type _or_ another, but never both. Interesting concepts implemented by `either<L,R>` include Functor and Monad.
+
+One notable difference between the Haskell and ftl versions is that while in Haskell, Either is a Functor and Monad in its Right type, in ftl it's an instance in its Left type. This is because of various technical reasons to be explained elsewhere.
+
+So, what does `either<L,R>` look like in use? Something like this:
+```cpp
+ftl::either<int, std::string> usingEitherToSignalError() {
+    if(someErrorCondition()) {
+        return ftl::either<int, std::string>("An error description");
+    }
+    else {
+        return ftl::either<int, std::string>(someComputationYieldingInt());
+    }
+}
+
+void checkingState(const ftl::either<typeA,typeB>& e) {
+    if(e.isLeft()) {
+        std::cout << e.left();
+    }
+    else {
+        std::cout << e.right();
+    }
+}
+```
+
 Maybe
 -----
 The `maybe<T>` datatype simply implements the idea that you may have an optional function parameter, or a function that _maybe_ returns a value. It is very similar to Boost.Optional&mdash;and in certain syntactical aspects, gets its inspiration from there&mdash;but its true origin is the `Maybe` data type of Haskell. Similarly to Haskell's `Maybe`, `maybe<T>` implements a number of useful concepts (type classes in Haskell), such as `Monoid`, `Functor`, etc. These are not always _exactly_ the same in _ftl_ as in Haskell, but they're always founded on the same ideas and express the same abstractions (or as similar as is possible in C++).
