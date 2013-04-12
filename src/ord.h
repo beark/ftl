@@ -76,6 +76,24 @@ namespace ftl {
 	};
 
 	/**
+	 * Orderable concept.
+	 */
+	template<typename T>
+	struct orderable {
+		/**
+		 * Compares two orderables of the same type.
+		 *
+		 * The default implementation should very rarely need to be overided.
+		 *
+		 * \return ord::Lt if lhs < rhs, ord::Eq if they're equal, and
+		 *         otherwise ord::Gt.
+		 */
+		static ord compare(const T& lhs, const T& rhs) {
+			return lhs < rhs ? ord::Lt : (lhs == rhs ? ord::Eq : ord::Gt);
+		}
+	};
+
+	/**
 	 * Monoid instance for ord.
 	 *
 	 * Quite neat in combination with the monoid instance for std::function.
@@ -99,6 +117,68 @@ namespace ftl {
 
 	constexpr ord operator^ (ord o1, ord o2) noexcept {
 		return monoid<ord>::append(o1, o2);
+	}
+
+	/**
+	 * Convenience function to compare objects by getter.
+	 *
+	 * \tparam R Must satisfy Orderable.
+	 *
+	 * \param method Getter method to do comparison by.
+	 *
+	 * \return Function that compares two objects by first applying method
+	 *         to each object and then compare the two results using their
+	 *         Ordering instance.
+	 */
+	template<typename A, typename R>
+	std::function<ord(const A&, const A&)> comparing(R (A::*method)() const) {
+		return [=] (const A& a, const A& b) {
+			return orderable<R>::compare((a.*method)(), (b.*method)());
+		};
+	}
+
+	/**
+	 * Convenience function to ease integration with stdlib's sort.
+	 *
+	 * \param cmp Compare function to apply internally.
+	 *
+	 * \return A function that returns true if the result of performing the
+	 *         given comparison is Lt.
+	 */
+	template<typename A>
+	std::function<bool(A, A)> lessThan(const std::function<ord(A, A)>& cmp) {
+		return [=] (A a, A b) {
+			return cmp(a, b) == ord::Lt;
+		};
+	}
+
+	/**
+	 * Convenience function to ease integration with stdlib's sort.
+	 *
+	 * \param cmp Compare function to apply internally.
+	 *
+	 * \return A function that returns true if the result of performing the
+	 *         given comparison is Gt.
+	 */
+	template<typename A>
+	std::function<bool(A, A)> greaterThan(const std::function<ord(A, A)>& cmp) {
+		return [=] (A a, A b) {
+			return cmp(a, b) == ord::Gt;
+		};
+	}
+	/**
+	 * Convenience function to ease integration with stdlib's sort.
+	 *
+	 * \param cmp Compare function to apply internally.
+	 *
+	 * \return A function that returns true if the result of performing the
+	 *         given comparison is Eq.
+	 */
+	template<typename A>
+	std::function<bool(A, A)> equal(const std::function<ord(A, A)>& cmp) {
+		return [=] (A a, A b) {
+			return cmp(a, b) == ord::Eq;
+		};
 	}
 }
 
