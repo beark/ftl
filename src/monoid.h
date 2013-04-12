@@ -24,7 +24,6 @@
 #define FTL_MONOID_H
 
 #include <type_traits>
-#include <tuple>
 
 namespace ftl {
 	/**
@@ -353,77 +352,6 @@ namespace ftl {
 
 	constexpr all operator^ (all a1, all a2) noexcept {
 		return monoid<all>::append(a1, a2);
-	}
-
-	// Unnamed private namespace for tuple append implementation
-	namespace {
-		template<std::size_t N, typename T>
-		struct tupMappend {
-			static void apply(T& ret, const T& t2) {
-				tupMappend<N-1, T>::apply(ret, t2);
-				std::get<N>(ret) = std::get<N>(ret) ^ std::get<N>(t2);
-			}
-		};
-
-		template<typename T>
-		struct tupMappend<0, T> {
-			static void apply(T& ret, const T& t2) {
-				std::get<0>(ret) = std::get<0>(ret) ^ std::get<0>(t2);
-			}
-		};
-	}
-
-	/**
-	 * Implementation of monoid for tuples.
-	 *
-	 * Basically, id will simply generate a tuple of id:s. That is, a call
-	 * to
-	 * \code
-	 *   monoid<std::tuple<t1, t2, ..., tN>>::id();
-	 * \endcode
-	 * is equivalent to
-	 * \code
-	 *   std::make_tuple(
-	 *       monoid<t1>::id(),
-	 *       monoid<t2>::id(),
-	 *       ...,
-	 *       monoid<tN>::id());
-	 * \endcode
-	 *
-	 * In a similar fashion, the combining operation is applied to all the
-	 * fields in the tuples, like so:
-	 * \code
-	 *   tuple1 ^ tuple2
-	 *   <=>
-	 *   std::make_tuple(
-	 *       std::get<0>(tuple1) ^ std::get<0>(tuple2),
-	 *       std::get<1>(tuple1) ^ std::get<1>(tuple2),
-	 *       ...,
-	 *       std::get<N>(tuple1) ^ std::get<N>(tuple2))
-	 * \endcode
-	 *
-	 * \tparam Ts Each of the types must be an instance of monoid.
-	 *   
-	 */
-	template<typename...Ts>
-	struct monoid<std::tuple<Ts...>> {
-		static std::tuple<Ts...> id() {
-			return std::make_tuple(monoid<Ts>::id()...);
-		}
-
-		static std::tuple<Ts...> append(
-				const std::tuple<Ts...>& t1,
-				const std::tuple<Ts...>& t2) {
-
-			auto ret = t1;
-			tupMappend<sizeof...(Ts)-1, std::tuple<Ts...>>::apply(ret, t2);
-			return ret;
-		}
-	};
-
-	template<typename...Ts>
-	std::tuple<Ts...> operator^ (const std::tuple<Ts...>& t1, const std::tuple<Ts...>& t2) {
-		return monoid<std::tuple<Ts...>>::append(t1, t2);
 	}
 
 }
