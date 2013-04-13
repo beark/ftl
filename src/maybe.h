@@ -24,7 +24,8 @@
 #define FTL_MAYBE_H
 
 #include <stdexcept>
-#include "type_functions.h"
+#include "monoid.h"
+#include "monad.h"
 
 namespace ftl {
 
@@ -395,19 +396,30 @@ namespace ftl {
 	}
 
 	/**
-	 * Implementation of monad::bind for maybe.
+	 * Implementation of monad for maybe.
 	 */
-	template<
-		typename F,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type>
-	maybe<B> bind(const maybe<A>& m, const F& f) {
-		if(m) {
-			return value(f(*m));
+	template<>
+	struct monad<maybe> {
+		template<typename A>
+		static constexpr maybe<A> pure(const A& a)
+		noexcept(std::is_nothrow_copy_constructible<A>::value) {
+			return value(a);
 		}
 
-		return maybe<B>();
-	}
+		template<typename A>
+		static constexpr maybe<A> pure(A&& a)
+		noexcept(std::is_nothrow_move_constructible<A>::value) {
+			return value(std::move(a));
+		}
+		
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type>
+		static maybe<B> bind(const maybe<A>& m, F f) {
+			return m ? value(f(*m)) : maybe<B>();
+		}
+	};
 }
 
 #endif
