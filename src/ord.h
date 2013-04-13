@@ -94,6 +94,24 @@ namespace ftl {
 	};
 
 	/**
+	 * Convenience function to more easily compare things.
+	 *
+	 * Simply invokes \c orderable<T>::compare.
+	 */
+	template<typename T>
+	ord compare(const T& a, const T& b) {
+		return orderable<T>::compare(a, b);
+	}
+
+	/**
+	 * Convenience function to get a comparator for a certain type.
+	 */
+	template<typename T>
+	std::function<ord(const T&, const T&)> getComparator() {
+		return [] ( const T& a, const T& b) { return compare(a, b); };
+	}
+
+	/**
 	 * Monoid instance for ord.
 	 *
 	 * Quite neat in combination with the monoid instance for std::function.
