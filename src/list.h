@@ -554,7 +554,7 @@ namespace ftl {
 			typename Alloc,
 			typename F,
 			typename A,
-			typename B = typename decayed_result<F(A)>::type>
+			typename B = typename decayed_result<F(A)>::type::value_type>
 		static list<B,Alloc> bind(const list<A,Alloc>& l, F f) {
 			return concatMap(f, l);
 		}

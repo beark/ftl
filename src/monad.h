@@ -53,7 +53,7 @@ namespace ftl {
 		template<
 			typename F,
 			typename A,
-			typename B = typename decayed_result<F(A)>::type,
+			typename B = typename decayed_result<F(A)>::type::value_type,
 			typename...Ts>
 		static M<B,Ts...> bind(const M<A,Ts...>&, F);
 	};
@@ -65,7 +65,7 @@ namespace ftl {
 		typename F,
 		template <typename,typename...> class M,
 		typename A,
-		typename B = typename decayed_result<F(A)>::type,
+		typename B = typename decayed_result<F(A)>::type::value_type,
 		typename...Ts>
 	M<B,Ts...> operator>>= (const M<A,Ts...>& m, F f) {
 		return monad<M>::bind(m, f);

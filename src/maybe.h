@@ -415,9 +415,9 @@ namespace ftl {
 		template<
 			typename F,
 			typename A,
-			typename B = typename decayed_result<F(A)>::type>
+			typename B = typename decayed_result<F(A)>::type::value_type>
 		static maybe<B> bind(const maybe<A>& m, F f) {
-			return m ? value(f(*m)) : maybe<B>();
+			return m ? f(*m) : maybe<B>();
 		}
 	};
 }
