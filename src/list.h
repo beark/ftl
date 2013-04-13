@@ -101,6 +101,12 @@ namespace ftl {
 				const allocator_type& alloc = allocator_type())
 			: _list(init, alloc) {}
 
+		explicit list(const std::list<T, allocator_type>& other)
+			: _list(other) {}
+
+		explicit list(std::list<T, allocator_type>&& other)
+			: _list(std::move(other)) {}
+
 		~list() = default;
 
 		list& operator= (const list& other) {
@@ -498,10 +504,36 @@ namespace ftl {
 	}
 
 	/**
-	 * Implementation of monoid for std::list.
+	 * Monoid implementation for list.
 	 *
 	 * The identity element is (naturally) the empty list, and the append
-	 * operation is (again, naturally) to append the second list to the first..
+	 * operation is (again, naturally) to append the second list to the first.
+	 */
+	template<typename...Ps>
+	struct monoid<list<Ps...>> {
+		static list<Ps...> id() {
+			return list<Ps...>();
+		}
+
+		static list<Ps...> append(
+				const list<Ps...>& l1,
+				const list<Ps...>& l2) {
+			auto l3 = l1;
+			l3.insert(l3.end(), l2.begin(), l2.end());
+			return l3;
+		}
+	};
+
+	template<typename...Ps>
+	list<Ps...> operator^(const list<Ps...>& l1, const list<Ps...>& l2) {
+		return monoid<list<Ps...>>::append(l1, l2);
+	}
+
+	/**
+	 * Implementation of monoid for std::list.
+	 *
+	 * Equivalent of the list monoid. Provided so not only ftl::lists can have
+	 * all the fun.
 	 */
 	template<typename...Ps>
 	struct monoid<std::list<Ps...>> {
@@ -522,7 +554,6 @@ namespace ftl {
 	std::list<Ps...> operator^(const std::list<Ps...>& l1, const std::list<Ps...>& l2) {
 		return monoid<std::list<Ps...>>::append(l1, l2);
 	}
-
 
 }
 
