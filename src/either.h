@@ -23,7 +23,7 @@
 #ifndef FTL_EITHER_H
 #define FTL_EITHER_H
 
-#include "type_functions.h"
+#include "monad.h"
 
 namespace ftl {
 
@@ -277,23 +277,32 @@ namespace ftl {
 	};
 
 	/**
-	 * Monad::bind implementation for either.
-	 *
-	 * \tparam F Must satisfy Function<either<L2,R>(L)>
+	 * Monad implementation for either.
 	 */
-	template<
-		typename F,
-		typename L,
-		typename R,
-		typename L2 = typename decayed_result<F(L)>::type::Left>
-	either<L2, R> bind(const either<L,R>& e, const F& f) {
-
-		if(e.isLeft()) {
-			return f(e.left());
+	template<>
+	struct monad<either> {
+		template<typename A, typename R>
+		static either<A,R> pure(const A& a) {
+			return either<A,R>(a);
 		}
 
-		return either<L2, R>(e.right());
-	}
+		template<typename A, typename R>
+		static either<A,R> pure(A&& a) {
+			return either<A,R>(std::move(a));
+		}
+
+		template<
+			typename F,
+			typename R,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type::value_type>
+		static either<B,R> bind(const either<A,R>& e, F f) {
+			if(e.isLeft())
+				return f(e.left());
+			else
+				return either<B,R>(e.right());
+		}
+	};
 
 	/**
 	 * Functor implementation for either.
