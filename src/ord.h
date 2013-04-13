@@ -31,29 +31,36 @@ namespace ftl {
 	 *
 	 * In essence, an ordering can be either 'less than' (Lt), 'equal' (Eq), or
 	 * 'greater than' (Gt).
+	 *
+	 * \par Concepts implemented by ord
+	 * \li FullyConstructible
+	 * \li TriviallyDestructible
+	 * \li Assignable
+	 * \li Comparable
+	 * \li Monoid
 	 */
 	class ord {
 	public:
 		enum ordering {
-			Lt, Eq, Gt
+			Lt = 0, Eq, Gt
 		};
 
 		constexpr ord() noexcept {}
+
+		/**
+		 * Construct from an int.
+		 *
+		 * The purpose of this constructor is to allow easy construction from
+		 * cstlib's strcmp and similar. Anything less than 0 becomes Lt, 0 is
+		 * Eq and >0 is Gt.
+		 */
 		explicit constexpr ord(int n) noexcept : o(n < 0 ? Lt : (n > 0 ? Gt : Eq)) {}
+
 		constexpr ord(const ord& order) noexcept : o(order.o) {}
 		constexpr ord(ord&& order) noexcept : o(std::move(order.o)) {}
 		constexpr ord(const ordering& order) noexcept : o(order) {}
 		constexpr ord(ordering&& order) noexcept : o(std::move(order)) {}
 		~ord() noexcept = default;
-
-		/**
-		 * Convenience operator for compatibility with stdlib's sort.
-		 *
-		 * \return true if the comparison resulting in this ord compared "less than".
-		 */
-		constexpr operator bool() noexcept {
-			return o == Lt;
-		}
 
 		constexpr bool operator== (const ord& order) noexcept {
 			return o == order.o;
@@ -69,6 +76,32 @@ namespace ftl {
 
 		constexpr bool operator!= (ordering order) noexcept {
 			return o != order;
+		}
+
+		constexpr bool operator< (const ord& order) noexcept {
+			return o < order.o;
+		}
+
+		constexpr bool operator<= (const ord& order) noexcept {
+			return o <= order.o;
+		}
+
+		constexpr bool operator> (const ord& order) noexcept {
+			return o > order.o;
+		}
+
+		constexpr bool operator>= (const ord& order) noexcept {
+			return o >= order.o;
+		}
+
+		const ord& operator= (const ord& order) noexcept {
+			o = order.o;
+			return *this;
+		}
+
+		const ord& operator= (ord&& order) noexcept {
+			o = std::move(order.o);
+			return *this;
 		}
 
 	private:
