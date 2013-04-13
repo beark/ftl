@@ -27,6 +27,8 @@ namespace ftl {
 
 
 	/**
+	 * \interface monad
+	 *
 	 * Definition of the Monad concept.
 	 */
 	template<
@@ -56,6 +58,9 @@ namespace ftl {
 		static M<B,Ts...> bind(const M<A,Ts...>&, F);
 	};
 
+	/**
+	 * Convenience operator for monad::bind.
+	 */
 	template<
 		typename F,
 		template <typename,typename...> class M,
