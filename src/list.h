@@ -424,6 +424,9 @@ namespace ftl {
 		return lhs.underlyingList() <= rhs.underlyingList();
 	}
 
+	/**
+	 * Functor instance of list.
+	 */
 	template<
 		typename F,
 		typename Alloc,
@@ -439,106 +442,51 @@ namespace ftl {
 	}
 
 	/**
-	 * Implementation of mappable::map for std::lists.
-	 *
-	 * Applies to cases where the allocator type is dependant on the element
-	 * type.
+	 * Mappable::mutate implementation for list.
 	 */
-	template<
-		typename F,
-		typename A,
-		template<typename,typename...> class Alloc,
-		typename B = typename decayed_result<F(A)>::type,
-		typename...AllocArgs>
-	auto map(const F& f, const std::list<A, Alloc<A, AllocArgs...>>& l)
-	-> std::list<B, Alloc<B, AllocArgs...>> {
-		std::list<B, Alloc<B, AllocArgs...>> result;
-		for(const auto& e : l)
-			result.push_back(f(e));
-
-		return result;
-	}
-
-	/**
-	 * Implementation of mappable::map for lists.
-	 *
-	 * Applies to cases where the allocator type is independant of the element
-	 * type.
-	 */
-	template<
-		typename F,
-		typename Alloc,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type>
-	std::list<B, Alloc> map(const F& f, const std::list<A, Alloc>& l) {
-		std::list<B, Alloc> result;
-		for(const auto& e : l)
-			result.push_back(f(e));
-
-		return result;
-	}
-
-	/**
-	 * Implementation of mappable::map (method version) for lists.
-	 */
-	template<
-		typename A,
-		typename B,
-		typename Alloc,
-		typename...Ps>
-	std::list<A, Alloc>& map(
-			B (A::*method)(Ps...),
-			std::list<A, Alloc>& l,
-			const Ps&...ps) {
-		for(auto& e : l)
-			(e.*method)(ps...);
+	template<typename T, typename A, typename F>
+	list<T,A>& mutate(list<T,A>& l, F f) {
+		for(auto& e : l) {
+			e = f(e);
+		}
 
 		return l;
 	}
 
 	/**
-	 * Implementation of mappable::concatMap for lists.
-	 *
-	 * Applies to lists with allocators whose type depends on the \c value_type
-	 * of the list.
+	 * Mappable::each implementation for list.
 	 */
-	template<
-		typename F,
-		template <typename, typename...> class Alloc,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type::value_type,
-		typename...AllocArgs>
-	auto concatMap(const F& f, const std::list<A, Alloc<A, AllocArgs...>>& l)
-	-> std::list<B, Alloc<B, AllocArgs...>> {
-
-		std::list<B, Alloc<B, AllocArgs...>> result;
-		auto nested = map(f, l);
-
-		for(auto& el : nested) {
-			for(auto& e : el) {
-				result.push_back(e);
-			}
+	template<typename T, typename A, typename F>
+	list<T,A>& each(list<T,A>& l, F f) {
+		for(auto& e : l) {
+			f(e);
 		}
 
-		return result;
+		return l;
+	}
+
+	/// \overload
+	template<typename T, typename A, typename F>
+	list<T,A>& each(const list<T,A>& l, F f) {
+		for(const auto& e : l) {
+			f(e);
+		}
+
+		return l;
 	}
 
 	/**
-	 * Implementation of mappable::concatMap for lists.
-	 *
-	 * Applies to lists where the allocator is not dependant on the
-	 * \c value_type of the list.
+	 * Implementation of Mappable::concatMap for list.
 	 */
 	template<
 		typename F,
 		typename Alloc,
 		typename A,
 		typename B = typename decayed_result<F(A)>::type::value_type>
-	auto concatMap(const F& f, const std::list<A, Alloc>& l)
-	-> std::list<B, Alloc> {
+	list<B,Alloc> concatMap(F f, const list<A,Alloc>& l) {
 
-		std::list<B, Alloc> result;
-		auto nested = map(f, l);
+		list<B,Alloc> result;
+		auto nested = fmap(f, l);
 
 		for(auto& el : nested) {
 			for(auto& e : el) {
@@ -550,35 +498,7 @@ namespace ftl {
 	}
 
 	/**
-	 * Implementation of functor for lists
-	 */
-	template<
-		typename F,
-		typename A,
-		typename Alloc>
-	auto fmap(const F& f, const std::list<A, Alloc>& l)
-	-> decltype(map(f, l)) {
-		return map(f, l);
-	}
-
-	/**
-	 * Implementation of monad::bind for lists.
-	 *
-	 * Defined essentially just as \c flip(concatMap).
-	 */
-	template<
-		typename F,
-		template <typename, typename...> class Alloc,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type,
-		typename...AllocArgs>
-	auto bind(const std::list<A, Alloc<A, AllocArgs...>>& l, const F& f)
-	-> std::list<B, Alloc<B, AllocArgs...>> {
-		return concatMap(f, l);
-	}
-
-	/**
-	 * Implementation of monoid for lists.
+	 * Implementation of monoid for std::list.
 	 *
 	 * The identity element is (naturally) the empty list, and the append
 	 * operation is (again, naturally) to append the second list to the first..
