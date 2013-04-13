@@ -41,6 +41,21 @@ namespace ftl {
 	 */
 	class ord {
 	public:
+		/**
+		 * Enum of the values an ord can take on.
+		 *
+		 * Because ord is implicitly constructible from an ordering, whenever you
+		 * want to return an ord, you can just be lazy and do something like
+		 * \code
+		 *   ord example() {
+		 *       return ord::Lt;
+		 *   }
+		 * \endcode
+		 * instead.
+		 *
+		 * Comparison and assignment also works as expected (as long as the lhs
+		 * is an ord and the rhs is an ordering).
+		 */
 		enum ordering {
 			Lt = 0, Eq, Gt
 		};
