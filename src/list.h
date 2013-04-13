@@ -26,6 +26,7 @@
 #include <list>
 #include "type_functions.h"
 #include "monoid.h"
+#include "monad.h"
 
 /**
  * \file list.h
@@ -38,7 +39,7 @@ namespace ftl {
 	/**
 	 * Thin wrapper around std::list, to comply better with ftl.
 	 *
-	 * The behvarious of ftl::list should be essentially indistinguishable fom
+	 * The behvariour of ftl::list should be essentially indistinguishable fom
 	 * std::list, except that it does some type level manipulation of the
 	 * allocator, allowing one to use Functor and Monad instance of list
 	 * without worrying about it.
@@ -482,7 +483,9 @@ namespace ftl {
 	}
 
 	/**
-	 * Implementation of Mappable::concatMap for list.
+	 * Maps and concatenates in one step.
+	 *
+	 * \tparam F must satisfy Function<list<B>(A)>
 	 */
 	template<
 		typename F,
@@ -528,6 +531,34 @@ namespace ftl {
 	list<Ps...> operator^(const list<Ps...>& l1, const list<Ps...>& l2) {
 		return monoid<list<Ps...>>::append(l1, l2);
 	}
+
+	/**
+	 * Monad implementation for list.
+	 */
+	template<>
+	struct monad<list> {
+
+		template<typename A, typename Alloc>
+		static list<A,Alloc> pure(const A& a) {
+			return list<A,Alloc>(1, a);
+		}
+
+		template<typename A, typename Alloc>
+		static list<A,Alloc> pure(A&& a) {
+			list<A,Alloc> l;
+			l.push_front(std::move(a));
+			return l;
+		}
+
+		template<
+			typename Alloc,
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type>
+		static list<B,Alloc> bind(const list<A,Alloc>& l, F f) {
+			return concatMap(f, l);
+		}
+	};
 
 	/**
 	 * Implementation of monoid for std::list.
