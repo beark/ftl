@@ -155,14 +155,14 @@ namespace ftl {
 	 * Convenience function to get a comparator for a certain type.
 	 */
 	template<typename T>
-	std::function<ord(const T&, const T&)> getComparator() {
+	function<ord,const T&,const T&> getComparator() {
 		return [] ( const T& a, const T& b) { return compare(a, b); };
 	}
 
 	/**
 	 * Monoid instance for ord.
 	 *
-	 * Quite neat in combination with the monoid instance for std::function.
+	 * Quite neat in combination with the monoid instance for function.
 	 *
 	 * Semantics:
 	 * \code
@@ -197,7 +197,7 @@ namespace ftl {
 	 *         Ordering instance.
 	 */
 	template<typename A, typename R>
-	std::function<ord(const A&, const A&)> comparing(R (A::*method)() const) {
+	function<ord,const A&,const A&> comparing(R (A::*method)() const) {
 		return [=] (const A& a, const A& b) {
 			return orderable<R>::compare((a.*method)(), (b.*method)());
 		};
@@ -212,7 +212,7 @@ namespace ftl {
 	 *         given comparison is Lt.
 	 */
 	template<typename A>
-	std::function<bool(A, A)> lessThan(const std::function<ord(A, A)>& cmp) {
+	function<bool,A,A> lessThan(const function<ord,A,A>& cmp) {
 		return [=] (A a, A b) {
 			return cmp(a, b) == ord::Lt;
 		};
@@ -227,7 +227,7 @@ namespace ftl {
 	 *         given comparison is Gt.
 	 */
 	template<typename A>
-	std::function<bool(A, A)> greaterThan(const std::function<ord(A, A)>& cmp) {
+	function<bool,A,A> greaterThan(const function<ord,A,A>& cmp) {
 		return [=] (A a, A b) {
 			return cmp(a, b) == ord::Gt;
 		};
@@ -241,7 +241,7 @@ namespace ftl {
 	 *         given comparison is Eq.
 	 */
 	template<typename A>
-	std::function<bool(A, A)> equal(const std::function<ord(A, A)>& cmp) {
+	function<bool,A,A> equal(const function<ord,A,A>& cmp) {
 		return [=] (A a, A b) {
 			return cmp(a, b) == ord::Eq;
 		};
