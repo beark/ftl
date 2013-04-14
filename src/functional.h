@@ -29,7 +29,7 @@
 namespace ftl {
 
 	/**
-	 * Monoid instance for functions returning monoids.
+	 * Monoid instance for ftl::functions returning monoids.
 	 *
 	 * The reason this works might not be immediately obvious, but basically,
 	 * any function (regardless of arity) that returns a value that is an
@@ -41,6 +41,44 @@ namespace ftl {
 	 *                   and then calls monoid<result_type>::append on the two
 	 *                   results.
 	 * \endcode
+	 */
+	template<typename M, typename...Ps>
+	struct monoid<function<M,Ps...>> {
+		static function<M,Ps...> id() {
+			return [](Ps...ps) { return monoid<M>::id(); };
+		}
+
+		static function<M,Ps...> append(
+				const function<M,Ps...>& f1,
+				const function<M,Ps...>& f2) {
+			return [=] (Ps...ps) {
+				return monoid<M>::append(f1(ps...), f2(ps...));
+			};
+		}
+	};
+
+	template<typename M, typename...Ps>
+	function<M,Ps...> operator^ (
+			const function<M,Ps...>& f1,
+			const function<M,Ps...>& f2) {
+		return monoid<function<M,Ps...>>::append(f1, f2);
+	}
+
+	template<
+		typename F,
+		typename A,
+		typename B = typename std::result_of<F(A)>::type,
+		typename...Ps>
+	function<B,Ps...> fmap(F f, function<A,Ps...> fn) {
+		return [f,fn] (Ps...ps) {
+			return f(fn(std::forward<Ps>(ps)...));
+		};
+	}
+
+	/**
+	 * Monoid instance for std::functions returning monoids.
+	 *
+	 * In essence, the same as ftl::function's implementation.
 	 */
 	template<typename M, typename...Ps>
 	struct monoid<std::function<M(Ps...)>> {
