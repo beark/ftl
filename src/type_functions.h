@@ -49,6 +49,20 @@ namespace ftl {
 			typename std::decay<typename std::result_of<F(Ps...)>::type>::type;
 	};
 
+	template<typename...Ts>
+	struct type_vec {};
+
+	template<template<typename...> class To, typename From>
+	struct copy_variadic_args {};
+
+	template<
+		template<typename...> class To,
+		template<typename...> class From,
+		typename...Ts>
+	struct copy_variadic_args<To, From<Ts...>> {
+		using type = To<Ts...>;
+	}
+
 }
 
 #endif
