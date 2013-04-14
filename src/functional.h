@@ -23,51 +23,10 @@
 #ifndef FTL_FUNCTIONAL_H
 #define FTL_FUNCTIONAL_H
 
-#include <functional>
+#include "function.h"
 #include "monoid.h"
 
 namespace ftl {
-
-	template<typename A, typename B>
-	std::function<B(A)> compose(std::function<B(A)> f) {
-		return f;
-	}
-
-	template<typename A, typename B>
-	std::function<B(A)> compose(B(*f)(A)) {
-		return [=](A a){ return f(a); };
-	}
-
-	template<typename A, typename B, typename C>
-	auto compose(std::function<C(B)> f1, std::function<B(A)> f2)
-	-> std::function<C(A)> {
-		return [=] (A a) { return f1(f2(a)); };
-	}
-
-	template<typename A, typename B, typename C>
-	std::function<C(A)> compose(C(*f1)(B), B(*f2)(A)) {
-		return [=] (A a) { return f1(f2(a)); };
-	}
-
-	template<typename A, typename B, typename C, typename...Fns>
-	auto compose(std::function<C(B)> f1, std::function<B(A)> f2, Fns...fns)
-	-> std::function<C (typename decltype(compose(fns...))::argument_type)> {
-
-		using top_arg_type = typename decltype(compose(fns...))::argument_type;
-
-		auto fr = compose(fns...);
-		return [=] (top_arg_type arg) { return f1(f2(fr(arg))); };
-	}
-
-	template<typename A, typename B, typename C, typename...Fns>
-	auto compose(C(*f1)(B), B(*f2)(A), Fns...fns)
-	-> std::function<C (typename decltype(compose(fns...))::argument_type)> {
-
-		using top_arg_type = typename decltype(compose(fns...))::argument_type;
-
-		auto fr = compose(fns...);
-		return [=] (top_arg_type arg) { return f1(f2(fr(arg))); };
-	}
 
 	/**
 	 * Monoid instance for functions returning monoids.
