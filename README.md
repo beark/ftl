@@ -61,6 +61,11 @@ F<float, Rem...> example(const F<int, Rem...>& f) {
     return ftl::fmap([] (int x) { return (float)x; }, f);
 }
 ```
+Finally, a non-exhaustive list of the Functors implemented in ftl:
+* ```ftl::maybe<T>```, applies the function to its value, unless it's nothing, then nothing's returned.
+* ```ftl::either<L,R>```, as mentioned above.
+* ```ftl::function<R,Ts...>```, composes the given function with the ftl::function, yielding an ```ftl::function<R2,Ts...>``` where ```R2``` is the return type of the function given to fmap.
+* ```ftl::list``` is a functor in its value_type, meaning that fmap will return a new list whose value_type is the result type of applying the given function to the original list's value_type.
 
 Maybe
 -----
@@ -103,8 +108,8 @@ void foo(const maybe<std::string>& m) {
 }
 ```
 
-Monoids
--------
+Monoid
+------
 A monoid is, in layman's terms, any set of things for which there is an associated binary operation, and an identity element. In addition, the operation and identity must conform to the following laws:
 ```
 a <> identity = a
@@ -126,7 +131,7 @@ A couple of monoids included in the library:
 * ```ftl::ord```
 * ```std::tuple<Ts...>```, if every T in Ts is a monoid 
 * ```ftl::maybe<T>```, if ```T``` is a monoid.
-* Any ```std::function<M(Ts...)>``` where M is a monoid. This is where things get interesting.
+* Any ```ftl::function<T,Ts...>``` and, equivalently, any ```std::function<T(Ts...)>``` where T is a monoid. This is where things get interesting.
 
 A few examples of actually using monoids:
 ```cpp
@@ -209,7 +214,7 @@ Output:
 user@home:~/ftl_example$ ./ex
 5
 ```
-An example using the monoid instance of ftl::ord and std::function:
+An example using the monoid instance of ftl::ord and ftl::function:
 ```cpp
 #include <vector>
 #include <string>
@@ -240,4 +245,4 @@ Output:
 user@home:~/ftl_example$ ./ex
 be, by, and, then, will, first, these, words, length, sorted, lexicographically,
 ```
-Confused by how this works? Well, ```ftl::comparing``` takes as argument a "getter" for some member and returns a function that orders two objects based on the value of this member (in this particular case, it returns an ```std::function<ftl::ord(const std::string&, const std::string&)>```). Then, ```ftl::getComparator<string>``` returns the standard compare function for strings, which simply orders them based on its own <,>,== operators. Because ```ftl::ord``` is a monoid, any function returning and ordering is _also_ a monoid, and hence we can simply combine these two ordering functions with the monoid operator. Thus, the result of ```comparing(&string::size) ^ getComparator<string>()``` is a function that orders two strings, first by their size, and then by string's built-in operators. Finally, ```ftl::lessThan``` creates a function that returns true if the ordering function given as argument orders the left hand side as "smaller" than the right hand side.
+Confused by how this works? Well, ```ftl::comparing``` takes as argument a "getter" for some member and returns a function that orders two objects based on the value of this member (in this particular case, it returns an ```ftl::function<ftl::ord,const std::string&, const std::string&>```). Then, ```ftl::getComparator<string>``` returns the standard compare function for strings, which simply orders them based on their own <,>,== operators. Because ```ftl::ord``` is a monoid, any function returning an ordering is _also_ a monoid, and hence we can simply combine these two ordering functions with the monoid operator. Thus, the result of ```comparing(&string::size) ^ getComparator<string>()``` is a function that orders two strings, first by their size, and then by string's built-in operators. Finally, ```ftl::lessThan``` creates a function that returns true if the ordering function given as argument orders the left hand side as "smaller" than the right hand side.
