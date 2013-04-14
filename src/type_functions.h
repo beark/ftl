@@ -61,7 +61,7 @@ namespace ftl {
 		typename...Ts>
 	struct copy_variadic_args<To, From<Ts...>> {
 		using type = To<Ts...>;
-	}
+	};
 
 }
 
