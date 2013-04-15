@@ -23,6 +23,8 @@
 #ifndef FTL_MONAD_H
 #define FTL_MONAD_H
 
+#include "functional.h"
+
 namespace ftl {
 
 
@@ -69,6 +71,33 @@ namespace ftl {
 		typename...Ts>
 	M<B,Ts...> operator>>= (const M<A,Ts...>& m, F f) {
 		return monad<M>::bind(m, f);
+	}
+
+	template<
+		template<typename,typename...> class M,
+		typename A,
+		typename R,
+		typename...Ts>
+	M<R,Ts...> liftM(function<A,R> f, const M<A,Ts...>& m) {
+		return m >>= [f] (A a) {
+			return monad<M>::pure(f(std::forward(a)));
+		};
+	}
+
+	/**
+	 * Apply a function in M to a value in M.
+	 */
+	template<
+		template<typename,typename...> class M,
+		typename A,
+		typename B,
+		typename...Ts>
+	M<B,Ts...> ap(M<function<B,A>,Ts...> f, const M<A,Ts...>& m) {
+		return f >>= [&m] (function<B,A> f) {
+			return m >>= [f] (A a) {
+				return monad<M>::pure(f(std::forward(a)));
+			};
+		};
 	}
 
 }
