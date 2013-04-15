@@ -73,6 +73,9 @@ namespace ftl {
 		return monad<M>::bind(m, f);
 	}
 
+	/**
+	 * Lifts a function into M.
+	 */
 	template<
 		template<typename,typename...> class M,
 		typename A,
