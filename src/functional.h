@@ -75,6 +75,68 @@ namespace ftl {
 		};
 	}
 
+	/*
+	 * N-ary curry, commented out until GCC fixes the bug where template
+	 * parameter packs cannot be captured in lambds...
+	 * TODO: Enable once gcc has fixed this
+	namespace {
+
+		template<
+			typename R,
+			typename T,
+			typename...Ts,
+			typename...Ps>
+		auto curry_rec(function<R,Ts...> f, type_vec<T> dummy, Ps...ps)
+		-> function<R,T> {
+			return [f,ps...] (T t) {
+				return f(std::forward<T>(t), std::forward<Ps>(ps)...);
+			};
+		}
+
+		template<
+			typename R,
+			typename T,
+			typename...OTs,
+			typename...Ts,
+			typename...Ps>
+		auto curry_rec(function<R,OTs..> f, type_vec<T,Ts...> dummy, Ps...ps)
+		-> function<decltype(curry_rec(f,type_vec<Ts...>(),std::forward<T>(T()),std::forward<Ps>(ps)...)),T> {
+			return  [f,ps...] (T t) {
+				return curry_rec(f, type_vec<Ts...>(), std::forward<T>(t), std::forward<Ps>(ps)...);
+			};
+		}
+	}
+
+	template<
+		typename R,
+		typename T,
+		typename...Ts>
+	auto curry(function<R,T,Ts...> f)
+	-> function<decltype(curry_rec(f,type_vec<Ts...>(), std::forward<T>(T()))), T> {
+		return [f] (T t) {
+			return curry_rec(f, type_vec<Ts...>(), std::forward<T>(t));
+		};
+	}
+	*/
+
+	/**
+	 * Curries a binary function.
+	 *
+	 * Currying is the process of turning a function of (a,b) -> c into
+	 * a -> b -> c. In other words, instead of taking two arguments and
+	 * returning the answer, the curried function takes one argument and
+	 * returns a function that takes another one and \em then returns the
+	 * answer.
+	 */
+	template<typename R, typename T1, typename T2>
+	function<function<R,T2>,T1> curry(function<R,T1,T2> f) {
+		return [f] (T1 t1) {
+			return [f,&t1] (T2 t2) {
+				return f(std::forward(t1), std::forward(t2));
+			};
+		}
+	}
+
 	/**
 	 * Monoid instance for std::functions returning monoids.
 	 *
