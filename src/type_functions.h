@@ -50,7 +50,7 @@ namespace ftl {
 	};
 
 	template<typename...Ts>
-	struct type_vec {};
+	struct type_seq {};
 
 	template<template<typename...> class To, typename From>
 	struct copy_variadic_args {};
@@ -61,6 +61,14 @@ namespace ftl {
 		typename...Ts>
 	struct copy_variadic_args<To, From<Ts...>> {
 		using type = To<Ts...>;
+	};
+
+	template<int...> struct seq {};
+
+	template<int N, int...S> struct gen_seq : gen_seq<N-1, S...> {};
+
+	template<int...S> struct gen_seq<0, S...> {
+		using type = seq<S...>;
 	};
 
 }

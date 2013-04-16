@@ -23,7 +23,7 @@
 
 /*
  * Big thanks to Malte Skarupke for the original implementation this
- * implementation is based on! See
+ * version is based on! See
  * http://probablydance.com/2013/01/13/a-faster-implementation-of-stdfunction/
  * for details.
  */
@@ -343,7 +343,7 @@ namespace ftl {
 	template<typename R, typename...Ps>
 	class function : public typedeffer<R,Ps...> {
 	public:
-		using parameter_types = type_vec<Ps...>;
+		using parameter_types = type_seq<Ps...>;
 
 		function() noexcept {
 			initialise_empty();
