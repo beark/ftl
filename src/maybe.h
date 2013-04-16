@@ -26,6 +26,7 @@
 #include <stdexcept>
 #include "monoid.h"
 #include "monad.h"
+#include "applicative.h"
 
 namespace ftl {
 
@@ -397,6 +398,8 @@ namespace ftl {
 
 	/**
 	 * Implementation of monad for maybe.
+	 *
+	 * \note This automatically gives maybe a default applicative instance.
 	 */
 	template<>
 	struct monad<maybe> {
