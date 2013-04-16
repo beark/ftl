@@ -134,7 +134,7 @@ namespace ftl {
 			return [f,&t1] (T2 t2) {
 				return f(std::forward(t1), std::forward(t2));
 			};
-		}
+		};
 	}
 
 	/**
@@ -143,8 +143,8 @@ namespace ftl {
 	template<typename R, typename T1, typename T2>
 	function<R,T1,T2> uncurry(function<function<R,T2>,T1> f) {
 		return [f] (T1 t1, T2 t2) {
-			return f(std::forward<T1>(t1))(std::forward<T2>(t2);
-		}
+			return f(std::forward<T1>(t1))(std::forward<T2>(t2));
+		};
 	}
 
 	/**
