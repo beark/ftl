@@ -138,6 +138,16 @@ namespace ftl {
 	}
 
 	/**
+	 * Uncurries a binary function.
+	 */
+	template<typename R, typename T1, typename T2>
+	function<R,T1,T2> uncurry(function<function<R,T2>,T1> f) {
+		return [f] (T1 t1, T2 t2) {
+			return f(std::forward<T1>(t1))(std::forward<T2>(t2);
+		}
+	}
+
+	/**
 	 * Monoid instance for std::functions returning monoids.
 	 *
 	 * In essence, the same as ftl::function's implementation.
