@@ -84,27 +84,20 @@ namespace ftl {
 		using type = type_seq<T>;
 	};
 
-	// Unnamed namespace for ugly implementation details.
-	namespace {
-		template<typename>
-		struct index_type_seq_helper;
-
-		template<typename...Ts>
-		struct index_type_seq_helper<type_seq<Ts...>> {
-			template<typename T>
-			static constexpr T eval(const volatile Ts*..., T*, ...);
-		};
-	}
-
 	/**
 	 * Get the Nth type in a type sequence.
 	 */
-	template<size_t N, typename...Ts>
-	using get_nth = decltype(index_type_seq_helper<typename repeat<void,N>::type>::eval((Ts*)nullptr...));
+	template<size_t N, typename T, typename...Ts>
+	struct get_nth : get_nth<N-1,Ts...> {};
+
+	template<typename T, typename...Ts>
+	struct get_nth<0,T,Ts...> {
+		using type = T;
+	};
 
 	/// Get the final element in a type sequence
-	template<typename...Ts>
-	using get_last = get_nth<sizeof...(Ts)-1, Ts...>;
+	template<typename T, typename...Ts>
+	using get_last = get_nth<sizeof...(Ts), T, Ts...>;
 
 	/// Get the first N elements in a type sequence
 	template<size_t N, typename T, typename...Ts>
@@ -113,19 +106,14 @@ namespace ftl {
 						typename take_types<N-1,Ts...>::type> {};
 
 	template<typename T, typename...Ts>
-	struct take_types<0,T,Ts...> {
-		using type = type_seq<>;
-	};
-
-	template<size_t N, typename T>
-	struct take_types<N,T> {
+	struct take_types<1,T,Ts...> {
 		using type = type_seq<T>;
 	};
 
 	/// Take all elements except the last
 	template<typename...Ts>
 	struct take_init {
-		using type = typename take_types<sizeof...(Ts)-2, Ts...>::type;
+		using type = typename take_types<sizeof...(Ts)-1, Ts...>::type;
 	};
 
 	template<typename T>
