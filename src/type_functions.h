@@ -49,8 +49,94 @@ namespace ftl {
 			typename std::decay<typename std::result_of<F(Ps...)>::type>::type;
 	};
 
+	/**
+	 * Meta type used to store a type sequence.
+	 */
 	template<typename...Ts>
 	struct type_seq {};
+
+	/**
+	 * Concatenates two variadic lists together.
+	 */
+	template<typename L, typename R>
+	struct concat_type_seqs {};
+
+	template<typename...Ls, typename...Rs>
+	struct concat_type_seqs<type_seq<Ls...>,type_seq<Rs...>> {
+		using type = type_seq<Ls...,Rs...>;
+	};
+
+	/**
+	 * Repeat a type N times.
+	 */
+	template<typename T, size_t N>
+	struct repeat : concat_type_seqs<
+					typename repeat<T,N/2>::type,
+					typename repeat<T,N-N/2>::type> {};
+
+	template<typename T>
+	struct repeat<T,0> {
+		using type = type_seq<>;
+	};
+
+	template<typename T>
+	struct repeat<T,1> {
+		using type = type_seq<T>;
+	};
+
+	// Unnamed namespace for ugly implementation details.
+	namespace {
+		template<typename>
+		struct index_type_seq_helper;
+
+		template<typename...Ts>
+		struct index_type_seq_helper<type_seq<Ts...>> {
+			template<typename T>
+			static constexpr T eval(const volatile Ts*..., T*, ...);
+		};
+	}
+
+	/**
+	 * Get the Nth type in a type sequence.
+	 */
+	template<size_t N, typename...Ts>
+	using get_nth = decltype(index_type_seq_helper<typename repeat<void,N>::type>::eval((Ts*)nullptr...));
+
+	/// Get the final element in a type sequence
+	template<typename...Ts>
+	using get_last = get_nth<sizeof...(Ts)-1, Ts...>;
+
+	/// Get the first N elements in a type sequence
+	template<size_t N, typename T, typename...Ts>
+	struct take_types : concat_type_seqs<
+						type_seq<T>,
+						typename take_types<N-1,Ts...>::type> {};
+
+	template<typename T, typename...Ts>
+	struct take_types<0,T,Ts...> {
+		using type = type_seq<>;
+	};
+
+	template<size_t N, typename T>
+	struct take_types<N,T> {
+		using type = type_seq<T>;
+	};
+
+	/// Take all elements except the last
+	template<typename...Ts>
+	struct take_init {
+		using type = typename take_types<sizeof...(Ts)-2, Ts...>::type;
+	};
+
+	template<typename T>
+	struct take_init<T> {
+		using type = type_seq<>;
+	};
+
+	template<typename T, typename U>
+	struct take_init<T,U> {
+		using type = type_seq<T>;
+	};
 
 	template<template<typename...> class To, typename From>
 	struct copy_variadic_args {};
