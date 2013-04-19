@@ -28,7 +28,7 @@
 #include "monoid.h"
 
 namespace ftl {
-	//
+
 	// Unnamed private namespace for various tuple helpers
 	namespace {
 
@@ -57,6 +57,24 @@ namespace ftl {
 				std::get<0>(ret) = f(std::get<0>(o));
 			}
 		};
+
+		template<
+			typename F,
+			typename...Ts,
+			size_t...S>
+		auto tup_apply(seq<S...>, F f, const std::tuple<Ts...>& t)
+		-> typename std::result_of<F(Ts...)>::type {
+			return f(std::get<S>(t)...);
+		}
+
+		template<
+			typename F,
+			typename...Ts,
+			size_t...S>
+		auto tup_apply(seq<S...>, F f, std::tuple<Ts...>&& t)
+		-> typename std::result_of<F(Ts...)>::type {
+			return f(std::get<S>(t)...);
+		}
 
 	}
 
@@ -123,6 +141,22 @@ namespace ftl {
 		std::tuple<B, Ts...> ret;
 		tup<sizeof...(Ts)-1, std::tuple<B, Ts...>>::fmap(f, t, ret);
 		return ret;
+	}
+
+	/**
+	 * Invoke a function using a tuple's fields as parameters.
+	 */
+	template<typename F, typename...Ts>
+	auto apply(F f, const std::tuple<Ts...>& t)
+	-> typename std::result_of<F(Ts...)>::type {
+		return tup_apply(seq<0,sizeof...(Ts)-1>(), std::forward<F>(f), t);
+	}
+
+	/// \overload
+	template<typename F, typename...Ts>
+	auto apply(F f, std::tuple<Ts...>&& t)
+	-> typename std::result_of<F(Ts...)>::type {
+		return tup_apply(seq<0,sizeof...(Ts)-1>(), std::forward<F>(f), std::move(t));
 	}
 
 }
