@@ -57,7 +57,6 @@ namespace ftl {
 		}
 	};
 
-	template<typename M>
 	/**
 	 * Monoid instance for unary ftl::functions returning monoids.
 	 */
@@ -97,6 +96,16 @@ namespace ftl {
 			};
 		}
 	};
+
+	template<
+		typename F,
+		typename A,
+		typename T,
+		typename B = typename std::result_of<F(A)>::type,
+		typename...Ts>
+	function<B,T,Ts...> fmap(F f, function<A,T,Ts...> fn) {
+		return fn.fmap(std::forward<F>(f));
+	}
 
 	/*
 	 * N-ary curry, commented out until GCC fixes the bug where template
