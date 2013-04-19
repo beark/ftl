@@ -155,7 +155,7 @@ namespace ftl {
 	 * Convenience function to get a comparator for a certain type.
 	 */
 	template<typename T>
-	function<const T&,const T&,ord> getComparator() {
+	function<ord,const T&,const T&> getComparator() {
 		return [] ( const T& a, const T& b) { return compare(a, b); };
 	}
 
@@ -193,7 +193,7 @@ namespace ftl {
 	 *         Ordering instance.
 	 */
 	template<typename A, typename R>
-	function<const A&,const A&,ord> comparing(R (A::*method)() const) {
+	function<ord,const A&,const A&> comparing(R (A::*method)() const) {
 		return [=] (const A& a, const A& b) {
 			return orderable<R>::compare((a.*method)(), (b.*method)());
 		};
@@ -208,7 +208,7 @@ namespace ftl {
 	 *         given comparison is Lt.
 	 */
 	template<typename A>
-	function<A,A,bool> lessThan(const function<A,A,ord>& cmp) {
+	function<bool,A,A> lessThan(const function<ord,A,A>& cmp) {
 		return [=] (A a, A b) {
 			return cmp(a, b) == ord::Lt;
 		};
@@ -223,7 +223,7 @@ namespace ftl {
 	 *         given comparison is Gt.
 	 */
 	template<typename A>
-	function<A,A,bool> greaterThan(const function<A,A,ord>& cmp) {
+	function<bool,A,A> greaterThan(const function<ord,A,A>& cmp) {
 		return [=] (A a, A b) {
 			return cmp(a, b) == ord::Gt;
 		};
@@ -237,7 +237,7 @@ namespace ftl {
 	 *         given comparison is Eq.
 	 */
 	template<typename A>
-	function<A,A,bool> equal(const function<A,A,ord>& cmp) {
+	function<bool,A,A> equal(const function<ord,A,A>& cmp) {
 		return [=] (A a, A b) {
 			return cmp(a, b) == ord::Eq;
 		};
