@@ -31,6 +31,7 @@
 #define FTL_FUNCTION_H
 
 #include <functional>
+#include <memory>
 #include "type_functions.h"
 
 namespace ftl {
@@ -117,12 +118,12 @@ namespace ftl {
 		};
 
 		template<typename R, typename...Ps>
-		struct is_valid_function_argument<function<R, Ps...>, R (Ps...)> {
+		struct is_valid_function_argument<function<R, Ps...>, R (type_seq<Ps...>)> {
 			static const bool value = false;
 		};
 
 		template<typename T, typename R, typename...Ps>
-		struct is_valid_function_argument<T, R (Ps...)> {
+		struct is_valid_function_argument<T, R (type_seq<Ps...>)> {
 
 			template<typename U>
 			static decltype(to_functor(std::declval<U>())(std::declval<Ps>()...)) check(U *);
@@ -168,7 +169,7 @@ namespace ftl {
 		template<typename T, typename Allocator, typename Enable = void>
 		struct function_manager_inplace_specialisation {
 
-			template<typename R, typename...Ps>
+			template<typename R,typename...Ps>
 			static R call(const functor_padding& storage, Ps... ps) {
 				// do not call get_functor_ref because I want this function to
 				// be fast in debug when nothing gets inlined
@@ -247,7 +248,7 @@ namespace ftl {
 				alloc_traits::deallocate(allocator, pointer, 1);
 			}
 
-			static T & get_functor_ref(const manager_storage_type& storage) noexcept {
+			static T& get_functor_ref(const manager_storage_type& storage) noexcept {
 				return *get_functor_ptr_ref(storage);
 			}
 
@@ -321,220 +322,252 @@ namespace ftl {
 			}
 		}
 
-		template<typename R, typename...>
-		struct typedeffer {
-			using result_type = R;
+		// Hidden implementation that ftl::function inherits from.
+		// Useful because it allows us to define operator() correctly despite
+		// the parameter pack in the deriving function being "oddly shaped".
+		template<typename...>
+		class fn {
 		};
-
-		template<typename R, typename P>
-		struct typedeffer<R, P> {
+	
+		template<typename R, typename...Ps>
+		class fn<R, type_seq<Ps...>> {
+		public:
 			using result_type = R;
-			using argument_type = P;
-		};
+			using parameter_types = type_seq<Ps...>;
 
-		template<typename R, typename P1, typename P2>
-		struct typedeffer<R, P1, P2> {
-			using result_type = R;
-			using first_argument_type = P1;
-			using second_argument_type = P2;
-		};
-	}
+			fn() noexcept {
+				initialise_empty();
+			}
 
-	template<typename R, typename...Ps>
-	class function : public typedeffer<R,Ps...> {
-	public:
-		using parameter_types = type_seq<Ps...>;
+			fn(std::nullptr_t) noexcept {
+				initialise_empty();
+			}
 
-		function() noexcept {
-			initialise_empty();
-		}
-
-		function(std::nullptr_t) noexcept {
-			initialise_empty();
-		}
-
-		function(const function& f) : call(f.call) {
-			f.manager_storage.manager(
+			fn(const fn& f) : call(f.call) {
+				f.manager_storage.manager(
 					&manager_storage,
 					const_cast<manager_storage_type*>(&f.manager_storage),
 					call_copy);
-		}
+			}
 
-		function(function&& f) noexcept {
-			initialise_empty();
-			swap(f);
-		}
+			fn(fn&& f) noexcept {
+				initialise_empty();
+				swap(f);
+			}
+
+			template<typename F>
+			fn(
+					F f,
+					typename std::enable_if<
+						is_valid_function_argument<F, result_type (parameter_types)>::value,
+						empty_struct>::type = empty_struct())
+			noexcept(is_inplace_allocated<F, std::allocator<typename functor_type<F>::type>>::value) {
+
+				if(is_null(f))
+					initialise_empty();
+
+				else {
+					using functor_type = typename functor_type<F>::type;
+					initialise(to_functor(std::forward<F>(f)), std::allocator<functor_type>());
+				}
+			}
+
+			template<typename Allocator>
+			fn(std::allocator_arg_t, const Allocator&) {
+				// ignore the allocator because I don't allocate
+				initialise_empty();
+			}
+
+			template<typename Allocator>
+			fn(std::allocator_arg_t, const Allocator&, std::nullptr_t) {
+				// ignore the allocator because I don't allocate
+				initialise_empty();
+			}
+
+			template<typename Allocator, typename F>
+			fn(
+					std::allocator_arg_t,
+					const Allocator& allocator,
+					F functor,
+					typename std::enable_if<
+						is_valid_function_argument<F, result_type (parameter_types)>::value,
+						empty_struct>::type = empty_struct())
+			noexcept(is_inplace_allocated<F, Allocator>::value) {
+
+				if(is_null(functor))
+					initialise_empty();
+
+				else {
+					initialise(to_functor(std::forward<F>(functor)), Allocator(allocator));
+				}
+			}
+
+			template<typename Allocator>
+			fn(
+					std::allocator_arg_t,
+					const Allocator& allocator,
+					const fn& other)
+			: call(other.call) {
+
+				using alloc_traits = std::allocator_traits<Allocator>;
+				using MyAllocator = typename alloc_traits::template rebind_alloc<function>::other;
+
+				// first try to see if the allocator matches the target type
+				manager_type manager_for_allocator
+					= &function_manager<
+						typename alloc_traits::value_type, Allocator>;
+
+				if(other.manager_storage.manager == manager_for_allocator) {
+					create_manager<typename alloc_traits::value_type, Allocator>(
+					manager_storage,
+					Allocator(allocator));
+
+					manager_for_allocator(
+						&manager_storage,
+						const_cast<manager_storage_type*>(&other.manager_storage),
+						call_copy_functor_only);
+				}
+
+				// if it does not, try to see if the target contains my type. this
+				// breaks the recursion of the last case. otherwise repeated copies
+				// would allocate more and more memory
+				else if(other.manager_storage.manager == &function_manager<function, MyAllocator>) {
+					create_manager<function, MyAllocator>(manager_storage, MyAllocator(allocator));
+					function_manager<function, MyAllocator>(
+						&manager_storage,
+						const_cast<manager_storage_type*>(&other.manager_storage),
+						call_copy_functor_only);
+				}
+
+				else
+				{
+					// else store the other function as my target
+					initialise(other, MyAllocator(allocator));
+				}
+			}
+
+			template<typename Allocator>
+			fn(std::allocator_arg_t, const Allocator&, fn&& other) noexcept {
+				// ignore the allocator because I don't allocate
+				initialise_empty();
+				swap(other);
+			}
+
+			virtual ~fn() noexcept {
+				manager_storage.manager(&manager_storage, nullptr, call_destroy);
+			}
+
+			result_type operator()(Ps...ps) const {
+				return call(manager_storage.functor, std::forward<Ps>(ps)...);
+			}
+
+			operator bool() const noexcept {
+				return call != &empty_call<result_type, Ps...>;
+			}
+
+			void swap(fn& other) noexcept {
+				manager_storage_type temp_storage;
+
+				other.manager_storage.manager(
+						&temp_storage,
+						&other.manager_storage,
+						call_move_and_destroy);
+
+				manager_storage.manager(
+						&other.manager_storage,
+						&manager_storage,
+						call_move_and_destroy);
+
+				temp_storage.manager(
+						&manager_storage,
+						&temp_storage,
+						call_move_and_destroy);
+
+				std::swap(call, other.call);
+			}
+
+			fn& operator= (fn other) noexcept {
+				swap(other);
+				return *this;
+			}
+
+			template<typename F>
+			fn& operator= (F f) {
+				fn other(std::forward<F>(f));
+				swap(other);
+				return *this;
+			}
+
+			template<typename F, typename Allocator>
+			void assign(F&& f, const Allocator& alloc)
+			noexcept(is_inplace_allocated<F, Allocator>::value) {
+				fn(std::allocator_arg, alloc, f).swap(*this);
+			}
+
+		protected:
+			manager_storage_type manager_storage;
+			result_type (*call) (const functor_padding&, Ps...);
+
+			template<typename F, typename Allocator>
+			void initialise(F f, Allocator&& alloc) {
+				call = &function_manager_inplace_specialisation<F, Allocator>
+					::template call<result_type, Ps...>;
+
+				create_manager<F,Allocator>(manager_storage, std::forward<Allocator>(alloc));
+
+				function_manager_inplace_specialisation<F, Allocator>::store_functor(
+					manager_storage,
+					std::forward<F>(f));
+			}
+
+			void initialise_empty() noexcept {
+				using fn_type = result_type (*)(Ps...);
+
+				using Allocator = std::allocator<fn_type>;
+
+				static_assert(
+					is_inplace_allocated<fn_type, Allocator>::value,
+					"The empty function should benefit from small functor optimization");
+
+				create_manager<fn_type, Allocator>(manager_storage, Allocator());
+				function_manager_inplace_specialisation<fn_type, Allocator>::store_functor(
+					manager_storage, nullptr);
+
+				call = &empty_call<result_type, Ps...>;
+			}
+		};
+
+	}
+
+	template<typename T, typename...Ts>
+	class function : public fn<
+	  	typename get_last<T,Ts...>::type,
+		typename take_init<T,Ts...>::type> {
+
+	public:
+
+		using function::fn::fn;
 
 		template<typename F>
-		function(
-				F f,
-				typename std::enable_if<
-					is_valid_function_argument<F, R (Ps...)>::value,
-					empty_struct>::type = empty_struct())
-		noexcept(is_inplace_allocated<F, std::allocator<typename functor_type<F>::type>>::value) {
+		function(F f) : function::fn(f) {}
 
-			if(is_null(f))
-				initialise_empty();
+		~function() noexcept = default;
 
-			else {
-				using functor_type = typename functor_type<F>::type;
-				initialise(to_functor(std::forward<F>(f)), std::allocator<functor_type>());
-			}
-		}
-
-		template<typename Allocator>
-		function(std::allocator_arg_t, const Allocator&) {
-			// ignore the allocator because I don't allocate
-			initialise_empty();
-		}
-
-		template<typename Allocator>
-		function(std::allocator_arg_t, const Allocator&, std::nullptr_t) {
-			// ignore the allocator because I don't allocate
-			initialise_empty();
-		}
-
-		template<typename Allocator, typename F>
-		function(
-				std::allocator_arg_t,
-				const Allocator& allocator,
-				F functor,
-				typename std::enable_if<
-					is_valid_function_argument<F, R (Ps...)>::value,
-					empty_struct>::type = empty_struct())
-		noexcept(is_inplace_allocated<F, Allocator>::value) {
-
-			if(is_null(functor))
-				initialise_empty();
-
-			else {
-				initialise(to_functor(std::forward<F>(functor)), Allocator(allocator));
-			}
-		}
-
-		template<typename Allocator>
-		function(
-				std::allocator_arg_t,
-				const Allocator& allocator,
-				const function& other)
-		: call(other.call) {
-
-			using alloc_traits = std::allocator_traits<Allocator>;
-			using MyAllocator = typename alloc_traits::template rebind_alloc<function>::other;
-
-			// first try to see if the allocator matches the target type
-			manager_type manager_for_allocator
-				= &function_manager<
-					typename alloc_traits::value_type, Allocator>;
-
-			if(other.manager_storage.manager == manager_for_allocator) {
-				create_manager<typename alloc_traits::value_type, Allocator>(
-						manager_storage,
-						Allocator(allocator));
-
-				manager_for_allocator(
-						&manager_storage,
-						const_cast<manager_storage_type*>(&other.manager_storage),
-						call_copy_functor_only);
-			}
-
-			// if it does not, try to see if the target contains my type. this
-			// breaks the recursion of the last case. otherwise repeated copies
-			// would allocate more and more memory
-			else if(other.manager_storage.manager == &function_manager<function, MyAllocator>) {
-				create_manager<function, MyAllocator>(manager_storage, MyAllocator(allocator));
-				function_manager<function, MyAllocator>(
-						&manager_storage,
-						const_cast<manager_storage_type*>(&other.manager_storage),
-						call_copy_functor_only);
-			}
-
-			else
-			{
-				// else store the other function as my target
-				initialise(other, MyAllocator(allocator));
-			}
-		}
-
-		template<typename Allocator>
-		function(std::allocator_arg_t, const Allocator&, function&& other) noexcept {
-			// ignore the allocator because I don't allocate
-			initialise_empty();
-			swap(other);
-		}
-
-		~function() noexcept {
-			manager_storage.manager(&manager_storage, nullptr, call_destroy);
-		}
-
-		function& operator= (function other) noexcept {
-			swap(other);
+		function& operator= (function f) noexcept {
+			function::fn::operator=(f);
 			return *this;
 		}
 
-		R operator()(Ps...ps) const {
-			return call(manager_storage.functor, std::forward<Ps>(ps)...);
-		}
-
-		template<typename F, typename Allocator>
-		void assign(F&& f, const Allocator& alloc)
-		noexcept(is_inplace_allocated<F, Allocator>::value) {
-			function(std::allocator_arg, alloc, f).swap(*this);
-		}
-
-		void swap(function& other) noexcept {
-			manager_storage_type temp_storage;
-
-			other.manager_storage.manager(
-					&temp_storage,
-					&other.manager_storage,
-					call_move_and_destroy);
-
-			manager_storage.manager(
-					&other.manager_storage,
-					&manager_storage,
-					call_move_and_destroy);
-
-			temp_storage.manager(
-					&manager_storage,
-					&temp_storage,
-					call_move_and_destroy);
-
-			std::swap(call, other.call);
-		}
-
-		operator bool() const noexcept {
-			return call != &empty_call<R, Ps...>;
-		}
-
-	private:
-		manager_storage_type manager_storage;
-		R (*call)(const functor_padding&, Ps...);
-
-		template<typename F, typename Allocator>
-		void initialise(F f, Allocator&& alloc) {
-			call = &function_manager_inplace_specialisation<F, Allocator>::template call<R, Ps...>;
-			create_manager<F,Allocator>(manager_storage, std::forward<Allocator>(alloc));
-
-			function_manager_inplace_specialisation<F, Allocator>::store_functor(
-				manager_storage,
-				std::forward<F>(f));
-		}
-
-		using empty_fn_type = R(*)(Ps...);
-
-		void initialise_empty() noexcept {
-			using Allocator = std::allocator<empty_fn_type>;
-
-			static_assert(
-				is_inplace_allocated<empty_fn_type, Allocator>::value,
-				"The empty function should benefit from small functor optimization");
-
-			create_manager<empty_fn_type, Allocator>(manager_storage, Allocator());
-			function_manager_inplace_specialisation<empty_fn_type, Allocator>::store_functor(
-				manager_storage, nullptr);
-
-			call = &empty_call<R, Ps...>;
+		template<typename F>
+		auto operator= (F f)
+		-> typename std::enable_if<
+			is_valid_function_argument<
+				F,
+				typename function::fn::result_type (typename function::fn::parameter_types)>::value,
+			function&>::type
+		{
+			function::fn::operator= (std::forward<F>(f));
+			return *this;
 		}
 	};
 

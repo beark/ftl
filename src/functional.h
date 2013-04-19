@@ -29,7 +29,7 @@
 namespace ftl {
 
 	/**
-	 * Monoid instance for ftl::functions returning monoids.
+	 * Monoid instance for argumentless ftl::functions returning monoids.
 	 *
 	 * The reason this works might not be immediately obvious, but basically,
 	 * any function (regardless of arity) that returns a value that is an
@@ -42,37 +42,80 @@ namespace ftl {
 	 *                   results.
 	 * \endcode
 	 */
-	template<typename M, typename...Ps>
-	struct monoid<function<M,Ps...>> {
-		static function<M,Ps...> id() {
-			return [](Ps...ps) { return monoid<M>::id(); };
+	template<typename M>
+	struct monoid<function<M>> {
+		static function<M> id() {
+			return []() { return monoid<M>::id(); };
 		}
 
-		static function<M,Ps...> append(
-				const function<M,Ps...>& f1,
-				const function<M,Ps...>& f2) {
-			return [=] (Ps...ps) {
-				return monoid<M>::append(f1(ps...), f2(ps...));
+		static function<M> append(
+				const function<M>& f1,
+				const function<M>& f2) {
+			return [=] () {
+				return monoid<M>::append(f1(), f2());
 			};
 		}
 	};
 
-	template<typename M, typename...Ps>
-	function<M,Ps...> operator^ (
-			const function<M,Ps...>& f1,
-			const function<M,Ps...>& f2) {
-		return monoid<function<M,Ps...>>::append(f1, f2);
+	template<typename M>
+	function<M> operator^ (
+			const function<M>& f1,
+			const function<M>& f2) {
+		return monoid<function<M>>::append(f1, f2);
 	}
 
-	template<
-		typename F,
-		typename A,
-		typename B = typename std::result_of<F(A)>::type,
-		typename...Ps>
-	function<B,Ps...> fmap(F f, function<A,Ps...> fn) {
-		return [f,fn] (Ps...ps) {
-			return f(fn(std::forward<Ps>(ps)...));
-		};
+	/**
+	 * Monoid instance for unary ftl::functions returning monoids.
+	 */
+	template<typename A, typename M>
+	struct monoid<function<A,M>> {
+		static function<A,M> id() {
+			return [](A){ return monoid<M>::id(); };
+		}
+
+		static function<A,M> append(
+				const function<A,M>& f1,
+				const function<A,M>& f2) {
+			return [=](A a) {
+				return monoid<M>::append(
+						f1(a),
+						f2(a));
+			};
+		}
+	};
+
+	template<typename M, typename A>
+	function<A,M> operator^ (
+			const function<A,M>& f1,
+			const function<A,M>& f2) {
+		return monoid<function<A,M>>::append(f1, f2);
+	}
+
+	/**
+	 * Monoid instance for binary ftl::functions returning monoids.
+	 */
+	template<typename A, typename B, typename M>
+	struct monoid<function<A,B,M>> {
+		static function<A,B,M> id() {
+			return [](A,B){ return monoid<M>::id(); };
+		}
+
+		static function<A,B,M> append(
+				const function<A,B,M>& f1,
+				const function<A,B,M>& f2) {
+			return [=](A a, B b) {
+				return monoid<M>::append(
+						f1(a, b),
+						f2(a, b));
+			};
+		}
+	};
+
+	template<typename M, typename A, typename B>
+	function<A,B,M> operator^ (
+			const function<A,B,M>& f1,
+			const function<A,B,M>& f2) {
+		return monoid<function<A,B,M>>::append(f1, f2);
 	}
 
 	/*
@@ -129,7 +172,7 @@ namespace ftl {
 	 * answer.
 	 */
 	template<typename R, typename T1, typename T2>
-	function<function<R,T2>,T1> curry(function<R,T1,T2> f) {
+	function<T1,function<T2,R>> curry(function<T1,T2,R> f) {
 		return [f] (T1 t1) {
 			return [f,&t1] (T2 t2) {
 				return f(std::forward(t1), std::forward(t2));
@@ -141,7 +184,7 @@ namespace ftl {
 	 * Uncurries a binary function.
 	 */
 	template<typename R, typename T1, typename T2>
-	function<R,T1,T2> uncurry(function<function<R,T2>,T1> f) {
+	function<T1,T2,R> uncurry(function<T1,function<T2,R>> f) {
 		return [f] (T1 t1, T2 t2) {
 			return f(std::forward<T1>(t1))(std::forward<T2>(t2));
 		};
