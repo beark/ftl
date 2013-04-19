@@ -131,12 +131,20 @@ namespace ftl {
 	 *
 	 * \tparam N The number of types to drop
 	 */
+	template<size_t N, typename...Ts>
+	struct drop_types {};
+
 	template<size_t N, typename T, typename...Ts>
-	struct drop_types : drop_types<N-1, Ts...> {};
+	struct drop_types<N,T,Ts...> : drop_types<N-1, Ts...> {};
 
 	template<typename T, typename...Ts>
 	struct drop_types<0,T,Ts...> {
 		using type = type_seq<T,Ts...>;
+	};
+
+	template<size_t N>
+	struct drop_types<N> {
+		using type = type_seq<>;
 	};
 
 	template<template<typename...> class To, typename From>
