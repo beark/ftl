@@ -322,16 +322,6 @@ namespace ftl {
 			}
 		}
 
-		template<
-			typename F,
-			typename F2,
-			typename...Ts,
-			size_t...S>
-		auto fmap_apply(seq<S...>, F f, F2 f2, std::tuple<Ts...>& t)
-		-> decltype(f2(f(std::get<0>(t)), std::get<S>(t)...)) {
-			return f2(f(std::get<0>(t)), std::get<S>(t)...);
-		}
-
 		// Hidden implementation that ftl::function inherits from.
 		// Useful because it allows us to define operator() correctly despite
 		// the parameter pack in the deriving function being "oddly shaped".
@@ -514,28 +504,7 @@ namespace ftl {
 				fn(std::allocator_arg, alloc, f).swap(*this);
 			}
 
-			template<
-				typename F,
-				typename B = typename std::result_of<F(typename get_nth<0,Ps...>::type)>::type>
-			fn<result_type, typename concat_type_seqs<type_seq<B>, typename drop_types<1,Ps...>::type>::type>
-			fmap(F f) const {
-				return fn<
-					result_type, typename concat_type_seqs<type_seq<B>,
-					typename drop_types<1,Ps...>::type>::type>::fmap_helper(std::forward<F>(f), *this);
-			}
-
 		protected:
-			template<typename F, typename F2>
-			static fn fmap_helper(F f, const F2& fn) {
-				return [=,&fn] (Ps...ps) {
-					using S = typename gen_seq<1,sizeof...(Ps)>::type;
-
-					auto args = std::forward_as_tuple(std::forward<Ps>(ps)...);
-
-					return fmap_apply(S(), f, fn, args);
-				};
-			}
-
 			manager_storage_type manager_storage;
 			result_type (*call) (const functor_padding&, Ps...);
 
