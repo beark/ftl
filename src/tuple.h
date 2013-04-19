@@ -108,11 +108,6 @@ namespace ftl {
 		}
 	};
 
-	template<typename...Ts>
-	std::tuple<Ts...> operator^ (const std::tuple<Ts...>& t1, const std::tuple<Ts...>& t2) {
-		return monoid<std::tuple<Ts...>>::append(t1, t2);
-	}
-
 	/**
 	 * Functor instance for tuples.
 	 *

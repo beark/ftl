@@ -391,11 +391,6 @@ namespace ftl {
 		}
 	};
 
-	template<typename A>
-	maybe<A> operator^ (const maybe<A>& m1, const maybe<A>& m2) {
-		return monoid<maybe<A>>::append(m1, m2);
-	}
-
 	/**
 	 * Implementation of monad for maybe.
 	 *

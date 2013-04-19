@@ -58,12 +58,6 @@ namespace ftl {
 	};
 
 	template<typename M>
-	function<M> operator^ (
-			const function<M>& f1,
-			const function<M>& f2) {
-		return monoid<function<M>>::append(f1, f2);
-	}
-
 	/**
 	 * Monoid instance for unary ftl::functions returning monoids.
 	 */
@@ -84,13 +78,6 @@ namespace ftl {
 		}
 	};
 
-	template<typename M, typename A>
-	function<A,M> operator^ (
-			const function<A,M>& f1,
-			const function<A,M>& f2) {
-		return monoid<function<A,M>>::append(f1, f2);
-	}
-
 	/**
 	 * Monoid instance for binary ftl::functions returning monoids.
 	 */
@@ -110,13 +97,6 @@ namespace ftl {
 			};
 		}
 	};
-
-	template<typename M, typename A, typename B>
-	function<A,B,M> operator^ (
-			const function<A,B,M>& f1,
-			const function<A,B,M>& f2) {
-		return monoid<function<A,B,M>>::append(f1, f2);
-	}
 
 	/*
 	 * N-ary curry, commented out until GCC fixes the bug where template
@@ -209,13 +189,6 @@ namespace ftl {
 			};
 		}
 	};
-
-	template<typename M, typename...Ps>
-	std::function<M(Ps...)> operator^ (
-			const std::function<M(Ps...)>& f1,
-			const std::function<M(Ps...)>& f2) {
-		return monoid<std::function<M(Ps...)>>::append(f1, f2);
-	}
 
 }
 

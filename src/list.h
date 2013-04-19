@@ -527,11 +527,6 @@ namespace ftl {
 		}
 	};
 
-	template<typename...Ps>
-	list<Ps...> operator^(const list<Ps...>& l1, const list<Ps...>& l2) {
-		return monoid<list<Ps...>>::append(l1, l2);
-	}
-
 	/**
 	 * Monad implementation for list.
 	 */
@@ -580,11 +575,6 @@ namespace ftl {
 			return l3;
 		}
 	};
-
-	template<typename...Ps>
-	std::list<Ps...> operator^(const std::list<Ps...>& l1, const std::list<Ps...>& l2) {
-		return monoid<std::list<Ps...>>::append(l1, l2);
-	}
 
 }
 

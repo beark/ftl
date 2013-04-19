@@ -160,11 +160,6 @@ namespace ftl {
 		}
 	};
 
-	template<typename...Ps>
-	std::vector<Ps...> operator^ (const std::vector<Ps...>& v1, const std::vector<Ps...>& v2) {
-		return monoid<std::vector<Ps...>>::append(v1, v2);
-	}
-
 	/**
 	 * Monad::bind implementation for vectors.
 	 */

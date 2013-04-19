@@ -59,7 +59,28 @@ namespace ftl {
 		 * and + is the definition of append / operator^ for sums.
 		 */
 		static M id();
+
+		/**
+		 * The monoid operation itself.
+		 *
+		 * While implementations should follow the general style of this
+		 * interface, they are also allowed to accept for instance
+		 * \c const \c M&, but never a non-const reference or other type
+		 * that would allow mutation of either \c m1 or \c m2.
+		 */
+		static M append(M m1, M m2);
 	};
+
+	/**
+	 * Convenience operator to ease use of append.
+	 *
+	 * This default implementation should work for any type that properly
+	 * implements the monoid interface.
+	 */
+	template<typename M>
+	M operator^ (const M& m1, const M& m2) {
+		return monoid<M>::append(m1, m2);
+	}
 
 	/**
 	 * Implementation of monoid for numbers, interpreted as sums.
@@ -163,17 +184,6 @@ namespace ftl {
 	};
 
 	/**
-	 * monoid::operator^ implementation for sums of numbers.
-	 */
-	template<typename N>
-	constexpr sum_monoid<N> operator^ (
-			const sum_monoid<N>& n1,
-			const sum_monoid<N>& n2) {
-
-		return monoid<sum_monoid<N>>::append(n1, n2);
-	}
-
-	/**
 	 * Implementatin of monoid for numbers, when interpreted as products.
 	 *
 	 * The reason behind this struct is exactly the same as with sum_monoid.
@@ -270,17 +280,6 @@ namespace ftl {
 	};
 
 	/**
-	 * monoid::operator^ implementation for products of numbers.
-	 */
-	template<typename N>
-	constexpr prod_monoid<N> operator^ (
-			const prod_monoid<N>& n1,
-			const prod_monoid<N>& n2) {
-
-		return monoid<prod_monoid<N>>::append(n1, n2);
-	}
-
-	/**
 	 * Wrapper for booleans to get one monoid implementation.
 	 *
 	 * This particular version of bools as monoids means that:
@@ -312,10 +311,6 @@ namespace ftl {
 			return a1.b || a2.b;
 		}
 	};
-
-	constexpr any operator^ (any a1, any a2) noexcept {
-		return monoid<any>::append(a1, a2);
-	}
 
 	/**
 	 * Wrapper for booleans to get a monoid implementation.
@@ -349,10 +344,6 @@ namespace ftl {
 			return a1 && a2;
 		}
 	};
-
-	constexpr all operator^ (all a1, all a2) noexcept {
-		return monoid<all>::append(a1, a2);
-	}
 
 }
 

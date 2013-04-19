@@ -181,10 +181,6 @@ namespace ftl {
 		}
 	};
 
-	constexpr ord operator^ (ord o1, ord o2) noexcept {
-		return monoid<ord>::append(o1, o2);
-	}
-
 	/**
 	 * Convenience function to compare objects by getter.
 	 *
