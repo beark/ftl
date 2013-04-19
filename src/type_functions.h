@@ -126,6 +126,19 @@ namespace ftl {
 		using type = type_seq<T>;
 	};
 
+	/**
+	 * Drops a number of types from a type sequence.
+	 *
+	 * \tparam N The number of types to drop
+	 */
+	template<size_t N, typename T, typename...Ts>
+	struct drop_types : drop_types<N-1, Ts...> {};
+
+	template<typename T, typename...Ts>
+	struct drop_types<0,Ts...> {
+		using type = type_seq<T,Ts...>;
+	};
+
 	template<template<typename...> class To, typename From>
 	struct copy_variadic_args {};
 
@@ -137,11 +150,18 @@ namespace ftl {
 		using type = To<Ts...>;
 	};
 
-	template<int...> struct seq {};
+	/// A number sequence
+	template<size_t...> struct seq {};
 
-	template<int N, int...S> struct gen_seq : gen_seq<N-1, S...> {};
+	/**
+	 * Generate a sequence of numbers.
+	 *
+	 * \tparam Z The first number in the sequence.
+	 * \tparam N The final number in the sequence.
+	 */
+	template<size_t Z, size_t N, size_t...S> struct gen_seq : gen_seq<Z,N-1,N-1,S...> {};
 
-	template<int...S> struct gen_seq<0, S...> {
+	template<size_t Z, size_t...S> struct gen_seq<Z,Z,S...> {
 		using type = seq<S...>;
 	};
 
