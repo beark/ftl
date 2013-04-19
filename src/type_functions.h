@@ -135,7 +135,7 @@ namespace ftl {
 	struct drop_types : drop_types<N-1, Ts...> {};
 
 	template<typename T, typename...Ts>
-	struct drop_types<0,Ts...> {
+	struct drop_types<0,T,Ts...> {
 		using type = type_seq<T,Ts...>;
 	};
 
@@ -164,7 +164,6 @@ namespace ftl {
 	template<size_t Z, size_t...S> struct gen_seq<Z,Z,S...> {
 		using type = seq<S...>;
 	};
-
 }
 
 #endif
