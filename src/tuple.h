@@ -24,8 +24,8 @@
 #define FTL_TUPLE_H
 
 #include <tuple>
-#include "type_functions.h"
 #include "monoid.h"
+#include "applicative.h"
 
 namespace ftl {
 
@@ -74,6 +74,41 @@ namespace ftl {
 		auto tup_apply(seq<S...>, F f, std::tuple<Ts...>&& t)
 		-> typename std::result_of<F(Ts...)>::type {
 			return f(std::get<S>(t)...);
+		}
+
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type,
+			typename...Ts,
+			size_t...S>
+		std::tuple<B,Ts...> apply_on_first(
+				const std::tuple<F,Ts...>& t1,
+				const std::tuple<A,Ts...>& t2,
+				seq<S...>) {
+
+			auto f = std::get<0>(t1);
+			return std::tuple<B,Ts...>(
+					f(std::get<0>(t2)),
+					monoid<
+						typename std::decay<decltype(std::get<S>(t1))>::type
+					>::append(
+						std::get<S>(t1), std::get<S>(t2))...
+					);
+		}
+
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type,
+			typename...Ts>
+		std::tuple<B,Ts...> applicative_implementation(
+				const std::tuple<F,Ts...>& t1,
+				const std::tuple<A,Ts...>& t2) {
+			return apply_on_first(
+					t1,
+					t2,
+					typename gen_seq<1,sizeof...(Ts)>::type());
 		}
 
 	}
@@ -142,6 +177,27 @@ namespace ftl {
 		tup<sizeof...(Ts)-1, std::tuple<B, Ts...>>::fmap(f, t, ret);
 		return ret;
 	}
+
+	/**
+	 * Applicative instance for tuples.
+	 *
+	 * Note that this requires a monoid instance for every type in the tuple
+	 * except the first one.
+	 */
+	template<>
+	struct applicative<std::tuple> {
+		template<typename A, typename...Ts>
+		static std::tuple<A,Ts...> pure(A a) {
+			return std::make_tuple(a, monoid<Ts>::id()...);
+		}
+
+		template<typename A, typename B, typename...Ts>
+		static std::tuple<B,Ts...> apply(
+				const std::tuple<function<B,A>,Ts...>& tfn,
+				const std::tuple<A,Ts...>& t) {
+			return applicative_implementation(tfn, t);
+		}
+	};
 
 	/**
 	 * Invoke a function using a tuple's fields as parameters.

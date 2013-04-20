@@ -25,6 +25,7 @@
 
 #include "function.h"
 #include "monoid.h"
+#include "applicative.h"
 
 namespace ftl {
 
@@ -67,6 +68,29 @@ namespace ftl {
 			return f(fn(std::forward<Ps>(ps)...));
 		};
 	}
+
+	/**
+	 * Applicative Functor instance for ftl::functions.
+	 */
+	template<>
+	struct applicative<function> {
+
+		/// Creates a function that returns a, regardless of its parameters.
+		template<typename A, typename...Ts>
+		static function<A,Ts...> pure(A a) {
+			return [a] (Ts...) { return a; };
+		}
+
+		template<typename A, typename B, typename...Ts>
+		static function<B,Ts...> apply(
+				function<function<B,A>, Ts...> fn,
+				const function<A,Ts...>& f) {
+			return [=] (Ts...ts) {
+				auto fab = fn(ts...);
+				return fab(f(ts...));
+			};
+		}
+	};
 
 	/*
 	 * N-ary curry, commented out until GCC fixes the bug where template
@@ -124,8 +148,8 @@ namespace ftl {
 	template<typename R, typename T1, typename T2>
 	function<function<R,T2>,T1> curry(function<R,T1,T2> f) {
 		return [f] (T1 t1) {
-			return [f,&t1] (T2 t2) {
-				return f(std::forward(t1), std::forward(t2));
+			return [f,t1] (T2 t2) {
+				return f(t1, std::forward<T2>(t2));
 			};
 		};
 	}
