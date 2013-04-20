@@ -34,7 +34,7 @@ namespace ftl {
 	 * Definition of the Monad concept.
 	 */
 	template<
-		template<typename,typename...> class M>
+		template<typename...> class M>
 	struct monad {
 
 		/**
@@ -65,7 +65,7 @@ namespace ftl {
 	 */
 	template<
 		typename F,
-		template <typename,typename...> class M,
+		template <typename...> class M,
 		typename A,
 		typename B = typename decayed_result<F(A)>::type::value_type,
 		typename...Ts>
@@ -77,7 +77,7 @@ namespace ftl {
 	 * Lifts a function into M.
 	 */
 	template<
-		template<typename,typename...> class M,
+		template<typename...> class M,
 		typename A,
 		typename R,
 		typename...Ts>
@@ -91,7 +91,7 @@ namespace ftl {
 	 * Apply a function in M to a value in M.
 	 */
 	template<
-		template<typename,typename...> class M,
+		template<typename...> class M,
 		typename A,
 		typename B,
 		typename...Ts>
