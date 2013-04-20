@@ -170,7 +170,7 @@ namespace ftl {
 	template<size_t Z, size_t N, size_t...S> struct gen_seq : gen_seq<Z,N-1,N-1,S...> {};
 
 	template<size_t Z, size_t...S> struct gen_seq<Z,Z,S...> {
-		using type = seq<S...>;
+		using type = seq<Z,S...>;
 	};
 }
 
