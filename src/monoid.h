@@ -262,7 +262,7 @@ namespace ftl {
 	/**
 	 * Actual implementation of monoid for products.
 	 *
-	 * Identity is 1 and comnining operation is *.
+	 * Identity is 1 and combining operation is *.
 	 */
 	template<typename N>
 	struct monoid<prod_monoid<N>> {
