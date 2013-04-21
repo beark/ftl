@@ -8,7 +8,7 @@ To use the ftl, you need a compiler that implements at least as much of C++11 as
 ## Applicative Functors
 Applicative functors are a subset of [functors](#functor), with a few additional operations available. Most notably, `apply` (or `operator*` if you don't mind bringing that into scope). So what does this `apply` thing do? In a way, it's not too dissimlar to Functor's `fmap`, except instead of a free function, it applies a function wrapped in the Applicative instance. The use case of this is simple: whenever you find yourself with a function you wish you could fmap on some Functor, but find that the function itself is wrapped in that same Functor, then you actually want Applicative's `apply`. If the exact type of the Functor is known, you can of course do this anyway, but abstracting the operation into Applicative can allow for more general code.
 
-A quick example to show what `apply` does:
+A quick example to show what `apply` does (see [Maybe](#maybe) for an explanation on the `value` function):
 ```cpp
 #include <ftl/maybe.h>
 
