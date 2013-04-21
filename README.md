@@ -3,8 +3,7 @@ ftl - The Functional Template Library
 
 C++ template library for fans of functional programming. The goal of this project is to implement a useful subset of the Haskell Prelude (and a couple of other libraries) in C++. To date, this subset is very minimal, but there are plans to expand.
 
-Applicative Functors
---------------------
+## Applicative Functors
 An applicative functor is a subset of [functors](#Functor), with a few additional operations available. Most notably, `apply` (or `operator*` if you don't mind bringing that into scope). So what does this `apply` thing do? In a way, it's not too dissimlar to Functor's `fmap`, except it applies a function wrapped in the type that is an Applicative. The use case of this is simple: whenever you find yourself with a function you wish you could fmap on some Functor, but find that the function itself is wrapped in that same Functor, then you actually want Applicative's `apply`. If the exact type of the Functor is known, you can of course do this anyway, but abstracting the operation into Applicative can allow for more general code.
 
 A quick example to show what `apply` does:
@@ -37,9 +36,9 @@ Notable instance of Applicative include:
 * `either<L,R>`
 * `std::tuple<T,Ts...>`
 * `ftl::function<R,Ps...>`
+* `std::shared_ptr`
 
-Either
-------
+## Either
 The `either<L,R>` datatype is used when a parameter, return value, or variable may be _either_ one type _or_ another, but never both. Interesting concepts implemented by `either<L,R>` include Functor and Monad.
 
 One notable difference between the Haskell and ftl versions is that while in Haskell, Either is a Functor and Monad in its Right type, in ftl it's an instance in its Left type. This is because of various technical reasons to be explained elsewhere.
@@ -65,8 +64,7 @@ void checkingState(const ftl::either<typeA,typeB>& e) {
 }
 ```
 
-Functor
--------
+## Functor
 Functor is a concept (as in the ones that might yet make it in C++14), or in Haskell terms, a type class. For a type to be considered a Functor, it really only needs to implement one function: `fmap`. The purpose of `fmap` is to map a function to some inner type contained in the type that is a Functor. For example, for `either<L,R>`, `fmap` maps the function to the `L` (but only if the either instance is "left"). After applying the function to the inner value, `fmap` should return a a new instance of the original functor, now containing whatever the mapped function returned. Perhaps this is better shown in an example:
 ```cpp
 void foo() {
@@ -101,9 +99,9 @@ Finally, a non-exhaustive list of the Functors implemented in ftl:
 * ```ftl::either<L,R>```, as mentioned above.
 * ```ftl::function<R,Ts...>```, composes the given function with the ftl::function, yielding an ```ftl::function<R2,Ts...>``` where ```R2``` is the return type of the function given to fmap.
 * ```ftl::list``` is a functor in its value_type, meaning that fmap will return a new list whose value_type is the result type of applying the given function to the original list's value_type.
+* `std::shared_ptr<T>`
 
-Maybe
------
+## Maybe
 The `maybe<T>` datatype simply implements the idea that you may have an optional function parameter, or a function that _maybe_ returns a value. It is very similar to Boost.Optional&mdash;and in certain syntactical aspects, gets its inspiration from there&mdash;but its true origin is the `Maybe` data type of Haskell. Similarly to Haskell's `Maybe`, `maybe<T>` implements a number of useful concepts (type classes in Haskell), such as `Monoid`, `Functor`, etc. These are not always _exactly_ the same in _ftl_ as in Haskell, but they're always founded on the same ideas and express the same abstractions (or as similar as is possible in C++).
 
 On to some examples. The following shows how you can define a function that might return an integer, or it might return nothing.
@@ -143,8 +141,7 @@ void foo(const maybe<std::string>& m) {
 }
 ```
 
-Monoid
-------
+## Monoid
 A monoid is, in layman's terms, any set of things for which there is an associated binary operation, and an identity element. In addition, the operation and identity must conform to the following laws:
 ```
 a <> identity = a
@@ -166,6 +163,7 @@ A couple of monoids included in the library:
 * ```ftl::ord```
 * ```std::tuple<Ts...>```, if every T in Ts is a monoid 
 * ```ftl::maybe<T>```, if ```T``` is a monoid.
+* `std::shared_ptr<T>`, if `T` is a monoid.
 * Any ```ftl::function<T,Ts...>``` and, equivalently, any ```std::function<T(Ts...)>``` where T is a monoid. This is where things get interesting.
 
 A few examples of actually using monoids:
