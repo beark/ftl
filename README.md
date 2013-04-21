@@ -1,10 +1,12 @@
 ftl - The Functional Template Library
 =====================================
 
-C++ template library for fans of functional programming. The goal of this project is to implement a useful subset of the Haskell Prelude (and a couple of other libraries) in C++. To date, this subset is very minimal, but there are plans to expand.
+C++ template library for fans of functional programming. The goal of this project is to implement a useful subset of the Haskell Prelude (and a couple of other libraries) in C++. Presently, this subset is small, but rapidly growing. Note, however, that the library and its API are still in heavy flux and the interface of any data type or concept may yet change without notice.
+
+To use the ftl, you need a compiler that implements at least as much of C++11 as gcc-4.7. Recent releases of clang, for instance, should be fine, but have not been tested. MSVC has not been tested, but it seems highly unlikely that it'll work. In fact, as of the time of this writing, the library has only been compiled and tested using gcc-4.7 and gcc-4.8. Should someone wish try ftl with additional compilers, both reports of results and compatibility patches are welcome.
 
 ## Applicative Functors
-An applicative functor is a subset of [functors](#functor), with a few additional operations available. Most notably, `apply` (or `operator*` if you don't mind bringing that into scope). So what does this `apply` thing do? In a way, it's not too dissimlar to Functor's `fmap`, except it applies a function wrapped in the type that is an Applicative. The use case of this is simple: whenever you find yourself with a function you wish you could fmap on some Functor, but find that the function itself is wrapped in that same Functor, then you actually want Applicative's `apply`. If the exact type of the Functor is known, you can of course do this anyway, but abstracting the operation into Applicative can allow for more general code.
+Applicative functors are a subset of [functors](#functor), with a few additional operations available. Most notably, `apply` (or `operator*` if you don't mind bringing that into scope). So what does this `apply` thing do? In a way, it's not too dissimlar to Functor's `fmap`, except instead of a free function, it applies a function wrapped in the Applicative instance. The use case of this is simple: whenever you find yourself with a function you wish you could fmap on some Functor, but find that the function itself is wrapped in that same Functor, then you actually want Applicative's `apply`. If the exact type of the Functor is known, you can of course do this anyway, but abstracting the operation into Applicative can allow for more general code.
 
 A quick example to show what `apply` does:
 ```cpp
@@ -36,7 +38,7 @@ Notable instance of Applicative include:
 * `either<L,R>`
 * `std::tuple<T,Ts...>`
 * `ftl::function<R,Ps...>`
-* `std::shared_ptr`
+* `std::shared_ptr<T>`
 
 ## Either
 The `either<L,R>` datatype is used when a parameter, return value, or variable may be _either_ one type _or_ another, but never both. Interesting concepts implemented by `either<L,R>` include Functor and Monad.
