@@ -111,6 +111,21 @@ namespace ftl {
 					typename gen_seq<1,sizeof...(Ts)>::type());
 		}
 
+		template<typename...>
+		struct allMonoids {
+		};
+
+		template<>
+		struct allMonoids<> {
+			static constexpr bool value = true;
+		};
+
+		template<typename T, typename...Ts>
+		struct allMonoids<T,Ts...> {
+			static constexpr bool value
+				= monoid<T>::instance && allMonoids<Ts...>::value;
+		};
+
 	}
 
 	/**
@@ -147,18 +162,26 @@ namespace ftl {
 	 */
 	template<typename...Ts>
 	struct monoid<std::tuple<Ts...>> {
-		static std::tuple<Ts...> id() {
+		static auto id()
+		-> typename std::enable_if<
+				allMonoids<Ts...>::value,
+				std::tuple<Ts...>>::type {
 			return std::make_tuple(monoid<Ts>::id()...);
 		}
 
-		static std::tuple<Ts...> append(
+		static auto append(
 				const std::tuple<Ts...>& t1,
-				const std::tuple<Ts...>& t2) {
+				const std::tuple<Ts...>& t2)
+		-> typename std::enable_if<
+				allMonoids<Ts...>::value,
+				std::tuple<Ts...>>::type {
 
 			auto ret = t1;
 			tup<sizeof...(Ts)-1, std::tuple<Ts...>>::app(ret, t2);
 			return ret;
 		}
+
+		static constexpr bool instance = allMonoids<Ts...>::value;
 	};
 
 	/**

@@ -389,6 +389,8 @@ namespace ftl {
 				return maybe<A>();
 			}
 		}
+
+		static constexpr bool instance = monoid<A>::instance;
 	};
 
 	/**

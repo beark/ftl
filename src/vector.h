@@ -158,6 +158,8 @@ namespace ftl {
 			rv.insert(rv.end(), v2.begin(), v2.end());
 			return rv;
 		}
+
+		static constexpr bool instance = true;
 	};
 
 	/**

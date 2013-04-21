@@ -45,17 +45,27 @@ namespace ftl {
 	 */
 	template<typename M, typename...Ps>
 	struct monoid<function<M,Ps...>> {
-		static function<M,Ps...> id() {
+
+		static auto id()
+		-> typename std::enable_if<
+				monoid<M>::instance,
+				function<M,Ps...>>::type {
 			return [](Ps...ps) { return monoid<M>::id(); };
 		}
 
-		static function<M,Ps...> append(
+		static auto append(
 				const function<M,Ps...>& f1,
-				const function<M,Ps...>& f2) {
+				const function<M,Ps...>& f2)
+		-> typename std::enable_if<
+				monoid<M>::instance,
+				function<M,Ps...>>::type {
 			return [=] (Ps...ps) {
 				return monoid<M>::append(f1(ps...), f2(ps...));
 			};
 		}
+
+		// function<M,Ps...> is only an instance of monoid if M is.
+		static constexpr bool instance = monoid<M>::instance;
 	};
 
 	template<
@@ -81,7 +91,11 @@ namespace ftl {
 			return [a] (Ts...) { return a; };
 		}
 
-		template<typename A, typename B, typename...Ts>
+		template<
+			typename F,
+			typename A,
+			typename B = typename std::result_of<F(A)>::type,
+			typename...Ts>
 		static function<B,Ts...> apply(
 				function<function<B,A>, Ts...> fn,
 				const function<A,Ts...>& f) {
@@ -173,17 +187,25 @@ namespace ftl {
 	 */
 	template<typename M, typename...Ps>
 	struct monoid<std::function<M(Ps...)>> {
-		static std::function<M(Ps...)> id() {
+		static auto id()
+		-> typename std::enable_if<
+				monoid<M>::instance,
+				std::function<M(Ps...)>>::type {
 			return [](Ps...ps) { return monoid<M>::id(); };
 		}
 
-		static std::function<M(Ps...)> append(
+		static auto append(
 				const std::function<M(Ps...)>& f1,
-				const std::function<M(Ps...)>& f2) {
+				const std::function<M(Ps...)>& f2)
+		-> typename std::enable_if<
+				monoid<M>::instance,
+				std::function<M(Ps...)>>::type {
 			return [=] (Ps...ps) {
 				return monoid<M>::append(f1(ps...), f2(ps...));
 			};
 		}
+
+		static constexpr bool instance = monoid<M>::instance;
 	};
 
 }

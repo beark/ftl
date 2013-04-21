@@ -525,6 +525,8 @@ namespace ftl {
 			l3.insert(l3.end(), l2.begin(), l2.end());
 			return l3;
 		}
+
+		static constexpr bool instance = true;
 	};
 
 	/**

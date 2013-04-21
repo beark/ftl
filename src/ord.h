@@ -179,6 +179,8 @@ namespace ftl {
 		static constexpr ord append(ord o1, ord o2) noexcept {
 			return (o1 == ord::Lt) ? o1 : (o1 == ord::Eq ? o2 : o1);
 		}
+
+		static constexpr bool instance = true;
 	};
 
 	/**

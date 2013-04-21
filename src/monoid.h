@@ -69,6 +69,13 @@ namespace ftl {
 		 * that would allow mutation of either \c m1 or \c m2.
 		 */
 		static M append(M m1, M m2);
+
+		/**
+		 * Used for compile time checks.
+		 *
+		 * Any actual instance must define this as true.
+		 */
+		static constexpr bool instance = false;
 	};
 
 	/**
@@ -77,7 +84,9 @@ namespace ftl {
 	 * This default implementation should work for any type that properly
 	 * implements the monoid interface.
 	 */
-	template<typename M>
+	template<
+		typename M,
+		typename = typename std::enable_if<monoid<M>::instance>::type>
 	M operator^ (const M& m1, const M& m2) {
 		return monoid<M>::append(m1, m2);
 	}
@@ -181,6 +190,8 @@ namespace ftl {
 
 			return n1 + n2;
 		}
+
+		static constexpr bool instance = true;
 	};
 
 	/**
@@ -277,6 +288,8 @@ namespace ftl {
 
 			return n1 * n2;
 		}
+
+		static constexpr bool instance = true;
 	};
 
 	/**
@@ -310,6 +323,8 @@ namespace ftl {
 		static constexpr any append(any a1, any a2) noexcept {
 			return a1.b || a2.b;
 		}
+
+		static constexpr bool instance = true;
 	};
 
 	/**
@@ -343,6 +358,8 @@ namespace ftl {
 		static constexpr all append(all a1, all a2) noexcept {
 			return a1 && a2;
 		}
+
+		static constexpr bool instance = true;
 	};
 
 }
