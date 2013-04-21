@@ -33,8 +33,7 @@ namespace ftl {
 	 *
 	 * Definition of the Monad concept.
 	 */
-	template<
-		template<typename...> class M>
+	template<template<typename...> class M>
 	struct monad {
 
 		/**
@@ -42,22 +41,29 @@ namespace ftl {
 		 *
 		 * Given a plain value, encapsulate it in the monad M.
 		 */
-		template<typename A, typename...Ts>
-		static M<A,Ts...> pure(const A&);
+		//template<typename A, typename...Ts>
+		//static M<A,Ts...> pure(const A&);
 
 		/// \overload
-		template<typename A, typename...Ts>
-		static M<A,Ts...> pure(A&&);
+		//template<typename A, typename...Ts>
+		//static M<A,Ts...> pure(A&&);
 
 		/**
 		 * Bind a value and execute a computation in M on it.
 		 */
-		template<
-			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type::value_type,
-			typename...Ts>
-		static M<B,Ts...> bind(const M<A,Ts...>&, F);
+		//template<
+			//typename F,
+			//typename A,
+			//typename B = typename decayed_result<F(A)>::type::value_type,
+			//typename...Ts>
+		//static M<B,Ts...> bind(const M<A,Ts...>&, F);
+
+		/**
+		 * Used for compile time checks.
+		 *
+		 * Implementors that aren't also Monads \em must override this default.
+		 */
+		static constexpr bool value = false;
 	};
 
 	/**
@@ -67,9 +73,20 @@ namespace ftl {
 		typename F,
 		template <typename...> class M,
 		typename A,
+		typename = typename std::enable_if<monad<M>::value>::type,
 		typename B = typename decayed_result<F(A)>::type::value_type,
 		typename...Ts>
 	M<B,Ts...> operator>>= (const M<A,Ts...>& m, F f) {
+		return monad<M>::bind(m, f);
+	}
+
+	template<
+		typename F,
+		template <typename> class M,
+		typename A,
+		typename = typename std::enable_if<monad<M>::value>::type,
+		typename B = typename decayed_result<F(A)>::type::value_type>
+	M<B> operator>>= (const M<A>& m, F f) {
 		return monad<M>::bind(m, f);
 	}
 
@@ -80,8 +97,20 @@ namespace ftl {
 		template<typename...> class M,
 		typename A,
 		typename R,
+		typename = typename std::enable_if<monad<M>::value>::type,
 		typename...Ts>
 	M<R,Ts...> liftM(function<A,R> f, const M<A,Ts...>& m) {
+		return m >>= [f] (A a) {
+			return monad<M>::pure(f(std::forward(a)));
+		};
+	}
+
+	template<
+		template<typename> class M,
+		typename A,
+		typename R,
+		typename = typename std::enable_if<monad<M>::value>::type>
+	M<R> liftM(function<A,R> f, const M<A>& m) {
 		return m >>= [f] (A a) {
 			return monad<M>::pure(f(std::forward(a)));
 		};
@@ -94,6 +123,7 @@ namespace ftl {
 		template<typename...> class M,
 		typename A,
 		typename B,
+		typename = typename std::enable_if<monad<M>::value>::type,
 		typename...Ts>
 	M<B,Ts...> ap(M<function<B,A>,Ts...> f, const M<A,Ts...>& m) {
 		return f >>= [&m] (function<B,A> f) {
@@ -103,6 +133,18 @@ namespace ftl {
 		};
 	}
 
+	template<
+		template<typename> class M,
+		typename A,
+		typename B,
+		typename = typename std::enable_if<monad<M>::value>::type>
+	M<B> ap(M<function<B,A>> f, const M<A>& m) {
+		return f >>= [&m] (function<B,A> f) {
+			return m >>= [f] (A a) {
+				return monad<M>::pure(f(std::forward<A>(a)));
+			};
+		};
+	}
 }
 
 #endif

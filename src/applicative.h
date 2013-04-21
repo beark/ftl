@@ -65,12 +65,41 @@ namespace ftl {
 		 *
 		 * \note Default implementation only works if F is already a monad.
 		 */
-		template<typename A, typename B, typename...Ts>
+		template<
+			typename Fn,
+			typename A,
+			typename B = typename decayed_result<Fn(A)>::type,
+			typename...Ts>
 		static F<B,Ts...> apply(
-				const F<function<B,A>,Ts...>& fn,
+				const F<Fn,Ts...>& fn,
 				const F<A,Ts...>& f) {
 			return ap(fn, f);
 		}
+
+		/**
+		 * Used for compile time checks.
+		 *
+		 * Implementors that aren't also Monads \em must override this default.
+		 */
+		static constexpr bool value = monad<F>::value;
+	};
+
+	template<template<typename> class F>
+	struct applicative<F> {
+		template<typename A>
+		static F<A> pure(A a) {
+			return monad<F>::pure(std::forward<A>(a));
+		}
+
+		template<
+			typename Fn,
+			typename A,
+			typename B = typename decayed_result<Fn(A)>::type>
+		static F<B> apply(const F<Fn>& fn, const F<A>& f) {
+			return ap(fn, f);
+		}
+
+		static constexpr bool value = monad<F>::value;
 	};
 
 	/**
@@ -78,12 +107,22 @@ namespace ftl {
 	 */
 	template<
 		template<typename...> class F,
+		typename Fn,
 		typename A,
-		typename B,
+		typename = typename std::enable_if<applicative<F>::value>::type,
+		typename B = typename decayed_result<Fn(A)>::type,
 		typename...Ts>
-	F<B,Ts...> operator* (
-			const F<function<B,A>,Ts...>& u,
-			const F<A,Ts...>& v) {
+	F<B,Ts...> operator* (const F<Fn,Ts...>& u, const F<A,Ts...>& v) {
+		return applicative<F>::apply(u, v);
+	}
+
+	template<
+		template<typename> class F,
+		typename Fn,
+		typename A,
+		typename = typename std::enable_if<applicative<F>::value>::type,
+		typename B = typename decayed_result<Fn(A)>::type>
+	F<B> operator* (const F<Fn>& u, const F<A>& v) {
 		return applicative<F>::apply(u, v);
 	}
 

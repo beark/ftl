@@ -90,6 +90,8 @@ namespace ftl {
 				return fab(f(ts...));
 			};
 		}
+
+		static constexpr bool value = true;
 	};
 
 	/*

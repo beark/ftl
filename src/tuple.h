@@ -191,12 +191,18 @@ namespace ftl {
 			return std::make_tuple(a, monoid<Ts>::id()...);
 		}
 
-		template<typename A, typename B, typename...Ts>
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type,
+			typename...Ts>
 		static std::tuple<B,Ts...> apply(
-				const std::tuple<function<B,A>,Ts...>& tfn,
+				const std::tuple<F,Ts...>& tfn,
 				const std::tuple<A,Ts...>& t) {
 			return applicative_implementation(tfn, t);
 		}
+
+		static constexpr bool value = true;
 	};
 
 	/**

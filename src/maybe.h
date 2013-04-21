@@ -417,6 +417,8 @@ namespace ftl {
 		static maybe<B> bind(const maybe<A>& m, F f) {
 			return m ? f(*m) : maybe<B>();
 		}
+
+		static constexpr bool value = true;
 	};
 }
 

@@ -302,6 +302,8 @@ namespace ftl {
 			else
 				return either<B,R>(e.right());
 		}
+
+		static constexpr bool value = true;
 	};
 
 	/**
