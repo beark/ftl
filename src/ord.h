@@ -202,6 +202,36 @@ namespace ftl {
 	}
 
 	/**
+	 * Convenience function to compare objects by converter.
+	 *
+	 * \tparam F Must satisfy Function<Orderable(A)>, or in other words, must
+	 *           return something that is Orderable.
+	 *
+	 * The use case for this convenience function is similar to the comparing
+	 * function that works with getter methods, but in this case the comparison
+	 * is made after a free function has been aplied to the original values.
+	 *
+	 * Example:
+	 * \code
+	 *   list<maybe<string>> l{value("abc"), value("de"), value("f)};
+	 *   // Sorts the above list in order of string length (nothing is regarded
+	 *   // as an empty string)
+	 *   sort(l.begin(), l.end(),
+	 *           lessThan(comparing([] (const maybe<string>& m) -> size_t {
+	 *       if(m) return m->size();
+	 *       return 0;
+	 *   })));
+	 * \endcode
+	 */
+	template<typename A, typename B>
+	function<ord,const A&,const A&> comparing(function<B,A> cmp) {
+		return [=] (const A& a, const A& b) {
+			return orderable<typename std::decay<B>::type>::compare(
+					f(a), f(b));
+		};
+	}
+
+	/**
 	 * Convenience function to ease integration with stdlib's sort.
 	 *
 	 * \param cmp Compare function to apply internally.
