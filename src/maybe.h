@@ -418,7 +418,7 @@ namespace ftl {
 			return m ? f(*m) : maybe<B>();
 		}
 
-		static constexpr bool value = true;
+		static constexpr bool instance = true;
 	};
 }
 

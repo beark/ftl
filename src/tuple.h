@@ -202,7 +202,7 @@ namespace ftl {
 			return applicative_implementation(tfn, t);
 		}
 
-		static constexpr bool value = true;
+		static constexpr bool instance = true;
 	};
 
 	/**

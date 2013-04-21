@@ -91,7 +91,7 @@ namespace ftl {
 			};
 		}
 
-		static constexpr bool value = true;
+		static constexpr bool instance = true;
 	};
 
 	/*

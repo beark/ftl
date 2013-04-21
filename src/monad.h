@@ -63,7 +63,7 @@ namespace ftl {
 		 *
 		 * Implementors that aren't also Monads \em must override this default.
 		 */
-		static constexpr bool value = false;
+		static constexpr bool instance = false;
 	};
 
 	/**
@@ -73,7 +73,7 @@ namespace ftl {
 		typename F,
 		template <typename...> class M,
 		typename A,
-		typename = typename std::enable_if<monad<M>::value>::type,
+		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename B = typename decayed_result<F(A)>::type::value_type,
 		typename...Ts>
 	M<B,Ts...> operator>>= (const M<A,Ts...>& m, F f) {
@@ -84,7 +84,7 @@ namespace ftl {
 		typename F,
 		template <typename> class M,
 		typename A,
-		typename = typename std::enable_if<monad<M>::value>::type,
+		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename B = typename decayed_result<F(A)>::type::value_type>
 	M<B> operator>>= (const M<A>& m, F f) {
 		return monad<M>::bind(m, f);
@@ -97,7 +97,7 @@ namespace ftl {
 		template<typename...> class M,
 		typename A,
 		typename R,
-		typename = typename std::enable_if<monad<M>::value>::type,
+		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename...Ts>
 	M<R,Ts...> liftM(function<A,R> f, const M<A,Ts...>& m) {
 		return m >>= [f] (A a) {
@@ -109,7 +109,7 @@ namespace ftl {
 		template<typename> class M,
 		typename A,
 		typename R,
-		typename = typename std::enable_if<monad<M>::value>::type>
+		typename = typename std::enable_if<monad<M>::instance>::type>
 	M<R> liftM(function<A,R> f, const M<A>& m) {
 		return m >>= [f] (A a) {
 			return monad<M>::pure(f(std::forward(a)));
@@ -121,23 +121,25 @@ namespace ftl {
 	 */
 	template<
 		template<typename...> class M,
+		typename F,
 		typename A,
-		typename B,
-		typename = typename std::enable_if<monad<M>::value>::type,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename B = typename decayed_result<F(A)>::type,
 		typename...Ts>
-	M<B,Ts...> ap(M<function<B,A>,Ts...> f, const M<A,Ts...>& m) {
-		return f >>= [&m] (function<B,A> f) {
+	M<B,Ts...> ap(M<F,Ts...> f, const M<A,Ts...>& m) {
+		return f >>= [&m] (F f) {
 			return m >>= [f] (A a) {
-				return monad<M>::pure(f(std::forward(a)));
+				return monad<M>::pure(f(std::forward<A>(a)));
 			};
 		};
 	}
 
 	template<
 		template<typename> class M,
+		typename F,
 		typename A,
-		typename B,
-		typename = typename std::enable_if<monad<M>::value>::type>
+		typename B = typename decayed_result<F(A)>::type,
+		typename = typename std::enable_if<monad<M>::instance>::type>
 	M<B> ap(M<function<B,A>> f, const M<A>& m) {
 		return f >>= [&m] (function<B,A> f) {
 			return m >>= [f] (A a) {

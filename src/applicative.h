@@ -81,7 +81,7 @@ namespace ftl {
 		 *
 		 * Implementors that aren't also Monads \em must override this default.
 		 */
-		static constexpr bool value = monad<F>::value;
+		static constexpr bool instance = monad<F>::instance;
 	};
 
 	template<template<typename> class F>
@@ -99,7 +99,7 @@ namespace ftl {
 			return ap(fn, f);
 		}
 
-		static constexpr bool value = monad<F>::value;
+		static constexpr bool instance = monad<F>::instance;
 	};
 
 	/**
@@ -109,7 +109,7 @@ namespace ftl {
 		template<typename...> class F,
 		typename Fn,
 		typename A,
-		typename = typename std::enable_if<applicative<F>::value>::type,
+		typename = typename std::enable_if<applicative<F>::instance>::type,
 		typename B = typename decayed_result<Fn(A)>::type,
 		typename...Ts>
 	F<B,Ts...> operator* (const F<Fn,Ts...>& u, const F<A,Ts...>& v) {
@@ -120,7 +120,7 @@ namespace ftl {
 		template<typename> class F,
 		typename Fn,
 		typename A,
-		typename = typename std::enable_if<applicative<F>::value>::type,
+		typename = typename std::enable_if<applicative<F>::instance>::type,
 		typename B = typename decayed_result<Fn(A)>::type>
 	F<B> operator* (const F<Fn>& u, const F<A>& v) {
 		return applicative<F>::apply(u, v);
