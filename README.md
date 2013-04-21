@@ -3,6 +3,41 @@ ftl - The Functional Template Library
 
 C++ template library for fans of functional programming. The goal of this project is to implement a useful subset of the Haskell Prelude (and a couple of other libraries) in C++. To date, this subset is very minimal, but there are plans to expand.
 
+Applicative Functors
+--------------------
+An applicative functor is a subset of [functors](#Functor), with a few additional operations available. Most notably, `apply` (or `operator*` if you don't mind bringing that into scope). So what does this `apply` thing do? In a way, it's not too dissimlar to Functor's `fmap`, except it applies a function wrapped in the type that is an Applicative. The use case of this is simple: whenever you find yourself with a function you wish you could fmap on some Functor, but find that the function itself is wrapped in that same Functor, then you actually want Applicative's `apply`. If the exact type of the Functor is known, you can of course do this anyway, but abstracting the operation into Applicative can allow for more general code.
+
+A quick example to show what `apply` does:
+```cpp
+#include <ftl/maybe.h>
+
+int main(int argc, char** argv) {
+    using namespace ftl;
+
+    // ftl overloads operator* for applicatives, it is equivalent to
+    // applicative<F>::apply(F1, F2);
+    auto mb = value([](int x){ return x/3; }) * value(9);
+    if(mb)
+        std::cout << "value(" << *mb << ")" << std::endl;
+    else
+        std::cout << "nothing" << std::endl;
+
+    return 0;
+}
+```
+Output:
+```
+user@home:~/ftl_example$ ./ex
+value(3)
+```
+Had either of the above `value`s been `nothing` instead, "nothing" would have been printed.
+
+Notable instance of Applicative include:
+* `maybe<T>`
+* `either<L,R>`
+* `std::tuple<T,Ts...>`
+* `ftl::function<R,Ps...>`
+
 Either
 ------
 The `either<L,R>` datatype is used when a parameter, return value, or variable may be _either_ one type _or_ another, but never both. Interesting concepts implemented by `either<L,R>` include Functor and Monad.
