@@ -122,6 +122,8 @@ namespace ftl {
 
 	/**
 	 * Apply a function in M to a value in M.
+	 *
+	 * This is actually exactly equivalent to applicative<M>::apply.
 	 */
 	template<
 		template<typename...> class M,
@@ -138,13 +140,14 @@ namespace ftl {
 		};
 	}
 
+	/// \overload
 	template<
 		template<typename> class M,
 		typename F,
 		typename A,
-		typename B = typename decayed_result<F(A)>::type,
-		typename = typename std::enable_if<monad<M>::instance>::type>
-	M<B> ap(M<function<B,A>> f, const M<A>& m) {
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename B = typename decayed_result<F(A)>::type>
+	M<B> ap(M<F> f, const M<A>& m) {
 		return f >>= [&m] (function<B,A> f) {
 			return m >>= [f] (A a) {
 				return monad<M>::pure(f(std::forward<A>(a)));
