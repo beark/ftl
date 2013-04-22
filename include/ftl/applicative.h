@@ -108,7 +108,7 @@ namespace ftl {
 			typename Fn,
 			typename A,
 			typename B = typename decayed_result<Fn(A)>::type>
-		F<B> map(Fn fn, F<A> f) {
+		static F<B> map(Fn fn, F<A> f) {
 			return monad<F>::map(fn, f);
 		}
 
