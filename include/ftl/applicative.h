@@ -23,6 +23,7 @@
 #ifndef FTL_APPLICATIVE_H
 #define FTL_APPLICATIVE_H
 
+#include "functor.h"
 #include "function.h"
 
 namespace ftl {
@@ -59,6 +60,18 @@ namespace ftl {
 		}
 
 		/**
+		 * Map a function to inner value of functor.
+		 */
+		template<
+			typename Fn,
+			typename A,
+			typename B = typename decayed_result<Fn(A)>::type,
+			typename...Ts>
+		static F<B,Ts...> map(Fn fn, F<A,Ts...> f) {
+			return monad<F>::map(fn, f);
+		}
+
+		/**
 		 * Sequential application.
 		 *
 		 * Default implementation is to use monad's ap.
@@ -89,6 +102,14 @@ namespace ftl {
 		template<typename A>
 		static F<A> pure(A a) {
 			return monad<F>::pure(std::forward<A>(a));
+		}
+
+		template<
+			typename Fn,
+			typename A,
+			typename B = typename decayed_result<Fn(A)>::type>
+		F<B> map(Fn fn, F<A> f) {
+			return monad<F>::map(fn, f);
 		}
 
 		template<

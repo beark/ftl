@@ -293,6 +293,18 @@ namespace ftl {
 
 		template<
 			typename F,
+			typename A,
+			typename R,
+			typename B = typename decayed_result<F(A)>::type>
+		static either<B,R> map(F f, either<A,R> e) {
+			if(e.isLeft())
+				return either<B,R>(f(e.left()));
+			else
+				return either<B,R>(e.right());
+		}
+
+		template<
+			typename F,
 			typename R,
 			typename A,
 			typename B = typename decayed_result<F(A)>::type::value_type>
@@ -305,38 +317,6 @@ namespace ftl {
 
 		static constexpr bool instance = true;
 	};
-
-	/**
-	 * Functor implementation for either.
-	 *
-	 * \note either is a functor in L, unlike in Haskell.
-	 */
-	template<
-		typename F,
-		typename L,
-		typename R,
-		typename L2 = typename decayed_result<F(L)>::type>
-	either<L2, R> fmap(const F& f, const either<L, R>& e) {
-
-		if(e.isLeft())
-			return either<L2, R>(f(e.left()));
-		else
-			return either<L2, R>(e.right());
-	}
-
-	/// \overload
-	template<
-		typename L,
-		typename R,
-		typename Mr,
-		typename...Ps>
-	either<L, R>& fmap(Mr (L::*method) (Ps...), const either<L, R>& e, Ps&&...ps) {
-		if(e.isLeft()) {
-			(e.left().*method)(ps...);
-		}
-		else
-			return e;
-	}
 
 }
 

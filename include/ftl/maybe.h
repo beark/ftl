@@ -396,7 +396,8 @@ namespace ftl {
 	/**
 	 * Implementation of monad for maybe.
 	 *
-	 * \note This automatically gives maybe a default applicative instance.
+	 * \note This automatically gives maybe default applicative and functor
+	 *       instances.
 	 */
 	template<>
 	struct monad<maybe> {
@@ -411,7 +412,21 @@ namespace ftl {
 		noexcept(std::is_nothrow_move_constructible<A>::value) {
 			return value(std::move(a));
 		}
+
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type>
+		static maybe<B> map(F f, maybe<A> m) {
+			return m ? value(f(*m)) : maybe<B>();
+		}
 		
+
+		/**
+		 * Applies a function to unwrapped maybe value.
+		 *
+		 * \tparam F must satisfy Function<maybe<B>(A)>
+		 */
 		template<
 			typename F,
 			typename A,

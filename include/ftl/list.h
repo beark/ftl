@@ -432,23 +432,6 @@ namespace ftl {
 	}
 
 	/**
-	 * Functor instance of list.
-	 */
-	template<
-		typename F,
-		typename Alloc,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type>
-	list<B,Alloc> fmap(F f, const list<A,Alloc>& l) {
-		list<B,Alloc> ret;
-		for(const auto& e : l) {
-			ret.push_back(f(e));
-		}
-
-		return ret;
-	}
-
-	/**
 	 * Mappable::mutate implementation for list.
 	 */
 	template<typename T, typename A, typename F>
@@ -551,10 +534,26 @@ namespace ftl {
 			typename Alloc,
 			typename F,
 			typename A,
+			typename B = typename decayed_result<F(A)>::type>
+		static list<B,Alloc> map(F f, const list<A,Alloc>& l) {
+			list<B,Alloc> ret;
+			for(const auto& e : l) {
+				ret.push_back(f(e));
+			}
+
+			return ret;
+		}
+
+		template<
+			typename Alloc,
+			typename F,
+			typename A,
 			typename B = typename decayed_result<F(A)>::type::value_type>
 		static list<B,Alloc> bind(const list<A,Alloc>& l, F f) {
 			return concatMap(f, l);
 		}
+
+		static constexpr bool instance = true;
 	};
 
 	/**

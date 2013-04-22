@@ -85,31 +85,32 @@ namespace ftl {
 		static constexpr bool instance = monoid<T>::instance;
 	};
 
-	/// Functor instance for shared_ptrs.
-	template<
-		typename F,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type>
-	std::shared_ptr<B> fmap(F f, std::shared_ptr<A> p) {
-		if(p)
-			return std::make_shared(f(*p));
-
-		else
-			return std::shared_ptr<B>();
-	}
-
 	/**
 	 * Monad instance of shared_ptr.
 	 */
 	template<>
 	struct monad<std::shared_ptr> {
 
+		template<typename A>
 		static std::shared_ptr<A> pure(const A& a) {
 			return std::make_shared(a);
 		}
 
+		template<typename A>
 		static std::shared_ptr<A> pure(A&& a) {
 			return std::make_shared(std::move(a));
+		}
+
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type>
+		std::shared_ptr<B> map(F f, std::shared_ptr<A> p) {
+			if(p)
+				return std::make_shared(f(*p));
+
+			else
+				return std::shared_ptr<B>();
 		}
 
 		template<

@@ -120,16 +120,22 @@ namespace ftl {
 	/**
 	 * Implementation of functor for vectors
 	 */
-	template<
-		typename F,
-		template <typename, typename...> class Alloc,
-		typename A,
-		typename B = decayed_result<F(A)>::type,
-		typename...AllocArgs>
-	auto fmap(const F& f, const std::vector<A, Alloc<A,AllocArgs...>>& v)
-	-> std::vector<B, Alloc<B,AllocArgs...>>
-		return map(f, l);
-	}
+	template<>
+	struct functor<std::vector> {
+		template<
+			typename F,
+			typename A,
+			typename B = decayed_result<F(A)>::type>
+		std::vector<B> map(const F& f, const std::vector<A>& v) {
+			std::vector<B> ret;
+			ret.reserve(v.size());
+			for(const auto& e : v) {
+				ret.push_back(f(e));
+			}
+
+			return ret;
+		}
+	};
 
 	// \overload
 	template<

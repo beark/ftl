@@ -187,19 +187,24 @@ namespace ftl {
 	/**
 	 * Functor instance for tuples.
 	 *
-	 * Applies the function to the first field in the tuple.
+	 * Separate from the applicative instance because tuples are always
+	 * functors, but only applicative ones if the remaining types are all
+	 * monoids.
 	 */
-	template<
-		typename F,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type,
-		typename...Ts>
-	std::tuple<B, Ts...> fmap(const F& f, const std::tuple<A, Ts...>& t) {
+	template<>
+	struct functor<std::tuple> {
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type,
+			typename...Ts>
+		std::tuple<B, Ts...> map(F f, std::tuple<A, Ts...>& t) {
 
-		std::tuple<B, Ts...> ret;
-		tup<sizeof...(Ts)-1, std::tuple<B, Ts...>>::fmap(f, t, ret);
-		return ret;
-	}
+			std::tuple<B, Ts...> ret;
+			tup<sizeof...(Ts)-1, std::tuple<B, Ts...>>::fmap(f, t, ret);
+			return ret;
+		}
+	};
 
 	/**
 	 * Applicative instance for tuples.
@@ -212,6 +217,15 @@ namespace ftl {
 		template<typename A, typename...Ts>
 		static std::tuple<A,Ts...> pure(A a) {
 			return std::make_tuple(a, monoid<Ts>::id()...);
+		}
+
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type,
+			typename...Ts>
+		static std::tuple<B,Ts...> map(F f, std::tuple<A,Ts...> t) {
+			return functor<std::tuple>::map(f, t);
 		}
 
 		template<

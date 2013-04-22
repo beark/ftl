@@ -24,6 +24,7 @@
 #define FTL_MONAD_H
 
 #include "functional.h"
+#include "applicative.h"
 
 namespace ftl {
 
@@ -47,6 +48,9 @@ namespace ftl {
 		/// \overload
 		//template<typename A, typename...Ts>
 		//static M<A,Ts...> pure(A&&);
+
+		// template<typename F, typename A, typename B = typename decayed_result<F(A)>::type, typename...Ts>
+		//static M<B,Ts...> map(Fn f, M<A,Ts...> m);
 
 		/**
 		 * Bind a value and execute a computation in M on it.

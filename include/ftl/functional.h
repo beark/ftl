@@ -68,17 +68,6 @@ namespace ftl {
 		static constexpr bool instance = monoid<M>::instance;
 	};
 
-	template<
-		typename F,
-		typename A,
-		typename B = typename std::result_of<F(A)>::type,
-		typename...Ps>
-	function<B,Ps...> fmap(F f, function<A,Ps...> fn) {
-		return [f,fn] (Ps...ps) {
-			return f(fn(std::forward<Ps>(ps)...));
-		};
-	}
-
 	/**
 	 * Applicative Functor instance for ftl::functions.
 	 */
@@ -89,6 +78,17 @@ namespace ftl {
 		template<typename A, typename...Ts>
 		static function<A,Ts...> pure(A a) {
 			return [a] (Ts...) { return a; };
+		}
+
+		template<
+			typename F,
+			typename A,
+			typename B = typename std::result_of<F(A)>::type,
+			typename...Ps>
+		static function<B,Ps...> map(F f, function<A,Ps...> fn) {
+			return [f,fn] (Ps...ps) {
+				return f(fn(std::forward<Ps>(ps)...));
+			};
 		}
 
 		template<
