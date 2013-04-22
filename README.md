@@ -33,6 +33,51 @@ value(3)
 ```
 Had either of the above `value`s been `nothing` instead, "nothing" would have been printed.
 
+A slightly more involved example, showing off proper "applicative style" programming, as seen in Haskell.
+```cpp
+int foo(int x, int y) {
+    return x/2 + y/3;
+}
+
+template<template<typename> class F, typename Fn>
+F<int> baz(Fn f, F<int> a, F<int> b) {
+    using ftl::operator%;    // Equivalent to functor<F>::map
+    using ftl::operator*;    // Equivalent to applicative<F>::apply
+
+    return f % a * b;
+}
+
+int main(int argc, char** argv) {
+    using ftl::curry;
+    using ftl::value;
+    auto foobar = curry(foo);    // See http://en.wikipedia.org/wiki/Currying
+                                 // for an explanation.
+
+    // While we again use maybe as example (because it's quite easy to
+    // understand), we could've used *any* applicative, really.
+    auto maybeAnswer = baz(foobar, value(6), value(9));
+    if(maybeAnswer)
+        std::cout << *maybeAnswer << std::endl;
+
+    return 0;
+}
+```
+Output:
+```
+user@home:~/ftl_example$ ./ex
+6
+```
+But what good is this? We could have accomplished very similar results using code like:
+```cpp
+if(a && b)
+    return foo(*a, *b);
+else
+    return maybe<int>();
+```
+The answer is twofold:
+* Every `apply` saves us from cluttering code with if-checks or equivalent (whatever the applicative action "hides" for us), which in larger algorithms can add up to a LOT of clutter. This also means it is impossible to forget about such checks, potentially saving time spent on searching for bugs.
+* Writing functions in applicative style is far more generalised. The various actions (`map`, `apply`, etc) all serve as a common interface that work on a surprisingly large set of data types, and if we can limit ourselves to use only these, then suddenly a very large amount of functions become reusable for completely different data types. The Applicative Functor concept is a very powerful abstraction.
+
 Notable instance of Applicative include:
 * `maybe<T>`
 * `either<L,R>`
