@@ -160,11 +160,27 @@ namespace ftl {
 	 * returning the answer, the curried function takes one argument and
 	 * returns a function that takes another one and \em then returns the
 	 * answer.
+	 *
+	 * \note This requires the "outer" function (the one who takes a parameter
+	 *       and returns an inner function) to capture its parameter by value.
+	 *       In other words, T1 must be copy or move constructible and must not
+	 *       refer to something that will be destroyed or otherwise made
+	 *       inaccessible.
 	 */
 	template<typename R, typename T1, typename T2>
 	function<function<R,T2>,T1> curry(function<R,T1,T2> f) {
 		return [f] (T1 t1) {
 			return [f,t1] (T2 t2) {
+				return f(t1, std::forward<T2>(t2));
+			};
+		};
+	}
+
+	/// \overload
+	template<typename R, typename T1, typename T2>
+	function<function<R,T2>,T1> curry(R (*f) (T1, T2)) {
+		return [f](T1 t1) {
+			return [f, t1](T2 t2) {
 				return f(t1, std::forward<T2>(t2));
 			};
 		};
