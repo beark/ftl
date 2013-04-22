@@ -87,14 +87,14 @@ namespace ftl {
 
 		explicit constexpr maybe(const value_type& v)
 		noexcept(std::is_nothrow_copy_constructible<A>::value)
-		: isValid(true), val(v) {}
+		: val(v), isValid(true) {}
 
 		explicit constexpr maybe(const value_type&& v)
 		noexcept(std::is_nothrow_move_constructible<A>::value)
-		: isValid(true), val(std::move(v)) {}
+		: val(std::move(v)), isValid(true) {}
 
 		// TODO: Enable the noexcept specifier once is_nothrow_destructible is
-		// available.
+		// available (gcc-4.8).
 		~maybe() /*noexcept(std::is_nothrow_destructible<A>::value)*/ {
 			if(isValid) {
 				val.~value_type();
