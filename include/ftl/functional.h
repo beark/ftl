@@ -208,6 +208,43 @@ namespace ftl {
 		static constexpr bool instance = monoid<M>::instance;
 	};
 
+	/**
+	 * Function composition first base case.
+	 */
+	template<
+		typename F,
+		typename A,
+		typename B = typename std::result_of<F(A)>::type,
+		typename...Ps>
+	function<B,Ps...> compose(F f, A (*fn)(Ps...)) {
+		return [f,fn](Ps...ps) {
+			return f(fn(std::forward<Ps>(ps)...));
+		};
+	}
+
+	/**
+	 * Function composition second base case.
+	 */
+	template<
+		typename F,
+		typename A,
+		typename B = typename std::result_of<F(A)>::type,
+		typename...Ps>
+	function<B,Ps...> compose(F f, function<A,Ps...> fn) {
+		return [f,fn](Ps...ps) {
+			return f(fn(std::forward<Ps>(ps)...));
+		};
+	}
+
+	/**
+	 * Generalised, n-ary function composition.
+	 */
+	template<typename F, typename...Fs>
+	auto compose(F f, Fs...fs)
+	-> decltype(compose(f,compose(std::forward<Fs>(fs)...))) {
+		return compose(f, compose(std::forward<Fs>(fs)...));
+	}
+
 }
 
 #endif
