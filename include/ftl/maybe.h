@@ -324,32 +324,6 @@ namespace ftl {
 	}
 
 	/**
-	 * Functor instance for maybe.
-	 *
-	 * Maps a function to the contained value, if it is a value. If it's
-	 * Nothing, then Nothing is returned.
-	 */
-	template<
-		typename F,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type>
-	maybe<B> fmap(const F& f, const maybe<A>& m) {
-		return m ? maybe<B>(f(*m)) : maybe<B>::nothing();
-	}
-
-	template<
-		typename A,
-		typename R,
-		typename...Ps>
-	maybe<A>& fmap(R (A::*method)(Ps...), maybe<A>& m, Ps&&...ps) {
-		if(m) {
-			((*m).*method)(std::forward(ps)...);
-		}
-
-		return m;
-	}
-
-	/**
 	 * Monoid implementation for maybe.
 	 *
 	 * Semantics are:
