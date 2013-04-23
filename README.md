@@ -10,7 +10,7 @@ Table of contents
 ### Concepts
 * [Monoids](docs/Monoid.md)
 * [Functors](docs/Functor.md)
-* [Applicative Functors](#applicative-functors)
+* [Applicative Functors](docs/Applicative.md)
 * Monads
 
 ### Data types
