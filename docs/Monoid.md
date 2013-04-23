@@ -6,12 +6,15 @@ Formal definition
 Monoids are a concept from abstract algebra, and are defined as a set, _S_, together with a binary operation, _•_, for which the following three laws must hold:
 
 * __Closure__
+
   For all _a_, _b_ in _S_, the result of `a • b` is also in _S_
 
 * __Associativity__
+
   For all _a_, _b_, and _c_ in _S_, the equation `(a • b) • c = a • (b • c)` is satisfied.
 
-* __Identity___
+* __Identity__
+
   There exists an element _id_ in _S_ such that `a • id = id • a = a` holds, for any element _a_ in _S_.
 
 ftl definition
@@ -43,21 +46,24 @@ As for the three laws, there is currently no way of enforcing them in a neat and
 ftl instances
 -------------
 The following primitive and standard types have predefined monoid instances in ftl:
-* All primitive integer and floating point types, using either of the two thin wrappers `ftl::sum_monoid<T>` and `ftl::prod_monoid<T>`.
-  The former makes the inner type a monoid by using ```0``` as the identity element and ```+``` as the associated operation, while the latter uses ```1``` and ```*```.
+* All primitive integer and floating point types, using either of the two thin wrappers `ftl::sum_monoid<T>` and `ftl::prod_monoid<T>`. The former makes the inner type a monoid by using _0_ as the identity element and _+_ as the associated operation, while the latter uses _1_ and _*_.
 * For booleans there are also two thin wrappers: `ftl::any` and `ftl::all`. These are defined as
+
+  `monoid<any>`:
   ```
-  monoid<any>:
   id = false
   a • b = a || b
+  ```
 
-  monoid<all>:
+  `monoid<all>`:
+  ```
   id = true
   a • b = a && b
   ```
 * `std::vector<T>` and, isomorphically, `std::list<T>` are both monoids, for any _T_. Identity is the empty container, and the monoid operation is concatenation.
 * For all monoids _M_, ```std::shared_ptr<M>``` is also a monoid, by using an empty pointer as the identity and the following as monoid operation:
-  ```a • b <=>
+  ```
+  a • b <=>
   if(a) {
       if(b) 
            return make_shared(*a • *b);
@@ -69,10 +75,14 @@ The following primitive and standard types have predefined monoid instances in f
           return b;
       else
           return shared_ptr<M>();
-  }```
-* For all monoids _M_ and any parameter pack _Parameters_, ```std::function<M(Parameters...)>``` is a monoid. This by using ```return monoid<M>::id()``` as function body, regardless of given parameters, for identity, and by using
-  ```(f1 • f2)(params) <=> f1(param) • f2(params)``` as basis for the monoid operation.
-* For all monoids _M1_, _M2_, ..., _Mn_, `std::tuple<M1, M2, ..., Mn>`, by simply applying element-wise monoid operations and identities.
+  }
+  ```
+* For all monoids _M_ and any parameter pack _Parameters_, ```std::function<M(Parameters...)>``` is a monoid. This by using a function that always returns ```monoid<M>::id()``` as idneity, and by using
+  ```
+  (f1 • f2)(params...) <=> f1(params...) • f2(params...)
+  ```
+  as basis for the monoid operation.
+* For all monoids _M1_, _M2_, ..., _Mn_, `std::tuple<M1, M2, ..., Mn>`, is a monoid by simply applying element-wise identity or monoid operations as apropriate.
 
 In addition to the above, the following ftl-defined types have monoid instances:
 * `ftl::ord` is a monoid, using `ftl::ord::Eq` as identity, and the following for the binary operation:
