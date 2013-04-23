@@ -1,7 +1,7 @@
 Applicative Functor
 ===================
 
-An applicative functor provides slightly more structure than a [functor](Functor.md), but slightly less than a [monad](Monad.ms). As such, less types can be viewed as applicative functors than functors, but on the other hand, we can do more interesting things with those types&mdash;even though we know nothing more about them than that they are applciative functors.
+An applicative functor provides slightly more structure than a [functor](Functor.md), but slightly less than a [monad](Monad.md). As such, less types can be viewed as applicative functors than functors, but on the other hand, we can do more interesting things with those types&mdash;even though we know nothing more about them than that they are applciative functors.
 
 ftl definition
 --------------
