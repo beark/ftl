@@ -261,6 +261,36 @@ namespace ftl {
 		return compose(f, compose(std::forward<Fs>(fs)...));
 	}
 
+	/**
+	 * Flip the parameter order of a binary function.
+	 */
+	template<typename A, typename B, typename R>
+	function<R,B,A> flip(function<R,A,B> f) {
+		return [f](B b, A a) {
+			return f(std::forward<A>(a), std::forward<B>(b));
+		};
+	}
+
+	/// \overload
+	template<typename A, typename B, typename R>
+	function<R,B,A> flip(R (&f) (A,B)) {
+		return [&f](B b, A a) {
+			return f(std::forward<A>(a), std::forward<B>(b));
+		};
+	}
+
+	/**
+	 * Flip parameter order of a curried binary function.
+	 */
+	template<typename R, typename A, typename B>
+	function<function<R,A>,B> flip(function<function<R,B>,A> f) {
+		return [f](B b) {
+			return [f,b](A a) {
+				return f(std::forward<A>(a))(b);
+			};
+		};
+	}
+
 }
 
 #endif
