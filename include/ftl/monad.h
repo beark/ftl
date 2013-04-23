@@ -99,22 +99,25 @@ namespace ftl {
 	 */
 	template<
 		template<typename...> class M,
+		typename F,
 		typename A,
-		typename R,
 		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename R = typename decayed_result<F(A)>::type,
 		typename...Ts>
-	M<R,Ts...> liftM(function<A,R> f, const M<A,Ts...>& m) {
+	M<R,Ts...> liftM(F f, const M<A,Ts...>& m) {
 		return m >>= [f] (A a) {
-			return monad<M>::pure(f(std::forward(a)));
+			return monad<M>::pure(f(std::forward<A>(a)));
 		};
 	}
 
+	/// \overload
 	template<
 		template<typename> class M,
+		typename F,
 		typename A,
-		typename R,
-		typename = typename std::enable_if<monad<M>::instance>::type>
-	M<R> liftM(function<A,R> f, const M<A>& m) {
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename R = typename decayed_result<F(A)>::type>
+	M<R> liftM(F f, const M<A>& m) {
 		return m >>= [f] (A a) {
 			return monad<M>::pure(f(std::forward(a)));
 		};
