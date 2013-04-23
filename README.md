@@ -9,7 +9,7 @@ Table of contents
 -----------------
 ### Concepts
 * [Monoids](docs/Monoid.md)
-* [Functors](#functor)
+* [Functors](docs/Functor.md)
 * [Applicative Functors](#applicative-functors)
 * Monads
 
@@ -128,49 +128,6 @@ void checkingState(const ftl::either<typeA,typeB>& e) {
     }
 }
 ```
-
-## Functor
-Functor is a concept (as in the ones that might yet make it in C++14), or in Haskell terms, a type class. For a type to be considered a Functor, it really only needs to implement one function: `map`. The purpose of `map` is to map a function to some inner type contained in the type that is a Functor. For example, for `either<L,R>`, `map` maps the function to the `L` (but only if the either instance is "left"). After applying the function to the inner value, `map` should return a a new instance of the original functor, now containing whatever the mapped function returned. Perhaps this is better shown in an example:
-```cpp
-void foo() {
-    // Brings the functor::map infix operator into scope.
-    // If this is not desired, use for instance functor<maybe>::map(a, b)
-    // instead.
-    using ftl::opeator%;
-
-    // x will be maybe<int>
-    auto x = ftl::value(12);
-
-    // y will be maybe<float>
-    auto y = [] (int x) { return float(x) / 2.f; } % x;
-
-    // z is nothing, of type maybe<std::string>
-    auto z = ftl::maybe<std::string>();
-
-    // w is also nothing, but of type maybe<int>
-    // The lambda is never actually called.
-    auto w = [] (const std::string& s) { std::cout << s << std::endl; return 0; } % z;
-}
-```
-The point of this is that it allows us to generalise functions to apply to any Functor. Consider the fact that at the point of invocation, you don't have to know what type you're `map`ing on, you only need to know that it is a Functor. We can thus write incredibly generalised functions like:
-```cpp
-template<template <typename, typename...> class F, typename...Rem>
-F<float, Rem...> example(const F<int, Rem...>& f) {
-    using ftl::operator%;
-    /* Assuming F is a Functor, we know it's a Functor on an int, and we claim
-     * to return something quite similar, but that is a functor on a float.
-     * Even though we have no idea what exactly F is, we can access its
-     * contained value and do stuff with it, like simply converting it to a
-     * float: */
-    return [] (int x) { return (float)x; } % f;
-}
-```
-Finally, a non-exhaustive list of the Functors implemented in ftl:
-* ```ftl::maybe<T>```, applies the function to its value, unless it's nothing, then nothing's returned.
-* ```ftl::either<L,R>```, as mentioned above.
-* ```ftl::function<R,Ts...>```, composes the given function with the ftl::function, yielding an `ftl::function<R2,Ts...>` where `R2` is the return type of the function given to `map`.
-* ```ftl::list``` is a functor in its value_type, meaning that `map` will return a new list whose value_type is the result type of applying the given function to the original list's value_type.
-* `std::shared_ptr<T>`
 
 ## Maybe
 The `maybe<T>` datatype simply implements the idea that you may have an optional function parameter, or a function that _maybe_ returns a value. It is very similar to Boost.Optional&mdash;and in certain syntactical aspects, gets its inspiration from there&mdash;but its true origin is the `Maybe` data type of Haskell. Similarly to Haskell's `Maybe`, `maybe<T>` implements a number of useful concepts (type classes in Haskell), such as `Monoid`, `Functor`, etc. These are not always _exactly_ the same in _ftl_ as in Haskell, but they're always founded on the same ideas and express the same abstractions (or as similar as is possible in C++).
