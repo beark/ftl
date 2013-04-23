@@ -119,7 +119,7 @@ namespace ftl {
 		typename R = typename decayed_result<F(A)>::type>
 	M<R> liftM(F f, const M<A>& m) {
 		return m >>= [f] (A a) {
-			return monad<M>::pure(f(std::forward(a)));
+			return monad<M>::pure(f(std::forward<A>(a)));
 		};
 	}
 
