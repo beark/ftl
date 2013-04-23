@@ -5,11 +5,11 @@ Formal definition
 -----------------
 Given the two categories _C_ and _D_, the functor _F_ from _C_ to _D_ is then a mapping that:
 
-* associates to each object _x_ in _C_ an object `F(X)` in _D_.
-* associates to each morphism `f : x -> y` in _C_ a morphism `F(f) : F(X) -> F(Y)` in _D_, such that the following conditions hold:
+* associates to each object _X_ in _C_ an object `F(X)` in _D_.
+* associates to each morphism `f : X -> Y` in _C_ a morphism `F(f) : F(X) -> F(Y)` in _D_, such that the following conditions hold:
   
   1. `F(id_X) = id_F(X)` for every object _X_ in _C_
-  2. `F(g &#8728; f) = F(g) &#8728; F(f)` for all morphisms `f : x -> y` and `g : y -> z`.
+  2. `F(g ∘ f) = F(g) ∘ F(f)` for all morphisms `f : x -> y` and `g : y -> z`.
 In other words, a mapping must preserve identity morphisms as well as composition of morphisms.
 
 ftl definition
@@ -78,4 +78,4 @@ The above is a minimal implementation, every method and member of functor implem
 
 Examples
 --------
-
+To be added.
