@@ -21,6 +21,7 @@ Concepts implemented
 
 ### High-level concepts
 * Orderable
+* [Monoid](Monoid.md)
 * [Functor](Functor.md)
 * [Applicative](Applicative.md)
 * [Monad](Monad.md)
