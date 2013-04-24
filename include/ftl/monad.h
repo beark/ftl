@@ -84,6 +84,7 @@ namespace ftl {
 		return monad<M>::bind(m, f);
 	}
 
+	/// \overload
 	template<
 		typename F,
 		template <typename> class M,
@@ -92,6 +93,38 @@ namespace ftl {
 		typename B = typename decayed_result<F(A)>::type::value_type>
 	M<B> operator>>= (const M<A>& m, F f) {
 		return monad<M>::bind(m, f);
+	}
+
+	/**
+	 * Perform two monadic computations, discard result of first.
+	 *
+	 * Using this operator to chain monadic computations is often times more
+	 * desirable than running them in separate statements, because whatever
+	 * operations \c M hides in its bind operation are still performed this way
+	 * (in other words, nothing:s propagate down the chain etc).
+	 */
+	template<
+		template<typename...> class M,
+		typename A,
+		typename B,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename...Ts>
+	M<B,Ts...> operator>> (const M<A,Ts...>& m1, const M<B,Ts...>& m2) {
+		return monad<M>::bind(m1, [&m2] (A a) {
+			return m2;
+		});
+	}
+
+	/// \overload
+	template<
+		template<typename> class M,
+		typename A,
+		typename B,
+		typename = typename std::enable_if<monad<M>::instance>::type>
+	M<B> operator>> (const M<A>& m1, const M<B>& m2) {
+		return monad<M>::bind(m1, [&m2] (A a) {
+			return m2;
+		});
 	}
 
 	/**
