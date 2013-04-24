@@ -5,22 +5,20 @@ C++ template library for fans of functional programming. The goal of this projec
 
 To use the ftl, you need a compiler that implements at least as much of C++11 as gcc-4.7. Recent releases of clang, for instance, should be fine, but have not been tested. MSVC has not been tested, but it seems highly unlikely that it'll work. In fact, as of the time of this writing, the library has only been compiled and tested using gcc-4.7 and gcc-4.8. Should someone wish try ftl with additional compilers, both reports of results and compatibility patches are welcome.
 
-Table of contents
------------------
+Documentation index
+-------------------
 ### Concepts
+* [Basic concepts](docs/Concepts.md)
 * [Monoids](docs/Monoid.md)
 * [Functors](docs/Functor.md)
 * [Applicative Functors](docs/Applicative.md)
-* Monads
+* [Monads](docs/Monad.md)
 
 ### Data types
-* function
+* [function](docs/Function.md)
 * [maybe](docs/Maybe.md)
 * [either](docs/Either.md)
 
-### Include headers
-* ftl/applicative.h
-* ftl/either.h
-* ftl/maybe.h
+### Examples & Tutorials
 * ...
 
