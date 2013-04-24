@@ -17,10 +17,8 @@ For everything else but the template parameters, `ftl::function` is essentially 
 Concepts implemented
 --------------------
 ### Low-level concepts
-* DefaultConstructible
-* CopyConstructible
-* MoveConstructible
-* Assignable (both Move and Copy)
+* FullyConstructible
+* Assignable
 * Swappable
 * Callable
 

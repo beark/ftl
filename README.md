@@ -16,8 +16,9 @@ Documentation index
 
 ### Data types
 * [function](docs/Function.md)
-* [maybe](docs/Maybe.md)
 * [either](docs/Either.md)
+* [maybe](docs/Maybe.md)
+* [ord](docs/Ord.md)
 
 ### Examples & Tutorials
 * ...

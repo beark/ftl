@@ -152,7 +152,7 @@ Output:
 user@home:~/ftl_example$ ./ex
 5
 ```
-### An example using the monoid instance of ftl::ord and ftl::function:
+### An example using the monoid instance of [ftl::ord](Ord.md) and [ftl::function](Function.md):
 ```cpp
 #include <vector>
 #include <string>
