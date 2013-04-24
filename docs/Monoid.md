@@ -48,14 +48,15 @@ ftl instances
 The following primitive and standard types have predefined monoid instances in ftl:
 * All primitive integer and floating point types, using either of the two thin wrappers `ftl::sum_monoid<T>` and `ftl::prod_monoid<T>`. The former makes the inner type a monoid by using _0_ as the identity element and _+_ as the associated operation, while the latter uses _1_ and _*_.
 * For booleans there are also two thin wrappers: `ftl::any` and `ftl::all`. These are defined as
-
   * _any_
+
     ```
     id = false
     a • b = a || b
     ```
 
   * _all_
+
     ```
     id = true
     a • b = a && b
