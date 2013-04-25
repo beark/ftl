@@ -47,20 +47,7 @@ ftl instances
 -------------
 The following primitive and standard types have predefined monoid instances in ftl:
 * All primitive integer and floating point types, using either of the two thin wrappers `ftl::sum_monoid<T>` and `ftl::prod_monoid<T>`. The former makes the inner type a monoid by using _0_ as the identity element and _+_ as the associated operation, while the latter uses _1_ and _*_.
-* For booleans there are also two thin wrappers: `ftl::any` and `ftl::all`. These are defined as
-  * _any_
-
-    ```
-    id = false
-    a • b = a || b
-    ```
-
-  * _all_
-
-    ```
-    id = true
-    a • b = a && b
-    ```
+* For booleans there are also two thin wrappers: `ftl::any` and `ftl::all`. These are defined as using _false_ combined with _||_, and _true_ combined with _&&_, respectively.
 * `std::vector<T>` and, isomorphically, `std::list<T>` are both monoids for any _T_. Identity is the empty container, while concatenation is the monoid operation.
 * For all monoids _M_, ```std::shared_ptr<M>``` is also a monoid, by using an empty pointer as the identity and the following as monoid operation:
   ```
@@ -132,15 +119,20 @@ int main(int argc, char** argv) {
     using ftl::sum;
     using ftl::value;
 
+    // 'sum' constructs a value of type sum_monoid. To use prod_monoid, there
+    // is the 'prod' constructor. Point being to allow the inner type to be
+    // automatically inferred, same as with maybe's 'value' constructor.
     auto x = value(sum(2));
     auto y = value(sum(3));
    
     // nothing is maybe's identity element, so z won't actually do anything
-    // below, except demonstrate the same.
+    // below, except demonstrate the fact that it does nothing.
     auto z = ftl::maybe<ftl::sum_monoid<int>>(); 
 
-    // Due to the way maybe's monoid instance works, This is equivalent of
-    // value(sum(2 + 3))
+    // This essentially expands to
+    // value(sum(2)) ^ value(sum(3)) ^ nothing
+    // which in turn expands to
+    // value(sum(2) ^ sum(3)) => value(sum(2+3))
     auto result = foo(x, y, z);
     if(result)
         std::cout << (int)*result << std::endl;
