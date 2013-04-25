@@ -30,6 +30,7 @@
 #ifndef FTL_FUNCTION_H
 #define FTL_FUNCTION_H
 
+#include <memory>
 #include <functional>
 #include "type_functions.h"
 
