@@ -1,10 +1,25 @@
 Monad
 =====
-There are already more than enough tutorials on monads, comparing them to all sorts of bizarre things (conversations, burritos, elephants, ...). Here's a [bunch](http://www.haskell.org/haskellwiki/Monad_tutorials_timeline). Thus, this documentation will not bother defining or explaining them, except as they occur in the ftl.
+There are already more than enough tutorials on monads, comparing them to all sorts of bizarre things (conversations, burritos, elephants, ...). Here's a [bunch](http://www.haskell.org/haskellwiki/Monad_tutorials_timeline). Thus, this documentation will not bother defining or explaining them, except the laws they must follow as well as how they appear in ftl.
+
+Laws
+----
+While there is no mechanism in place to enforce these laws, _all_ monads should follow these laws. Otherwise, generalised algorithms might make assumptions that don't hold.
+### Left identity
+`pure(a) >>= f` is equivalent to `f(a)`
+
+### Right identity
+`m >>= pure` is equivalent to `m`
+
+### Associativity
+`(m >>= f) >>= g` is equivalent to `m >>= [f,g](A a){ return f(a) >>= g; };`
+
+### More on the laws
+As is to be expected when dealing with concepts so heavily inspired from Haskell, the Haskellers themselves have produced [plenty](http://www.haskell.org/haskellwiki/Monad_Laws) of material available for those who want more than this documentation offers.
 
 ftl definition
 --------------
-In ftl, the only real difference between a Monad and an [Applicative](Applicative.md), is that just like applicative functors add operations to plain ol' regular [functors](Functor.md), monads add one new basic operation&mdash;`bind`&mdash;and a couple of free standing other operations that in reality just use `bind`. Also, any type that implements the Monad concept gets functor and applicative for free, no catches. Anyway, here's how ftl defines the monad concepts:
+In ftl, the only real difference between a Monad and an [Applicative](Applicative.md), is that just like applicative functors add operations to plain ol' regular [functors](Functor.md), monads add one new basic operation&mdash;`bind`&mdash;and a couple of free standing other operations that in reality just use `bind`. Also, any type that implements the Monad concept gets functor and applicative for free, no catch. Anyway, here's how ftl defines the monad concept:
 ```cpp
 template<template<typename> class M>
 struct monad {
