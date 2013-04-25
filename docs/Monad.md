@@ -20,19 +20,18 @@ struct monad {
     static constexpr bool instance;
 };
 ```
-So what's the difference between _map_ and _bind_, then? Looks like they just had their parameters flipped, right? Well, because "functions" in C++ can be absolutely anything and everything that defines an `operator()`, these type signatures do not actually expose correctly what _F_ above must conform to. For map, _F_ is required to be a function from _A_ to _B_ (and the _B_ is actually properly inferred in all ftl-instances of Monad), whereas in _bind_, _F_ is a function form _A_ to _M<B>_ (and again, ftl correctly derives _B_ in all its monad instances).
+So what's the difference between `map` and `bind`, then? Looks like they just had their parameters flipped, right? Well, because "functions" in C++ can be absolutely anything and everything that defines an `operator()`, these type signatures do not actually expose correctly what _F_ above must conform to. For `map`, _F_ is required to be a function from _A_ to _B_ (and the _B_ is actually properly inferred in all ftl-instances of Monad), whereas in `bind`, _F_ is a function form _A_ to _M&lt;B&gt;_ (and again, ftl correctly derives _B_ in all its monad instances).
 
 In addition to the above interface definition, the following free functions and operators are defined in `<ftl/monad.h>`:
 ```cpp
 /* This is not actually the complete definition, there is also some TMP to 
- * "hide" this operator for types that aren't monad isntances.
+ * "hide" this operator for types that aren't monad instances.
  */
 template<
         template<typename> class M,
         typename F,
-        typename A,
-        typename Mb = typename std::result_of<F(A)>::type>
-Mb operator >>= (const M<A>& m, F f) {
+        typename A>
+auto operator >>= (const M<A>& m, F f) -> decltype(monad<M>::bind(m,f)) {
     return monad<M>::bind(m, f);
 }
 
@@ -53,11 +52,11 @@ template<
         typename B = typename result_of<F(A)>::type>
 M<B> ap(M<F>, const M<A>&);
 ```
-The last one, _ap_, is actually [applicative's](Applicative.md) _apply_, defined in terms of monad's _bind_. This is how all monads are also applicative functors.
+The last one, `ap`, is actually [applicative's](Applicative.md) `apply` in disguise, defined in terms of monad's `bind`. This is how all monads are also applicative functors.
 
 Custom instances
 ----------------
-Perhaps the easiest way to show how to make a type an instance is to simply show an existing instance. Here is [_maybe_](Maybe.md)'s instance:
+Perhaps the easiest way to show how to make a type an instance is to simply show an existing instance. Here is [maybe](Maybe.md)'s instance:
 ```cpp
 template<>
 struct monad<maybe> {
@@ -93,9 +92,9 @@ struct monad<maybe> {
     static constexpr bool instance = true;
 };
 ```
-There is some noise in there with the _noexcept_ clauses and similar&mdash;that is all optional. But naturally, if you can guarantee _constexpr_ or _noexcept_, that is a good idea to do. The move overload of _pure_ is also a sensible thing. For an explanation on `decayed_result`, see the [type level functions](TypeLevel.md)
+There is some noise in there with the _noexcept_ clauses and similar&mdash;that is all optional. But naturally, if you can guarantee _constexpr_ or _noexcept_, that is a good idea to do. The move overload of `pure` is also a sensible thing. For an explanation on `decayed_result`, see the [type level functions](TypeLevel.md)
 
-In any case, aside from the above mentined things, _maybe_'s instance implementation is in fact minimal. If desirable, one could also overload _ap_, for instance, to provide a more performant version.
+In any case, aside from the above mentined things, `maybe`'s instance implementation is in fact minimal. If desirable, one could also overload `ap`, for instance, to provide a more performant version.
 
 Examples
 -------
@@ -120,5 +119,5 @@ int main(int argc, char** argv) {
 }
 
 ```
-Note how, despite performing a total of three actions that could fail (return _nothing_), we only had to check for nothingness once at the end. This is because _maybe_'s _bind_ already does this for us. But the really nice part is that if we'd changed the interface to use _either_ instad of _maybe_ (using _right_ values to contain an error description or similar), the only lines in _main_ that would change are the final two to print the object description.
+Note how, despite performing a total of three actions that could fail (return _nothing_), we only had to check for nothingness once at the end. This is because `maybe`'s `bind` already does this for us. But the really nice part is that if we'd changed the interface to use `either` instad of `maybe` (using _right_ values to contain an error description or similar), the only lines in `main` that would change are the final two to print the object description.
 
