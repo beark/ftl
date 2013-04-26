@@ -96,6 +96,33 @@ namespace ftl {
 	}
 
 	/**
+	 * Convenience operator for monad::bind.
+	 *
+	 * Mirror of operator >>=
+	 */
+	template<
+		typename F,
+		template <typename...> class M,
+		typename A,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename B = typename decayed_result<F(A)>::type::value_type,
+		typename...Ts>
+	M<B,Ts...> operator<<= (F f, const M<A,Ts...>& m) {
+		return monad<M>::bind(m, f);
+	}
+
+	/// \overload
+	template<
+		typename F,
+		template <typename> class M,
+		typename A,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename B = typename decayed_result<F(A)>::type::value_type>
+	M<B> operator<<= (F f, const M<A>& m) {
+		return monad<M>::bind(m, f);
+	}
+
+	/**
 	 * Perform two monadic computations, discard result of first.
 	 *
 	 * Using this operator to chain monadic computations is often times more
@@ -110,7 +137,7 @@ namespace ftl {
 		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename...Ts>
 	M<B,Ts...> operator>> (const M<A,Ts...>& m1, const M<B,Ts...>& m2) {
-		return monad<M>::bind(m1, [&m2] (A a) {
+		return monad<M>::bind(m1, [&m2](A) {
 			return m2;
 		});
 	}
@@ -122,7 +149,7 @@ namespace ftl {
 		typename B,
 		typename = typename std::enable_if<monad<M>::instance>::type>
 	M<B> operator>> (const M<A>& m1, const M<B>& m2) {
-		return monad<M>::bind(m1, [&m2] (A a) {
+		return monad<M>::bind(m1, [&m2](A) {
 			return m2;
 		});
 	}
@@ -139,7 +166,7 @@ namespace ftl {
 		typename...Ts>
 	M<R,Ts...> liftM(F f, const M<A,Ts...>& m) {
 		return m >>= [f] (A a) {
-			return monad<M>::pure(f(std::forward<A>(a)));
+			return monad<M>::template pure<A,Ts...>(f(std::forward<A>(a)));
 		};
 	}
 
@@ -171,7 +198,7 @@ namespace ftl {
 	M<B,Ts...> ap(M<F,Ts...> f, const M<A,Ts...>& m) {
 		return f >>= [&m] (F f) {
 			return m >>= [f] (A a) {
-				return monad<M>::pure(f(std::forward<A>(a)));
+				return monad<M>::template pure<A,Ts...>(f(std::forward<A>(a)));
 			};
 		};
 	}
