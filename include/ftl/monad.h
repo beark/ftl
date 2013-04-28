@@ -136,8 +136,8 @@ namespace ftl {
 		typename B,
 		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename...Ts>
-	M<B,Ts...> operator>> (const M<A,Ts...>& m1, const M<B,Ts...>& m2) {
-		return monad<M>::bind(m1, [&m2](A) {
+	M<B,Ts...> operator>> (const M<A,Ts...>& m1, M<B,Ts...> m2) {
+		return monad<M>::bind(m1, [m2](A) {
 			return m2;
 		});
 	}
@@ -148,9 +148,46 @@ namespace ftl {
 		typename A,
 		typename B,
 		typename = typename std::enable_if<monad<M>::instance>::type>
-	M<B> operator>> (const M<A>& m1, const M<B>& m2) {
-		return monad<M>::bind(m1, [&m2](A) {
+	M<B> operator>> (const M<A>& m1, M<B> m2) {
+		return monad<M>::bind(m1, [m2](A) {
 			return m2;
+		});
+	}
+
+	/**
+	 * Sequence two monadic computations, return the first.
+	 *
+	 * This operator is used to perform the computations \c m1 and \c m2
+	 * in left-to-right order, and then return the result of \c m1.
+	 * 
+	 * Use case is when we have two computations that must be done in sequence,
+	 * but it's only the first one that yields an interesting result. Most
+	 * likely, the second one is only needed for a side effect of some kind.
+	 */
+	template<
+		template<typename...> class M,
+		typename A,
+		typename B,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename...Ts>
+	M<A,Ts...> operator<< (const M<A,Ts...>& m1, M<B,Ts...> m2) {
+		return monad<M>::bind(m1, [m2](A a) {
+			return monad<M>::bind(m2, [a](B) {
+				return monad<M>::template pure<A,Ts...>(a);
+			});
+		});
+	}
+
+	template<
+		template<typename...> class M,
+		typename A,
+		typename B,
+		typename = typename std::enable_if<monad<M>::instance>::type>
+	M<A> operator<< (const M<A>& m1, M<B> m2) {
+		return monad<M>::bind(m1, [m2](A a) {
+			return monad<M>::bind(m2, [a](B) {
+				return monad<M>::template pure<A>(a);
+			});
 		});
 	}
 
@@ -195,8 +232,8 @@ namespace ftl {
 		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename B = typename decayed_result<F(A)>::type,
 		typename...Ts>
-	M<B,Ts...> ap(M<F,Ts...> f, const M<A,Ts...>& m) {
-		return f >>= [&m] (F f) {
+	M<B,Ts...> ap(M<F,Ts...> f, M<A,Ts...> m) {
+		return f >>= [m] (F f) {
 			return m >>= [f] (A a) {
 				return monad<M>::template pure<A,Ts...>(f(std::forward<A>(a)));
 			};
@@ -210,8 +247,8 @@ namespace ftl {
 		typename A,
 		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename B = typename decayed_result<F(A)>::type>
-	M<B> ap(M<F> f, const M<A>& m) {
-		return f >>= [&m] (function<B,A> f) {
+	M<B> ap(M<F> f, M<A> m) {
+		return f >>= [m] (function<B,A> f) {
 			return m >>= [f] (A a) {
 				return monad<M>::pure(f(std::forward<A>(a)));
 			};
