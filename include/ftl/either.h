@@ -27,6 +27,14 @@
 
 namespace ftl {
 
+	namespace {
+		enum tag_t {
+			LEFT,
+			LIMBO,
+			RIGHT
+		};
+	}
+
 	/*!
 	 * Data type modelling a "one of" type.
 	 *
@@ -44,15 +52,18 @@ namespace ftl {
 	 * Either fulfills the following concepts regardless of its sub-types:
 	 *
 	 * \li Functor (in L)
+	 * \li Applicative (in L)
 	 * \li Monad (in L)
 	 *
 	 * \note Either is \em not DefaultConstructible.
 	 *
-	 * \note L and R may \em not be the same type.
+	 * \note L and R may \em not be the same type. If this functionality
+	 *       is required, create a thin wrapper of the type that needs to
+	 *       appear as both R and L and use that on \em one side.
 	 *
-	 * \tparam L The "left" type of the disjunction
+	 * \tparam L The "left" type
 	 *
-	 * \tparam R The "right" type of the disjunction
+	 * \tparam R The "right" type (sometimes used to signal an error)
 	 */
 	template<typename L, typename R>
 	class either {
@@ -65,47 +76,56 @@ namespace ftl {
 		either(const either& e)
 		noexcept(  std::is_nothrow_copy_constructible<L>::value
 				&& std::is_nothrow_copy_constructible<R>::value)
-		: isL(e.isL) {
-			if(isL)
+		: tag(e.tag) {
+			if(tag == LEFT)
 				new (&l) L(e.l);
-			else
+			else if(tag == RIGHT)
 				new (&r) R(e.r);
 		}
 
 		either(either&& e)
 		noexcept(  std::is_nothrow_move_constructible<L>::value
 				&& std::is_nothrow_move_constructible<R>::value)
-		: isL(e.isL) {
-			if(isL)
+		: tag(e.tag) {
+			switch(tag) {
+			case LEFT:
 				new (&l) L(std::move(e.l));
-			else
+				break;
+
+			case RIGHT:
 				new (&r) R(std::move(e.r));
+				break;
+			default:
+				break;
+			}
+
+			e.tag = LIMBO;
 		}
 
 		explicit constexpr either(const L& left)
 		noexcept(std::is_nothrow_copy_constructible<L>::value)
-		: l(left), isL(true) {
+		: l(left), tag(LEFT) {
 		}
 
 		explicit constexpr either(L&& left)
 		noexcept(std::is_nothrow_move_constructible<L>::value)
-		: l(std::move(left)), isL(true) {
+		: l(std::move(left)), tag(LEFT) {
 		}
 
 		explicit constexpr either(const R& right)
 		noexcept(std::is_nothrow_copy_constructible<R>::value)
-		: r(right), isL(false) {
+		: r(right), tag(RIGHT) {
 		}
 
 		explicit constexpr either(R&& right)
 		noexcept(std::is_nothrow_move_constructible<R>::value)
-		: r(std::move(right)), isL(false) {
+		: r(std::move(right)), tag(RIGHT) {
 		}
 
 		~either() {
-			if(isL)
+			if(tag == LEFT)
 				l.~L();
-			else
+			else if(tag == RIGHT)
 				r.~R();
 		}
 
@@ -113,14 +133,14 @@ namespace ftl {
 		 *  Check if the either instance contains the left type.
 		 */
 		constexpr bool isLeft() noexcept {
-			return isL;
+			return tag == LEFT;
 		}
 
 		/*!
 		 *  Check if the either instance contains the right type.
 		 */
 		constexpr bool isRight() noexcept {
-			return !isL;
+			return tag == RIGHT;
 		}
 
 		/*!
@@ -154,113 +174,151 @@ namespace ftl {
 		}
 
 		const either& operator= (const either& e) {
-			if(isL) {
-				if(e.isL) 
+			switch(tag) {
+			case LEFT:
+				if(e.tag == LEFT) 
 					l = e.l;
 
 				else {
 					l.~L();
-					new (&r) R(e.r);
-					isL = false;
-				}
-			}
+					tag = e.tag;
 
-			else {
-				if(!e.isL)
+					if(tag == RIGHT) {
+						new (&r) R(e.r);
+					}
+				}
+				break;
+
+			case RIGHT:
+				if(e.tag == RIGHT)
 					r = e.r;
 
 				else {
 					r.~R();
-					new (&l) L(e.l);
-					isL = true;
+					tag = e.tag;
+
+					if(tag == LEFT) {
+						new (&l) L(e.l);
+					}
+				}
+				break;
+
+			case LIMBO:
+				tag = e.tag;
+
+				if(tag == RIGHT) {
+					r = e.r;
+				}
+
+				else if(tag == LEFT) {
+					l = e.l;
 				}
 			}
 
 			return *this;
 		}
 
-		const either& operator=(either&& e) {
-			if(isL) {
-				if(e.isL)
+		const either& operator= (either&& e) {
+			switch(tag) {
+			case LEFT:
+				if(e.tag == LEFT)
 					l = std::move(e.l);
 
 				else {
 					l.~L();
-					new (&r) R(std::move(e.r));
-					isL = false;
-				}
-			}
+					tag = e.tag;
 
-			else {
-				if(!e.isL)
+					if(e.tag == RIGHT) {
+						new (&r) R(std::move(e.r));
+					}
+
+				}
+				e.tag = LIMBO;
+				break;
+
+			case RIGHT:
+				if(e.tag == RIGHT)
 					r = std::move(e.r);
 
 				else {
 					r.~R();
-					new (&l) L(std::move(e.l));
-					isL = true;
+					tag = e.tag;
+
+					if(e.tag == LEFT)
+						new (&l) L(std::move(e.l));
 				}
+				e.tag = LIMBO;
+				break;
+
+			case LIMBO:
+				break;
 			}
 
 			return *this;
 		}
 
 		const either& operator= (const L& left) {
-			if(!isL) {
-				r.~R();
-				isL = true;
+			if(tag != LEFT) {
+				if(tag == RIGHT)
+					r.~R();
+
+				tag = LEFT;
 				new (&l) L(left);
 			}
 
-			else
+			else if(tag == LEFT)
 				l = left;
 
 			return *this;
 		}
 
 		const either& operator= (L&& left) {
-			if(!isL) {
+			if(tag == LEFT) {
+				l = std::move(left);
+			}
+			else if(tag == RIGHT) {
 				r.~R();
-				isL = true;
+
+				tag = LEFT;
 				new (&l) L(std::move(left));
 			}
-
-			else
-				l = std::move(left);
 
 			return *this;
 		}
 
 		const either& operator= (const R& right) {
-			if(isL) {
-				l.~L();
-				isL = false;
+			if(tag != RIGHT) {
+				if(tag == LEFT)
+					l.~L();
+
+				tag = RIGHT;
 				new (&r) R(right);
 			}
-			
-			else
+
+			else if(tag == RIGHT)
 				r = right;
 
 			return *this;
 		}
 
 		const either& operator= (R&& right) {
-			if(isL) {
+			if(tag == RIGHT) {
+				r = std::move(right);
+			}
+			else if(tag == LEFT) {
 				l.~L();
-				isL = false;
+
+				tag = RIGHT;
 				new (&r) R(std::move(right));
 			}
-
-			else
-				r = std::move(right);
 
 			return *this;
 		}
 
 		constexpr bool operator== (const either& e) {
-			return isLeft()
-				? e.isLeft() && l == e.l
-				: !e.isLeft() && r == e.r;
+			return tag == e.tag && tag != LIMBO
+				? (tag == LEFT ? l == e.l : r == e.r)
+				: false;
 		}
 
 		constexpr bool operator!= (const either& e) {
@@ -273,7 +331,7 @@ namespace ftl {
 			R r;
 		};
 
-		bool isL;
+		tag_t tag = LIMBO;
 	};
 
 	/**
@@ -286,17 +344,19 @@ namespace ftl {
 			return either<A,R>(a);
 		}
 
+		/*
 		template<typename A, typename R>
 		static either<A,R> pure(A&& a) {
 			return either<A,R>(std::move(a));
 		}
+		*/
 
 		template<
 			typename F,
 			typename A,
 			typename R,
 			typename B = typename decayed_result<F(A)>::type>
-		static either<B,R> map(F f, either<A,R> e) {
+		static either<B,R> map(F f, const either<A,R>& e) {
 			if(e.isLeft())
 				return either<B,R>(f(e.left()));
 			else
