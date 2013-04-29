@@ -173,7 +173,64 @@ namespace ftl {
 			return r;
 		}
 
+		/**
+		 * Convenience operator when using either for error handling.
+		 *
+		 * \return true if the instance is of \em left type.
+		 */
+		explicit constexpr operator bool () const noexcept {
+			return tag == LEFT;
+		}
+
+		/**
+		 * Alternate, concise way of accessing left values.
+		 *
+		 * \throws std::logic_error if called one a right type.
+		 */
+		L& operator* () {
+			if(tag == LEFT)
+				return l;
+
+			throw std::logic_error(
+					"Attempting to access 'left' value of right type.");
+		}
+
+		/// \overload
+		const L& operator* () const {
+			if(tag == LEFT)
+				return l;
+
+			throw std::logic_error(
+					"Attempting to access 'left' value of right type.");
+		}
+
+		/**
+		 * Concise way of accessing member of left values.
+		 *
+		 * \throws std::logic_error if called one a right type.
+		 */
+		L* operator-> () {
+			if(tag == LEFT)
+				return &l;
+
+			throw std::logic_error(
+					"Attempting to access 'left' value of right type.");
+		}
+
+		/// \overload
+		const L* operator-> () const {
+			if(tag == LEFT)
+				return &l;
+
+			throw std::logic_error(
+					"Attempting to access 'left' value of right type.");
+		}
+
 		const either& operator= (const either& e) {
+			// Deal with self assignment
+			if(this == &e)
+				return *this;
+
 			switch(tag) {
 			case LEFT:
 				if(e.tag == LEFT) 
