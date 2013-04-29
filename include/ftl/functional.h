@@ -186,6 +186,30 @@ namespace ftl {
 		};
 	}
 
+	/// Curry a ternary function
+	template<typename R, typename T1, typename T2, typename T3>
+	function<function<function<R,T3>,T2>,T1> curry(function<R,T1,T2,T3> f) {
+		return [f](T1 t1) {
+			return [f,t1](T2 t2) {
+				return [f,t1,t2](T3 t3) {
+					return f(t1, t2, std::forward<T2>(t2));
+				};
+			};
+		};
+	}
+
+	/// \overload
+	template<typename R, typename T1, typename T2, typename T3>
+	function<function<function<R,T3>,T2>,T1> curry(R (*f) (T1, T2, T3)) {
+		return [f](T1 t1) {
+			return [f, t1](T2 t2) {
+				return [f,t1,t2](T3 t3) {
+					return f(t1, t2, std::forward<T3>(t3));
+				};
+			};
+		};
+	}
+
 	/**
 	 * Uncurries a binary function.
 	 */
