@@ -179,7 +179,7 @@ namespace ftl {
 	}
 
 	template<
-		template<typename...> class M,
+		template<typename> class M,
 		typename A,
 		typename B,
 		typename = typename std::enable_if<monad<M>::instance>::type>
