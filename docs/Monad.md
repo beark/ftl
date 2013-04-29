@@ -1,6 +1,6 @@
 Monad
 =====
-There are already more than enough tutorials on monads, comparing them to all sorts of bizarre things (conversations, burritos, elephants, ...). Here's a [bunch](http://www.haskell.org/haskellwiki/Monad_tutorials_timeline). Thus, this documentation will not bother defining or explaining them, except the laws they must follow as well as how they appear in ftl.
+There are already more than enough tutorials on monads, comparing them to all sorts of bizarre things (conversations, burritos, elephants, ...). Here's a [bunch](http://www.haskell.org/haskellwiki/Monad_tutorials_timeline). Thus, this documentation will not bother defining or explaining them, except the laws they must follow as well as how they appear in FTL.
 
 Laws
 ----
@@ -17,9 +17,9 @@ While there is no mechanism in place to enforce these laws, _all_ monads should 
 ### More on the laws
 As is to be expected when dealing with concepts so heavily inspired from Haskell, the Haskellers themselves have produced [plenty](http://www.haskell.org/haskellwiki/Monad_Laws) of material available for those who want more than this documentation offers.
 
-ftl definition
+FTL definition
 --------------
-In ftl, the only real difference between a Monad and an [Applicative](Applicative.md), is that just like applicative functors add operations to plain ol' regular [functors](Functor.md), monads add one new basic operation&mdash;`bind`&mdash;and a couple of free standing other operations that in reality just use `bind`. Also, any type that implements the Monad concept gets functor and applicative for free, no catch. Anyway, here's how ftl defines the monad concept:
+In FTL, the only real difference between a Monad and an [Applicative](Applicative.md), is that just like applicative functors add operations to plain ol' regular [functors](Functor.md), monads add one new basic operation&mdash;`bind`&mdash;and a couple of free standing other operations that in reality just use `bind`. Also, any type that implements the Monad concept gets functor and applicative for free, no catch. Anyway, here's how FTL defines the monad concept:
 ```cpp
 template<template<typename> class M>
 struct monad {
@@ -35,7 +35,7 @@ struct monad {
     static constexpr bool instance;
 };
 ```
-So what's the difference between `map` and `bind`, then? Looks like they just had their parameters flipped, right? Well, because "functions" in C++ can be absolutely anything and everything that defines an `operator()`, these type signatures do not actually expose correctly what _F_ above must conform to. For `map`, _F_ is required to be a function from _A_ to _B_ (and the _B_ is actually properly inferred in all ftl-instances of Monad), whereas in `bind`, _F_ is a function form _A_ to _M&lt;B&gt;_ (and again, ftl correctly derives _B_ in all its monad instances).
+So what's the difference between `map` and `bind`, then? Looks like they just had their parameters flipped, right? Well, because "functions" in C++ can be absolutely anything and everything that defines an `operator()`, these type signatures do not actually expose correctly what _F_ above must conform to. For `map`, _F_ is required to be a function from _A_ to _B_ (and the _B_ is actually properly inferred in all FTL-instances of Monad), whereas in `bind`, _F_ is a function form _A_ to _M&lt;B&gt;_ (and again, FTL correctly derives _B_ in all its monad instances).
 
 In addition to the above interface definition, the following free functions and operators are defined in `<ftl/monad.h>`:
 ```cpp
@@ -68,6 +68,17 @@ template<
 M<B> ap(M<F>, const M<A>&);
 ```
 The last one, `ap`, is actually [applicative's](Applicative.md) `apply` in disguise, defined in terms of monad's `bind`. This is how all monads are also applicative functors.
+
+FTL instances
+-------------
+The following standard library types are instances of Monad:
+* `std::list<T>` and `std::vector<T>`.
+* `std::shared_ptr<T>`.
+* `std::future<T>`
+
+Further, the following FTL-native types implement this concept:
+* `maybe<T>`
+* `either<L,_>`
 
 Custom instances
 ----------------

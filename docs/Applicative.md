@@ -3,11 +3,11 @@ Applicative Functor
 
 An applicative functor provides slightly more structure than a [functor](Functor.md), but slightly less than a [monad](Monad.md). As such, less types can be viewed as applicative functors than functors, but on the other hand, we can do more interesting things with those types&mdash;even though we know nothing more about them than that they are applciative functors.
 
-ftl definition
+FTL definition
 --------------
-There is, as far as I know, no formal definition of applicative functors, they are purely an invention of the Haskell community. Thus, the ftl definition is entirely based on the behaviour provided in the Haskell definition.
+There is, as far as I know, no formal definition of applicative functors, they are purely an invention of the Haskell community. Thus, the FTL definition is entirely based on the behaviour provided in the Haskell definition.
 
-As all the other major concepts in ftl, applicative functors are defined in terms of specialisations of a struct. The basic, unspecialised version of this struct&mdash;which defines the interface specialisations must conform to&mdash;is as follows:
+As all the other major concepts in FTL, applicative functors are defined in terms of specialisations of a struct. The basic, unspecialised version of this struct&mdash;which defines the interface specialisations must conform to&mdash;is as follows:
 ```cpp
 template<template<typename> class F>
 struct applicative {
@@ -42,7 +42,7 @@ F<B> operator* (const F<Fn>& u, const F<A>& v) {
 ```
 As you can see, all members of the applicative interface have default implementations relying on the [monad](Monad.md) concept. This is because just as all applicative functors are plain, regular functors, all monads are applicative functors. Thus, if a type is a monad, it is only necessary to implement the monad interface to get all three of functor, applicative, and monad.
 
-ftl instances
+FTL instances
 -------------
 The following standard library types have applicative instances defined:
 * `std::vector<T>` and `std::list<T>` (details to follow)
@@ -57,8 +57,9 @@ The following standard library types have applicative instances defined:
   apply(fn_ptr, some_ptr) = (*fn_ptr)(*some_ptr), if and only if both pointers are
                             valid. Otherwise, an empty pointer.
   ```
+* `std::future<T>`, basically by waiting for all composed futures to complete before applications.
 
-In addition, the following ftl data structures are applicative functors:
+In addition, the following FTL data structures are applicative functors:
 * `maybe<T>`, in a manner isomorphic to `std::shared_ptr<T>`
 * `either<L,R>` on L (details to follow)
 * `function<R,Ps...>` on R (details to follow)
