@@ -27,7 +27,7 @@
 
 namespace ftl {
 
-	namespace {
+	namespace _dtl {
 		enum tag_t {
 			LEFT,
 			LIMBO,
@@ -77,9 +77,9 @@ namespace ftl {
 		noexcept(  std::is_nothrow_copy_constructible<L>::value
 				&& std::is_nothrow_copy_constructible<R>::value)
 		: tag(e.tag) {
-			if(tag == LEFT)
+			if(tag == _dtl::LEFT)
 				new (&l) L(e.l);
-			else if(tag == RIGHT)
+			else if(tag == _dtl::RIGHT)
 				new (&r) R(e.r);
 		}
 
@@ -88,44 +88,44 @@ namespace ftl {
 				&& std::is_nothrow_move_constructible<R>::value)
 		: tag(e.tag) {
 			switch(tag) {
-			case LEFT:
+			case _dtl::LEFT:
 				new (&l) L(std::move(e.l));
 				break;
 
-			case RIGHT:
+			case _dtl::RIGHT:
 				new (&r) R(std::move(e.r));
 				break;
 			default:
 				break;
 			}
 
-			e.tag = LIMBO;
+			e.tag = _dtl::LIMBO;
 		}
 
 		explicit constexpr either(const L& left)
 		noexcept(std::is_nothrow_copy_constructible<L>::value)
-		: l(left), tag(LEFT) {
+		: l(left), tag(_dtl::LEFT) {
 		}
 
 		explicit constexpr either(L&& left)
 		noexcept(std::is_nothrow_move_constructible<L>::value)
-		: l(std::move(left)), tag(LEFT) {
+		: l(std::move(left)), tag(_dtl::LEFT) {
 		}
 
 		explicit constexpr either(const R& right)
 		noexcept(std::is_nothrow_copy_constructible<R>::value)
-		: r(right), tag(RIGHT) {
+		: r(right), tag(_dtl::RIGHT) {
 		}
 
 		explicit constexpr either(R&& right)
 		noexcept(std::is_nothrow_move_constructible<R>::value)
-		: r(std::move(right)), tag(RIGHT) {
+		: r(std::move(right)), tag(_dtl::RIGHT) {
 		}
 
 		~either() {
-			if(tag == LEFT)
+			if(tag == _dtl::LEFT)
 				l.~L();
-			else if(tag == RIGHT)
+			else if(tag == _dtl::RIGHT)
 				r.~R();
 		}
 
@@ -133,14 +133,14 @@ namespace ftl {
 		 *  Check if the either instance contains the left type.
 		 */
 		constexpr bool isLeft() noexcept {
-			return tag == LEFT;
+			return tag == _dtl::LEFT;
 		}
 
 		/*!
 		 *  Check if the either instance contains the right type.
 		 */
 		constexpr bool isRight() noexcept {
-			return tag == RIGHT;
+			return tag == _dtl::RIGHT;
 		}
 
 		/*!
@@ -179,7 +179,7 @@ namespace ftl {
 		 * \return true if the instance is of \em left type.
 		 */
 		explicit constexpr operator bool () const noexcept {
-			return tag == LEFT;
+			return tag == _dtl::LEFT;
 		}
 
 		/**
@@ -188,7 +188,7 @@ namespace ftl {
 		 * \throws std::logic_error if called one a right type.
 		 */
 		L& operator* () {
-			if(tag == LEFT)
+			if(tag == _dtl::LEFT)
 				return l;
 
 			throw std::logic_error(
@@ -197,7 +197,7 @@ namespace ftl {
 
 		/// \overload
 		const L& operator* () const {
-			if(tag == LEFT)
+			if(tag == _dtl::LEFT)
 				return l;
 
 			throw std::logic_error(
@@ -210,7 +210,7 @@ namespace ftl {
 		 * \throws std::logic_error if called one a right type.
 		 */
 		L* operator-> () {
-			if(tag == LEFT)
+			if(tag == _dtl::LEFT)
 				return &l;
 
 			throw std::logic_error(
@@ -219,7 +219,7 @@ namespace ftl {
 
 		/// \overload
 		const L* operator-> () const {
-			if(tag == LEFT)
+			if(tag == _dtl::LEFT)
 				return &l;
 
 			throw std::logic_error(
@@ -232,42 +232,42 @@ namespace ftl {
 				return *this;
 
 			switch(tag) {
-			case LEFT:
-				if(e.tag == LEFT) 
+			case _dtl::LEFT:
+				if(e.tag == _dtl::LEFT) 
 					l = e.l;
 
 				else {
 					l.~L();
 					tag = e.tag;
 
-					if(tag == RIGHT) {
+					if(tag == _dtl::RIGHT) {
 						new (&r) R(e.r);
 					}
 				}
 				break;
 
-			case RIGHT:
-				if(e.tag == RIGHT)
+			case _dtl::RIGHT:
+				if(e.tag == _dtl::RIGHT)
 					r = e.r;
 
 				else {
 					r.~R();
 					tag = e.tag;
 
-					if(tag == LEFT) {
+					if(tag == _dtl::LEFT) {
 						new (&l) L(e.l);
 					}
 				}
 				break;
 
-			case LIMBO:
+			case _dtl::LIMBO:
 				tag = e.tag;
 
-				if(tag == RIGHT) {
+				if(tag == _dtl::RIGHT) {
 					r = e.r;
 				}
 
-				else if(tag == LEFT) {
+				else if(tag == _dtl::LEFT) {
 					l = e.l;
 				}
 			}
@@ -277,37 +277,37 @@ namespace ftl {
 
 		const either& operator= (either&& e) {
 			switch(tag) {
-			case LEFT:
-				if(e.tag == LEFT)
+			case _dtl::LEFT:
+				if(e.tag == _dtl::LEFT)
 					l = std::move(e.l);
 
 				else {
 					l.~L();
 					tag = e.tag;
 
-					if(e.tag == RIGHT) {
+					if(e.tag == _dtl::RIGHT) {
 						new (&r) R(std::move(e.r));
 					}
 
 				}
-				e.tag = LIMBO;
+				e.tag = _dtl::LIMBO;
 				break;
 
-			case RIGHT:
-				if(e.tag == RIGHT)
+			case _dtl::RIGHT:
+				if(e.tag == _dtl::RIGHT)
 					r = std::move(e.r);
 
 				else {
 					r.~R();
 					tag = e.tag;
 
-					if(e.tag == LEFT)
+					if(e.tag == _dtl::LEFT)
 						new (&l) L(std::move(e.l));
 				}
-				e.tag = LIMBO;
+				e.tag = _dtl::LIMBO;
 				break;
 
-			case LIMBO:
+			case _dtl::LIMBO:
 				break;
 			}
 
@@ -315,28 +315,28 @@ namespace ftl {
 		}
 
 		const either& operator= (const L& left) {
-			if(tag != LEFT) {
-				if(tag == RIGHT)
+			if(tag != _dtl::LEFT) {
+				if(tag == _dtl::RIGHT)
 					r.~R();
 
-				tag = LEFT;
+				tag = _dtl::LEFT;
 				new (&l) L(left);
 			}
 
-			else if(tag == LEFT)
+			else if(tag == _dtl::LEFT)
 				l = left;
 
 			return *this;
 		}
 
 		const either& operator= (L&& left) {
-			if(tag == LEFT) {
+			if(tag == _dtl::LEFT) {
 				l = std::move(left);
 			}
-			else if(tag == RIGHT) {
+			else if(tag == _dtl::RIGHT) {
 				r.~R();
 
-				tag = LEFT;
+				tag = _dtl::LEFT;
 				new (&l) L(std::move(left));
 			}
 
@@ -344,28 +344,28 @@ namespace ftl {
 		}
 
 		const either& operator= (const R& right) {
-			if(tag != RIGHT) {
-				if(tag == LEFT)
+			if(tag != _dtl::RIGHT) {
+				if(tag == _dtl::LEFT)
 					l.~L();
 
-				tag = RIGHT;
+				tag = _dtl::RIGHT;
 				new (&r) R(right);
 			}
 
-			else if(tag == RIGHT)
+			else if(tag == _dtl::RIGHT)
 				r = right;
 
 			return *this;
 		}
 
 		const either& operator= (R&& right) {
-			if(tag == RIGHT) {
+			if(tag == _dtl::RIGHT) {
 				r = std::move(right);
 			}
-			else if(tag == LEFT) {
+			else if(tag == _dtl::LEFT) {
 				l.~L();
 
-				tag = RIGHT;
+				tag = _dtl::RIGHT;
 				new (&r) R(std::move(right));
 			}
 
@@ -373,8 +373,8 @@ namespace ftl {
 		}
 
 		constexpr bool operator== (const either& e) {
-			return tag == e.tag && tag != LIMBO
-				? (tag == LEFT ? l == e.l : r == e.r)
+			return tag == e.tag && tag != _dtl::LIMBO
+				? (tag == _dtl::LEFT ? l == e.l : r == e.r)
 				: false;
 		}
 
@@ -388,7 +388,7 @@ namespace ftl {
 			R r;
 		};
 
-		tag_t tag = LIMBO;
+		_dtl::tag_t tag = _dtl::LIMBO;
 	};
 
 	/**
