@@ -203,7 +203,7 @@ namespace ftl {
 		 */
 		value_type* operator-> () {
 			if(!isValid)
-				throw std::logic_error("Attempting to read teh value of Nothing.");
+				throw std::logic_error("Attempting to read the value of Nothing.");
 
 			return &val;
 		}
@@ -211,7 +211,7 @@ namespace ftl {
 		/// \overload
 		const value_type* operator-> () const {
 			if(!isValid)
-				throw std::logic_error("Attempting to read teh value of Nothing.");
+				throw std::logic_error("Attempting to read the value of Nothing.");
 
 			return &val;
 		}
