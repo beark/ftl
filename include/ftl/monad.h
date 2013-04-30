@@ -23,7 +23,7 @@
 #ifndef FTL_MONAD_H
 #define FTL_MONAD_H
 
-#include "functional.h"
+#include "function.h"
 #include "applicative.h"
 
 namespace ftl {

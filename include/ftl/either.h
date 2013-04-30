@@ -64,6 +64,8 @@ namespace ftl {
 	 * \tparam L The "left" type
 	 *
 	 * \tparam R The "right" type (sometimes used to signal an error)
+	 *
+	 * TODO: Specialise for L = void
 	 */
 	template<typename L, typename R>
 	class either {
