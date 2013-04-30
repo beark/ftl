@@ -24,11 +24,14 @@
 #define FTL_MAYBE_H
 
 #include <stdexcept>
+#include <type_traits>
 #include "monoid.h"
 #include "monad.h"
-#include "applicative.h"
 
 namespace ftl {
+
+	/// Used to distinguish in-place constructors from others
+	struct inplace_tag {};
 
 	/**
 	 * Abstracts the concept of optional arguments and similar.
@@ -72,7 +75,7 @@ namespace ftl {
 		noexcept(std::is_nothrow_copy_constructible<A>::value)
 	    : isValid(m.isValid) {
 			if(isValid) {
-				new (&val) value_type(m.val);
+				new (&val) value_type(reinterpret_cast<const A&>(m.val));
 			}
 		}
 
@@ -80,39 +83,51 @@ namespace ftl {
 		noexcept(std::is_nothrow_move_constructible<A>::value)
 		: isValid(m.isValid) {
 			if(isValid) {
-				new (&val) value_type(std::move(m.val));
+				new (&val) value_type(std::move(reinterpret_cast<A&>(m.val)));
 				m.isValid = false;
 			}
 		}
 
-		explicit constexpr maybe(const value_type& v)
+		explicit maybe(const value_type& v)
 		noexcept(std::is_nothrow_copy_constructible<A>::value)
-		: val(v), isValid(true) {}
+		: isValid(true) {
+			 new (&val) value_type(v);
+		}
 
-		explicit constexpr maybe(const value_type&& v)
+		explicit maybe(const value_type&& v)
 		noexcept(std::is_nothrow_move_constructible<A>::value)
-		: val(std::move(v)), isValid(true) {}
+		: isValid(true) {
+			new (&val) value_type(std::move(v));
+		}
+
+		/**
+		 * In place construction constructor.
+		 *
+		 * Calls \c value_types's constructor with the given arguments.
+		 */
+		template<typename...Ts>
+		maybe(inplace_tag, Ts...ts) noexcept(std::is_nothrow_constructible<A,Ts...>::value)
+		: isValid(true) {
+			new (&val) value_type(std::forward<Ts>(ts)...);
+		}
 
 		// TODO: Enable the noexcept specifier once is_nothrow_destructible is
 		// available (gcc-4.8).
 		~maybe() /*noexcept(std::is_nothrow_destructible<A>::value)*/ {
-			if(isValid) {
-				val.~value_type();
-				isValid = false;
-			}
+			self_destruct();
 		}
 
 		/**
 		 * Check if the maybe is nothing.
 		 */
-		constexpr bool isNothing() noexcept {
+		constexpr bool isNothing() const noexcept {
 			return !isValid;
 		}
 
 		/**
 		 * Check if the maybe is a value.
 		 */
-		constexpr bool isValue() noexcept {
+		constexpr bool isValue() const noexcept {
 			return isValid;
 		}
 
@@ -123,11 +138,9 @@ namespace ftl {
 				&& std::is_nothrow_destructible<A>::value) */ {
 			// Check for self-assignment
 			if(this == &m)
-				return;
+				return *this;
 
-			if(isValid) {
-				val.~value_type();
-			}
+			self_destruct();
 
 			isValid = m.isValid;
 			if(isValid) {
@@ -144,11 +157,9 @@ namespace ftl {
 				&& std::is_nothrow_destructible<A>::value) */ {
 			// Check for self-assignment
 			if(this == &m)
-				return;
+				return *this;
 
-			if(isValid) {
-				val.~value_type();
-			}
+			self_destruct();
 
 			isValid = m.isValid;
 			if(isValid) {
@@ -170,7 +181,7 @@ namespace ftl {
 		 *   }
 		 * \endcode
 		 */
-		constexpr operator bool() noexcept {
+		constexpr operator bool() const noexcept {
 			return isValue();
 		}
 
@@ -183,7 +194,7 @@ namespace ftl {
 			if(!isValid)
 				throw std::logic_error("Attempting to read the value of Nothing.");
 
-			return val;
+			return reinterpret_cast<A&>(val);
 		}
 
 		/**
@@ -193,7 +204,7 @@ namespace ftl {
 			if(!isValid)
 				throw std::logic_error("Attempting to read the value of Nothing.");
 
-			return val;
+			return reinterpret_cast<const A&>(val);
 		}
 
 		/**
@@ -205,7 +216,7 @@ namespace ftl {
 			if(!isValid)
 				throw std::logic_error("Attempting to read the value of Nothing.");
 
-			return &val;
+			return reinterpret_cast<const A*>(&val);
 		}
 
 		/// \overload
@@ -213,7 +224,7 @@ namespace ftl {
 			if(!isValid)
 				throw std::logic_error("Attempting to read the value of Nothing.");
 
-			return &val;
+			return reinterpret_cast<const A*>(&val);
 		}
 
 		/**
@@ -224,11 +235,16 @@ namespace ftl {
 		}
 
 	private:
-		// Dummy union to prevent value from being initialised except when needed
-		union {
-			char dummy[sizeof(value_type)];
-			value_type val;
-		};
+		void self_destruct() {
+			if(isValid) {
+				reinterpret_cast<A&>(val).~A();
+				isValid = false;
+			}
+		}
+
+		typename std::aligned_storage<
+			sizeof(A),
+			std::alignment_of<A>::value>::type val;
 
 		bool isValid = false;
 	};
