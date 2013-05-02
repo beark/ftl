@@ -68,7 +68,7 @@ namespace ftl {
 			typename B = typename decayed_result<Fn(A)>::type,
 			typename...Ts>
 		static F<B,Ts...> map(Fn fn, F<A,Ts...> f) {
-			return monad<F>::map(fn, f);
+			return monad<F>::map(fn, std::forward<F<A,Ts...>>(f));
 		}
 
 		/**
@@ -109,7 +109,7 @@ namespace ftl {
 			typename A,
 			typename B = typename decayed_result<Fn(A)>::type>
 		static F<B> map(Fn fn, F<A> f) {
-			return monad<F>::map(fn, f);
+			return monad<F>::map(fn, std::forward<F<A>>(f));
 		}
 
 		template<

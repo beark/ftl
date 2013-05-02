@@ -49,7 +49,7 @@ namespace ftl {
 			typename B = typename decayed_result<Fn(A)>::type,
 			typename...Ts>
 		static F<B,Ts...> map(Fn fn, F<A,Ts...> f) {
-			return applicative<F>::map(fn, f);
+			return applicative<F>::map(fn, std::forward<F<A,Ts...>>(f));
 		}
 
 		/**
@@ -68,7 +68,7 @@ namespace ftl {
 			typename A,
 			typename B = typename decayed_result<Fn(A)>::type>
 		static F<B> map(Fn fn, F<A> f) {
-			return applicative<F>::map(fn, f);
+			return applicative<F>::map(fn, std::forward<F<A>>(f));
 		}
 
 		static constexpr bool instance = applicative<F>::instance;
@@ -85,7 +85,7 @@ namespace ftl {
 		typename B = typename decayed_result<Fn(A)>::type,
 		typename...Ts>
 	F<B,Ts...> operator% (Fn fn, F<A,Ts...> f) {
-		return functor<F>::map(fn, f);
+		return functor<F>::map(fn, std::forward<F<A,Ts...>>(f));
 	}
 
 	template<
@@ -95,7 +95,7 @@ namespace ftl {
 		typename = typename std::enable_if<functor<F>::instance>::type,
 		typename B = typename decayed_result<Fn(A)>::type>
 	F<B> operator% (Fn fn, F<A> f) {
-		return functor<F>::map(fn, f);
+		return functor<F>::map(fn, std::forward<F<A>>(f));
 	}
 
 	/**
@@ -120,7 +120,7 @@ namespace ftl {
 					return f(a);
 				},
 				f);
-		}
+		};
 	}
 
 	/// \overload
@@ -135,7 +135,7 @@ namespace ftl {
 					return f(a);
 				},
 				f);
-		}
+		};
 	}
 }
 
