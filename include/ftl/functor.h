@@ -24,6 +24,7 @@
 #define FTL_FUNCTOR_H
 
 #include "type_functions.h"
+#include "function.h"
 
 namespace ftl {
 	// Forward declaration so we can mention applicatives
@@ -95,6 +96,46 @@ namespace ftl {
 		typename B = typename decayed_result<Fn(A)>::type>
 	F<B> operator% (Fn fn, F<A> f) {
 		return functor<F>::map(fn, f);
+	}
+
+	/**
+	 * Distribute function inside a context across entire context.
+	 *
+	 * A practical example would be if you had a list of functions from
+	 * A to R, then \c distributing that list would give you a function from
+	 * A to a list of Rs.
+	 *
+	 * TODO: Implement the Representable concept and make distribute work
+	 * with any Representable.
+	 */
+	template<
+		template<typename...> class F,
+		typename A,
+		typename R,
+		typename...Ts>
+	function<F<R,Ts...>,A> distribute(F<function<R,A>,Ts...> f) {
+		return [f](A a) {
+			functor<F>::map(
+				[f,a](function<R,A> fn) {
+					return f(a);
+				},
+				f);
+		}
+	}
+
+	/// \overload
+	template<
+		template<typename> class F,
+		typename A,
+		typename R>
+	function<F<R>,A> distribute(F<function<R,A>> f) {
+		return [f](A a) {
+			functor<F>::map(
+				[f,a](function<R,A> fn) {
+					return f(a);
+				},
+				f);
+		}
 	}
 }
 
