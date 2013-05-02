@@ -31,7 +31,7 @@ namespace ftl {
 	// Some silly implementation details
 	// TODO: maybe generalise this and move into type_functions?
 	namespace _dtl {
-		template<template<typename> class O>
+		template<typename>
 		struct inner_type;
 
 		template<typename T>
@@ -48,6 +48,7 @@ namespace ftl {
 	 * when we explicitly \em need the value will it be computed (when we call
 	 * \c get on the final future).
 	 */
+	template<>
 	struct monad<std::future> {
 
 		/**
@@ -55,7 +56,7 @@ namespace ftl {
 		 */
 		template<typename T>
 		static std::future<T> pure(T t) {
-			return std::async(std::launch:deferred, [](T t){ return t; }, t);
+			return std::async(std::launch::deferred, [](T t){ return t; }, t);
 		}
 
 		/**
@@ -70,14 +71,14 @@ namespace ftl {
 			typename F,
 			typename A,
 			typename B = typename std::result_of<F(A)>::type>
-		static std::future<B> map(F f, const std::future<A>& fa) {
+		static std::future<B> map(F f, std::future<A>&& fa) {
 			return std::async(
 				std::launch::deferred,
-				[](F f, const std::future<A>& fa) {
+				[](F f, std::future<A>&& fa) {
 					return f(fa.get());
 				},
 				f,
-				fa
+				std::move(fa)
 			);
 		}
 
@@ -92,14 +93,14 @@ namespace ftl {
 			typename F,
 			typename A,
 			typename B = typename _dtl::inner_type<
-				typename std::result_of<F(A)>::type>::type>>
-		static std::future<B> bind(const std::future<A>& fa, F f) {
+				typename std::result_of<F(A)>::type>::type>
+		static std::future<B> bind(std::future<A>&& fa, F f) {
 			return std::async(
 				std::launch::deferred,
-				[](const std::future<A>& fa, F f) {
+				[](std::future<A>&& fa, F f) {
 					return f(fa.get()).get();
 				},
-				fa,
+				std::move(fa),
 				f
 			);
 		}
@@ -108,6 +109,7 @@ namespace ftl {
 		static constexpr bool instance = true;
 
 	};
+
 }
 
 #endif
