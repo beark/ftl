@@ -78,9 +78,9 @@ namespace ftl {
 		template <typename...> class M,
 		typename A,
 		typename = typename std::enable_if<monad<M>::instance>::type,
-		typename B = typename decayed_result<F(A)>::type::value_type,
 		typename...Ts>
-	M<B,Ts...> operator>>= (const M<A,Ts...>& m, F&& f) {
+	auto operator>>= (const M<A,Ts...>& m, F&& f)
+	-> decltype(monad<M>::bind(m, std::forward<F>(f))) {
 		return monad<M>::bind(m, std::forward<F>(f));
 	}
 
@@ -89,9 +89,9 @@ namespace ftl {
 		typename F,
 		template <typename> class M,
 		typename A,
-		typename = typename std::enable_if<monad<M>::instance>::type,
-		typename B = typename decayed_result<F(A)>::type::value_type>
-	M<B> operator>>= (const M<A>& m, F&& f) {
+		typename = typename std::enable_if<monad<M>::instance>::type>
+	auto operator>>= (const M<A>& m, F&& f)
+	-> decltype(monad<M>::bind(m, std::forward<F>(f))) {
 		return monad<M>::bind(m, std::forward<F>(f));
 	}
 
@@ -101,9 +101,9 @@ namespace ftl {
 		template <typename...> class M,
 		typename A,
 		typename = typename std::enable_if<monad<M>::instance>::type,
-		typename B = typename decayed_result<F(A)>::type::value_type,
 		typename...Ts>
-	M<B,Ts...> operator>>= (M<A,Ts...>&& m, F&& f) {
+	auto operator>>= (M<A,Ts...>&& m, F&& f)
+	-> decltype(monad<M>::bind(std::move(m), std::forward<F>(f))) {
 		return monad<M>::bind(std::move(m), std::forward<F>(f));
 	}
 
@@ -112,9 +112,9 @@ namespace ftl {
 		typename F,
 		template <typename> class M,
 		typename A,
-		typename = typename std::enable_if<monad<M>::instance>::type,
-		typename B = typename decayed_result<F(A)>::type::value_type>
-	M<B> operator>>= (M<A>&& m, F&& f) {
+		typename = typename std::enable_if<monad<M>::instance>::type>
+	auto operator>>= (M<A>&& m, F&& f)
+	-> decltype(monad<M>::bind(std::move(m), std::forward<F>(f))) {
 		return monad<M>::bind(std::move(m), std::forward<F>(f));
 	}
 

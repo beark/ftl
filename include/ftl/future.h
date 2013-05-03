@@ -55,8 +55,11 @@ namespace ftl {
 		 * Creates a future that returns t.
 		 */
 		template<typename T>
-		static std::future<T> pure(T t) {
-			return std::async(std::launch::deferred, [](T t){ return t; }, t);
+		static std::future<T> pure(T&& t) {
+			return std::async(
+					std::launch::deferred,
+					[](T t){ return t; },
+					std::forward<T>(t));
 		}
 
 		/**
@@ -71,13 +74,13 @@ namespace ftl {
 			typename F,
 			typename A,
 			typename B = typename std::result_of<F(A)>::type>
-		static std::future<B> map(F f, std::future<A>&& fa) {
+		static std::future<B> map(F&& f, std::future<A>&& fa) {
 			return std::async(
 				std::launch::deferred,
-				[](F f, std::future<A>&& fa) {
+				[](F&& f, std::future<A>&& fa) {
 					return f(fa.get());
 				},
-				f,
+				std::forward<F>(f),
 				std::move(fa)
 			);
 		}
@@ -94,14 +97,14 @@ namespace ftl {
 			typename A,
 			typename B = typename _dtl::inner_type<
 				typename std::result_of<F(A)>::type>::type>
-		static std::future<B> bind(std::future<A>&& fa, F f) {
+		static std::future<B> bind(std::future<A>&& fa, F&& f) {
 			return std::async(
 				std::launch::deferred,
-				[](std::future<A>&& fa, F f) {
+				[](std::future<A>&& fa, F&& f) {
 					return f(fa.get()).get();
 				},
 				std::move(fa),
-				f
+				std::forward<F>(f)
 			);
 		}
 
@@ -110,6 +113,35 @@ namespace ftl {
 
 	};
 
+	// Because futures cannot be copied, only moved, we need to specialise
+	// ap to make applicative's apply/operator* work.
+
+	// TODO: When lambdas can capture by move, this won't be necessary
+	namespace _dtl {
+		template<typename A, typename B>
+		struct inner_ap {
+			using result_type = B;
+
+			explicit inner_ap(std::future<A>&& f) : _f(std::move(f)) {}
+
+			std::future<B> operator() (function<B,A> fn) {
+				return std::move(_f) >>= [fn](A&& a) {
+					return monad<std::future>::pure(fn(std::forward<A>(a)));
+				};
+			}
+
+			std::future<A> _f;
+		};
+	}
+
+	/// Specialised for futures, because they cannot be copied.
+	template<
+		typename F,
+		typename A,
+		typename B = typename std::result_of<F(A)>::type>
+	std::future<B> ap(std::future<F>&& f, std::future<A>&& m) {
+		return std::move(f) >>= _dtl::inner_ap<A,B>(std::move(m));
+	}
 }
 
 #endif
