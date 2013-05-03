@@ -169,8 +169,8 @@ namespace ftl {
 /**
  * Combinator to try parsers in sequence.
  *
- * First tries to run \c p1, and if that fails, tries p2. If both fail, a parse
- * error is returned.
+ * First tries to run \c p1, and if that fails, tries \c p2. If both fail, a
+ * parse error is returned.
  */
 template<typename T>
 parser<T> operator|| (parser<T> p1, parser<T> p2) {
@@ -216,7 +216,7 @@ parser<char> parseChar(char c);
 /**
  * Parses any character except c.
  *
- * This parser will fail if the next character does not equal c.
+ * This parser will fail if the next character \em does equal \c c.
  */
 parser<char> notChar(char c);
 

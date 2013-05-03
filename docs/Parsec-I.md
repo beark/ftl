@@ -3,8 +3,8 @@ Parser Combinator Part I: Simple Parser
 
 In this tutorial, we will use a parser combinator library built on FTL to create a simple parser. For now, we disregard the implementation of the library itself, and focus on simply using its monadic interface to combine smaller, basic parsers into more advanced ones. [Part II](Parsec-II.md) concerns itself with how the library itself was built.
 
-Chapter 1: Parser Combinator API
---------------------------------
+1 - Parser Combinator API
+-------------------------
 Before we do anything, we should familiarise ourselves with the API we intend to use, that of the parser combinator library. If you wish, you can head straight to [source](../examples/parser_combinator/parser_combinator.h) and have a glance at that, otherwise a short description follows. If you do sift through the source, remember that this tutorial does not concern itself with the implementation details, so there is no need to look beyond declarations and public parts of data types.
 
 On to the good stuff. A central part of the API is the type `parser<T>`, which denotes a parser capable of somehow extracting a _T_ from an input stream. How it does this, we do not know, all we know is that it consumes characters and produces something of the stated type. The direct interface to this type can be summarised as:
@@ -19,10 +19,11 @@ On to the good stuff. A central part of the API is the type `parser<T>`, which d
  */
 template<typename T>
 class parser {
+public:
     ftl::either<T,error> run(std::istream&);
 };
 ```
-What's that? only one single, lonely little method? Something must surely be wrong? Well, let's give it a chance to prove itself at least...
+What's that? Only one single, lonely little method? Something must surely be wrong? Well, let's give it a chance to prove itself at least...
 
 So, what else does this interface tell us? First, apparently parsers are monads. This actually tells us quite a bit: we now know we can use all of the [functor](Functor.md), [applicative functor](Applicative.md), and [monad](Monad.md) interfaces to interact with parsers. Neat. Second, we also know that the `run` method apparently can fail: its return type of `either<T,error>` clearly indicates that it will either return whatever we wanted it to parse, or an error.
 
@@ -31,8 +32,8 @@ Alright, now we've deduced quite a bit about this `parser<T>` type, but we still
 /**
  * Combinator to try parsers in sequence.
  *
- * First tries to run \c p1, and if that fails, tries p2. If both fail, a parse
- * error is returned.
+ * First tries to run \c p1, and if that fails, tries \c p2. If both fail, a
+ * parse error is returned.
  */
 template<typename T>
 parser<T> operator|| (parser<T> p1, parser<T> p2);
@@ -97,9 +98,9 @@ Here, we rely on yet another of the Functor series of operations, specifically t
 
 Alright, we have covered enough to do something actually useful. Let's move on!
 
-Chapter 2: Doing Something Non-Trivial
---------------------------------------
-At this point, we have a library to build parsers and the knowledge how to use it, so what do we do? For this particular tutorial, we'll try to stay in the shallow end of the pool a bit longer, but still put together something that shouldn't tax us _too_ much. Let's make ourselves a parser that parses a lisp-list of integers to an `std::vector<int>`. This should provide us with a few challenges, yet not grow out of hand.
+2 - Doing Something Non-Trivial
+-------------------------------
+At this point, we have a library to build parsers and the knowledge how to use it, so what do we do? For this particular tutorial, we'll try to stay in the shallow end of the pool a bit longer, but still put together something that shouldn't bore us _too_ much. Let's make ourselves a parser that parses a lisp-list of integers to an `std::vector<int>`. This should provide us with a few challenges, yet not grow out of hand.
 
 We can give it a go using a top-down approach. A list in lisp has an opening parenthesis, then a space separated list of elements, and then a closing parenthesis. Starting from that, we intuitively get:
 ```cpp
@@ -137,7 +138,7 @@ parser<T> option(parser<T> p, T t) {
 	return p || ftl::monad<parser>::pure(t);
 }
 ```
-Easily! The OR-combinator we found earlier comes in very handy, and monad's `pure` gives us the final piece. See, it wasn't quite true what was said in Chapter 1&mdash;even without _anything_ save the monad instance, we _can_ create parsers. Only, they're rather useless on their own. Parsers creates with `pure` will consume no input and always yield the exact value we gave to `pure`. Our `option` above then quite simply reads as "parse p, but if that fails, just default to t".
+Easily! The OR-combinator we found earlier comes in very handy, and monad's `pure` gives us the final piece. See, it wasn't quite true what was said in section 1&mdash;even without _anything_ save the monad instance, we _can_ create parsers. Only, they're rather useless on their own. Parsers creates with `pure` will consume no input and always yield the exact value we gave to `pure`. Our `option` above then quite simply reads as "parse p, but if that fails, just default to t".
 
 Alright, we can return to our `parseList` again. It now looks like this:
 ```cpp
@@ -179,7 +180,7 @@ parser<std::string> whitespace() {
 ```
 While we actually don't care at all what whitespace we actually parse, the parser generator library as it exists gives us no way of declaring a parser that consumes input without also producing _something_. Or in other words, we cannot create a parser that is run for its side effects only. This doesn't much matter, we discard the parsed whitespace in `operator>>` anyway. Also, we're ready to test our parser now, so who cares?
 
-Chapter 3: Running the Parser
+3 - Running the Parser
 -----------------------------
 Building a quick `main` to try all this out is not too troublesome.
 ```cpp
