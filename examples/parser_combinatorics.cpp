@@ -1,5 +1,6 @@
 #include <iostream>
 #include <limits>
+#include <vector>
 #include "parser_combinator/parser_combinator.h"
 
 int string2int(const std::string& str) {
@@ -14,14 +15,6 @@ int string2int(const std::string& str) {
 		return -result;
 
 	return result;
-}
-
-parser<std::string> parseQuotedString() {
-	using namespace ftl;
-
-	return parseChar('"')
-		>> many(notChar('"'))
-		<< parseChar('"');
 }
 
 template<typename T>
@@ -48,11 +41,40 @@ parser<int> parseInt() {
 	return string2int % (option<char>(parseSign(), '+') >>= parseN);
 }
 
+parser<std::string> spaces() {
+	return many1(oneOf(" \t\r\n"));
+}
+
+std::vector<int> singleton(int n) {
+	std::vector<int> v; v.push_back(n);
+	return std::move(v);
+}
+
+std::vector<int> concat(std::vector<int> v1, std::vector<int> v2) {
+	v1.insert(v1.end(), v2.begin(), v2.end());
+	return v1;
+}
+
+parser<std::vector<int>> parseList() {
+	using namespace ftl;
+
+	return curry(concat)
+		% (singleton % parseInt())
+		* option(
+			spaces() >> lazy(parseList),
+			std::vector<int>());
+}
+
+parser<std::vector<int>> parseSexpr() {
+	using namespace ftl;
+	return parseChar('(') >> parseList() << parseChar(')');
+}
+
 int main(int arc, char** argv) {
 
 	using std::string;
 
-	auto parser = parseInt();
+	auto parser = parseSexpr();
 	auto res = parser.run(std::cin);
 
 	while(!res) {
@@ -63,7 +85,11 @@ int main(int arc, char** argv) {
 		res = parser.run(std::cin);
 	}
 
-	std::cout << *res + 12 << std::endl;
+	for(auto e : *res) {
+		std::cout << e << ", ";
+	}
+
+	std::cout << std::endl;
 
 	return 0;
 }
