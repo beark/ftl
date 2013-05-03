@@ -67,12 +67,22 @@ namespace ftl {
 			typename A,
 			typename B = typename decayed_result<Fn(A)>::type,
 			typename...Ts>
-		static F<B,Ts...> map(Fn fn, F<A,Ts...> f) {
-			return monad<F>::map(fn, std::forward<F<A,Ts...>>(f));
+		static F<B,Ts...> map(Fn&& fn, const F<A,Ts...>& f) {
+			return monad<F>::map(std::forward<Fn>(fn), f);
+		}
+
+		/// \overload
+		template<
+			typename Fn,
+			typename A,
+			typename B = typename decayed_result<Fn(A)>::type,
+			typename...Ts>
+		static F<B,Ts...> map(Fn&& fn, F<A,Ts...>&& f) {
+			return monad<F>::map(std::forward<Fn>(fn), std::move(f));
 		}
 
 		/**
-		 * Sequential application.
+		 * Application.
 		 *
 		 * Default implementation is to use monad's ap.
 		 *
@@ -83,10 +93,17 @@ namespace ftl {
 			typename A,
 			typename B = typename decayed_result<Fn(A)>::type,
 			typename...Ts>
-		static F<B,Ts...> apply(
-				const F<Fn,Ts...>& fn,
-				const F<A,Ts...>& f) {
+		static F<B,Ts...> apply(const F<Fn,Ts...>& fn, const F<A,Ts...>& f) {
 			return ap(fn, f);
+		}
+
+		template<
+			typename Fn,
+			typename A,
+			typename B = typename decayed_result<Fn(A)>::type,
+			typename...Ts>
+		static F<B,Ts...> apply(F<Fn,Ts...>&& fn, F<A,Ts...>&& f) {
+			return ap(std::move(fn), std::move(f));
 		}
 
 		/**
@@ -108,8 +125,16 @@ namespace ftl {
 			typename Fn,
 			typename A,
 			typename B = typename decayed_result<Fn(A)>::type>
-		static F<B> map(Fn fn, F<A> f) {
-			return monad<F>::map(fn, std::forward<F<A>>(f));
+		static F<B> map(Fn&& fn, const F<A>& f) {
+			return monad<F>::map(std::forward<Fn>(fn), f);
+		}
+
+		template<
+			typename Fn,
+			typename A,
+			typename B = typename decayed_result<Fn(A)>::type>
+		static F<B> map(Fn&& fn, F<A>&& f) {
+			return monad<F>::map(std::forward<Fn>(fn), std::move(f));
 		}
 
 		template<
@@ -118,6 +143,14 @@ namespace ftl {
 			typename B = typename decayed_result<Fn(A)>::type>
 		static F<B> apply(const F<Fn>& fn, const F<A>& f) {
 			return ap(fn, f);
+		}
+
+		template<
+			typename Fn,
+			typename A,
+			typename B = typename decayed_result<Fn(A)>::type>
+		static F<B> apply(F<Fn>&& fn, F<A>&& f) {
+			return ap(std::move(fn), std::move(f));
 		}
 
 		static constexpr bool instance = monad<F>::instance;
@@ -137,6 +170,19 @@ namespace ftl {
 		return applicative<F>::apply(u, v);
 	}
 
+	/// \overload
+	template<
+		template<typename...> class F,
+		typename Fn,
+		typename A,
+		typename = typename std::enable_if<applicative<F>::instance>::type,
+		typename B = typename decayed_result<Fn(A)>::type,
+		typename...Ts>
+	F<B,Ts...> operator* (F<Fn,Ts...>&& u, F<A,Ts...>&& v) {
+		return applicative<F>::apply(std::move(u), std::move(v));
+	}
+
+	/// \overload
 	template<
 		template<typename> class F,
 		typename Fn,
@@ -145,6 +191,17 @@ namespace ftl {
 		typename B = typename decayed_result<Fn(A)>::type>
 	F<B> operator* (const F<Fn>& u, const F<A>& v) {
 		return applicative<F>::apply(u, v);
+	}
+
+	/// \overload
+	template<
+		template<typename> class F,
+		typename Fn,
+		typename A,
+		typename = typename std::enable_if<applicative<F>::instance>::type,
+		typename B = typename decayed_result<Fn(A)>::type>
+	F<B> operator* (F<Fn>&& u, F<A>&& v) {
+		return applicative<F>::apply(std::move(u), std::move(v));
 	}
 
 }

@@ -48,8 +48,18 @@ namespace ftl {
 			typename A,
 			typename B = typename decayed_result<Fn(A)>::type,
 			typename...Ts>
-		static F<B,Ts...> map(Fn fn, F<A,Ts...> f) {
-			return applicative<F>::map(fn, std::forward<F<A,Ts...>>(f));
+		static F<B,Ts...> map(Fn&& fn, const F<A,Ts...>& f) {
+			return applicative<F>::map(std::forward<Fn>(fn), f);
+		}
+
+		/// \overload
+		template<
+			typename Fn,
+			typename A,
+			typename B = typename decayed_result<Fn(A)>::type,
+			typename...Ts>
+		static F<B,Ts...> map(Fn&& fn, F<A,Ts...>&& f) {
+			return applicative<F>::map(std::forward<Fn>(fn), std::move(f));
 		}
 
 		/**
@@ -67,8 +77,16 @@ namespace ftl {
 			typename Fn,
 			typename A,
 			typename B = typename decayed_result<Fn(A)>::type>
-		static F<B> map(Fn fn, F<A> f) {
-			return applicative<F>::map(fn, std::forward<F<A>>(f));
+		static F<B> map(Fn&& fn, const F<A>& f) {
+			return applicative<F>::map(std::forward<Fn>(fn), f);
+		}
+
+		template<
+			typename Fn,
+			typename A,
+			typename B = typename decayed_result<Fn(A)>::type>
+		static F<B> map(Fn&& fn, F<A>&& f) {
+			return applicative<F>::map(std::forward<Fn>(fn), std::move(f));
 		}
 
 		static constexpr bool instance = applicative<F>::instance;

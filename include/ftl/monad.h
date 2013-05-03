@@ -80,8 +80,8 @@ namespace ftl {
 		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename B = typename decayed_result<F(A)>::type::value_type,
 		typename...Ts>
-	M<B,Ts...> operator>>= (const M<A,Ts...>& m, F f) {
-		return monad<M>::bind(m, f);
+	M<B,Ts...> operator>>= (const M<A,Ts...>& m, F&& f) {
+		return monad<M>::bind(m, std::forward<F>(f));
 	}
 
 	/// \overload
@@ -91,8 +91,31 @@ namespace ftl {
 		typename A,
 		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename B = typename decayed_result<F(A)>::type::value_type>
-	M<B> operator>>= (const M<A>& m, F f) {
-		return monad<M>::bind(m, f);
+	M<B> operator>>= (const M<A>& m, F&& f) {
+		return monad<M>::bind(m, std::forward<F>(f));
+	}
+
+	/// \overload
+	template<
+		typename F,
+		template <typename...> class M,
+		typename A,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename B = typename decayed_result<F(A)>::type::value_type,
+		typename...Ts>
+	M<B,Ts...> operator>>= (M<A,Ts...>&& m, F&& f) {
+		return monad<M>::bind(std::move(m), std::forward<F>(f));
+	}
+
+	/// \overload
+	template<
+		typename F,
+		template <typename> class M,
+		typename A,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename B = typename decayed_result<F(A)>::type::value_type>
+	M<B> operator>>= (M<A>&& m, F&& f) {
+		return monad<M>::bind(std::move(m), std::forward<F>(f));
 	}
 
 	/**
@@ -107,8 +130,8 @@ namespace ftl {
 		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename B = typename decayed_result<F(A)>::type::value_type,
 		typename...Ts>
-	M<B,Ts...> operator<<= (F f, const M<A,Ts...>& m) {
-		return monad<M>::bind(m, f);
+	M<B,Ts...> operator<<= (F&& f, const M<A,Ts...>& m) {
+		return monad<M>::bind(m, std::forward<F>(f));
 	}
 
 	/// \overload
@@ -118,8 +141,8 @@ namespace ftl {
 		typename A,
 		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename B = typename decayed_result<F(A)>::type::value_type>
-	M<B> operator<<= (F f, const M<A>& m) {
-		return monad<M>::bind(m, f);
+	M<B> operator<<= (F&& f, const M<A>& m) {
+		return monad<M>::bind(m, std::forward<F>(f));
 	}
 
 	/**
@@ -143,6 +166,20 @@ namespace ftl {
 	}
 
 	/// \overload
+	//TODO: Add version with lambda capture by move once available (C++14)
+	template<
+		template<typename...> class M,
+		typename A,
+		typename B,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename...Ts>
+	M<B,Ts...> operator>> (M<A,Ts...>&& m1, M<B,Ts...> m2) {
+		return monad<M>::bind(std::move(m1), [m2](A) {
+			return m2;
+		});
+	}
+
+	/// \overload
 	template<
 		template<typename> class M,
 		typename A,
@@ -150,6 +187,19 @@ namespace ftl {
 		typename = typename std::enable_if<monad<M>::instance>::type>
 	M<B> operator>> (const M<A>& m1, M<B> m2) {
 		return monad<M>::bind(m1, [m2](A) {
+			return m2;
+		});
+	}
+
+	/// \overload
+	//TODO: Add version with lambda capture by move once available (C++14)
+	template<
+		template<typename> class M,
+		typename A,
+		typename B,
+		typename = typename std::enable_if<monad<M>::instance>::type>
+	M<B> operator>> (M<A>&& m1, M<B> m2) {
+		return monad<M>::bind(std::move(m1), [m2](A) {
 			return m2;
 		});
 	}
@@ -178,6 +228,23 @@ namespace ftl {
 		});
 	}
 
+	/// \overload
+	// TODO: Lambda capture by move (C++14)
+	template<
+		template<typename...> class M,
+		typename A,
+		typename B,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename...Ts>
+	M<A,Ts...> operator<< (M<A,Ts...>&& m1, M<B,Ts...> m2) {
+		return monad<M>::bind(std::move(m1), [m2](A a) {
+			return monad<M>::bind(m2, [a](B) {
+				return monad<M>::template pure<A,Ts...>(a);
+			});
+		});
+	}
+
+	/// \overload
 	template<
 		template<typename> class M,
 		typename A,
@@ -191,9 +258,22 @@ namespace ftl {
 		});
 	}
 
-	/**
-	 * Lifts a function into M.
-	 */
+	/// \overload
+	// TODO: Lambda capture by move (C++14)
+	template<
+		template<typename> class M,
+		typename A,
+		typename B,
+		typename = typename std::enable_if<monad<M>::instance>::type>
+	M<A> operator<< (M<A>&& m1, M<B> m2) {
+		return monad<M>::bind(std::move(m1), [m2](A a) {
+			return monad<M>::bind(m2, [a](B) {
+				return monad<M>::template pure<A>(a);
+			});
+		});
+	}
+
+	/// Lifts a function into M.
 	template<
 		template<typename...> class M,
 		typename F,
@@ -203,6 +283,20 @@ namespace ftl {
 		typename...Ts>
 	M<R,Ts...> liftM(F f, const M<A,Ts...>& m) {
 		return m >>= [f] (A a) {
+			return monad<M>::template pure<A,Ts...>(f(std::forward<A>(a)));
+		};
+	}
+
+	/// \overload
+	template<
+		template<typename...> class M,
+		typename F,
+		typename A,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename R = typename decayed_result<F(A)>::type,
+		typename...Ts>
+	M<R,Ts...> liftM(F f, M<A,Ts...>&& m) {
+		return std::move(m) >>= [f] (A a) {
 			return monad<M>::template pure<A,Ts...>(f(std::forward<A>(a)));
 		};
 	}
@@ -220,6 +314,19 @@ namespace ftl {
 		};
 	}
 
+	/// \overload
+	template<
+		template<typename> class M,
+		typename F,
+		typename A,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename R = typename decayed_result<F(A)>::type>
+	M<R> liftM(F f, M<A>&& m) {
+		return std::move(m) >>= [f] (A a) {
+			return monad<M>::pure(f(std::forward<A>(a)));
+		};
+	}
+
 	/**
 	 * Apply a function in M to a value in M.
 	 *
@@ -232,8 +339,25 @@ namespace ftl {
 		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename B = typename decayed_result<F(A)>::type,
 		typename...Ts>
-	M<B,Ts...> ap(M<F,Ts...> f, M<A,Ts...> m) {
+	M<B,Ts...> ap(const M<F,Ts...>& f, M<A,Ts...> m) {
 		return f >>= [m] (F f) {
+			return m >>= [f] (A a) {
+				return monad<M>::template pure<A,Ts...>(f(std::forward<A>(a)));
+			};
+		};
+	}
+
+	/// \overload
+	// TODO: Catpure by move (C++14)
+	template<
+		template<typename...> class M,
+		typename F,
+		typename A,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename B = typename decayed_result<F(A)>::type,
+		typename...Ts>
+	M<B,Ts...> ap(M<F,Ts...>&& f, M<A,Ts...> m) {
+		return std::move(f) >>= [m] (F f) {
 			return m >>= [f] (A a) {
 				return monad<M>::template pure<A,Ts...>(f(std::forward<A>(a)));
 			};
@@ -247,8 +371,24 @@ namespace ftl {
 		typename A,
 		typename = typename std::enable_if<monad<M>::instance>::type,
 		typename B = typename decayed_result<F(A)>::type>
-	M<B> ap(M<F> f, M<A> m) {
+	M<B> ap(const M<F>& f, M<A> m) {
 		return f >>= [m] (function<B,A> f) {
+			return m >>= [f] (A a) {
+				return monad<M>::pure(f(std::forward<A>(a)));
+			};
+		};
+	}
+
+	/// \overload
+	// TODO: Catpure by move (C++14)
+	template<
+		template<typename> class M,
+		typename F,
+		typename A,
+		typename = typename std::enable_if<monad<M>::instance>::type,
+		typename B = typename decayed_result<F(A)>::type>
+	M<B> ap(M<F>&& f, M<A> m) {
+		return std::move(f) >>= [m] (function<B,A> f) {
 			return m >>= [f] (A a) {
 				return monad<M>::pure(f(std::forward<A>(a)));
 			};
