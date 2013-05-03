@@ -56,7 +56,7 @@ parser<char> oneOf(std::string str) {
 		}
 
 		std::ostringstream oss;
-		oss << "expected one of \"" << str << "\"";
+		oss << "one of \"" << str << "\"";
 		return fail<char>(oss.str());
 	}};
 }

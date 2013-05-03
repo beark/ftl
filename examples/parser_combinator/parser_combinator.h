@@ -199,18 +199,6 @@ parser<T> operator|| (parser<T> p1, parser<T> p2) {
  */
 
 /**
- * Used to recurse in a parser.
- *
- * This is required because C++ is eagerly evaluated.
- */
-template<typename T>
-parser<T> rec(ftl::function<parser<T>> fp) {
-	return parser<T>([fp](std::istream& strm) {
-			return fp().run(strm);
-	});
-}
-
-/**
  * Parses any one character.
  *
  * This parser can only fail if the end of stream has been reached.
