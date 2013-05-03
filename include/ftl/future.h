@@ -122,7 +122,8 @@ namespace ftl {
 		struct inner_ap {
 			using result_type = B;
 
-			explicit inner_ap(std::future<A>&& f) : _f(std::move(f)) {}
+			explicit inner_ap(std::future<A>&& f) noexcept
+			: _f(std::move(f)) {}
 
 			std::future<B> operator() (function<B,A> fn) {
 				return std::move(_f) >>= [fn](A&& a) {
