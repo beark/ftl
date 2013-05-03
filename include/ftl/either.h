@@ -104,21 +104,25 @@ namespace ftl {
 			e.tag = _dtl::LIMBO;
 		}
 
+		/// Construct a left type value
 		explicit constexpr either(const L& left)
 		noexcept(std::is_nothrow_copy_constructible<L>::value)
 		: l(left), tag(_dtl::LEFT) {
 		}
 
+		/// \overload
 		explicit constexpr either(L&& left)
 		noexcept(std::is_nothrow_move_constructible<L>::value)
 		: l(std::move(left)), tag(_dtl::LEFT) {
 		}
 
+		/// Construct a right type value
 		explicit constexpr either(const R& right)
 		noexcept(std::is_nothrow_copy_constructible<R>::value)
 		: r(right), tag(_dtl::RIGHT) {
 		}
 
+		/// \overload
 		explicit constexpr either(R&& right)
 		noexcept(std::is_nothrow_move_constructible<R>::value)
 		: r(std::move(right)), tag(_dtl::RIGHT) {
@@ -187,7 +191,7 @@ namespace ftl {
 		/**
 		 * Alternate, concise way of accessing left values.
 		 *
-		 * \throws std::logic_error if called one a right type.
+		 * \throws std::logic_error if called on a right type.
 		 */
 		L& operator* () {
 			if(tag == _dtl::LEFT)
@@ -403,12 +407,10 @@ namespace ftl {
 			return either<A,R>(a);
 		}
 
-		/*
 		template<typename A, typename R>
 		static either<A,R> pure(A&& a) {
 			return either<A,R>(std::move(a));
 		}
-		*/
 
 		template<
 			typename F,
