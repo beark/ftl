@@ -100,20 +100,41 @@ namespace ftl {
 		typename Fn,
 		typename A,
 		typename = typename std::enable_if<functor<F>::instance>::type,
-		typename B = typename decayed_result<Fn(A)>::type,
 		typename...Ts>
-	F<B,Ts...> operator% (Fn fn, F<A,Ts...> f) {
-		return functor<F>::map(fn, std::forward<F<A,Ts...>>(f));
+	auto operator% (Fn&& fn, const F<A,Ts...>& f)
+	-> decltype(functor<F>::map(std::forward<Fn>(fn), f)) {
+		return functor<F>::map(std::forward<Fn>(fn), f);
+	}
+
+	template<
+		template<typename...> class F,
+		typename Fn,
+		typename A,
+		typename = typename std::enable_if<functor<F>::instance>::type,
+		typename...Ts>
+	auto operator% (Fn&& fn, F<A,Ts...>&& f)
+	-> decltype(functor<F>::map(std::forward<Fn>(fn), std::move(f))) {
+		return functor<F>::map(std::forward<Fn>(fn), std::move(f));
 	}
 
 	template<
 		template<typename> class F,
 		typename Fn,
 		typename A,
-		typename = typename std::enable_if<functor<F>::instance>::type,
-		typename B = typename decayed_result<Fn(A)>::type>
-	F<B> operator% (Fn fn, F<A> f) {
-		return functor<F>::map(fn, std::forward<F<A>>(f));
+		typename = typename std::enable_if<functor<F>::instance>::type>
+	auto operator% (Fn&& fn, const F<A>& f)
+	-> decltype(functor<F>::map(std::forward<Fn>(fn), f)) {
+		return functor<F>::map(std::forward<Fn>(fn), f);
+	}
+
+	template<
+		template<typename> class F,
+		typename Fn,
+		typename A,
+		typename = typename std::enable_if<functor<F>::instance>::type>
+	auto operator% (Fn&& fn, F<A>&& f)
+	-> decltype(functor<F>::map(std::forward<Fn>(fn), std::move(f))) {
+		return functor<F>::map(std::forward<Fn>(fn), std::move(f));
 	}
 
 	/**
