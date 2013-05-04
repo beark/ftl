@@ -44,14 +44,16 @@ result_type result = computeAlotOfStuff(
 ```
 Not too bad, really. But what if one of the _eventually_ computations takes a long while to complete? Well, we have to wait for it to complete, obviously. But what if we're not even sure we need the result _right now_? What if we simply want another `future` instead, so that all the inputs have a chance to complete while we do other stuff, and so that we are only forced to wait when we really do _need_ `result`?
 
-Well, we could always rewrite `computeAlotOfStuff` to take futures as input and spit out a new future as result. But that takes effort, and `computeAlotOfStuff` might be a library function too, and thus impossible to rewrite. Right, so let's wrap it in an `async` call, then. We can do that regardless of who defined it and where. Sure, but it still takes effort and adds cruft to our code.
+Well, we could always rewrite `computeAlotOfStuff` to take futures as input and spit out a new future as result.
+But that takes effort, and `computeAlotOfStuff` might be a library function too, and thus impossible to rewrite.
 
-Let's just use future's [applicative](docs/Applicative.md) instance instead.
+Right, so let's wrap it in an `async` call, then. We can do that regardless of who defined it and where.
+Sure, but it still takes effort and adds cruft to our code. Let's just use future's [applicative](docs/Applicative.md) instance instead.
 ```cpp
 auto result = curry(computeAlotOfStuff) %
                   eventuallyInt() * eventuallyFloat() * eventuallyObject();
 ```
-This might look a bit strange, but once you've learnt applicative style programming, this is actually just as clear as the plain, original function call that `get`ed on the futures. Except, this is even slightly cleaner (less noise with all the `get`s and parens gone). It helps a bit to read this if you ignore `curry` for now (or, you can read about it [here](http://en.wikipedia.org/wiki/Currying), and then view `operator%` as an opening parenthesis, `operator*` as comma, and then insert a closing parenthesis at the end of the expression. I.e., like this:
+This might look a bit strange, but once you've learnt applicative style programming, this is actually just as clear as the plain, original function call that `get`ed on the futures. Except, this is even slightly cleaner (less noise with all the `get`s and some parens gone). It helps a bit to read this if you ignore `curry` for now (or, you can read about it [here](http://en.wikipedia.org/wiki/Currying)), and then view `operator%` as an opening parenthesis, `operator*` as comma, and then insert a closing parenthesis at the end of the expression. I.e., like this:
 ```cpp
 computeAlotOfStuff(eventuallyInt(), eventuallyFloat(), eventuallyObject());
 ```
