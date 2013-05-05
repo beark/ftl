@@ -72,11 +72,11 @@ The last one, `ap`, is actually [applicative's](Applicative.md) `apply` in disgu
 FTL instances
 -------------
 The following standard library types are instances of Monad:
-* `std::list<T>` and `std::vector<T>`.
 * `std::shared_ptr<T>`.
 * `std::future<T>`
 
 Further, the following FTL-native types implement this concept:
+* The type aliases `ftl::list<T>` and `ftl::vector<T>`.
 * `maybe<T>`
 * `either<L,_>`
 

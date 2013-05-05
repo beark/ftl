@@ -46,14 +46,14 @@ FTL instances
 -------------
 The following standard library types have been given functor implementations in FTL:
 * `std::shared_ptr<T>`: by mapping a function to a `shared_ptr`, it is applied only if it is actively managing data. Otherwise, nothing is done and an empty pointer is returned.
-* `std::vector<T>` and, isomorphically, `std::list<T>`. For containers, mapping a function has the effect of applying it once to each element in the container, and then collecting all the results and returning them in a new container.
 * `std::tuple<T,Ts...>` is a functor on _T_. In other words, mapping a function applies it to the first field in the tuple and returns a new tuple with the value (and possibly type) of the first element changed.
 * `std::future<T>` can map a function to a future value, yielding a future that when `get`ed applies the function after waiting for the original future.
 
 In addition, the following FTL data types are functors:
+* The type aliases `ftl::vector<T>` and, isomorphically, `ftl::list<T>`. For containers, mapping a function has the effect of applying it once to each element in the container, and then collecting all the results and returning them in a new container.
 * `maybe<T>`, in a way isomorphic to `std::shared_ptr<T>`.
 * `either<L,R>` is a functor on _L_, similar to how `std::tuple<T,Ts...>` is a functor on _T_.
-* `function<R,Ps...>` is a functor on _R_. Mapping a function to this type is exactly equivalent to composing the two functions (see [compose](functional.h.md#compose)).
+* `function<R,Ps...>` is a functor on _R_. Mapping a function to this type is exactly equivalent to composing the two functions.
 
 Custom instances
 ----------------
