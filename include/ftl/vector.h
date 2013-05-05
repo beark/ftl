@@ -24,89 +24,35 @@
 #define FTL_VECTOR_H
 
 #include <vector>
-#include "type_functions.h"
 #include "monoid.h"
+#include "monad.h"
 
 namespace ftl {
+
 	/**
-	 * Implementation of mappable::map for vectors.
+	 * Workaround to make vectors compatible with the functor series of
+	 * concepts.
+	 *
+	 * If you require a different allocator than \c std::allocator, then make
+	 * a similar type synonym and give it a monad instance of its own.
+	 */
+	template<typename T>
+	using vector = std::vector<T, std::allocator<T>>;
+
+	/**
+	 * Maps and concatenates in one step.
+	 *
+	 * \tparam F must satisfy Function<Container<B>(A)>
 	 */
 	template<
 		typename F,
-		typename A,
-		template<typename, typename...> class Alloc,
-		typename B = typename decayed_result<F(A)>::type,
-		typename...AllocArgs>
-	auto map(const F& f, const std::vector<A, Alloc<A, AllocArgs...>>& v)
-	-> std::vector<B, Alloc<B, AllocArgs...>> {
-		std::vector<B, Alloc<B, AllocArgs...>> result;
-		result.reserve(v.size());
-
-		for(const auto& e : v) {
-			result.push_back(f(e));
-		}
-
-		return result;
-	}
-
-	/**
-	 * Implementation of mappable::map for vectors.
-	 */
-	template<
-		typename F,
-		typename A,
-		typename Alloc,
-		typename B = typename decayed_result<F(A)>::type>
-	std::vector<B, Alloc> map(const F& f, const std::vector<A, Alloc>& v) {
-		std::vector<B, Alloc> result;
-		result.reserve(v.size());
-
-		for(const auto& e : v) {
-			result.push_back(f(e));
-		}
-
-		return result;
-	}
-
-	/**
-	 * Implementation of mappable::concatMap for vectors.
-	 */
-	template<
-		typename F,
-		template <typename, typename...> class Alloc,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type::value_type,
-		typename...AllocArgs>
-	auto concatMap(const F& f, const std::vector<A, Alloc<A, AllocArgs...>>& v)
-	-> std::vector<B, Alloc<B, AllocArgs...>> {
-
-		std::vector<B, Alloc<B, AllocArgs...>> result;
-		result.reserve(v.size() * 2);	// Reasonable assumption? TODO: test!
-
-		auto nested = map(f, l);
-
-		for(auto& el : nested) {
-			for(auto& e : el) {
-				result.push_back(e);
-			}
-		}
-
-		return result;
-	}
-
-	/// \overload
-	template<
-		typename F,
-		typename Alloc,
 		typename A,
 		typename B = typename decayed_result<F(A)>::type::value_type>
-	auto concatMap(const F& f, const std::vector<A, Alloc>& v)
-	-> std::vector<B, Alloc> {
+	vector<B> concatMap(F f, const vector<A>& v) {
 
-		std::vector<B, Alloc> result;
+		std::vector<B> result;
 		result.reserve(v.size() * 2);	// Reasonable assumption? TODO: test!
-
-		auto nested = map(f, l);
+		auto nested = f % v;
 
 		for(auto& el : nested) {
 			for(auto& e : el) {
@@ -118,16 +64,64 @@ namespace ftl {
 	}
 
 	/**
-	 * Implementation of functor for vectors
+	 * Monoid implementation for vectors.
+	 */
+	template<typename T>
+	struct monoid<std::vector<T>> {
+		static std::vector<T> id() {
+			return std::vector<T>();
+		}
+
+		static std::vector<T> append(
+				const std::vector<T>& v1,
+				const std::vector<T>& v2) {
+			auto rv(v1);
+			rv.reserve(v2.size());
+			rv.insert(rv.end(), v2.begin(), v2.end());
+			return rv;
+		}
+
+		static std::vector<T> append(
+				std::vector<T>&& v1,
+				const std::vector<T>& v2) {
+			v1.reserve(v2.size());
+			v1.insert(v1.end(), v2.begin(), v2.end());
+			return v1;
+		}
+
+		static std::vector<T> append(
+				const std::vector<T>& v1,
+				std::vector<T>&& v2) {
+			v2.reserve(v1.size());
+			v2.insert(v2.begin(), v1.begin(), v1.end());
+			return v1;
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
+	 * Monad implementation of vectors
 	 */
 	template<>
-	struct functor<std::vector> {
+	struct monad<vector> {
+		template<typename T>
+		static vector<T> pure(const T& t) {
+			return vector{t};
+		}
+
+		template<typename T>
+		static vector<T> pure(T&& t) {
+			return vector{std::move(t)};
+		}
+
+		/// Applies f to each element
 		template<
 			typename F,
 			typename A,
-			typename B = decayed_result<F(A)>::type>
-		std::vector<B> map(const F& f, const std::vector<A>& v) {
-			std::vector<B> ret;
+			typename B = typename decayed_result<F(A)>::type>
+		static vector<B> map(F&& f, const vector<A>& v) {
+			vector<B> ret;
 			ret.reserve(v.size());
 			for(const auto& e : v) {
 				ret.push_back(f(e));
@@ -135,46 +129,18 @@ namespace ftl {
 
 			return ret;
 		}
-	};
 
-	// \overload
-	template<
-		typename F,
-		typename Alloc,
-		typename A,
-		typename B = decayed_result<F(A)>::type>
-	std::vector<B, Alloc> fmap(const F& f, const std::vector<A, Alloc>& v) {
-		return map(f, l);
-	}
-
-	/**
-	 * Monoid implementation for vectors.
-	 */
-	template<typename...Ps>
-	struct monoid<std::vector<Ps...>> {
-		static std::vector<Ps...> id() {
-			return std::vector<Ps...>();
-		}
-
-		static std::vector<Ps...> append(
-				const std::vector<Ps...>& v1,
-				const std::vector<Ps...>& v2) {
-			auto rv(v1);
-			rv.reserve(v2.size());
-			rv.insert(rv.end(), v2.begin(), v2.end());
-			return rv;
+		/// Equivalent of flip(concatMap)
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type::value_type>
+		static vector<B> bind(const vector<A>& v, F&& f) {
+			return concatMap(std::forward<F>(f), v);
 		}
 
 		static constexpr bool instance = true;
 	};
-
-	/**
-	 * Monad::bind implementation for vectors.
-	 */
-	auto bind(const std::vector<A, Alloc<A, AllocArgs...>>& v, const F& f)
-	-> std::vector<B, Alloc<B, AllocArgs...>> {
-		return concatMap(f, v);
-	}
 
 }
 
