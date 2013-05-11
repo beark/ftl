@@ -27,22 +27,35 @@
 
 namespace ftl {
 	/**
+	 * \defgroup monoid Monoid
+	 *
+	 * Concept encapsulating the mathematical construct of the same name.
+	 *
+	 * Mathematically, a monoid is any set \c S, for which there is an
+	 * associated binary operation, \f$\bullet\f$, and where there exists
+	 * an element \c id of \c S such that the following laws hold:
+	 *
+	 * \li Right identity law: \f$a \bullet id = a\f$
+	 * \li Left identity law: \f$id \bullet a = a\f$
+	 * \li Law of associativity:
+	 *     \f$a \bullet (b \bullet c) = (a \bullet b) \bullet c\f$
+	 *
+	 * In FTL, the binary monoid operation is denoted either by
+	 * `monoid<specific_instance>::append` or by `ftl::operator^`. This is due
+	 * to the limited selection of overloadable operators in C++.
+	 *
+	 * \ingroup concepts
+	 */
+
+	/**
 	 * \interface monoid
 	 *
-	 * Monoid abstraction.
+	 * \brief Concrete monoid interface.
 	 *
-	 * In addition to the methods listed here, an instance of Monoid must also
-	 * implement \c append, and its equivalent \c operator^. These should have
-	 * the signatures:
-	 * \code
-	 *   monoid_instance append(const monoid_instance&, const monoid_instance&);
-	 *   monoid_instance operator^ (const monoid_instance&, const monoid_instance&);
-	 * \endcode
+	 * For any type to be an instance of the monoid concept, it must specialise
+	 * this interface.
 	 *
-	 * \laws
-	 * \li a ^ id = a
-	 * \li id ^ a = a
-	 * \li a ^ (b ^ c) = (a ^ b) ^ c
+	 * \ingroup monoid
 	 */
 	template<typename M>
 	struct monoid {
@@ -56,7 +69,7 @@ namespace ftl {
 		 *   a + 0 = a
 		 *   0 + a = a
 		 * \endcode
-		 * and + is the definition of append / operator^ for sums.
+		 * and + is the definition of append / `operator^` for sums.
 		 */
 		static M id();
 
@@ -83,6 +96,8 @@ namespace ftl {
 	 *
 	 * This default implementation should work for any type that properly
 	 * implements the monoid interface.
+	 *
+	 * \ingroup monoid
 	 */
 	template<
 		typename M,
@@ -106,43 +121,22 @@ namespace ftl {
 	 *   operator^ => N::operator+
 	 * \endcode
 	 *
-	 * \tparam N Any integer or floating point primitive type, \em or a type
-	 *           that is an instance of Number and can be implicitly casted to
-	 *           from the literal \c 0.
+	 * \tparam N Any integer or floating point primitive type, \em or any 
+	 *           type that implements `operator+` (in such a way that it does
+	 *           not violate the monoid laws) and can be constructed from the
+	 *           literal `0`.
+	 *
+	 * \ingroup monoid
 	 */
 	template<typename N>
 	struct sum_monoid {
-
-		sum_monoid() = default;
 
 		constexpr sum_monoid(N num)
 		noexcept(std::is_nothrow_copy_constructible<N>::value)
 			: n(num) {}
 
-		constexpr sum_monoid(const sum_monoid& m)
-		noexcept(std::is_nothrow_copy_constructible<N>::value)
-			: n(m.n) {}
-
-		constexpr sum_monoid(sum_monoid&& m)
-		noexcept(std::is_nothrow_move_constructible<N>::value)
-		   	: n(std::move(m.n)) {}
-
-		~sum_monoid() = default;
-
 		constexpr operator N () const noexcept {
 			return n;
-		}
-
-		const sum_monoid& operator=(const sum_monoid& m)
-		noexcept(std::is_nothrow_assignable<N, N>::value) {
-			n = m.n;
-			return *this;
-		}
-
-		const sum_monoid& operator=(sum_monoid&& m)
-		noexcept(std::is_nothrow_move_assignable<N>::value) {
-			n = std::move(m.n);
-			return *this;
 		}
 
 		constexpr sum_monoid operator+ (const sum_monoid& n2) const
@@ -155,16 +149,6 @@ namespace ftl {
 
 	/**
 	 * Convenience function to concisely create new sums.
-	 *
-	 * Example usage:
-	 * \code
-	 *   template<typename M>
-	 *   M foo(const M& m1, const M& m2); // defined elsewhere, uses monoid operations
-	 *
-	 *   void bar() {
-	 *       foo(sum(1), sum(2));
-	 *   }
-	 * \endcode
 	 */
 	template<typename N>
 	constexpr sum_monoid<N> sum(N num)
@@ -172,7 +156,7 @@ namespace ftl {
 		return sum_monoid<N>(num);
 	}
 
-	/**
+	/*
 	 * Actual implementation of monoid for sums.
 	 *
 	 * The identity is 0 and the combining operation is +.
@@ -195,7 +179,7 @@ namespace ftl {
 	};
 
 	/**
-	 * Implementatin of monoid for numbers, when interpreted as products.
+	 * Implementation of monoid for numbers, when interpreted as products.
 	 *
 	 * The reason behind this struct is exactly the same as with sum_monoid.
 	 *
@@ -206,38 +190,16 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \tparam N Any integer or floating point primitive type, \em or a type
-	 *           that is an instance of Number and can be implicitly casted to
-	 *           from the literal \c 1.
+	 *           that implements `operator*` (in a way that does not violate the
+	 *           monoid laws) and can be constructed from the literal `1`.
+	 *
+	 * \ingroup monoid
 	 */
 	template<typename N>
 	struct prod_monoid {
-		prod_monoid() = default;
-
 		constexpr prod_monoid(N num)
 		noexcept(std::is_nothrow_copy_constructible<N>::value)
 			: n(num) {}
-
-		constexpr prod_monoid(const prod_monoid& m)
-		noexcept(std::is_nothrow_copy_constructible<N>::value)
-			: n(m.n) {}
-
-		constexpr prod_monoid(prod_monoid&& m)
-		noexcept(std::is_nothrow_move_constructible<N>::value)
-			: n(std::move(m.n)) {}
-
-		~prod_monoid() = default;
-
-		const prod_monoid& operator= (const prod_monoid& m)
-		noexcept(std::is_nothrow_assignable<N,N>::value) {
-			n = m.n;
-			return *this;
-		}
-
-		const prod_monoid& operator= (prod_monoid&& m)
-		noexcept(std::is_nothrow_move_assignable<N>::value) {
-			n = std::move(m.n);
-			return *this;
-		}
 
 		constexpr prod_monoid operator* (const prod_monoid& m)
 		noexcept(std::is_nothrow_move_constructible<prod_monoid>::value) {
@@ -253,16 +215,6 @@ namespace ftl {
 
 	/**
 	 * Convenience function to concisely create new products.
-	 *
-	 * Example usage:
-	 * \code
-	 *   template<typename M>
-	 *   M foo(const M& m1, const M& m2); // defined elsewhere, uses monoid operations
-	 *
-	 *   void bar() {
-	 *       foo(prod(1), prod(2));
-	 *   }
-	 * \endcode
 	 */
 	template<typename N>
 	constexpr prod_monoid<N> prod(N n)
@@ -270,10 +222,8 @@ namespace ftl {
 		return prod_monoid<N>(n);
 	}
 
-	/**
+	/*
 	 * Actual implementation of monoid for products.
-	 *
-	 * Identity is 1 and combining operation is *.
 	 */
 	template<typename N>
 	struct monoid<prod_monoid<N>> {
@@ -293,13 +243,15 @@ namespace ftl {
 	};
 
 	/**
-	 * Wrapper for booleans to get one monoid implementation.
+	 * Wrapper for booleans to make them a monoid.
 	 *
 	 * This particular version of bools as monoids means that:
 	 * \code
 	 *   monoid<any>::id() <=> false
 	 *   monoid<any>::append() <=> ||
 	 * \endcode
+	 *
+	 * \ingroup monoid
 	 */
 	struct any {
 		constexpr any(bool bl) noexcept : b(bl) {}
@@ -311,8 +263,8 @@ namespace ftl {
 		bool b;
 	};
 
-	/**
-	 * Monoid implementation for bools as an OR-operation.
+	/*
+	 * Monoid implementation for any.
 	 */
 	template<>
 	struct monoid<any> {
@@ -335,6 +287,8 @@ namespace ftl {
 	 *   monoid<any>::id() <=> true
 	 *   monoid<any>::append() <=> &&
 	 * \endcode
+	 *
+	 * \ingroup monoid
 	 */
 	struct all {
 		constexpr all(bool bl) noexcept : b(bl) {}
@@ -346,7 +300,7 @@ namespace ftl {
 		bool b;
 	};
 
-	/**
+	/*
 	 * Monoid implementation for bools as an AND-operation.
 	 */
 	template<>

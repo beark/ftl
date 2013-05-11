@@ -27,19 +27,43 @@
 #include "monoid.h"
 #include "monad.h"
 
-/**
- * \file list.h
- *
- * Various concept implementations for std::lists.
- */
-
 namespace ftl {
+
+	/**
+	 * \defgroup list List
+	 *
+	 * Doubly linked list, its concept implementations, and so on.
+	 *
+	 * \code
+	 *   #include <ftl/list.h>
+	 * \endcode
+	 *
+	 * The list type is in reality just a simple type alias of std::list. The
+	 * main reason for this is because the template parameter signature of
+	 * std::list is not compatible with some of the concepts FTL defines.
+	 *
+	 * \par Dependencies
+	 * - list
+	 * - functional
+	 * - memory
+	 * - type_traits
+	 * - ftl/monoid.h
+	 * - ftl/monad.h
+	 * - ftl/applicative.h
+	 * - ftl/functor.h
+	 * - ftl/function.h
+	 * - ftl/type_functions.h
+	 *
+	 * \ingroup modules
+	 */
 
 	/**
 	 * Workaround to make lists compatible with the functor series of concepts.
 	 *
 	 * If you require a different allocator than \c std::allocator, then make
 	 * a similar type synonym and give it a monad instance of its own.
+	 *
+	 * \ingroup list
 	 */
 	template<typename T>
 	using list = std::list<T, std::allocator<T>>;
@@ -48,6 +72,9 @@ namespace ftl {
 	 * Maps and concatenates in one step.
 	 *
 	 * \tparam F must satisfy Function<Container<B>(A)>
+	 *
+	 * \ingroup list
+	 * \ingroup containers
 	 */
 	template<
 		typename F,
@@ -72,16 +99,22 @@ namespace ftl {
 	 *
 	 * The identity element is (naturally) the empty list, and the append
 	 * operation is (again, naturally) to append the second list to the first.
+	 *
+	 * \note This concept instance is valid both for regular std::list and its
+	 *       alias normally used in FTL.
+	 *
+	 * \ingroup list
+	 * \ingroup monoid
 	 */
 	template<typename...Ts>
-	struct monoid<list<Ts...>> {
-		static list<Ts...> id() {
-			return list<Ts...>();
+	struct monoid<std::list<Ts...>> {
+		static std::list<Ts...> id() {
+			return std::list<Ts...>();
 		}
 
-		static list<Ts...> append(
-				const list<Ts...>& l1,
-				const list<Ts...>& l2) {
+		static std::list<Ts...> append(
+				const std::list<Ts...>& l1,
+				const std::list<Ts...>& l2) {
 			auto l3 = l1;
 			l3.insert(l3.end(), l2.begin(), l2.end());
 			return l3;
@@ -90,16 +123,16 @@ namespace ftl {
 		// For performance reasons, we give overloads for cases where we don't
 		// have to copy any of the lists
 
-		static list<Ts...> append(
-				list<Ts...>&& l1,
-				const list<Ts...>& l2) {
+		static std::list<Ts...> append(
+				std::list<Ts...>&& l1,
+				const std::list<Ts...>& l2) {
 			l1.insert(l1.end(), l2.begin(), l2.end());
 			return std::move(l1);
 		}
 
-		static list<Ts...> append(
-				const list<Ts...>& l1,
-				list<Ts...>&& l2) {
+		static std::list<Ts...> append(
+				const std::list<Ts...>& l1,
+				std::list<Ts...>&& l2) {
 			l2.insert(l2.end(), l1.begin(), l1.end());
 			return std::move(l2);
 		}
@@ -109,11 +142,27 @@ namespace ftl {
 
 	/**
 	 * Monad implementation for list.
+	 *
+	 * \note This concept instance is only valid for the list alias commonly
+	 *       used in FTL. It is not valid for regular std::lists. If you
+	 *       require the use of an allocator aside from std::allocator, then
+	 *       you must create your own alias of std::list and give it a monad
+	 *       instance.
+	 *
+	 * \ingroup list
+	 * \ingroup monad
+	 * \ingroup applicative
+	 * \ingroup functor
 	 */
 	template<>
 	struct monad<list> {
 
-		/// Produces a singleton list
+		/**
+		 * Produces a singleton list.
+		 *
+		 * That is, pure generates a one element list, where that single element
+		 * is a.
+		 */
 		template<typename A>
 		static list<A> pure(const A& a) {
 			return list<A>{a};
@@ -124,7 +173,12 @@ namespace ftl {
 			return list<A>{std::move(a)};
 		}
 
-		/// Applies f to each element
+		/**
+		 * Applies f to each element.
+		 *
+		 * The result of each call to f is collected and returned as an element
+		 * in the list returned by the call to map.
+		 */
 		template<
 			typename F,
 			typename A,
@@ -136,6 +190,29 @@ namespace ftl {
 			}
 
 			return ret;
+		}
+
+		/**
+		 * Move optimised version enabled when f does not change domain.
+		 *
+		 * Basically, if the return type of f is the same as its parameter type
+		 * and l is a temporary (rvalue reference), then l is re-used. This
+		 * means no copies are made.
+		 */
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type,
+			typename = typename std::enable_if<std::is_same<A,B>::value>::type>
+		static list<A> map(F&& f, list<A>&& l) {
+			for(auto& e : l) {
+				e = f(e);
+			}
+
+			// Make sure compiler remembers l is a temporary.
+			// This is safe, because we're returning it to the context from
+			// whence it came.
+			return std::move(l);
 		}
 
 		/// Equivalent of flip(concatMap)

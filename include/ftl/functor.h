@@ -27,21 +27,76 @@
 #include "function.h"
 
 namespace ftl {
+	/**
+	 * \defgroup concepts Concepts
+	 */
+
 	// Forward declaration so we can mention applicatives
 	template<template<typename...> class F>
 	struct applicative;
 
 	/**
+	 * \defgroup functor Functor
+	 *
+	 * \brief Abstraction of data types that can be "mapped to".
+	 *
+	 * Mathematically, functors are mappings from one category to another,
+	 * following a set of well defined laws. What this means in FTL is that
+	 * partial types (ie, vector is partial, vector<int> is complete) can often
+	 * be made functors by giving a means of mapping a morphism (function) from
+	 * the "pure" universe of plain types, to its own internal type universe.
+	 *
+	 * Ie, \c int is a plain type, \c vector<int> is an \c int "trapped" in the
+	 * context of \c vector, and the mapping should apply the function "inside"
+	 * that context. The most obvious way of doing so would be to apply the
+	 * mapped function to every element in the vector.
+	 *
+	 * All instances of Functor should follow the following laws (which are part
+	 * of the mathematical definition from which this concept is derived):
+	 * - given
+	 *   \code
+	 *     template<typename T>
+	 *     T id(T t) { return t; }
+	 *   \endcode
+	 *   then,
+	 *   \code
+	 *     map(id<T>, t)          <=> t
+	 *     map(compose(f, g), t)  <=> compose(curry(map)(f), curry(map)(g))(t)
+	 *   \endcode
+	 *
+	 * \par Creating new instances
+	 * \code
+	 *   #include <ftl/functor.h>
+	 * \endcode
+	 * Specialise the ftl::functor struct and make sure to implement the static
+	 * methods found under its documentation.
+	 *
+	 * \ingroup concepts
+	 */
+
+	/**
 	 * \interface functor
 	 *
-	 * The Functor concept.
+	 * \brief Struct that must be specialised to implement the functor concept.
+	 *
+	 * This is one of the concrete interface that types wishing to implement the
+	 * functor concept must specialise (assuming they do not implement
+	 * applicative or monad already).
+	 *
+	 * In particular, this interface must be specialised by types parameterised
+	 * on more types than the one they're a functor on. Such a type must not
+	 * change in its other type parameters when being mapped to. For guidance,
+	 * look at the type signatures and template parameters of map below.
+	 *
+	 * \ingroup functor
 	 */
 	template<template<typename...> class F>
 	struct functor {
 		/**
 		 * Maps a function to the contained value(s).
 		 *
-		 * \tparam Fn must satisfy Function<B(A)>
+		 * \tparam Fn must satisfy Function<B(A)>, where \c B is any arbitrary
+		 *         type that can be put into the context of \c F.
 		 */
 		template<
 			typename Fn,
@@ -52,7 +107,6 @@ namespace ftl {
 			return applicative<F>::map(std::forward<Fn>(fn), f);
 		}
 
-		/// \overload
 		template<
 			typename Fn,
 			typename A,
@@ -71,8 +125,29 @@ namespace ftl {
 		static constexpr bool instance = applicative<F>::instance;
 	};
 
+	/**
+	 * \interface functor
+	 *
+	 * \brief Struct that must be specialised to implement the functor concept.
+	 *
+	 * This is one of the concrete interface that types wishing to implement the
+	 * functor concept must specialise (assuming they do not implement
+	 * applicative or monad already).
+	 *
+	 * In particular, this interface must be specialised by types parameterised
+	 * \em only by the type they're a functor on. E.g., \c maybe specialises
+	 * this interface, \c either specialises the other version.
+	 *
+	 * \ingroup functor
+	 */
 	template<template<typename> class F>
 	struct functor<F> {
+		/**
+		 * Maps a function to the contained value(s).
+		 *
+		 * \tparam Fn must satisfy Function<B(A)>, where \c B is any arbitrary
+		 *         type that can be put into the context of \c F.
+		 */
 		template<
 			typename Fn,
 			typename A,
@@ -94,6 +169,8 @@ namespace ftl {
 
 	/**
 	 * Convenience operator for functor::map.
+	 *
+	 * \ingroup functor
 	 */
 	template<
 		template<typename...> class F,
@@ -106,6 +183,7 @@ namespace ftl {
 		return functor<F>::map(std::forward<Fn>(fn), f);
 	}
 
+	/// \overload
 	template<
 		template<typename...> class F,
 		typename Fn,
@@ -117,6 +195,7 @@ namespace ftl {
 		return functor<F>::map(std::forward<Fn>(fn), std::move(f));
 	}
 
+	/// \overload
 	template<
 		template<typename> class F,
 		typename Fn,
@@ -127,6 +206,7 @@ namespace ftl {
 		return functor<F>::map(std::forward<Fn>(fn), f);
 	}
 
+	/// \overload
 	template<
 		template<typename> class F,
 		typename Fn,
@@ -144,6 +224,9 @@ namespace ftl {
 	 * A to R, then \c distributing that list would give you a function from
 	 * A to a list of Rs.
 	 *
+	 * \ingroup functor
+	 */
+	/*
 	 * TODO: Implement the Representable concept and make distribute work
 	 * with any Representable.
 	 */
@@ -151,6 +234,7 @@ namespace ftl {
 		template<typename...> class F,
 		typename A,
 		typename R,
+		typename = typename std::enable_if<functor<F>::instance>::type,
 		typename...Ts>
 	function<F<R,Ts...>,A> distribute(F<function<R,A>,Ts...> f) {
 		return [f](A a) {
@@ -166,7 +250,8 @@ namespace ftl {
 	template<
 		template<typename> class F,
 		typename A,
-		typename R>
+		typename R,
+		typename = typename std::enable_if<functor<F>::instance>::type>
 	function<F<R>,A> distribute(F<function<R,A>> f) {
 		return [f](A a) {
 			functor<F>::map(

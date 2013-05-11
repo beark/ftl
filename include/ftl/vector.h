@@ -30,11 +30,43 @@
 namespace ftl {
 
 	/**
+	 * \defgroup vector Vector
+	 *
+	 * Run-time sized array container, its concept implementations, and so on.
+	 *
+	 * \code
+	 *   #include <ftl/vector.h>
+	 * \endcode
+	 *
+	 * Much like ftl::list, this vector type is actually merely a type alias of
+	 * std::vector. It is used throughout FTL&mdash;and recommended for use in
+	 * applications and libraries using FTL, unless they need a different
+	 * allocator&mdash;because the original vector type's template parameters
+	 * do not mesh well with e.g. the Functor series of concepts.
+	 *
+	 * \par Dependencies
+	 * - list
+	 * - functional
+	 * - memory
+	 * - type_traits
+	 * - ftl/monoid.h
+	 * - ftl/monad.h
+	 * - ftl/applicative.h
+	 * - ftl/functor.h
+	 * - ftl/function.h
+	 * - ftl/type_functions.h
+	 *
+	 * \ingroup modules
+	 */
+
+	/**
 	 * Workaround to make vectors compatible with the functor series of
 	 * concepts.
 	 *
 	 * If you require a different allocator than \c std::allocator, then make
 	 * a similar type synonym and give it a monad instance of its own.
+	 *
+	 * \ingroup vector
 	 */
 	template<typename T>
 	using vector = std::vector<T, std::allocator<T>>;
@@ -43,6 +75,9 @@ namespace ftl {
 	 * Maps and concatenates in one step.
 	 *
 	 * \tparam F must satisfy Function<Container<B>(A)>
+	 *
+	 * \ingroup vector
+	 * \ingroup containers
 	 */
 	template<
 		typename F,
@@ -65,33 +100,38 @@ namespace ftl {
 
 	/**
 	 * Monoid implementation for vectors.
+	 *
+	 * Should work for both FTL's type alias and plain std::vectors.
+	 *
+	 * \ingroup vector
+	 * \ingroup monoid
 	 */
-	template<typename T>
-	struct monoid<std::vector<T>> {
-		static std::vector<T> id() {
-			return std::vector<T>();
+	template<typename...Ts>
+	struct monoid<std::vector<Ts...>> {
+		static std::vector<Ts...> id() {
+			return std::vector<Ts...>();
 		}
 
-		static std::vector<T> append(
-				const std::vector<T>& v1,
-				const std::vector<T>& v2) {
+		static std::vector<Ts...> append(
+				const std::vector<Ts...>& v1,
+				const std::vector<Ts...>& v2) {
 			auto rv(v1);
 			rv.reserve(v2.size());
 			rv.insert(rv.end(), v2.begin(), v2.end());
 			return rv;
 		}
 
-		static std::vector<T> append(
-				std::vector<T>&& v1,
-				const std::vector<T>& v2) {
+		static std::vector<Ts...> append(
+				std::vector<Ts...>&& v1,
+				const std::vector<Ts...>& v2) {
 			v1.reserve(v2.size());
 			v1.insert(v1.end(), v2.begin(), v2.end());
 			return v1;
 		}
 
-		static std::vector<T> append(
-				const std::vector<T>& v1,
-				std::vector<T>&& v2) {
+		static std::vector<Ts...> append(
+				const std::vector<Ts...>& v1,
+				std::vector<Ts...>&& v2) {
 			v2.reserve(v1.size());
 			v2.insert(v2.begin(), v1.begin(), v1.end());
 			return v1;
@@ -102,14 +142,21 @@ namespace ftl {
 
 	/**
 	 * Monad implementation of vectors
+	 *
+	 * \ingroup monad
+	 * \ingroup applicative
+	 * \ingroup functor
+	 * \ingroup vector
 	 */
 	template<>
 	struct monad<vector> {
+		/// Creates a one element vector
 		template<typename T>
 		static vector<T> pure(const T& t) {
 			return vector{t};
 		}
 
+		/// As above, but using move semantics
 		template<typename T>
 		static vector<T> pure(T&& t) {
 			return vector{std::move(t)};
@@ -128,6 +175,29 @@ namespace ftl {
 			}
 
 			return ret;
+		}
+
+		/**
+		 * Move optimised version enabled when `f` does not change domain.
+		 *
+		 * Basically, if the return type of `f` is the same as its parameter type
+		 * and `v` is a temporary (rvalue reference), then `v` is re-used. This
+		 * means no copies are made.
+		 */
+		template<
+			typename F,
+			typename A,
+			typename B = typename decayed_result<F(A)>::type,
+			typename = typename std::enable_if<std::is_same<A,B>::value>::type>
+		static vector<A> map(F&& f, vector<A>&& l) {
+			for(auto& e : v) {
+				e = f(e);
+			}
+
+			// Make sure compiler remembers v is a temporary.
+			// This is safe, because we're returning it to the context from
+			// whence it came.
+			return std::move(v);
 		}
 
 		/// Equivalent of flip(concatMap)

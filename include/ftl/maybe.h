@@ -31,25 +31,55 @@
 namespace ftl {
 
 	/// Used to distinguish in-place constructors from others
+	// TODO: Move to someplace more generic (might be used by other data types)
 	struct inplace_tag {};
 
 	/**
-	 * Abstracts the concept of optional arguments and similar.
+	 * \defgroup maybe Maybe
+	 *
+	 * The maybe data type and associated operations.
+	 *
+	 * \code
+	 *   #include <ftl/maybe.h>
+	 * \endcode
+	 *
+	 * \par Dependencies
+	 * - stdexcept
+	 * - memory
+	 * - functional
+	 * - type_traits
+	 * - ftl/monoid.h
+	 * - ftl/monad.h
+	 * - ftl/applicative.h
+	 * - ftl/functor.h
+	 * - ftl/function.h
+	 * - ftl/type_functions.h
+	 *
+	 * \ingroup modules
+	 */
+
+	/**
+	 * \brief Abstracts the concept of optional arguments and similar.
 	 *
 	 * In essence, an instance of maybe is either a value, or nothing.
 	 * 
 	 * \par Concepts
 	 * Maybe is an instance of the following concepts:
-	 * \li DefaultConstructible
-	 * \li CopyConstructible
-	 * \li MoveConstructible
+	 * \li FullyConstructible
 	 * \li Assignable
 	 * \li Dereferencable
-	 * \li EqComparable, iff A is EqComparable
-	 * \li Orderable, iff A is Orderable
-	 * \li Functor (in A)
-	 * \li Monad (in A)
-	 * \li Monoid, iff A is Monoid
+	 * \li EqComparable, if, and only if, `A` is EqComparable
+	 * \li Orderable, if, and only if, `A` is Orderable
+	 * \li Functor (in `A`)
+	 * \li Monad (in `A`)
+	 * \li Monoid, if, and only if, `A` is a Monoid
+	 *
+	 * \ingroup maybe
+	 * \ingroup functor
+	 * \ingroup applicative
+	 * \ingroup monad
+	 * \ingroup monoid
+	 * \ingroup orderable
 	 */
 	template<typename A>
 	class maybe {
@@ -71,6 +101,7 @@ namespace ftl {
 		 */
 		constexpr maybe() noexcept {}
 
+		/// Copy c-tor
 		maybe(const maybe& m)
 		noexcept(std::is_nothrow_copy_constructible<A>::value)
 	    : isValid(m.isValid) {
@@ -79,6 +110,7 @@ namespace ftl {
 			}
 		}
 
+		/// Move c-tor
 		maybe(maybe&& m)
 		noexcept(std::is_nothrow_move_constructible<A>::value)
 		: isValid(m.isValid) {
@@ -88,25 +120,30 @@ namespace ftl {
 			}
 		}
 
+		/**
+		 * Construct a value by copy.
+		 */
 		explicit maybe(const value_type& v)
 		noexcept(std::is_nothrow_copy_constructible<A>::value)
 		: isValid(true) {
 			 new (&val) value_type(v);
 		}
 
-		explicit maybe(const value_type&& v)
+		/// Construct a value by move.
+		explicit maybe(value_type&& v)
 		noexcept(std::is_nothrow_move_constructible<A>::value)
 		: isValid(true) {
 			new (&val) value_type(std::move(v));
 		}
 
 		/**
-		 * In place construction constructor.
+		 * In-place value construction constructor.
 		 *
-		 * Calls \c value_types's constructor with the given arguments.
+		 * Constructs a value in the internal storage, forwarding the parameters
+		 * to `A`'s constructor.
 		 */
 		template<typename...Ts>
-		maybe(inplace_tag, Ts...ts) noexcept(std::is_nothrow_constructible<A,Ts...>::value)
+		maybe(inplace_tag, Ts&&...ts) noexcept(std::is_nothrow_constructible<A,Ts...>::value)
 		: isValid(true) {
 			new (&val) value_type(std::forward<Ts>(ts)...);
 		}
@@ -131,6 +168,7 @@ namespace ftl {
 			return isValid;
 		}
 
+		/// Copy assignment
 		const maybe& operator= (const maybe& m)
 		/* TODO: Enable noexcept specifier once is_nothrow_destructible is
 		 * available.
@@ -150,6 +188,7 @@ namespace ftl {
 			return *this;
 		}
 
+		/// Move assignment
 		const maybe& operator= (maybe&& m)
 		/* TODO: Enable noexcept specifier once is_nothrow_destructible is
 		 * available.
@@ -188,7 +227,7 @@ namespace ftl {
 		/**
 		 * Dereference operator.
 		 * 
-		 * \note Throws an \c std::logic_error if \c this is \c nothing.
+		 * \throws std::logic_error if `this` is `nothing`.
 		 */
 		value_type& operator* () {
 			if(!isValid)
@@ -197,9 +236,7 @@ namespace ftl {
 			return reinterpret_cast<A&>(val);
 		}
 
-		/**
-		 * \overload
-		 */
+		/// \overload
 		const value_type& operator* () const {
 			if(!isValid)
 				throw std::logic_error("Attempting to read the value of Nothing.");
@@ -210,7 +247,7 @@ namespace ftl {
 		/**
 		 * Member access operator.
 		 * 
-		 * \note Throws an \c std::logic_error if \c this is \c nothing.
+		 * \throws std::logic_error if `this` is `nothing`.
 		 */
 		value_type* operator-> () {
 			if(!isValid)
@@ -229,6 +266,10 @@ namespace ftl {
 
 		/**
 		 * Static constructor of Nothing:s.
+		 *
+		 * The only purpose of this static method is to be more explicit than
+		 * relying on maybe's default constructor. The end result is exactly
+		 * equivalent.
 		 */
 		static constexpr maybe<A> nothing() noexcept {
 			return maybe();
@@ -251,6 +292,8 @@ namespace ftl {
 
 	/**
 	 * Convenience function to create maybe:s.
+	 *
+	 * \ingroup maybe
 	 */
 	template<typename A>
 	constexpr maybe<A> value(const A& a)
@@ -260,6 +303,8 @@ namespace ftl {
 
 	/**
 	 * \overload
+	 *
+	 * \ingroup maybe
 	 */
 	template<typename A>
 	constexpr maybe<A> value(A&& a)
@@ -268,9 +313,10 @@ namespace ftl {
 	}
 
 	/**
-	 * EqComparable::operator== implementation for maybe.
+	 * Equality comparison for maybe.
 	 *
-	 * Will result in compilation error if A is not EqComparable.
+	 * \note Instantiating this operator for `A`s that have no equality operator
+	 *       of their own will result in compilation error.
 	 */
 	template<typename A>
 	bool operator== (const maybe<A>& m1, const maybe<A>& m2) {
@@ -286,9 +332,10 @@ namespace ftl {
 	}
 
 	/**
-	 * EqComparable::operator!= implementation for maybe.
+	 * Not equal to operator for maybe.
 	 *
-	 * Will result in compilation error if A is not EqComparable.
+	 * \note Instantiating this operator for `A`s that have no `operator!=`
+	 *       of their own will result in compilation error.
 	 */
 	template<typename A>
 	bool operator!= (const maybe<A>& m1, const maybe<A>& m2) {
@@ -296,9 +343,9 @@ namespace ftl {
 	}
 
 	/**
-	 * Orderable::operator< implementation for maybe.
+	 * Less than operator.
 	 *
-	 * Will result in compilation error if A is not also Orderable.
+	 * \note Will result in compilation error if `A` is not Orderable.
 	 */
 	template<typename A>
 	bool operator< (const maybe<A>& m1, const maybe<A>& m2) {
@@ -319,7 +366,9 @@ namespace ftl {
 	}
 
 	/**
-	 * Orderable::operator> implementation for maybe.
+	 * Greater than operator.
+	 *
+	 * \note Will result in compilation error if `A` is not Orderable.
 	 */
 	template<typename A>
 	bool operator> (const maybe<A>& m1, const maybe<A>& m2) {
@@ -354,6 +403,9 @@ namespace ftl {
 	 * In other words, the append operation is simply lifted into the
 	 * \c value_type of the maybe and all nothings are ignored (unless
 	 * everything is nothing).
+	 *
+	 * \ingroup maybe
+	 * \ingroup monoid
 	 */
 	template<typename A>
 	struct monoid<maybe<A>> {
@@ -388,6 +440,11 @@ namespace ftl {
 	 *
 	 * \note This automatically gives maybe default applicative and functor
 	 *       instances.
+	 *
+	 * \ingroup functor
+	 * \ingroup applicative
+	 * \ingroup monad
+	 * \ingroup maybe
 	 */
 	template<>
 	struct monad<maybe> {
@@ -403,11 +460,14 @@ namespace ftl {
 			return value(std::move(a));
 		}
 
+		/**
+		 * Apply `f` if `m` is a value.
+		 */
 		template<
 			typename F,
 			typename A,
 			typename B = typename decayed_result<F(A)>::type>
-		static maybe<B> map(F f, maybe<A> m) {
+		static maybe<B> map(F f, const maybe<A>& m) {
 			return m ? value(f(*m)) : maybe<B>();
 		}
 		

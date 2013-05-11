@@ -28,6 +28,27 @@
 
 namespace ftl {
 
+	/**
+	 * \defgroup future Future
+	 *
+	 * Concept instances for std::future.
+	 *
+	 * \code
+	 *   #include <ftl/future.h>
+	 * \endcode
+	 *
+	 * \par Dependencies
+	 * - future
+	 * - type_traits
+	 * - monad.h
+	 * - applicative.h
+	 * - functor.h
+	 * - function.h
+	 * - type_functions.h
+	 *
+	 * \ingroup modules
+	 */
+
 	// Some silly implementation details
 	// TODO: maybe generalise this and move into type_functions?
 	namespace _dtl {
@@ -47,12 +68,17 @@ namespace ftl {
 	 * computations on future values, without actually waiting for them. Only
 	 * when we explicitly \em need the value will it be computed (when we call
 	 * \c get on the final future).
+	 *
+	 * \ingroup future
+	 * \ingroup monad
+	 * \ingroup applicative
+	 * \ingroup functor
 	 */
 	template<>
 	struct monad<std::future> {
 
 		/**
-		 * Creates a future that returns t.
+		 * Creates a future that returns `t`.
 		 */
 		template<typename T>
 		static std::future<T> pure(T&& t) {
@@ -65,10 +91,10 @@ namespace ftl {
 		/**
 		 * Apply a function sometime in the future.
 		 *
-		 * Basically, f will not be applied until \em both of the following
+		 * Basically, `f` will not be applied until _both_ of the following
 		 * has happened:
-		 * \li we call \c get on the result of \c map
-		 * \li \c fa finishes waiting from the resulting call to its \c get
+		 * \li we call `get` on the result of `map`
+		 * \li `fa` finishes waiting from the resulting call to its `get`
 		 */
 		template<
 			typename F,

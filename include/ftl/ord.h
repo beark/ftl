@@ -27,6 +27,38 @@
 
 namespace ftl {
 	/**
+	 * \defgroup orderable Orderable
+	 *
+	 * Instances of Orderable can be ordered in some strict sense.
+	 *
+	 * For a type to become an instance of Orderable, it must either implement
+	 * all of the operators `<`, `==`, and `>`, or it must specialise the
+	 * `orderable<T>` struct. Both of these have equivalent results.
+	 *
+	 * \ingroup concepts
+	 */
+
+	/**
+	 * \defgroup ord Ord
+	 *
+	 * Ord data type, concept instances, and utlity functions.
+	 *
+	 * \code
+	 *   #include <ftl/ord.h>
+	 * \endcode
+	 *
+	 * The `ord` data type represents an ordering, in the form of "less than",
+	 * "equal", or "greater than". The Orderable concept relies on this data
+	 * type to order values.
+	 *
+	 * \par Dependencies
+	 * - type_traits
+	 * - monoid.h
+	 *
+	 * \ingroup modules
+	 */
+
+	/**
 	 * Encapsulation of the concept of an ordering.
 	 *
 	 * In essence, an ordering can be either 'less than' (Lt), 'equal' (Eq), or
@@ -34,10 +66,13 @@ namespace ftl {
 	 *
 	 * \par Concepts implemented by ord
 	 * \li FullyConstructible
-	 * \li TriviallyDestructible
 	 * \li Assignable
-	 * \li Comparable
+	 * \li Orderable
 	 * \li Monoid
+	 *
+	 * \ingroup ord
+	 * \ingroup orderable
+	 * \ingroup monoid
 	 */
 	class ord {
 	public:
@@ -60,6 +95,7 @@ namespace ftl {
 			Lt = 0, Eq, Gt
 		};
 
+		/// Default to Eq.
 		constexpr ord() noexcept {}
 
 		/**
@@ -124,7 +160,9 @@ namespace ftl {
 	};
 
 	/**
-	 * Orderable concept.
+	 * Concrete definition of orderable concept.
+	 *
+	 * \ingroup orderable
 	 */
 	template<typename T>
 	struct orderable {
@@ -145,6 +183,8 @@ namespace ftl {
 	 * Convenience function to more easily compare things.
 	 *
 	 * Simply invokes \c orderable<T>::compare.
+	 *
+	 * \ingroup ord
 	 */
 	template<typename T>
 	ord compare(const T& a, const T& b) {
@@ -153,6 +193,8 @@ namespace ftl {
 
 	/**
 	 * Convenience function to get a comparator for a certain type.
+	 *
+	 * \ingroup ord
 	 */
 	template<typename T>
 	function<ord,const T&,const T&> getComparator() {
@@ -169,6 +211,9 @@ namespace ftl {
 	 *   id() <=> Eq
 	 *   append(a,b) <=> a, unless a == Eq, then b
 	 * \endcode
+	 *
+	 * \ingroup ord
+	 * \ingroup monoid
 	 */
 	template<>
 	struct monoid<ord> {
@@ -192,7 +237,9 @@ namespace ftl {
 	 *
 	 * \return Function that compares two objects by first applying method
 	 *         to each object and then compare the two results using their
-	 *         Ordering instance.
+	 *         Orderable instance.
+	 *
+	 * \ingroup ord
 	 */
 	template<typename A, typename R>
 	function<ord,const A&,const A&> comparing(R (A::*method)() const) {
@@ -202,7 +249,7 @@ namespace ftl {
 	}
 
 	/**
-	 * Convenience function to compare objects by converter.
+	 * Convenience function to compare objects by "converter".
 	 *
 	 * \tparam F Must satisfy Function<Orderable(A)>, or in other words, must
 	 *           return something that is Orderable.
@@ -213,15 +260,17 @@ namespace ftl {
 	 *
 	 * Example:
 	 * \code
-	 *   list<maybe<string>> l{value("abc"), value("de"), value("f)};
-	 *   // Sorts the above list in order of string length (nothing is regarded
-	 *   // as an empty string)
+	 *   list<maybe<string>> l{value("abc"), value("de"), value("f")};
 	 *   sort(l.begin(), l.end(),
 	 *           lessThan(comparing([] (const maybe<string>& m) -> size_t {
 	 *       if(m) return m->size();
 	 *       return 0;
 	 *   })));
 	 * \endcode
+	 * The above would sort `l` in ascending order of string length. Any element
+	 * that is `nothing` would be considered to be of length `0`.
+	 *
+	 * \ingroup ord
 	 */
 	template<typename A, typename B>
 	function<ord,const A&,const A&> comparing(function<B,A> cmp) {
@@ -238,10 +287,13 @@ namespace ftl {
 	 *
 	 * \return A function that returns true if the result of performing the
 	 *         given comparison is Lt.
+	 *
+	 * \ingroup ord
 	 */
 	template<typename A>
-	function<bool,A,A> lessThan(const function<ord,A,A>& cmp) {
-		return [=] (A a, A b) {
+	function<bool,const A&,const A&> lessThan(
+			function<ord,const A&,const A&> cmp) {
+		return [=] (const A& a, const A& b) {
 			return cmp(a, b) == ord::Lt;
 		};
 	}
@@ -253,10 +305,13 @@ namespace ftl {
 	 *
 	 * \return A function that returns true if the result of performing the
 	 *         given comparison is Gt.
+	 *
+	 * \ingroup ord
 	 */
 	template<typename A>
-	function<bool,A,A> greaterThan(const function<ord,A,A>& cmp) {
-		return [=] (A a, A b) {
+	function<bool,const A&,const A&> greaterThan(
+			function<ord,const A&,const A&> cmp) {
+		return [=] (const A& a, const A& b) {
 			return cmp(a, b) == ord::Gt;
 		};
 	}
@@ -267,9 +322,12 @@ namespace ftl {
 	 *
 	 * \return A function that returns true if the result of performing the
 	 *         given comparison is Eq.
+	 *
+	 * \ingroup ord
 	 */
 	template<typename A>
-	function<bool,A,A> equal(const function<ord,A,A>& cmp) {
+	function<bool,const A&,const A&> equal(
+			function<ord,const A&,const A&> cmp) {
 		return [=] (A a, A b) {
 			return cmp(a, b) == ord::Eq;
 		};

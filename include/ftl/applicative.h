@@ -32,15 +32,63 @@ namespace ftl {
 	struct monad;
 
 	/**
-	 * \interface Applicative
+	 * \defgroup applicative Applicative Functor
 	 *
-	 * The Applicative Functor concept.
+	 * \breif One step above a functor and one step below a monad.
 	 *
-	 * An applicative functor is kind of one step above a functor and one step
-	 * below a monad.
+	 * What this means is that it has slightly more structure than a plain
+	 * functor, but less than a monad.  Specifically, what applicative adds on
+	 * functors is a means of contextualising a "pure" value (go from \c type to
+	 * \c F<type>, where \c F is some applicative functor), as well as a means
+	 * to apply a function that is already in the context of the applicative
+	 * functor.
 	 *
-	 * All Applicative Functors are also Functors (so if you find yourself
-	 * making an Applicative instance, you should also implement fmap).
+	 * All Applicative Functors are also Functors. There is no need to define
+	 * an instance for both concepts.
+	 *
+	 * Finally, an applicative instance must satisfy the following laws:
+	 * - **Identity law**
+	 *
+	 *   given
+	 *   \code
+	 *     template<typename T>
+	 *     T id(T t) { return t; }
+	 *   \endcode
+	 *   then,
+	 *   \code
+	 *     pure(id<T>) * v   <=> v
+	 *   \endcode
+	 *
+	 * - **Homomorphism law**
+	 *   \code
+	 *     pure(f) * pure(x) <=> pure(f(x))
+	 *   \endcode
+	 *
+	 * \par Creating new instances
+	 * \code
+	 *   #include <ftl/applicative.h>
+	 * \endcode
+	 * Specialise the ftl::applicative struct and make sure to implement the
+	 * static methods found under its documentation.
+	 *
+	 * \ingroup concepts
+	 */
+
+	/**
+	 * \interface applicative
+	 *
+	 * \brief Struct that must be specialised to implement the applicative
+	 *        concept.
+	 *
+	 * \note There exists a second, essentially duplicate interface, used by
+	 *       types parameterised _only_ on the type they're an applicative
+	 *       functor on. I.e., there is an interface with the appearance
+	 *       \code
+	 *         template<template<typename> class F>
+	 *         struct applicative;
+	 *       \endcode
+	 *
+	 * \ingroup applicative
 	 */
 	template<template<typename...> class F>
 	struct applicative {
@@ -51,16 +99,30 @@ namespace ftl {
 		 * Defaults to monad<A>::pure, because any monad is also an
 		 * applicative functor.
 		 *
+		 * For single parameter types implementing applicative, `pure` has the
+		 * signature
+		 * \code
+		 *   template<typename A>
+		 *   static F<A> pure(A&& a);
+		 * \endcode
+		 * instead.
+		 *
 		 * \note Default implementation only works if F has a monad instance
 		 *       defined.
+		 *
+		 * \note If implementing applicative directly (instead of implicitly by
+		 *       way of monad), then `pure` may be overloaded or replaced with a
+		 *       `const` reference version, or even a pass by value version.
 		 */
 		template<typename A, typename...Ts>
-		static F<A,Ts...> pure(A a) {
+		static F<A,Ts...> pure(A&& a) {
 			return monad<F>::pure(std::forward<A>(a));
 		}
 
 		/**
 		 * Map a function to inner value of functor.
+		 *
+		 * \see functor<F>::map
 		 */
 		template<
 			typename Fn,
@@ -82,9 +144,15 @@ namespace ftl {
 		}
 
 		/**
-		 * Application.
+		 * Contextualised function application.
 		 *
-		 * Default implementation is to use monad's ap.
+		 * Applies the wrapped/contextualised function fn to the similarly
+		 * wrapped value f.
+		 *
+		 * Default implementation is to use monad's \c ap().
+		 *
+		 * \tparam Fn must satisfy `Function<B(A)>`, where `B` is an arbitrary
+		 *         type that can be wrapped in `F`.
 		 *
 		 * \note Default implementation only works if F is already a monad.
 		 */
@@ -97,6 +165,7 @@ namespace ftl {
 			return ap(fn, f);
 		}
 
+		/// \overload
 		template<
 			typename Fn,
 			typename A,
@@ -158,6 +227,14 @@ namespace ftl {
 
 	/**
 	 * Convenience operator to ease applicative style programming.
+	 *
+	 * \code
+	 *   a * b <=> applicative<F>::apply(a, b)
+	 * \endcode
+	 * Where \c a and \c b are complete types of \c F and \c F is an applicative
+	 * functor.
+	 *
+	 * \ingroup applicative
 	 */
 	template<
 		template<typename...> class F,

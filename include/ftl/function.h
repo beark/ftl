@@ -33,6 +33,7 @@
 #include <memory>
 #include <functional>
 #include "type_functions.h"
+#include "monoid.h"
 
 namespace ftl {
 
@@ -60,7 +61,7 @@ namespace ftl {
 
 		template<typename T, typename Alloc>
 		struct is_inplace_allocated {
-			static const bool value
+			static constexpr bool value
 				// so that it fits
 				= sizeof(T) <= sizeof(functor_padding)
 
@@ -114,12 +115,12 @@ namespace ftl {
 
 		template<typename, typename>
 		struct is_valid_function_argument {
-			static const bool value = false;
+			static constexpr bool value = false;
 		};
 
 		template<typename R, typename...Ps>
 		struct is_valid_function_argument<function<R, Ps...>, R (Ps...)> {
-			static const bool value = false;
+			static constexpr bool value = false;
 		};
 
 		template<typename T, typename R, typename...Ps>
@@ -131,7 +132,7 @@ namespace ftl {
 			template<typename>
 			static empty_struct check(...);
 
-			static const bool value = std::is_convertible<decltype(check<T>(nullptr)), R>::value;
+			static constexpr bool value = std::is_convertible<decltype(check<T>(nullptr)), R>::value;
 		};
 
 		enum function_manager_calls
@@ -341,15 +342,40 @@ namespace ftl {
 		};
 	}
 
+	/**
+	 * Function object encapsulator.
+	 *
+	 * \tparam R Return value of the wrapped function or function object.
+	 * \tparam Ps Parameter pack of the wrapped function's `operator()`.
+	 *
+	 * ftl::function is an instance of the following concepts:
+	 * \li Function<R(Ps...)>
+	 * \li Applicative
+	 * \li Monoid (if and only if R is a monoid)
+	 *
+	 * \ingroup functional
+	 * \ingroup fn
+	 * \ingroup functor
+	 * \ingroup applicative
+	 * \ingroup monoid
+	 */
 	template<typename R, typename...Ps>
 	class function : public _dtl::typedeffer<R,Ps...> {
 	public:
+		/**
+		 * Type sequence representation of the function's parameter list.
+		 *
+		 * Use in combination with e.g. get_nth to get the type of any
+		 * parameter.
+		 */
 		using parameter_types = type_seq<Ps...>;
 
+		/// Equivalent of function(std::nullptr_t)
 		function() noexcept {
 			initialise_empty();
 		}
 
+		/// Initialise a nullary function wrapper
 		function(std::nullptr_t) noexcept {
 			initialise_empty();
 		}
@@ -483,6 +509,7 @@ namespace ftl {
 			return *this;
 		}
 
+		/// Call the wrapped function object
 		R operator()(Ps...ps) const {
 			return call(manager_storage.functor, std::forward<Ps>(ps)...);
 		}
@@ -514,6 +541,7 @@ namespace ftl {
 			std::swap(call, other.call);
 		}
 
+		/// Check if function is nullary
 		operator bool() const noexcept {
 			return call != &_dtl::empty_call<R, Ps...>;
 		}
@@ -554,6 +582,63 @@ namespace ftl {
 
 			call = &_dtl::empty_call<R, Ps...>;
 		}
+	};
+
+	/**
+	 * Monoid instance for ftl::functions returning monoids.
+	 *
+	 * The reason this works might not be immediately obvious, but basically,
+	 * any function (regardless of arity) that returns a value that is an
+	 * instance of monoid, is in fact also a monoid. It works as follows:
+	 * \code
+	 *   id() <=> A function, returning monoid<result_type>::id(),
+	 *            regardless of parameters.
+	 *   append(a,b) <=> A function that forwards its arguments to both a and b,
+	 *                   and then calls monoid<result_type>::append on the two
+	 *                   results.
+	 * \endcode
+	 *
+	 * \ingroup function
+	 * \ingroup monoid
+	 */
+	template<typename M, typename...Ps>
+	struct monoid<function<M,Ps...>> {
+
+		/**
+		 * Function returning monoid<M>::id().
+		 */
+		static auto id()
+		-> typename std::enable_if<
+				monoid<M>::instance,
+				function<M,Ps...>>::type {
+			return [](Ps...ps) { return monoid<M>::id(); };
+		}
+
+		/**
+		 * Compute f1 and f2 and combine the results with monoid operation.
+		 *
+		 * \note The parameter pack \c Ps cannot be perfectly forwarded, because
+		 *       both f1 and f2 must be called with the same parameters. It is
+		 *       therefore recommended you use this monoid operation only with
+		 *       functions working on values or `const` references.
+		 *
+		 * \warning Should e.g. f1 mutate one of the parameters, it \em will
+		 *          affect the call to f2. Be very careful if either f1 or f2
+		 *          has side effects.
+		 */
+		static auto append(
+				const function<M,Ps...>& f1,
+				const function<M,Ps...>& f2)
+		-> typename std::enable_if<
+				monoid<M>::instance,
+				function<M,Ps...>>::type {
+			return [=] (Ps...ps) {
+				return monoid<M>::append(f1(ps...), f2(ps...));
+			};
+		}
+
+		/// function<M,Ps...> is only a monoid instance if M is.
+		static constexpr bool instance = monoid<M>::instance;
 	};
 
 }
