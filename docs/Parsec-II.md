@@ -38,7 +38,7 @@ private:
     ftl::function<ftl::either<T,error>,std::istream&> runP;
 };
 ```
-This looks better. We've prevented users from constructing nullary parsers, as well as using arbitrary functions as parsers. Instead, parsers must now be built by combining the building blocks we design. Of course, making all constructors except copy/move means that&mdash;as we add them&mdash;our library of combinator blocks must be made friends of the `parser` data type. If that is not desirable, one could opt to create e.g. a `make_parser` function that is friends with `parser` but part of a private or anonymous namespace instead.
+This looks better. We've prevented users from constructing nullary parsers, as well as using arbitrary functions as parsers. Instead, parsers must now be built by combining the building blocks we design. Of course, making all constructors private except copy/move means that&mdash;as we add them&mdash;our library of combinator blocks must be made friends of the `parser` data type. If that is not desirable, one could opt to create e.g. a `make_parser` function that is friends with `parser` but part of a private or anonymous namespace instead.
 
 ### Error data type
 The `error` data type is even more trivial and should explain itself:
@@ -46,7 +46,7 @@ The `error` data type is even more trivial and should explain itself:
 /**
  * Error reporting class.
  * 
- * We could have used a string directly, but this thin wrapper provides more
+ * We could have used a string directly, but this thin wrapper conveys more
  * semantic information to users of the library.
  */
 class error {
@@ -59,7 +59,7 @@ public:
     explicit error(std::string&& msg) : e(std::move(msg)) {}
 
     /// Access the error message
-    std::string message() const {
+    std::string message() const noexcept {
         return e;
     }
 
@@ -112,15 +112,19 @@ auto yield(T&& t) -> decltype(ftl::make_left<error>(std::forward<T>(t))) {
 ```
 Cool, now we can just call `yield(some_value)` to get an `ftl::either<some_type,error>`.
 
-Moving on, we get to the implementation of `map`.
+Moving on, we get to the implementation of `map`. It's supposed to map a function into the context of our monad. That is, the function we're mapping should be applied in the context of `parser`. What could this mean? Just looking at its conceptualised type&mdash;something like `parser<B> map(Function<B(A)>, parser<A>)`&mdash;should give us a pretty good idea. In fact, after that, it almost writes itself:
 ```cpp
 template<
         typename F,
         typename A,
         typename B = typename decayed_result<F(A)>::type>
 static parser<B> map(F f, parser<A> p) {
+    // Return type is obvious and naturally we want to capture the parameters
     return parser<B>([f,p](std::istream& s) {
+        // To get a B, we must apply f to an A, and to get an A, we must run p
         auto r = p.run(s);
+
+        // The only quirk is that parsers can fail, but that is easily handled
         if(r) {
             return yield(f(*r));
         }
@@ -130,9 +134,9 @@ static parser<B> map(F f, parser<A> p) {
     });
 }
 ```
-Because the lambda must capture by copy anyway (if we copy by reference, either of `f` or `p` could "die" before the parser is run), we might as well make those copies at the point of invocation. Hence why `f` and `p` are pass-by-value. The rest is really not that hard. We return a new parser, whose `run` method will first run `p`, and if `p` succeeds apply `f` to the result. Otherwise, it just passes on the error message from `p`.
+Note: because the lambda must capture by copy anyway (if we copy by reference, either of `f` or `p` could "die" before the parser is run), we opt to make those copies at the point of invocation, hence why `f` and `p` are pass-by-value. 
 
-Now for the trickiest part: `bind`.
+Now for the trickiest part: `bind`. Let's just dig right in, explanations can wait.
 ```cpp
 template<
         typename F,
@@ -176,7 +180,7 @@ parser<char> anyChar() {
     });
 }
 ```
-With `s.get(ch)`, the parser attempts to read one byte&mdash;any byte&mdashfrom the input stream. If the input stream has at least one character to read, we simply `yield` it. Otherwise, either the stream has reached end-of-file, or some other bad thing has happened, so we return what the parser _expected_, but could not find.
+With `s.get(ch)`, the parser attempts to read one byte&mdash;any byte&mdash;from the input stream. If the input stream has at least one character to read, we simply `yield` it. Otherwise, either the stream has reached end-of-file, or some other bad thing has happened, so we return what the parser _expected_, but could not find.
 
 ### oneOf
 Surely we can do something slightly more advanced than that. How about parsing any one out of a number of characters? Actually, not that hard.
