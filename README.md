@@ -22,7 +22,7 @@ Documentation index
 
 ### Examples & Tutorials
 * [Parser Combinator Part I: Simple Parser](docs/Parsec-I.md)
-* ...
+* [Parser Combinator Part II: Parser Generator Library](docs/Parsec-II.md)
 
 Showcases
 ---------
