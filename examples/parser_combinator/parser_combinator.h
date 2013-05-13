@@ -8,20 +8,19 @@
 /**
  * Error reporting class.
  * 
- * We could have used a string directly, but this thin wrapper allows us to
- * actually instantiate \c ftl::either<string,error>, whereas it's impossible
- * to instantiate \c ftl::either<string,string>.
+ * We could have used a string directly, but this thin wrapper conveys more
+ * semantic information to users of the library.
  */
 class error {
 public:
 	// Default versions of c-tors default, copy, and move are acceptable
 
 	/// Construct from string error message
-	explicit error(const std::string& msg) : e(msg) {}
-	explicit error(std::string&& msg) : e(std::move(msg)) {}
+	explicit error(const std::string& msg) noexcept : e(msg) {}
+	explicit error(std::string&& msg) noexcept : e(std::move(msg)) {}
 
 	/// Access the error message
-	std::string message() const {
+	std::string message() const noexcept {
 		return e;
 	}
 
