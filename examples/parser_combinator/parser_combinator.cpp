@@ -1,4 +1,5 @@
 #include "parser_combinator.h" 
+#include <sstream>
 
 parser<char> anyChar() {
 	return parser<char>([](std::istream& s) {
@@ -62,25 +63,15 @@ parser<char> oneOf(std::string str) {
 }
 
 parser<std::string> many(parser<char> p) {
-	using std::string;
-
 	return parser<string>([p](std::istream& s) {
 		auto r = p.run(s);
-		if(r) {
-			auto str = many(p).run(s);
-			if(str) {
-				str->insert(str->begin(), *r);
-				return str;
-			}
-			else {
-				string str;
-				str.push_back(*r);
-				return yield(str);
-			}
+		std::ostringstream oss;
+		while(r) {
+			oss << *r;
+			r = p.run(s);
 		}
-		else {
-			return yield(string());
-		}
+
+		return yield(oss.str());
 	});
 }
 
