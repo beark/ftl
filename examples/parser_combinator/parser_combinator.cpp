@@ -34,7 +34,7 @@ parser<char> notChar(char c) {
 			char ch = s.peek();
 			if(ch != c) {
 				s.get();
-				return yield(c);
+				return yield(ch);
 			}
 		}
 

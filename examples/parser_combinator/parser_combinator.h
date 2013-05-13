@@ -32,13 +32,13 @@ private:
 /// Convenience function to reduce template gibberish
 template<typename T>
 ftl::either<T,error> fail(const std::string& s) {
-	return ftl::either<T,error>(error(s));
+	return ftl::make_right<T>(error(s));
 }
 
 /// Convenience function to reduce template gibberish
 template<typename T>
 ftl::either<T,error> yield(const T& t) {
-	return ftl::either<T,error>(t);
+	return ftl::make_left<error>(t);
 }
 
 // Forward declarations required for later friend declarations, sigh
@@ -80,7 +80,10 @@ public:
 
 	using value_type = T;
 
-	// Default set of c-tors is fine
+	parser() = delete;
+	parser(const parser&) = default;
+	parser(parser&&) = default;
+	~parser() = default;
 
 	/**
 	 * Run the parser, reading characters from some input stream.
