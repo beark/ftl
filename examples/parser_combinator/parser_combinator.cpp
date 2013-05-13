@@ -63,7 +63,7 @@ parser<char> oneOf(std::string str) {
 }
 
 parser<std::string> many(parser<char> p) {
-	return parser<string>([p](std::istream& s) {
+	return parser<std::string>([p](std::istream& s) {
 		auto r = p.run(s);
 		std::ostringstream oss;
 		while(r) {
