@@ -37,8 +37,8 @@ ftl::either<T,error> fail(const std::string& s) {
 
 /// Convenience function to reduce template gibberish
 template<typename T>
-ftl::either<T,error> yield(const T& t) {
-	return ftl::make_left<error>(t);
+auto yield(T&& t) -> decltype(ftl::make_left<error>(std::forward<T>(t))) {
+	return ftl::make_left<error>(std::forward<T>(t));
 }
 
 // Forward declarations required for later friend declarations, sigh
