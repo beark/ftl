@@ -1,16 +1,12 @@
 #include <iostream>
 #include <limits>
 #include <vector>
+#include <string>
 #include "parser_combinator/parser_combinator.h"
 
+// Workaround because stoi is not unary
 int string2int(const std::string& str) {
-	int result = 0;
-	for(auto nc : str) {
-		result *= 10;
-		result += nc - '0';
-	}
-
-	return result;
+	return std::stoi(str);
 }
 
 template<typename T>
