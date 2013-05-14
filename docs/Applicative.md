@@ -50,7 +50,7 @@ The following standard library types have applicative instances defined:
   ```
   pure(some_val) = make_shared(some_val);
 
-  map(f, some_val) = f(*some_ptr), if the pointer is valid, otherwise, an empty
+  map(f, some_ptr) = f(*some_ptr), if the pointer is valid, otherwise, an empty
                      pointer is returned.
   
   apply(fn_ptr, some_ptr) = (*fn_ptr)(*some_ptr), if and only if both pointers are
