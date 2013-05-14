@@ -23,8 +23,8 @@
 #ifndef FTL_EITHER_H
 #define FTL_EITHER_H
 
-#include "monad.h"
 #include <stdexcept>
+#include "monad.h"
 
 namespace ftl {
 
@@ -46,18 +46,9 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * - stdexcept
-	 * - memory
-	 * - functional
-	 * - type_traits
-	 * - ftl/monoid.h
-	 * - ftl/monad.h
-	 * - ftl/applicative.h
-	 * - ftl/functor.h
-	 * - ftl/function.h
-	 * - ftl/type_functions.h
-	 *
-	 * \ingroup modules
+	 * The following additional headers and modules are included by this module.
+	 * - <stdexcept>
+	 * - \ref monad
 	 */
 
 	/**
@@ -87,26 +78,25 @@ namespace ftl {
 	 * Either fulfills the following concepts if, and only if,
 	 * \em both of its sub-types also do:
 	 *  
-	 * \li CopyConstructible
-	 * \li MoveConstrutible
-	 * \li Assignable
-	 * \li EqComparable
+	 * \li \ref movecons
+	 * \li \ref assignable
+	 * \li \ref eq
 	 *
 	 * Either fulfills the following concepts regardless of its sub-types:
 	 *
-	 * \li Functor (in L)
-	 * \li Applicative (in L)
-	 * \li Monad (in L)
+	 * \li \ref copycons
+	 * \li \ref deref
+	 * \li \ref functor (in L)
+	 * \li \ref applicative (in L)
+	 * \li \ref monad (in L)
 	 *
-	 * \note Either is \em not DefaultConstructible.
+	 * \note Either is \em not \ref defcons.
 	 *
-	 * \tparam L The "left" type
-	 * \tparam R The "right" type (sometimes used to signal an error)
+	 * \tparam L The "left" type, must satisfy \ref copycons
+	 * \tparam R The "right" type (sometimes used to signal an error), must
+	 *           satisfy \ref copycons
 	 *
 	 * \ingroup either
-	 * \ingroup functor
-	 * \ingroup applicative
-	 * \ingroup monad
 	 */
 	// TODO: Specialise for L = void
 	template<typename L, typename R>
@@ -390,9 +380,6 @@ namespace ftl {
 	/**
 	 * Monad implementation for either.
 	 *
-	 * \ingroup functor
-	 * \ingroup applicative
-	 * \ingroup monad
 	 * \ingroup either
 	 */
 	template<>

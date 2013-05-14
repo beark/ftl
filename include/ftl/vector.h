@@ -45,18 +45,9 @@ namespace ftl {
 	 * do not mesh well with e.g. the Functor series of concepts.
 	 *
 	 * \par Dependencies
-	 * - list
-	 * - functional
-	 * - memory
-	 * - type_traits
-	 * - ftl/monoid.h
-	 * - ftl/monad.h
-	 * - ftl/applicative.h
-	 * - ftl/functor.h
-	 * - ftl/function.h
-	 * - ftl/type_functions.h
-	 *
-	 * \ingroup modules
+	 * - <vector>
+	 * - \ref monoid
+	 * - \ref monad
 	 */
 
 	/**
@@ -66,6 +57,11 @@ namespace ftl {
 	 * If you require a different allocator than \c std::allocator, then make
 	 * a similar type synonym and give it a monad instance of its own.
 	 *
+	 * \par Concepts
+	 * As an ordinary std::vector, with the additions of:
+	 * - \ref monoid
+	 * - \ref monad
+	 *
 	 * \ingroup vector
 	 */
 	template<typename T>
@@ -74,10 +70,9 @@ namespace ftl {
 	/**
 	 * Maps and concatenates in one step.
 	 *
-	 * \tparam F must satisfy Function<Container<B>(A)>
+	 * \tparam F must satisfy \ref fn`<`\ref container`<B>(A)>`
 	 *
 	 * \ingroup vector
-	 * \ingroup containers
 	 */
 	template<
 		typename F,
@@ -104,7 +99,6 @@ namespace ftl {
 	 * Should work for both FTL's type alias and plain std::vectors.
 	 *
 	 * \ingroup vector
-	 * \ingroup monoid
 	 */
 	template<typename...Ts>
 	struct monoid<std::vector<Ts...>> {
@@ -143,9 +137,6 @@ namespace ftl {
 	/**
 	 * Monad implementation of vectors
 	 *
-	 * \ingroup monad
-	 * \ingroup applicative
-	 * \ingroup functor
 	 * \ingroup vector
 	 */
 	template<>

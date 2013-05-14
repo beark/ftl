@@ -30,9 +30,26 @@
 namespace ftl {
 
 	/**
+	 * \defgroup memory Memory
+	 *
+	 * Concepts instances for std::shared_ptr.
+	 *
+	 * \code
+	 *   #include <ftl/memory.h>
+	 * \endcode
+	 *
+	 * \par Dependencies
+	 * - <memory>
+	 * - \ref monoid
+	 * - \ref monad
+	 */
+
+	/**
 	 * Monoid instance for shared_ptr.
 	 *
 	 * Much like maybe, any shared_ptr that wraps a monoid is also a monoid.
+	 *
+	 * \ingroup memory
 	 */
 	template<typename T>
 	struct monoid<std::shared_ptr<T>> {
@@ -87,6 +104,8 @@ namespace ftl {
 
 	/**
 	 * Monad instance of shared_ptr.
+	 *
+	 * \ingroup memory
 	 */
 	template<>
 	struct monad<std::shared_ptr> {

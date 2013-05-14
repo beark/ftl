@@ -38,15 +38,8 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * - future
-	 * - type_traits
-	 * - monad.h
-	 * - applicative.h
-	 * - functor.h
-	 * - function.h
-	 * - type_functions.h
-	 *
-	 * \ingroup modules
+	 * - <future>
+	 * - \ref monad
 	 */
 
 	// Some silly implementation details
@@ -70,9 +63,6 @@ namespace ftl {
 	 * \c get on the final future).
 	 *
 	 * \ingroup future
-	 * \ingroup monad
-	 * \ingroup applicative
-	 * \ingroup functor
 	 */
 	template<>
 	struct monad<std::future> {

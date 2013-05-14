@@ -27,21 +27,9 @@
 
 namespace ftl {
 	/**
-	 * \defgroup orderable Orderable
-	 *
-	 * Instances of Orderable can be ordered in some strict sense.
-	 *
-	 * For a type to become an instance of Orderable, it must either implement
-	 * all of the operators `<`, `==`, and `>`, or it must specialise the
-	 * `orderable<T>` struct. Both of these have equivalent results.
-	 *
-	 * \ingroup concepts
-	 */
-
-	/**
 	 * \defgroup ord Ord
 	 *
-	 * Ord data type, concept instances, and utlity functions.
+	 * Orderable concept, Ord data type, concept instances, and related.
 	 *
 	 * \code
 	 *   #include <ftl/ord.h>
@@ -52,10 +40,7 @@ namespace ftl {
 	 * type to order values.
 	 *
 	 * \par Dependencies
-	 * - type_traits
-	 * - monoid.h
-	 *
-	 * \ingroup modules
+	 * - \ref monoid
 	 */
 
 	/**
@@ -65,14 +50,12 @@ namespace ftl {
 	 * 'greater than' (Gt).
 	 *
 	 * \par Concepts implemented by ord
-	 * \li FullyConstructible
-	 * \li Assignable
-	 * \li Orderable
-	 * \li Monoid
+	 * \li \ref fullycons
+	 * \li \ref assignable
+	 * \li \ref orderable
+	 * \li \ref monoid
 	 *
 	 * \ingroup ord
-	 * \ingroup orderable
-	 * \ingroup monoid
 	 */
 	class ord {
 	public:
@@ -160,9 +143,19 @@ namespace ftl {
 	};
 
 	/**
+	 * \interface orderable
+	 *
 	 * Concrete definition of orderable concept.
 	 *
-	 * \ingroup orderable
+	 * In essence, instances of Orderable can be ordered in some strict sense.
+	 *
+	 * For a type to become an instance of Orderable, it must either implement
+	 * all of the operators `<`, `==`, and `>`, or it must specialise this
+	 * struct. Both of these have equivalent results.
+	 *
+	 * A type that is orderable must also implement \ref eq.
+	 *
+	 * \ingroup ord
 	 */
 	template<typename T>
 	struct orderable {
@@ -231,7 +224,7 @@ namespace ftl {
 	/**
 	 * Convenience function to compare objects by getter.
 	 *
-	 * \tparam R Must satisfy Orderable.
+	 * \tparam R Must satisfy orderable.
 	 *
 	 * \param method Getter method to do comparison by.
 	 *
@@ -251,8 +244,8 @@ namespace ftl {
 	/**
 	 * Convenience function to compare objects by "converter".
 	 *
-	 * \tparam F Must satisfy Function<Orderable(A)>, or in other words, must
-	 *           return something that is Orderable.
+	 * \tparam F Must satisfy \ref fn<orderable(A)>, or in other words, must
+	 *           return something that is orderable.
 	 *
 	 * The use case for this convenience function is similar to the comparing
 	 * function that works with getter methods, but in this case the comparison

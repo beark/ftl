@@ -54,14 +54,110 @@ namespace ftl {
 	 */
 
 	/**
-	 * \defgroup modules Modules
+	 * \page concepts Concepts
 	 *
-	 * The various top level modules of the library.
+	 * Less concrete concepts that are nevertheless referenced in FTL.
 	 *
-	 * Each module can be completely brought into scope by a single `#include`
-	 * statement. There is, however, some inter-dependence between the modules
-	 * and thus, the various additional headers that will be included by each
-	 * module shall be documented under the apropriate section.
+	 * \subpage assignable
+	 * \subpage container
+	 * \subpage copyassignable
+	 * \subpage copycons
+	 * \subpage defcons
+	 * \subpage deref
+	 * \subpage eq
+	 * \subpage fullycons
+	 * \subpage fn
+	 * \subpage moveassignable
+	 * \subpage movecons
+	 */
+
+	/**
+	 * \page fullycons FullyConstructible
+	 *
+	 * Types with a "full" set of constructors.
+	 *
+	 * Any type that has the full set of standard constructors, i.e., implements
+	 * \ref defcons, \ref copycons, and \ref movecons.
+	 */
+
+	/**
+	 * \page defcons DefaultConstructible
+	 *
+	 * Any type that has a default constructor.
+	 */
+
+	/**
+	 * \page copycons CopyConstructible
+	 *
+	 * Any type that has a copy constructor.
+	 */
+
+	/**
+	 * \page movecons MoveConstructible
+	 *
+	 * Any type that has a move constructor.
+	 */
+
+	/**
+	 * \page container Container
+	 *
+	 * Anything that is a container of elements of some type. In FTL, this
+	 * concept is quite relaxed compared to its definition in the standard
+	 * library. Here, a Container is simply anything that provides a forward
+	 * iterable interface (both `const` and non-`const`), i.e., `begin()` and
+	 * `end()`, as well as a `value_type` type definition.
+	 *
+	 * Often, you'll see other parts of the documentation refer to Container
+	 * with a "template parameter". This means that an additional constraint is
+	 * put on the container, namely that its `value_type` must match the given
+	 * parameter.
+	 */
+
+	/**
+	 * \page deref Dereferenceable
+	 *
+	 * Types that are dereferenceable.
+	 *
+	 * A type is dereferenceable if it has pointer-like semantics. That is, at
+	 * minimum, it must define `operator bool`, `operator*`, and `operator->`.
+	 *
+	 * The behaviour of these should be as expected, in the context of the type
+	 * in question. `operator bool` should, for instance, be usable to check if
+	 * a particular value of the type is _valid_, as in, it's in a usable state
+	 * where dereferencing it with the other operators will not throw or cause
+	 * undefined behaviour.
+	 */
+
+	/**
+	 * \page eq EqualityComparable
+	 *
+	 * Any type that can be compared for equality.
+	 *
+	 * More formally, there must exist an `operator==` and an `operator!=`.
+	 */
+
+	/**
+	 * \page copyassignable CopyAssignable
+	 *
+	 * Types that can be copy assigned to.
+	 *
+	 * Any type that has defined a copy assignment operator.
+	 */
+
+	/**
+	 * \page moveassignable MoveAssignable
+	 *
+	 * Types that can be move assigned to.
+	 *
+	 * Any type that has defined a move assignment operator.
+	 */
+
+	/**
+	 * \page assignable Assignable
+	 *
+	 * Types that can be assigned to.
+	 *
+	 * Any type that is both \ref copyassignable and \ref moveassignable.
 	 */
 
 	/**
@@ -75,8 +171,6 @@ namespace ftl {
 	 *
 	 * \par Dependencies
 	 * None.
-	 *
-	 * \ingroup modules
 	 */
 
 	/**

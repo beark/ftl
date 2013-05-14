@@ -27,31 +27,7 @@
 
 namespace ftl {
 	/**
-	 * \defgroup functional Functional
-	 *
-	 * \brief A collection of higher order utility functions.
-	 *
-	 * \code
-	 *   #include <ftl/functional.h>
-	 * \endcode
-	 *
-	 * The functions herein deal mostly with modifying functions, such as
-	 * composing them, flipping the order of their parameters, and so on.
-	 *
-	 * \par Dependencies
-	 * - ftl/applicative.h
-	 * - ftl/function.h
-	 * - ftl/monoid.h
-	 * - ftl/type_functions.h
-	 * - memory
-	 * - functional
-	 * - type_traits
-	 *
-	 * \ingroup modules
-	 */
-
-	/**
-	 * \defgroup fn Function<R(Ps...)>
+	 * \page fn Function
 	 *
 	 * \brief Abstraction of callable objects.
 	 *
@@ -65,23 +41,38 @@ namespace ftl {
 	 * \li lambdas
 	 * \li *anything* else with an `operator()` defined
 	 *
-	 * The purpose of the "template parameters" of this concept is to
-	 * distinguish specifically what types the function constraining a parameter
-	 * by this concept require the function to work on/with. It's quite simple,
+	 * When possible, instances of Function should also include the type alias
+	 * `result_type`, which should be the type returned by calling `operator()`.
+	 *
+	 * The purpose of the "template parameters" often found when other parts of
+	 * the documentation reference this concept is to distinguish specifically
+	 * what types the function constraining a parameter by this concept require
+	 * the particular Function instance to work on/with. It's quite simple,
 	 * really: `Function<B(A)>` simply means that the type constrained by the
 	 * aforementioned must take a single parameter of type `A`, and return a
 	 * value of type `B`.
+	 */
+
+	/**
+	 * \defgroup functional Functional
 	 *
-	 * \ingroup concepts
+	 * \brief A collection of higher order utility functions.
+	 *
+	 * \code
+	 *   #include <ftl/functional.h>
+	 * \endcode
+	 *
+	 * The functions herein deal mostly with modifying functions, such as
+	 * composing them, flipping the order of their parameters, and so on.
+	 *
+	 * \par Dependencies
+	 * - \ref applicative
 	 */
 
 	/**
 	 * Applicative Functor instance for ftl::functions.
 	 *
 	 * \ingroup functional
-	 * \ingroup function
-	 * \ingroup applicative
-	 * \ingroup functor
 	 */
 	template<>
 	struct applicative<function> {

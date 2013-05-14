@@ -44,18 +44,10 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * - stdexcept
-	 * - memory
-	 * - functional
-	 * - type_traits
-	 * - ftl/monoid.h
-	 * - ftl/monad.h
-	 * - ftl/applicative.h
-	 * - ftl/functor.h
-	 * - ftl/function.h
-	 * - ftl/type_functions.h
-	 *
-	 * \ingroup modules
+	 * - <stdexcept>
+	 * - <type_traits>
+	 * - \ref monoid
+	 * - \ref monad
 	 */
 
 	/**
@@ -65,21 +57,17 @@ namespace ftl {
 	 * 
 	 * \par Concepts
 	 * Maybe is an instance of the following concepts:
-	 * \li FullyConstructible
-	 * \li Assignable
-	 * \li Dereferencable
-	 * \li EqComparable, if, and only if, `A` is EqComparable
-	 * \li Orderable, if, and only if, `A` is Orderable
-	 * \li Functor (in `A`)
-	 * \li Monad (in `A`)
-	 * \li Monoid, if, and only if, `A` is a Monoid
+	 * \li \ref fullycons
+	 * \li \ref assignable
+	 * \li \ref deref
+	 * \li \ref eq, if, and only if, `A` is EqComparable
+	 * \li \ref orderable, if, and only if, `A` is Orderable
+	 * \li \ref functor (in `A`)
+	 * \li \ref applicative (in `A`)
+	 * \li \ref monad (in `A`)
+	 * \li \ref monoid, if, and only if, `A` is a Monoid
 	 *
 	 * \ingroup maybe
-	 * \ingroup functor
-	 * \ingroup applicative
-	 * \ingroup monad
-	 * \ingroup monoid
-	 * \ingroup orderable
 	 */
 	template<typename A>
 	class maybe {
@@ -317,6 +305,8 @@ namespace ftl {
 	 *
 	 * \note Instantiating this operator for `A`s that have no equality operator
 	 *       of their own will result in compilation error.
+	 *
+	 * \ingroup maybe
 	 */
 	template<typename A>
 	bool operator== (const maybe<A>& m1, const maybe<A>& m2) {
@@ -336,6 +326,8 @@ namespace ftl {
 	 *
 	 * \note Instantiating this operator for `A`s that have no `operator!=`
 	 *       of their own will result in compilation error.
+	 *
+	 * \ingroup maybe
 	 */
 	template<typename A>
 	bool operator!= (const maybe<A>& m1, const maybe<A>& m2) {
@@ -346,6 +338,8 @@ namespace ftl {
 	 * Less than operator.
 	 *
 	 * \note Will result in compilation error if `A` is not Orderable.
+	 *
+	 * \ingroup maybe
 	 */
 	template<typename A>
 	bool operator< (const maybe<A>& m1, const maybe<A>& m2) {
@@ -369,6 +363,8 @@ namespace ftl {
 	 * Greater than operator.
 	 *
 	 * \note Will result in compilation error if `A` is not Orderable.
+	 *
+	 * \ingroup maybe
 	 */
 	template<typename A>
 	bool operator> (const maybe<A>& m1, const maybe<A>& m2) {
@@ -405,7 +401,6 @@ namespace ftl {
 	 * everything is nothing).
 	 *
 	 * \ingroup maybe
-	 * \ingroup monoid
 	 */
 	template<typename A>
 	struct monoid<maybe<A>> {
@@ -441,9 +436,6 @@ namespace ftl {
 	 * \note This automatically gives maybe default applicative and functor
 	 *       instances.
 	 *
-	 * \ingroup functor
-	 * \ingroup applicative
-	 * \ingroup monad
 	 * \ingroup maybe
 	 */
 	template<>
@@ -475,7 +467,7 @@ namespace ftl {
 		/**
 		 * Applies a function to unwrapped maybe value.
 		 *
-		 * \tparam F must satisfy Function<maybe<B>(A)>
+		 * \tparam F must satisfy \ref fn<maybe<B>(A)>
 		 */
 		template<
 			typename F,

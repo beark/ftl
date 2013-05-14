@@ -322,24 +322,6 @@ namespace ftl {
 				return nullptr;
 			}
 		}
-
-		template<typename R, typename...>
-		struct typedeffer {
-			using result_type = R;
-		};
-
-		template<typename R, typename P>
-		struct typedeffer<R, P> {
-			using result_type = R;
-			using argument_type = P;
-		};
-
-		template<typename R, typename P1, typename P2>
-		struct typedeffer<R, P1, P2> {
-			using result_type = R;
-			using first_argument_type = P1;
-			using second_argument_type = P2;
-		};
 	}
 
 	/**
@@ -348,16 +330,15 @@ namespace ftl {
 	 * \tparam R Return value of the wrapped function or function object.
 	 * \tparam Ps Parameter pack of the wrapped function's `operator()`.
 	 *
-	 * ftl::function is an instance of the following concepts:
-	 * \li Function<R(Ps...)>
-	 * \li Applicative
-	 * \li Monoid (if and only if R is a monoid)
+	 * \par Concepts
+	 * - \ref fullycons
+	 * - \ref assignable
+	 * - \ref fn<R(Ps...)>
+	 * - \ref applicative
+	 * - \ref functor
+	 * - \ref monoid, if and only if R is a Monoid.
 	 *
 	 * \ingroup functional
-	 * \ingroup fn
-	 * \ingroup functor
-	 * \ingroup applicative
-	 * \ingroup monoid
 	 */
 	template<typename R, typename...Ps>
 	class function : public _dtl::typedeffer<R,Ps...> {
@@ -369,6 +350,9 @@ namespace ftl {
 		 * parameter.
 		 */
 		using parameter_types = type_seq<Ps...>;
+
+		/// Type returned when calling the function object.
+		using result_type = R;
 
 		/// Equivalent of function(std::nullptr_t)
 		function() noexcept {
@@ -598,8 +582,7 @@ namespace ftl {
 	 *                   results.
 	 * \endcode
 	 *
-	 * \ingroup function
-	 * \ingroup monoid
+	 * \ingroup functional
 	 */
 	template<typename M, typename...Ps>
 	struct monoid<function<M,Ps...>> {

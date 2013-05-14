@@ -24,7 +24,6 @@
 #define FTL_APPLICATIVE_H
 
 #include "functor.h"
-#include "function.h"
 
 namespace ftl {
 
@@ -35,6 +34,10 @@ namespace ftl {
 	 * \defgroup applicative Applicative Functor
 	 *
 	 * \breif One step above a functor and one step below a monad.
+	 *
+	 * \code
+	 *   #include <ftl/applicative.h>
+	 * \endcode
 	 *
 	 * What this means is that it has slightly more structure than a plain
 	 * functor, but less than a monad.  Specifically, what applicative adds on
@@ -64,21 +67,14 @@ namespace ftl {
 	 *     pure(f) * pure(x) <=> pure(f(x))
 	 *   \endcode
 	 *
-	 * \par Creating new instances
-	 * \code
-	 *   #include <ftl/applicative.h>
-	 * \endcode
-	 * Specialise the ftl::applicative struct and make sure to implement the
-	 * static methods found under its documentation.
-	 *
-	 * \ingroup concepts
+	 * \par Dependencies
+	 * - \ref functor
 	 */
 
 	/**
 	 * \interface applicative
 	 *
-	 * \brief Struct that must be specialised to implement the applicative
-	 *        concept.
+	 * Struct that must be specialised to implement the applicative concept.
 	 *
 	 * \note There exists a second, essentially duplicate interface, used by
 	 *       types parameterised _only_ on the type they're an applicative
@@ -133,7 +129,6 @@ namespace ftl {
 			return monad<F>::map(std::forward<Fn>(fn), f);
 		}
 
-		/// \overload
 		template<
 			typename Fn,
 			typename A,
@@ -151,7 +146,13 @@ namespace ftl {
 		 *
 		 * Default implementation is to use monad's \c ap().
 		 *
-		 * \tparam Fn must satisfy `Function<B(A)>`, where `B` is an arbitrary
+		 * For functors parameterised only on `A`, `apply` is declared as
+		 * \code
+		 *   static F<B> apply(const F<Fn>& fn, const F<A>& f);
+		 * \endcode
+		 * with the template parameters defined equivalently to this version.
+		 *
+		 * \tparam Fn must satisfy \ref fn<B(A)>, where `B` is an arbitrary
 		 *         type that can be wrapped in `F`.
 		 *
 		 * \note Default implementation only works if F is already a monad.
@@ -247,7 +248,11 @@ namespace ftl {
 		return applicative<F>::apply(u, v);
 	}
 
-	/// \overload
+	/**
+	 * Overloaded for rvalue references.
+	 *
+	 * \ingroup applicative
+	 */
 	template<
 		template<typename...> class F,
 		typename Fn,
@@ -259,7 +264,11 @@ namespace ftl {
 		return applicative<F>::apply(std::move(u), std::move(v));
 	}
 
-	/// \overload
+	/**
+	 * Overloaded for applicatives parameterised on a single type.
+	 *
+	 * \ingroup applicative
+	 */
 	template<
 		template<typename> class F,
 		typename Fn,
@@ -270,7 +279,11 @@ namespace ftl {
 		return applicative<F>::apply(u, v);
 	}
 
-	/// \overload
+	/**
+	 * Overloaded for both single parameter types and rvalues.
+	 *
+	 * \ingroup applicative
+	 */
 	template<
 		template<typename> class F,
 		typename Fn,

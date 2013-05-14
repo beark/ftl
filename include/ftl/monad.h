@@ -23,7 +23,6 @@
 #ifndef FTL_MONAD_H
 #define FTL_MONAD_H
 
-#include "function.h"
 #include "applicative.h"
 
 namespace ftl {
@@ -31,7 +30,11 @@ namespace ftl {
 	/**
 	 * \defgroup monad Monad
 	 *
-	 * \brief Abstraction of sequenceable computations in some context.
+	 * Abstraction of sequenceable computations in some context.
+	 *
+	 * \code
+	 *   #include <ftl/monad.h>
+	 * \endcode
 	 *
 	 * Monads are essentially just a functor with some additional structure.
 	 * Specifically, types that are monads have the added functionality (on top
@@ -64,14 +67,8 @@ namespace ftl {
 	 *     (m >>= f) >>= g) <=> m >>= ([f](X x){return f(x);} >>= g)
 	 *   \endcode
 	 *
-	 * \par Creating new instances
-	 * \code
-	 *   #include <ftl/monad.h>
-	 * \endcode
-	 * Specialise the ftl::monad struct and make sure to implement the static
-	 * methods found under its documentation.
-	 *
-	 * \ingroup concepts
+	 * \par Dependencies
+	 * - \ref applicative
 	 */
 
 	/**
@@ -101,6 +98,11 @@ namespace ftl {
 		 */
 		static constexpr bool instance = false;
 
+// Below ifdef section is to make sure the compiler disregards these
+// definitions, while allowing a doc generator to find them and generate the
+// proper documentation for the monad concept.
+#ifdef SILLY_WORKAROUND
+
 		/**
 		 * Encapsulate a "pure" value.
 		 *
@@ -108,27 +110,20 @@ namespace ftl {
 		 *
 		 * \see applicative::pure
 		 */
-#ifdef SILLY_WORKAROUND
 		template<typename A, typename...Ts>
 		static M<A,Ts...> pure(const A&);
-#endif
-// Above ifdef section (and all following ones) are to make sure the compiler
-// disregards these definitions, while allowing a doc generator to find them
-// and generate the proper documentation for the monad concept.
 
 		/**
 		 * Map a function to a contextualised value.
 		 *
 		 * \see functor::map
 		 */
-#ifdef SILLY_WORKAROUND
 		template<
 			typename F,
 			typename A,
 			typename B = typename decayed_result<F(A)>::type,
 			typename...Ts>
 		static M<B,Ts...> map(F&& f, const M<A,Ts...>& m);
-#endif
 
 		/**
 		 * Bind a value and execute a computation in M on it.
@@ -144,9 +139,13 @@ namespace ftl {
 		 * Instances are free to provide `bind` using move semantics on `M`,
 		 * either in addition to `const` reference version, or instead of.
 		 *
-		 * \tparam F must satisfy Function<M<B>(A)>
+		 * In the single type parameter case, `bind` is declared as
+		 * \code
+		 *   static M<B> bind(const M<A>&, F&&);
+		 * \endcode
+		 *
+		 * \tparam F must satisfy \ref fn<M<B>(A)>
 		 */
-#ifdef SILLY_WORKAROUND
 		template<
 			typename F,
 			typename A,

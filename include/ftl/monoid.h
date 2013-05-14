@@ -31,20 +31,33 @@ namespace ftl {
 	 *
 	 * Concept encapsulating the mathematical construct of the same name.
 	 *
+	 * \code
+	 *   #include <ftl/monoid.h>
+	 * \endcode
+	 *
 	 * Mathematically, a monoid is any set \c S, for which there is an
-	 * associated binary operation, \f$\bullet\f$, and where there exists
+	 * associated binary operation, •, and where there exists
 	 * an element \c id of \c S such that the following laws hold:
 	 *
-	 * \li Right identity law: \f$a \bullet id = a\f$
-	 * \li Left identity law: \f$id \bullet a = a\f$
-	 * \li Law of associativity:
-	 *     \f$a \bullet (b \bullet c) = (a \bullet b) \bullet c\f$
+	 * \li **Right identity law**
+	 *     \code
+	 *       a • id = a
+	 *     \endcode
+	 * \li **Left identity law**
+	 *     \code
+	 *       id • a = a
+	 *     \endcode
+	 * \li **Law of associativity**
+	 *     \code
+	 *       a • (b • c) = (a • b) • c
+	 *     \endcode
 	 *
-	 * In FTL, the binary monoid operation is denoted either by
-	 * `monoid<specific_instance>::append` or by `ftl::operator^`. This is due
-	 * to the limited selection of overloadable operators in C++.
+	 * Note, however, that in FTL, the binary monoid operation is denoted either
+	 * by `monoid<instance>::append` or by `ftl::operator^`. This is due to the
+	 * limited selection of overloadable operators in C++.
 	 *
-	 * \ingroup concepts
+	 * \par Dependencies
+	 * - <type_traits>
 	 */
 
 	/**
@@ -149,6 +162,8 @@ namespace ftl {
 
 	/**
 	 * Convenience function to concisely create new sums.
+	 *
+	 * \ingroup monoid
 	 */
 	template<typename N>
 	constexpr sum_monoid<N> sum(N num)
@@ -160,6 +175,8 @@ namespace ftl {
 	 * Actual implementation of monoid for sums.
 	 *
 	 * The identity is 0 and the combining operation is +.
+	 *
+	 * \ingroup monoid
 	 */
 	template<typename N>
 	struct monoid<sum_monoid<N>> {
@@ -215,6 +232,8 @@ namespace ftl {
 
 	/**
 	 * Convenience function to concisely create new products.
+	 *
+	 * \ingroup monoid
 	 */
 	template<typename N>
 	constexpr prod_monoid<N> prod(N n)
@@ -224,6 +243,8 @@ namespace ftl {
 
 	/*
 	 * Actual implementation of monoid for products.
+	 *
+	 * \ingroup monoid
 	 */
 	template<typename N>
 	struct monoid<prod_monoid<N>> {
@@ -254,24 +275,30 @@ namespace ftl {
 	 * \ingroup monoid
 	 */
 	struct any {
+		/// Construct from bool
 		constexpr any(bool bl) noexcept : b(bl) {}
 
+		/// Cast back to bool
 		constexpr operator bool() noexcept {
 			return b;
 		}
 
-		bool b;
+		bool b = false;
 	};
 
 	/*
 	 * Monoid implementation for any.
+	 *
+	 * \ingroup monoid
 	 */
 	template<>
 	struct monoid<any> {
+		/// Return `false`
 		static constexpr any id() noexcept {
 			return false;
 		}
 
+		/// Return `a1 || a2`
 		static constexpr any append(any a1, any a2) noexcept {
 			return a1.b || a2.b;
 		}
@@ -291,24 +318,30 @@ namespace ftl {
 	 * \ingroup monoid
 	 */
 	struct all {
+		/// Construct from a bool
 		constexpr all(bool bl) noexcept : b(bl) {}
 
+		/// Cast back to bool
 		constexpr operator bool() noexcept {
 			return b;
 		}
 
-		bool b;
+		bool b = true;
 	};
 
 	/*
 	 * Monoid implementation for bools as an AND-operation.
+	 *
+	 * \ingroup monoid
 	 */
 	template<>
 	struct monoid<all> {
+		/// Returns `true`
 		static constexpr all id() noexcept {
 			return true;
 		}
 
+		/// Returns `a1 && a2`
 		static constexpr all append(all a1, all a2) noexcept {
 			return a1 && a2;
 		}

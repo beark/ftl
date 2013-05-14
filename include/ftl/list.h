@@ -43,18 +43,9 @@ namespace ftl {
 	 * std::list is not compatible with some of the concepts FTL defines.
 	 *
 	 * \par Dependencies
-	 * - list
-	 * - functional
-	 * - memory
-	 * - type_traits
-	 * - ftl/monoid.h
-	 * - ftl/monad.h
-	 * - ftl/applicative.h
-	 * - ftl/functor.h
-	 * - ftl/function.h
-	 * - ftl/type_functions.h
-	 *
-	 * \ingroup modules
+	 * - <list>
+	 * - \ref monoid
+	 * - \ref monad
 	 */
 
 	/**
@@ -62,6 +53,11 @@ namespace ftl {
 	 *
 	 * If you require a different allocator than \c std::allocator, then make
 	 * a similar type synonym and give it a monad instance of its own.
+	 *
+	 * \par Concepts
+	 * As an ordinary std::list, with the additions:
+	 * - \ref monoid
+	 * - \ref monad
 	 *
 	 * \ingroup list
 	 */
@@ -71,10 +67,9 @@ namespace ftl {
 	/**
 	 * Maps and concatenates in one step.
 	 *
-	 * \tparam F must satisfy Function<Container<B>(A)>
+	 * \tparam F must satisfy \ref fn`<`\ref container`<B>(A)>`
 	 *
 	 * \ingroup list
-	 * \ingroup containers
 	 */
 	template<
 		typename F,
@@ -104,7 +99,6 @@ namespace ftl {
 	 *       alias normally used in FTL.
 	 *
 	 * \ingroup list
-	 * \ingroup monoid
 	 */
 	template<typename...Ts>
 	struct monoid<std::list<Ts...>> {
@@ -150,9 +144,6 @@ namespace ftl {
 	 *       instance.
 	 *
 	 * \ingroup list
-	 * \ingroup monad
-	 * \ingroup applicative
-	 * \ingroup functor
 	 */
 	template<>
 	struct monad<list> {
