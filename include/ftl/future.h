@@ -25,6 +25,7 @@
 
 #include <future>
 #include "monad.h"
+#include "monoid.h"
 
 namespace ftl {
 
@@ -40,6 +41,7 @@ namespace ftl {
 	 * \par Dependencies
 	 * - <future>
 	 * - \ref monad
+	 * - \ref monoid
 	 */
 
 	// Some silly implementation details
@@ -55,7 +57,7 @@ namespace ftl {
 	}
 
 	/**
-	 * Monad instance for futures.
+	 * Monad instance for std::future.
 	 *
 	 * This is a pretty powerful instance. It lets us perform all sorts of
 	 * computations on future values, without actually waiting for them. Only
@@ -159,6 +161,39 @@ namespace ftl {
 	std::future<B> ap(std::future<F>&& f, std::future<A>&& m) {
 		return std::move(f) >>= _dtl::inner_ap<A,B>(std::move(m));
 	}
+
+	/**
+	 * Monoid instance of std::future.
+	 *
+	 * \tparam T must satisfy \ref monoid
+	 *
+	 * \ingroup future
+	 */
+	template<typename T>
+	struct monoid<std::future<T>> {
+
+		/// Future representing `monoid<T>::id()`
+		static auto id()
+		-> typename std::enable_if<monoid<T>::instance,std::future<T>>::type {
+			return std::async(
+				std::launch::deferred,
+				[](){ return monoid<T>::id(); });
+		}
+
+		/// Future representing `f1 ^ f2`
+		static auto append(std::future<T>&& f1, std::future<T>&& f2)
+		-> typename std::enable_if<monoid<T>::instance,std::future<T>>::type {
+			return std::async(
+				std::launch::deferred,
+				[](std::future<T>&& f1, std::future<T>&& f2) {
+					return monoid<T>::append(f1.get(), f2.get());
+				},
+				std::move(f1),
+				std::move(f2));
+		}
+
+		static constexpr bool instance = monoid<T>::instance;
+	};
 }
 
 #endif
