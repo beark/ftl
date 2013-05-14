@@ -341,7 +341,7 @@ namespace ftl {
 	 * \ingroup functional
 	 */
 	template<typename R, typename...Ps>
-	class function : public _dtl::typedeffer<R,Ps...> {
+	class function {
 	public:
 		/**
 		 * Type sequence representation of the function's parameter list.
