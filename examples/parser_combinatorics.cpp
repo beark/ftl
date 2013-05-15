@@ -2,6 +2,7 @@
 #include <limits>
 #include <vector>
 #include <string>
+#include <ftl/prelude.h>
 #include "parser_combinator/parser_combinator.h"
 
 // Workaround because stoi is not unary
