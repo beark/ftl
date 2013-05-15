@@ -29,6 +29,21 @@
 
 namespace ftl {
 
+	/**
+	 * \defgroup tuple Tuple
+	 *
+	 * Concept instances and utility functions for std::tuple.
+	 *
+	 * \code
+	 *   #include <ftl/tuple.h>
+	 * \endcode
+	 *
+	 * \par Dependencies
+	 * - <tuple>
+	 * - \ref monoid
+	 * - \ref applicative
+	 */
+
 	// Unnamed private namespace for various tuple helpers
 	namespace {
 
@@ -62,7 +77,7 @@ namespace ftl {
 			typename F,
 			typename...Ts,
 			size_t...S>
-		auto tup_apply(seq<S...>, F f, const std::tuple<Ts...>& t)
+		auto tup_apply(seq<S...>, const F& f, const std::tuple<Ts...>& t)
 		-> typename std::result_of<F(Ts...)>::type {
 			return f(std::get<S>(t)...);
 		}
@@ -71,7 +86,7 @@ namespace ftl {
 			typename F,
 			typename...Ts,
 			size_t...S>
-		auto tup_apply(seq<S...>, F f, std::tuple<Ts...>&& t)
+		auto tup_apply(seq<S...>, const F& f, std::tuple<Ts...>&& t)
 		-> typename std::result_of<F(Ts...)>::type {
 			return f(std::get<S>(t)...);
 		}
@@ -157,8 +172,9 @@ namespace ftl {
 	 *       std::get<N>(tuple1) ^ std::get<N>(tuple2))
 	 * \endcode
 	 *
-	 * \tparam Ts Each of the types must be an instance of monoid.
-	 *   
+	 * \tparam Ts Each of the types must be an instance of \ref monoid.
+	 *
+	 * \ingroup tuple
 	 */
 	template<typename...Ts>
 	struct monoid<std::tuple<Ts...>> {
@@ -190,18 +206,22 @@ namespace ftl {
 	 * Separate from the applicative instance because tuples are always
 	 * functors, but only applicative ones if the remaining types are all
 	 * monoids.
+	 *
+	 * \ingroup tuple
 	 */
 	template<>
 	struct functor<std::tuple> {
+		/// Apply `f` to first element in the tuple
 		template<
 			typename F,
 			typename A,
 			typename B = typename decayed_result<F(A)>::type,
 			typename...Ts>
-		std::tuple<B, Ts...> map(F f, std::tuple<A, Ts...>& t) {
+		std::tuple<B, Ts...> map(F&& f, const std::tuple<A, Ts...>& t) {
 
 			std::tuple<B, Ts...> ret;
-			tup<sizeof...(Ts)-1, std::tuple<B, Ts...>>::fmap(f, t, ret);
+			tup<sizeof...(Ts)-1, std::tuple<B, Ts...>>::fmap(
+					std::forward<F>(f), t, ret);
 			return ret;
 		}
 	};
@@ -211,12 +231,14 @@ namespace ftl {
 	 *
 	 * Note that this requires a monoid instance for every type in the tuple
 	 * except the first one.
+	 *
+	 * \ingroup tuple
 	 */
 	template<>
 	struct applicative<std::tuple> {
 		template<typename A, typename...Ts>
-		static std::tuple<A,Ts...> pure(A a) {
-			return std::make_tuple(a, monoid<Ts>::id()...);
+		static std::tuple<A,Ts...> pure(A&& a) {
+			return std::make_tuple(std::forward<A>(a), monoid<Ts>::id()...);
 		}
 
 		template<
@@ -224,8 +246,8 @@ namespace ftl {
 			typename A,
 			typename B = typename decayed_result<F(A)>::type,
 			typename...Ts>
-		static std::tuple<B,Ts...> map(F f, std::tuple<A,Ts...> t) {
-			return functor<std::tuple>::map(f, t);
+		static std::tuple<B,Ts...> map(F&& f, const std::tuple<A,Ts...>& t) {
+			return functor<std::tuple>::map(std::forward<F>(f), t);
 		}
 
 		template<
@@ -244,16 +266,22 @@ namespace ftl {
 
 	/**
 	 * Invoke a function using a tuple's fields as parameters.
+	 *
+	 * \ingroup tuple
 	 */
 	template<typename F, typename...Ts>
-	auto apply(F f, const std::tuple<Ts...>& t)
+	auto apply(F&& f, const std::tuple<Ts...>& t)
 	-> typename std::result_of<F(Ts...)>::type {
 		return tup_apply(seq<0,sizeof...(Ts)-1>(), std::forward<F>(f), t);
 	}
 
-	/// \overload
+	/**
+	 * \overload
+	 *
+	 * \ingroup tuple
+	 */
 	template<typename F, typename...Ts>
-	auto apply(F f, std::tuple<Ts...>&& t)
+	auto apply(F&& f, std::tuple<Ts...>&& t)
 	-> typename std::result_of<F(Ts...)>::type {
 		return tup_apply(seq<0,sizeof...(Ts)-1>(), std::forward<F>(f), std::move(t));
 	}
