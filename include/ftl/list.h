@@ -95,11 +95,10 @@ namespace ftl {
 	 * The identity element is (naturally) the empty list, and the append
 	 * operation is (again, naturally) to append the second list to the first.
 	 *
-	 * \note This concept instance is valid both for regular std::list and its
-	 *       alias normally used in FTL.
-	 *
 	 * \ingroup list
 	 */
+	// TODO: Make monoid instance for ftl::list too, because apparently that's
+	// necessary
 	template<typename...Ts>
 	struct monoid<std::list<Ts...>> {
 		static std::list<Ts...> id() {
@@ -116,7 +115,6 @@ namespace ftl {
 
 		// For performance reasons, we give overloads for cases where we don't
 		// have to copy any of the lists
-
 		static std::list<Ts...> append(
 				std::list<Ts...>&& l1,
 				const std::list<Ts...>& l2) {
@@ -220,9 +218,6 @@ namespace ftl {
 
 	/**
 	 * Foldable instance for std::lists.
-	 *
-	 * \note This concepts instance works for both regular std::lists and the
-	 *       type alias used in FTL.
 	 *
 	 * \ingroup list
 	 */
