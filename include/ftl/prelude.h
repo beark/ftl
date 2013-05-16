@@ -48,8 +48,8 @@ namespace ftl {
 	 * \ingroup prelude
 	 */
 	template<typename T>
-	T id(T&& t) {
-		return std::forward<T>(t);
+	const T& id(const T& t) {
+		return t;
 	}
 
 	/**
