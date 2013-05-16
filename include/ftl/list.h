@@ -24,7 +24,7 @@
 #define FTL_LIST_H
 
 #include <list>
-#include "monoid.h"
+#include "foldable.h"
 #include "monad.h"
 
 namespace ftl {
@@ -44,7 +44,7 @@ namespace ftl {
 	 *
 	 * \par Dependencies
 	 * - <list>
-	 * - \ref monoid
+	 * - \ref foldable
 	 * - \ref monad
 	 */
 
@@ -213,6 +213,58 @@ namespace ftl {
 			typename B = typename decayed_result<F(A)>::type::value_type>
 		static list<B> bind(const list<A>& l, F&& f) {
 			return concatMap(std::forward<F>(f), l);
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
+	 * Foldable instance for std::lists.
+	 *
+	 * \note This concepts instance works for both regular std::lists and the
+	 *       type alias used in FTL.
+	 *
+	 * \ingroup list
+	 */
+	template<>
+	struct foldable<std::list>
+	: fold_default<std::list>, foldMap_default<std::list> {
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						A,
+						typename decayed_result<Fn(B,A)>::type
+						>::value
+					>::type,
+				typename...Ts>
+		static A foldl(Fn&& fn, A z, const std::list<B,Ts...>& l) {
+			for(auto& e : l) {
+				z = fn(z, e);
+			}
+
+			return z;
+		}
+
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						B,
+						typename decayed_result<Fn(A,B)>::type
+						>::value
+					>::type,
+				typename...Ts>
+		static B foldr(Fn&& fn, B z, const std::list<A,Ts...>& l) {
+			for(auto it = l.rbegin(); it != l.rend(); ++it) {
+				z = fn(*it, z);
+			}
+
+			return z;
 		}
 
 		static constexpr bool instance = true;
