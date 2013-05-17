@@ -94,9 +94,9 @@ namespace ftl {
 	}
 
 	/**
-	 * Monoid implementation for vectors.
+	 * Monoid implementation for std::vectors.
 	 *
-	 * Should work for both FTL's type alias and plain std::vectors.
+	 * Essentially equivalent of monoid<std::list<Ts...>>.
 	 *
 	 * \ingroup vector
 	 */
@@ -126,6 +126,41 @@ namespace ftl {
 		static std::vector<Ts...> append(
 				const std::vector<Ts...>& v1,
 				std::vector<Ts...>&& v2) {
+			v2.reserve(v1.size());
+			v2.insert(v2.begin(), v1.begin(), v1.end());
+			return v1;
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
+	 * Monoid implementation for vectors.
+	 *
+	 * Exactly equivalent of the std::vector instance.
+	 *
+	 * \ingroup vector
+	 */
+	template<typename T>
+	struct monoid<vector<T>> {
+		static vector<T> id() {
+			return vector<T>();
+		}
+
+		static vector<T> append(const vector<T>& v1, const vector<T>& v2) {
+			auto rv(v1);
+			rv.reserve(v2.size());
+			rv.insert(rv.end(), v2.begin(), v2.end());
+			return rv;
+		}
+
+		static vector<T> append(vector<T>&& v1, const vector<T>& v2) {
+			v1.reserve(v2.size());
+			v1.insert(v1.end(), v2.begin(), v2.end());
+			return v1;
+		}
+
+		static vector<T> append(const vector<T>& v1, vector<T>&& v2) {
 			v2.reserve(v1.size());
 			v2.insert(v2.begin(), v1.begin(), v1.end());
 			return v1;
@@ -180,15 +215,14 @@ namespace ftl {
 			typename A,
 			typename B = typename decayed_result<F(A)>::type,
 			typename = typename std::enable_if<std::is_same<A,B>::value>::type>
-		static vector<A> map(F&& f, vector<A>&& l) {
+		static vector<A> map(F&& f, vector<A>&& v) {
 			for(auto& e : v) {
 				e = f(e);
 			}
 
-			// Make sure compiler remembers v is a temporary.
-			// This is safe, because we're returning it to the context from
-			// whence it came.
-			return std::move(v);
+			// Move into new (temporary) container, so reference does not go
+			// and die
+			return vector<A>(std::move(v));
 		}
 
 		/// Equivalent of flip(concatMap)
@@ -198,6 +232,102 @@ namespace ftl {
 			typename B = typename decayed_result<F(A)>::type::value_type>
 		static vector<B> bind(const vector<A>& v, F&& f) {
 			return concatMap(std::forward<F>(f), v);
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
+	 * Foldable instance for std::vector.
+	 *
+	 * \ingroup vector
+	 */
+	template<>
+	struct foldable<std::vector>
+	: fold_default<std::vector>, foldMap_default<std::vector> {
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						A,
+						typename decayed_result<Fn(B,A)>::type
+						>::value
+					>::type,
+				typename...Ts>
+		static A foldl(Fn&& fn, A z, const std::vector<B,Ts...>& v) {
+			for(auto& e : v) {
+				z = fn(z, e);
+			}
+
+			return z;
+		}
+
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						B,
+						typename decayed_result<Fn(A,B)>::type
+						>::value
+					>::type,
+				typename...Ts>
+		static B foldr(Fn&& fn, B z, const std::vector<A,Ts...>& v) {
+			for(auto it = v.rbegin(); it != v.rend(); ++it) {
+				z = fn(*it, z);
+			}
+
+			return z;
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/*
+	 * Foldable instance for ftl::vector.
+	 *
+	 * \ingroup vector
+	 */
+	template<>
+	struct foldable<vector>
+	: fold_default<vector>, foldMap_default<vector> {
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						A,
+						typename decayed_result<Fn(B,A)>::type
+						>::value
+					>::type>
+		static A foldl(Fn&& fn, A z, const vector<B>& v) {
+			for(auto& e : v) {
+				z = fn(z, e);
+			}
+
+			return z;
+		}
+
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						B,
+						typename decayed_result<Fn(A,B)>::type
+						>::value
+					>::type>
+		static B foldr(Fn&& fn, B z, const vector<A>& v) {
+			for(auto it = v.rbegin(); it != v.rend(); ++it) {
+				z = fn(*it, z);
+			}
+
+			return z;
 		}
 
 		static constexpr bool instance = true;
