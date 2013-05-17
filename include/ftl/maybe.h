@@ -27,6 +27,7 @@
 #include <type_traits>
 #include "monoid.h"
 #include "monad.h"
+#include "foldable.h"
 
 namespace ftl {
 
@@ -48,6 +49,7 @@ namespace ftl {
 	 * - <type_traits>
 	 * - \ref monoid
 	 * - \ref monad
+	 * - \ref foldable
 	 */
 
 	/**
@@ -66,6 +68,7 @@ namespace ftl {
 	 * \li \ref applicative (in `A`)
 	 * \li \ref monad (in `A`)
 	 * \li \ref monoid, if, and only if, `A` is a Monoid
+	 * \li \ref foldable
 	 *
 	 * \ingroup maybe
 	 */
@@ -478,6 +481,52 @@ namespace ftl {
 		}
 
 		static constexpr bool instance = true;
+	};
+
+	/**
+	 * Foldable instance for maybe
+	 *
+	 * \ingroup maybe
+	 */
+	template<>
+	struct foldable<maybe> : foldMap_default<maybe>, fold_default<maybe> {
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						A,
+						typename decayed_result<Fn(B,A)>::type
+						>::value
+					>::type
+				>
+		static A foldl(Fn&& fn, A&& z, const maybe<B>& m) {
+			if(m) {
+				return fn(std::forward<A>(z), *m);
+			}
+
+			return z;
+		}
+
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						B,
+						typename decayed_result<Fn(A,B)>::type
+						>::value
+					>::type
+				>
+		static B foldl(Fn&& fn, B&& z, const maybe<A>& m) {
+			if(m) {
+				return fn(std::forward<B>(z), *m);
+			}
+
+			return z;
+		}
 	};
 }
 
