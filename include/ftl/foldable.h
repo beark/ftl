@@ -126,6 +126,11 @@ namespace ftl {
 		static constexpr bool instance = false;
 	};
 
+	template<template<typename> class F>
+	struct foldable<F> {
+		static constexpr bool instance = false;
+	};
+
 	/**
 	 * Default implementation of foldable::foldMap.
 	 *
@@ -143,6 +148,25 @@ namespace ftl {
 				typename = typename std::enable_if<monoid<M>::instance>::type,
 				typename...Ts>
 		static M foldMap(Fn fn, const F<A,Ts...>& f) {
+			return foldable<F>::foldl(
+					[fn](const A& a, const M& b) {
+						return monoid<M>::append(
+							fn(a),
+							b);
+					},
+					monoid<M>::id(),
+					f);
+		}
+	};
+
+	template<template<typename> class F>
+	struct foldMap_default<F> {
+		template<
+				typename A,
+				typename Fn,
+				typename M = typename decayed_result<Fn(A)>::type,
+				typename = typename std::enable_if<monoid<M>::instance>::type>
+		static M foldMap(Fn fn, const F<A>& f) {
 			return foldable<F>::foldl(
 					[fn](const A& a, const M& b) {
 						return monoid<M>::append(
@@ -173,6 +197,16 @@ namespace ftl {
 		}
 	};
 
+	template<template<typename> class F>
+	struct fold_default<F> {
+		template<
+				typename M,
+				typename = typename std::enable_if<monoid<M>::instance>::type>
+		static M fold(const F<M>& f) {
+			return foldable<F>::foldMap(id<M>, f);
+		}
+	};
+
 	/**
 	 * Convenience function alias of foldable<T>::fold.
 	 *
@@ -185,6 +219,20 @@ namespace ftl {
 			typename = typename std::enable_if<monoid<M>::instance>::type,
 			typename...Ts>
 	M fold(const F<M,Ts...>& f) {
+		return foldable<F>::fold(f);
+	}
+
+	/**
+	 * Overloaded for singly type parametrised types.
+	 *
+	 * \ingroup foldable
+	 */
+	template<
+			template<typename> class F,
+			typename M,
+			typename = typename std::enable_if<foldable<F>::instance>::type,
+			typename = typename std::enable_if<monoid<M>::instance>::type>
+	M fold(const F<M>& f) {
 		return foldable<F>::fold(f);
 	}
 
@@ -202,6 +250,22 @@ namespace ftl {
 			typename = typename std::enable_if<monoid<M>::instance>::type,
 			typename...Ts>
 	static M foldMap(Fn&& fn, const F<A,Ts...>& f) {
+		return foldable<F>::foldMap(std::forward<Fn>(fn), f);
+	}
+
+	/**
+	 * Overloaded for singly type parametrised types.
+	 *
+	 * \ingroup foldable
+	 */
+	template<
+			template<typename> class F,
+			typename A,
+			typename Fn,
+			typename M = typename std::result_of<Fn(A)>::type,
+			typename = typename std::enable_if<foldable<F>::instance>::type,
+			typename = typename std::enable_if<monoid<M>::instance>::type>
+	static M foldMap(Fn&& fn, const F<A>& f) {
 		return foldable<F>::foldMap(std::forward<Fn>(fn), f);
 	}
 
@@ -228,6 +292,27 @@ namespace ftl {
 	}
 
 	/**
+	 * Overloaded for singly type parametrised types.
+	 *
+	 * \ingroup foldable
+	 */
+	template<
+			template<typename> class F,
+			typename Fn,
+			typename A,
+			typename B,
+			typename = typename std::enable_if<foldable<F>::instance>::type,
+			typename = typename std::enable_if<
+				std::is_same<
+					B,
+					typename decayed_result<Fn(A,B)>::type
+					>::value
+				>::type>
+	B foldr(Fn&& fn, B&& z, const F<A>& f) {
+		return foldable<F>::foldr(std::forward<Fn>(fn), std::forward<B>(z), f);
+	}
+
+	/**
 	 * Convenience function alias of foldable<T>::foldl.
 	 *
 	 * \ingroup foldable
@@ -248,6 +333,28 @@ namespace ftl {
 	A foldl(Fn&& fn, A&& z, const F<B,Ts...>& f) {
 		return foldable<F>::foldl(std::forward<Fn>(fn), std::forward<A>(z), f);
 	}
+
+	/**
+	 * Overloaded for singly type parametrised types.
+	 *
+	 * \ingroup foldable
+	 */
+	template<
+			template<typename> class F,
+			typename Fn,
+			typename A,
+			typename B,
+			typename = typename std::enable_if<foldable<F>::instance>::type,
+			typename = typename std::enable_if<
+				std::is_same<
+					A,
+					typename decayed_result<Fn(B,A)>::type
+					>::value
+				>::type>
+	A foldl(Fn&& fn, A&& z, const F<B>& f) {
+		return foldable<F>::foldl(std::forward<Fn>(fn), std::forward<A>(z), f);
+	}
+
 }
 
 #endif
