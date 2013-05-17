@@ -322,6 +322,35 @@ namespace ftl {
 				return nullptr;
 			}
 		}
+
+		template<typename...>
+		struct curried {};
+
+		template<typename R>
+		struct curried<R> {
+			R operator()() const {
+				throw(std::logic_error("Curried calling of parameterless function"));
+			}
+		};
+
+		template<typename R, typename P>
+		struct curried<R,P> {
+			function<R> operator()(P p) const {
+				throw(std::logic_error("Curried calling of parameterless function"));
+			}
+		};
+
+		template<typename R, typename P1, typename P2, typename...Ps>
+		struct curried<R,P1,P2,Ps...> {
+
+			function<R,P2,Ps...> operator() (P1 p1) const {
+				auto self = *reinterpret_cast<const function<R,P1,P2,Ps...>*>(this);
+				return [self,p1] (P2 p2, Ps...ps) {
+					return self.operator()(p1, std::forward<P2>(p2), std::forward<Ps>(ps)...);
+				};
+			}
+		};
+
 	}
 
 	/**
@@ -341,7 +370,7 @@ namespace ftl {
 	 * \ingroup functional
 	 */
 	template<typename R, typename...Ps>
-	class function {
+	class function : _dtl::curried<R,Ps...> {
 	public:
 		/**
 		 * Type sequence representation of the function's parameter list.
@@ -492,6 +521,8 @@ namespace ftl {
 			swap(other);
 			return *this;
 		}
+
+		using _dtl::curried<R,Ps...>::operator();
 
 		/// Call the wrapped function object
 		R operator()(Ps...ps) const {
