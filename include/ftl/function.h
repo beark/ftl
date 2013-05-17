@@ -362,10 +362,31 @@ namespace ftl {
 	 * \par Concepts
 	 * - \ref fullycons
 	 * - \ref assignable
-	 * - \ref fn<R(Ps...)>
+	 * - \ref fn`<R(Ps...)>`
+	 * - \ref fn`<`\ref fn`<R(P2, ..., PN)>(P1)>`, assuming `sizeof...(Ps) > 2`
+	 *   and `P1`, `P2`, ..., `PN` are the elements of `Ps`.
 	 * - \ref applicative
 	 * - \ref functor
 	 * - \ref monoid, if and only if R is a Monoid.
+	 *
+	 * If the second \ref fn instance above is not completely obvious in what it
+	 * means, it signifies that ftl::function supports the notion of curried
+	 * calling. For example:
+	 * \code
+	 *   ftl::function<int,int,int> f = ... // Binary function of integers
+	 *   f(1,2);        // Call directly
+	 *   auto g = f(1); // Curried call, providing one parameter only
+	 *   g(2);          // Results in the same as f(1,2);
+	 * \endcode
+	 *
+	 * \note While often convenient, it may give rise to ambiguous calls to
+	 * `operator()` if the function object encapsulated by the ftl::function
+	 * has several overloaded `operator()` that differ only in the number of
+	 * parameters they take.
+	 *
+	 * \warning Curried calling _will_ result in copies of the parameter being
+	 *          made. Every time you invoke `operator()` without filling the
+	 *          complete parameter list, you are creating copies.
 	 *
 	 * \ingroup functional
 	 */

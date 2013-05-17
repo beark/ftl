@@ -44,6 +44,12 @@ namespace ftl {
 	/**
 	 * \interface foldable
 	 *
+	 * Concrete definition of the foldable concept.
+	 *
+	 * The most typical types that are instances of foldable are containers of
+	 * different sorts, in which case the fold operation is usually a
+	 * generalisation of a "sum" operation on the elements of the container.
+	 *
 	 * \ingroup foldable
 	 */
 	template<template<typename...> class F>
