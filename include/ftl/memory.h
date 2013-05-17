@@ -146,6 +146,52 @@ namespace ftl {
 		static constexpr bool instance = true;
 	};
 
+	/**
+	 * Foldable instance for shared_ptr
+	 *
+	 * \ingroup memory
+	 */
+	template<>
+	struct foldable<std::shared_ptr>
+	: foldMap_default<std::shared_ptr>, fold_default<std::shared_ptr> {
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						A,
+						typename decayed_result<Fn(B,A)>::type
+						>::value
+					>::type
+				>
+		static A foldl(Fn&& fn, A&& z, std::shared_ptr<B> p) {
+			if(p) {
+				return fn(std::forward<A>(z), *p);
+			}
+
+			return z;
+		}
+
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						B,
+						typename decayed_result<Fn(A,B)>::type
+						>::value
+					>::type
+				>
+		static B foldl(Fn&& fn, B&& z, std::shared_ptr<A> p) {
+			if(p) {
+				return fn(std::forward<B>(z), *p);
+			}
+
+			return z;
+		}
+	};
 }
 
 #endif
