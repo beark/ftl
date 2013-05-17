@@ -191,6 +191,8 @@ namespace ftl {
 
 			return z;
 		}
+
+		static constexpr bool instance = true;
 	};
 }
 
