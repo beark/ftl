@@ -53,79 +53,23 @@ namespace ftl {
 	}
 
 	/**
-	 * Curries a binary function.
+	 * Curries an n-ary function pointer.
 	 *
-	 * Currying is the process of turning a function of (a,b) -> c into
-	 * a -> b -> c. In other words, instead of taking two arguments and
+	 * Currying is the process of turning a function of e.g. `(a,b) -> c` into
+	 * `a -> b -> c`. In other words, instead of taking two arguments and
 	 * returning the answer, the curried function takes one argument and
 	 * returns a function that takes another one and \em then returns the
 	 * answer.
 	 *
-	 * \note This requires the "outer" function (the one who takes a parameter
-	 *       and returns an inner function) to capture its parameter by value.
-	 *       In other words, T1 must be copy or move constructible and must not
-	 *       refer to something that will be destroyed or otherwise made
-	 *       inaccessible.
+	 * \note This operation is actually exactly equivalent of wrapping the
+	 *       function in an ftl::function object, as those support curried
+	 *       calling by default.
 	 *
 	 * \ingroup prelude
 	 */
-	template<typename R, typename T1, typename T2>
-	function<function<R,T2>,T1> curry(function<R,T1,T2> f) {
-		// TODO: Change with move capturing lambdas (C++14)
-		return [f] (T1 t1) {
-			return [f,t1] (T2&& t2) {
-				return f(t1, std::forward<T2>(t2));
-			};
-		};
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup prelude
-	 */
-	template<typename R, typename T1, typename T2>
-	function<function<R,T2>,T1> curry(R (*f) (T1, T2)) {
-		return [f](T1 t1) {
-			return [f, t1](T2&& t2) {
-				return f(t1, std::forward<T2>(t2));
-			};
-		};
-	}
-
-	/**
-	 * Curry a ternary function
-	 *
-	 * Similar to the binary curry, except this works with functions taking
-	 * three parameters.
-	 *
-	 * \ingroup prelude
-	 */
-	template<typename R, typename T1, typename T2, typename T3>
-	function<function<function<R,T3>,T2>,T1> curry(function<R,T1,T2,T3> f) {
-		return [f](T1 t1) {
-			return [f,t1](T2 t2) {
-				return [f,t1,t2](T3&& t3) {
-					return f(t1, t2, std::forward<T2>(t2));
-				};
-			};
-		};
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup prelude
-	 */
-	template<typename R, typename T1, typename T2, typename T3>
-	function<function<function<R,T3>,T2>,T1> curry(R (*f) (T1, T2, T3)) {
-		return [f](T1 t1) {
-			return [f, t1](T2 t2) {
-				return [f,t1,t2](T3&& t3) {
-					return f(t1, t2, std::forward<T3>(t3));
-				};
-			};
-		};
+	template<typename R, typename P1, typename P2, typename...Ps>
+	function<R,P1,P2,Ps...> curry(R (*f) (P1, P2, Ps...)) {
+		return function<R,P1,P2,Ps...>(f);
 	}
 
 	/**
