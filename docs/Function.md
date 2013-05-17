@@ -2,7 +2,7 @@ Function
 ========
 You might wonder why ftl provides its own function data type. After all, the standard library already provides `std::function`, which `ftl::function` is indeed very similar to&mdash;almost identical, in fact. What, then, is the justification for this data type?
 
-Simple, the way it accepts template parameters. To provide as full a Haskell-like library as possible, it was desired that functions could act as [functors](Functor.md), [monoids](Monoid.md), and all sorts of other concepts. While possible to an extent with `std::function`, truly generalised functor code, for example, was _not_. Consider:
+Simple: the way it accepts template parameters. To provide as full a Haskell-like library as possible, it was desired that functions could act as [functors](Functor.md), [monoids](Monoid.md), and all sorts of other concepts. While possible to an extent with `std::function`, truly generalised functor code, for example, was _not_. Consider:
 ```cpp
 template<template<typename> class F, typename...Ts>
 F<float,Ts...> intToFloat(const F<int,Ts...>& f) {
@@ -12,7 +12,14 @@ F<float,Ts...> intToFloat(const F<int,Ts...>& f) {
 ```
 This function would work on _any_ functor containing an _int_ (and an unknown and arbitrary amount of other types&mdash;parameters in the case of functions), and return one of the same value, but now a _float_, while preserving everything else. It is not possible to unify the above type signature with `std::function`'s. It works excellently with `ftl::function` however.
 
-For everything else but the template parameters, `ftl::function` is essentially identical to `std::function`, and you may simply look that up on cppreference.com or similar.
+A second thing that `ftl::function` does differently is that it provides curried calling semantics out of the box. That is, you can invoke any function with an arity greater than one partially, like so:
+```cpp
+ftl::function<int,int,int,int> f = ...;
+auto g = f(1); // Invoke f as if it was curried
+g(2,3);        // Invoke g "completely"; equivalent of f(1,2,3);
+```
+
+For everything else but these two things, `ftl::function` is essentially identical to `std::function`, and you may simply look that up on cppreference.com or similar.
 
 Concepts implemented
 --------------------
