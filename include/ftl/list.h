@@ -90,15 +90,13 @@ namespace ftl {
 	}
 
 	/**
-	 * Monoid implementation for list.
+	 * Monoid implementation for std::list.
 	 *
 	 * The identity element is (naturally) the empty list, and the append
 	 * operation is (again, naturally) to append the second list to the first.
 	 *
 	 * \ingroup list
 	 */
-	// TODO: Make monoid instance for ftl::list too, because apparently that's
-	// necessary
 	template<typename...Ts>
 	struct monoid<std::list<Ts...>> {
 		static std::list<Ts...> id() {
@@ -125,6 +123,38 @@ namespace ftl {
 		static std::list<Ts...> append(
 				const std::list<Ts...>& l1,
 				std::list<Ts...>&& l2) {
+			l2.insert(l2.end(), l1.begin(), l1.end());
+			return std::move(l2);
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
+	 * Monoid instance for list.
+	 *
+	 * Exactly equivalent of monoid<std::list<Ts...>>.
+	 *
+	 * \ingroup list
+	 */
+	template<typename T>
+	struct monoid<list<T>> {
+		static list<T> id() {
+			return list<T>();
+		}
+
+		static list<T> append(const list<T>& l1, const list<T>& l2) {
+			auto l3 = l1;
+			l3.insert(l3.end(), l2.begin(), l2.end());
+			return l3;
+		}
+
+		static list<T> append(list<T>&& l1, const list<T>& l2) {
+			l1.insert(l1.end(), l2.begin(), l2.end());
+			return std::move(l1);
+		}
+
+		static list<T> append(const list<T>& l1, list<T>&& l2) {
 			l2.insert(l2.end(), l1.begin(), l1.end());
 			return std::move(l2);
 		}
@@ -255,6 +285,53 @@ namespace ftl {
 					>::type,
 				typename...Ts>
 		static B foldr(Fn&& fn, B z, const std::list<A,Ts...>& l) {
+			for(auto it = l.rbegin(); it != l.rend(); ++it) {
+				z = fn(*it, z);
+			}
+
+			return z;
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
+	 * Foldable instance for ftl::lists.
+	 *
+	 * \ingroup list
+	 */
+	template<>
+	struct foldable<list>
+	: fold_default<list>, foldMap_default<list> {
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						A,
+						typename decayed_result<Fn(B,A)>::type
+						>::value
+					>::type>
+		static A foldl(Fn&& fn, A z, const list<B>& l) {
+			for(auto& e : l) {
+				z = fn(z, e);
+			}
+
+			return z;
+		}
+
+		template<
+				typename Fn,
+				typename A,
+				typename B,
+				typename = typename std::enable_if<
+					std::is_same<
+						B,
+						typename decayed_result<Fn(A,B)>::type
+						>::value
+					>::type>
+		static B foldr(Fn&& fn, B z, const list<A>& l) {
 			for(auto it = l.rbegin(); it != l.rend(); ++it) {
 				z = fn(*it, z);
 			}
