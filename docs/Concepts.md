@@ -32,4 +32,5 @@ These are concepts whose characteristics are a bit more advanced and require fur
 * [Functor](Functor.md)
 * [Applicative Functor](Applicative.md)
 * [Monad](Monad.md)
+* [Foldable](Foldable.md)
 

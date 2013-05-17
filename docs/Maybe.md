@@ -25,6 +25,7 @@ Concepts implemented
 * [Functor](Functor.md)
 * [Applicative](Applicative.md)
 * [Monad](Monad.md)
+* [Foldable](Foldable.md)
 
 Memory
 ------

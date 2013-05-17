@@ -15,6 +15,7 @@ Documentation index
 * [Functors](docs/Functor.md)
 * [Applicative Functors](docs/Applicative.md)
 * [Monads](docs/Monad.md)
+* [Foldables](docs/Foldable.md)
 
 ### Data types
 * [function](docs/Function.md)
