@@ -302,15 +302,15 @@ namespace ftl {
 	 * binary operation that can result in such a failure state. In monoid
 	 * terms, the failure state is the same as the identity element.
 	 *
+	 * \tparam F must be an \ref applicative.
+	 *
 	 * \note Due to the constraint on `F` that it is already an applicative
 	 *       functor, the monoid operation may be _effectful_, unlike in the
 	 *       \ref monoid concept.
 	 *
 	 * \ingroup applicative
 	 */
-	template<
-			template<typename...> class F,
-			typename = typename std::enable_if<applicative<F>::instance>::type>
+	template<template<typename...> class F>
 	struct monoidA {
 		/**
 		 * Get an instance of the failure state.
@@ -367,7 +367,7 @@ namespace ftl {
 			typename = typename std::enable_if<monoidA<F>::instance>::type,
 			typename...Ts>
 	F<Ts...> operator| (const F<Ts...>& f1, F<Ts...>&& f2) {
-		return monoidA<F>::op(f1, std::move(f2));
+		return monoidA<F>::orDo(f1, std::move(f2));
 	}
 
 	/**
@@ -380,7 +380,7 @@ namespace ftl {
 			typename = typename std::enable_if<monoidA<F>::instance>::type,
 			typename...Ts>
 	F<Ts...> operator| (F<Ts...>&& f1, F<Ts...>&& f2) {
-		return monoidA<F>::op(std::move(f1), std::move(f2));
+		return monoidA<F>::orDo(std::move(f1), std::move(f2));
 	}
 
 	// Forward declarations
