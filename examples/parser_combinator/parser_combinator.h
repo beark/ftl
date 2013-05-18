@@ -56,6 +56,7 @@ parser<T> lazy(parser<T>(*)());
  *
  * \par Concepts
  * \li Monad 
+ * \li MonoidAlternative
  */
 template<typename T>
 class parser {

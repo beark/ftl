@@ -16,6 +16,7 @@ On to the good stuff. A central part of the API is the type `parser<T>`, which d
  *
  * \par Concepts
  * \li Monad
+ * \li MonoidAlternative
  */
 template<typename T>
 class parser {
@@ -25,20 +26,9 @@ public:
 ```
 What's that? Only one single, lonely little method? Something must surely be wrong? Well, let's give it a chance to prove itself at least...
 
-So, what else does this interface tell us? First, apparently parsers are monads. This actually tells us quite a bit: we now know we can use all of the [functor](Functor.md), [applicative functor](Applicative.md), and [monad](Monad.md) interfaces to interact with parsers. Neat. Second, we also know that the `run` method apparently can fail: its return type of `either<T,error>` clearly indicates that it will either return whatever we wanted it to parse, or an error.
+So, what else does this interface tell us? First, apparently parsers are monads. This actually tells us quite a bit: we now know we can use all of the [functor](Functor.md), [applicative functor](Applicative.md), and [monad](Monad.md) interfaces to interact with parsers. Neat. Second, we also know that the `run` method apparently can fail: its return type of `either<T,error>` clearly indicates that it will either return whatever we wanted it to parse, or an error. Third, we know parsers are also instances of monoidal alternatives, which gives us one more way of combining parsers, as well as the ability to create parsers that automatically fail.
 
-Alright, now we've deduced quite a bit about this `parser<T>` type, but we still can't do much, because we're missing a rather fundamental thing: how do we actually create parsers? Because looking at the interface, there are no public constructors! Let's browse further down the parser combinator API, and see if there is something there to enlighten us.
-```cpp
-/**
- * Combinator to try parsers in sequence.
- *
- * First tries to run \c p1, and if that fails, tries \c p2. If both fail, a
- * parse error is returned.
- */
-template<typename T>
-parser<T> operator|| (parser<T> p1, parser<T> p2);
-```
-Okay, that sounds useful, but it's just another combining operation (in addition to those provided by the monad instance). We still can't produce any parsers to actually combine. Let's keep going.
+Alright, now we've deduced quite a bit about this `parser<T>` type, but we still can't do much, because we're missing a rather fundamental thing: how do we actually create parsers (that _do_ something, besides failing)? Because looking at the interface, there are no public constructors! Let's browse further down the parser combinator API, and see if there is something there to enlighten us.
 ```cpp
 /**
  * Parses any one character.
@@ -135,10 +125,12 @@ However, looking closer at our "sketch", we notice a nasty thing at the end: we 
 ```cpp
 template<typename T>
 parser<T> option(parser<T> p, T t) {
-	return p || ftl::monad<parser>::pure(t);
+    using ftl::operator|;
+
+	return p | ftl::monad<parser>::pure(t);
 }
 ```
-Easily! The OR-combinator we found earlier comes in very handy, and monad's `pure` gives us the final piece. See, it wasn't quite true what was said in section 1&mdash;even without _anything_ save the monad instance, we _can_ create parsers. Only, they're rather useless on their own. Parsers creates with `pure` will consume no input and always yield the exact value we gave to `pure`. Our `option` above then quite simply reads as "parse p, but if that fails, just default to t".
+Easily! The OR-combinator from the monoidal alternative instance, and monad's `pure` gives us the final piece. Our `option` above quite simply reads as "parse p, but if that fails, default to t".
 
 Alright, we can return to our `parseList` again. It now looks like this:
 ```cpp
