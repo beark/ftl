@@ -287,20 +287,9 @@ namespace ftl {
 	 * \ingroup maybe
 	 */
 	template<typename A>
-	constexpr maybe<A> value(const A& a)
-	noexcept(std::is_nothrow_copy_constructible<A>::value) {
-		return maybe<A>(a);
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename A>
 	constexpr maybe<A> value(A&& a)
-	noexcept(std::is_nothrow_move_constructible<A>::value) {
-		return maybe<A>(std::move(a));
+	noexcept(std::is_nothrow_constructible<A,A>::value) {
+		return maybe<A>(std::forward<A>(a));
 	}
 
 	/**
@@ -478,6 +467,32 @@ namespace ftl {
 			typename B = typename decayed_result<F(A)>::type::value_type>
 		static maybe<B> bind(const maybe<A>& m, F f) {
 			return m ? f(*m) : maybe<B>();
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
+	 * Implementation of ftl::monoidA concept.
+	 *
+	 * Semantics are simple:
+	 * \code
+	 *   value(x)            | maybeValue = value(x)
+	 *   maybe<T>::nothing() | maybeValue = maybeValue
+	 * \endcode
+	 *
+	 * \ingroup maybe
+	 */
+	template<>
+	struct monoidA<maybe> {
+		template<typename T>
+		static constexpr maybe<T> fail() noexcept {
+			return maybe<T>{};
+		}
+
+		template<typename T>
+		static maybe<T> orDo(const maybe<T>& m1, const maybe<T>& m2) {
+			return m1 ? m1 : m2;
 		}
 
 		static constexpr bool instance = true;
