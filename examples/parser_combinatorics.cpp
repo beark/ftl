@@ -12,7 +12,8 @@ int string2int(const std::string& str) {
 
 template<typename T>
 parser<T> option(parser<T> p, T&& t) {
-	return p || ftl::monad<parser>::pure<T>(std::forward<T>(t));
+	using ftl::operator|;
+	return p | ftl::monad<parser>::pure<T>(std::forward<T>(t));
 }
 
 parser<int> parseNatural() {

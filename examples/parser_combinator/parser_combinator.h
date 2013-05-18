@@ -44,9 +44,6 @@ auto yield(T&& t) -> decltype(ftl::make_left<error>(std::forward<T>(t))) {
 template<typename T> class parser;
 
 template<typename T>
-parser<T> operator|| (parser<T>, parser<T>);
-
-template<typename T>
 parser<T> lazy(ftl::function<parser<T>>);
 
 template<typename T>
@@ -74,8 +71,8 @@ public:
 	friend parser<char> oneOf(std::string);
 	friend parser<std::string> many(parser<char>);
 	friend parser<std::string> many1(parser<char>);
-	friend parser operator|| <>(parser, parser);
 	friend class ftl::monad<parser>;
+	friend class ftl::monoidA<parser>;
 
 	using value_type = T;
 
@@ -166,33 +163,58 @@ namespace ftl {
 		// Yes, parser is an instance of monad (and applicative, and functor)
 		static constexpr bool instance = true;
 	};
-}
 
-/**
- * Combinator to try parsers in sequence.
- *
- * First tries to run \c p1, and if that fails, tries \c p2. If both fail, a
- * parse error is returned.
- */
-template<typename T>
-parser<T> operator|| (parser<T> p1, parser<T> p2) {
-	return parser<T>{[p1,p2](std::istream& strm) {
-		auto r = p1.run(strm);
-		if(r) {
-			return r;
+	/**
+	 * monoidA instance for parser.
+	 *
+	 * Parsers have a well defined fail state (when the either is of right
+	 * type), so this concept makes perfect sense.
+	 */
+	template<>
+	struct monoidA<parser> {
+		/// Generic fail parser
+		template<typename T>
+		static parser<T> fail() {
+			return parser<T>{
+				[](std::istream&) {
+					return fail<T>("Unknown parse error.");
+				}
+			};
 		}
-		else {
-			auto r2 = p2.run(strm);
-			if(r2) {
-				return r2;
-			}
-			else {
-				std::ostringstream oss;
-				oss << r.right().message() << " or " << r2.right().message();
-				return fail<T>(oss.str());
-			}
+
+		/**
+		 * Try two parsers in sequence.
+		 *
+		 * If p1 fails, then run p2. If both fail, then the composite parser
+		 * fails.
+		 *
+		 * \note p1 could in some situations consume input and _then_ fail. This
+		 *       might be exactly what you want, or it might be very confusing.
+		 */
+		template<typename T>
+		static parser<T> orDo(parser<T> p1, parser<T> p2) {
+			return parser<T>{[p1,p2](std::istream& is) {
+				auto r = p1.run(is);
+				if(r)
+					return r;
+
+				else {
+					auto r2 = p2.run(is);
+					if(r2)
+						return r2;
+
+					else {
+						std::ostringstream oss;
+						oss << r.right().message()
+							<< " or " << r2.right().message();
+						return ::fail<T>(oss.str());
+					}
+				}
+			}};
 		}
-	}};
+
+		static constexpr bool instance = true;
+	};
 }
 
 /* What follows is a basic set of blocks that a user of the library can
