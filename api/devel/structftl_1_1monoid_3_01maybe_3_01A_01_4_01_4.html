@@ -104,16 +104,16 @@ struct ftl::monoid&lt; maybe&lt; A &gt; &gt;</h3>
 
 <p>Monoid implementation for maybe. </p>
 <p>Semantics are: </p>
-<div class="fragment"><div class="line">id() &lt;=&gt; <a class="code" href="classftl_1_1maybe.html#a7add60ae7993ee1a5794ec0d0a2f93d9" title="Static constructor of Nothing:s.">maybe::nothing</a>() &lt;=&gt; maybe()</div>
-<div class="line">append(<a class="code" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443" title="Convenience function to create maybe:s.">value</a>(x), <a class="code" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443" title="Convenience function to create maybe:s.">value</a>(y)) &lt;=&gt; <a class="code" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443" title="Convenience function to create maybe:s.">value</a>(append(x, y))</div>
-<div class="line">append(<a class="code" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443" title="Convenience function to create maybe:s.">value</a>(x), maybe::nothing()) &lt;=&gt; <a class="code" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443" title="Convenience function to create maybe:s.">value</a>(x)</div>
-<div class="line">append(maybe::nothing, <a class="code" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443" title="Convenience function to create maybe:s.">value</a>(y)) &lt;=&gt; <a class="code" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443" title="Convenience function to create maybe:s.">value</a>(y)</div>
+<div class="fragment"><div class="line">id() &lt;=&gt; <a class="code" href="classftl_1_1maybe.html#a49b701c1d6d5ebe2896f05165da1fcce" title="Static constructor of Nothing:s.">maybe::nothing</a>() &lt;=&gt; maybe()</div>
+<div class="line">append(<a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(x), <a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(y)) &lt;=&gt; <a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(append(x, y))</div>
+<div class="line">append(<a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(x), maybe::nothing()) &lt;=&gt; <a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(x)</div>
+<div class="line">append(maybe::nothing, <a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(y)) &lt;=&gt; <a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(y)</div>
 <div class="line">append(maybe::nothing, maybe::nothing) &lt;=&gt; maybe::nothing</div>
 </div><!-- fragment --><p>In other words, the append operation is simply lifted into the <code>value_type</code> of the maybe and all nothings are ignored (unless everything is nothing). </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 14 2013 19:01:39 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

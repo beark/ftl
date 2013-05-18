@@ -90,7 +90,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="structftl_1_1monoid_3_01std_1_1tuple_3_01Ts_8_8_8_4_01_4-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">ftl::monoid&lt; std::tuple&lt; Ts...&gt; &gt; Struct Template Reference</div>  </div>
+<div class="title">ftl::monoid&lt; std::tuple&lt; Ts...&gt; &gt; Struct Template Reference<div class="ingroups"><a class="el" href="group__tuple.html">Tuple</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -107,10 +107,10 @@ struct ftl::monoid&lt; std::tuple&lt; Ts...&gt; &gt;</h3>
 <div class="fragment"><div class="line">monoid&lt;std::tuple&lt;t1, t2, ..., tN&gt;&gt;::id();</div>
 </div><!-- fragment --><p> is equivalent to </p>
 <div class="fragment"><div class="line">std::make_tuple(</div>
-<div class="line">    monoid&lt;t1&gt;::id(),</div>
-<div class="line">    monoid&lt;t2&gt;::id(),</div>
+<div class="line">    <a class="code" href="group__prelude.html#gaf45d5c020afaf3880a007196bd1999a8" title="Identity function.">monoid&lt;t1&gt;::id</a>(),</div>
+<div class="line">    <a class="code" href="group__prelude.html#gaf45d5c020afaf3880a007196bd1999a8" title="Identity function.">monoid&lt;t2&gt;::id</a>(),</div>
 <div class="line">    ...,</div>
-<div class="line">    monoid&lt;tN&gt;::id());</div>
+<div class="line">    <a class="code" href="group__prelude.html#gaf45d5c020afaf3880a007196bd1999a8" title="Identity function.">monoid&lt;tN&gt;::id</a>());</div>
 </div><!-- fragment --><p>In a similar fashion, the combining operation is applied to all the fields in the tuples, like so: </p>
 <div class="fragment"><div class="line">tuple1 ^ tuple2</div>
 <div class="line">&lt;=&gt;</div>
@@ -121,14 +121,14 @@ struct ftl::monoid&lt; std::tuple&lt; Ts...&gt; &gt;</h3>
 <div class="line">    std::get&lt;N&gt;(tuple1) ^ std::get&lt;N&gt;(tuple2))</div>
 </div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Ts</td><td>Each of the types must be an instance of monoid. </td></tr>
+    <tr><td class="paramname">Ts</td><td>Each of the types must be an instance of <a class="el" href="group__monoid.html">Monoid</a>. </td></tr>
   </table>
   </dd>
 </dl>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 14 2013 19:01:39 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

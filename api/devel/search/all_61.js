@@ -10,6 +10,7 @@ var searchData=
   ['applicative',['applicative',['../structftl_1_1applicative.html',1,'ftl']]],
   ['applicative_3c_20function_20_3e',['applicative&lt; function &gt;',['../structftl_1_1applicative_3_01function_01_4.html',1,'ftl']]],
   ['applicative_3c_20std_3a_3atuple_20_3e',['applicative&lt; std::tuple &gt;',['../structftl_1_1applicative_3_01std_1_1tuple_01_4.html',1,'ftl']]],
-  ['apply',['apply',['../structftl_1_1applicative.html#a0cd7e6888d5dc84dd84dfafc383b3cc6',1,'ftl::applicative::apply(const F&lt; Fn, Ts...&gt; &amp;fn, const F&lt; A, Ts...&gt; &amp;f)'],['../structftl_1_1applicative.html#a59c0a3391eca12e9fc851cf4b6b02df5',1,'ftl::applicative::apply(F&lt; Fn, Ts...&gt; &amp;&amp;fn, F&lt; A, Ts...&gt; &amp;&amp;f)']]],
+  ['applicative_20functor',['Applicative Functor',['../applicativepg.html',1,'concepts']]],
+  ['apply',['apply',['../structftl_1_1applicative.html#a0cd7e6888d5dc84dd84dfafc383b3cc6',1,'ftl::applicative::apply(const F&lt; Fn, Ts...&gt; &amp;fn, const F&lt; A, Ts...&gt; &amp;f)'],['../structftl_1_1applicative.html#a59c0a3391eca12e9fc851cf4b6b02df5',1,'ftl::applicative::apply(F&lt; Fn, Ts...&gt; &amp;&amp;fn, F&lt; A, Ts...&gt; &amp;&amp;f)'],['../group__tuple.html#gab20eb83de4a3d134a26bf117f4767358',1,'ftl::apply(F &amp;&amp;f, const std::tuple&lt; Ts...&gt; &amp;t) -&gt; typename std::result_of&lt; F(Ts...)&gt;::type'],['../group__tuple.html#ga1a792896890d990fdd5f55e4701eb2ba',1,'ftl::apply(F &amp;&amp;f, std::tuple&lt; Ts...&gt; &amp;&amp;t) -&gt; typename std::result_of&lt; F(Ts...)&gt;::type']]],
   ['assignable',['Assignable',['../assignable.html',1,'concepts']]]
 ];

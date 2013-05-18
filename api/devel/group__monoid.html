@@ -83,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Concept encapsulating the mathematical construct of the same name.  
+<p>Functions and interfaces relating to the <a class="el" href="monoidpg.html">Monoid</a> concept.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -128,19 +128,9 @@ template&lt;typename N &gt; </td></tr>
 <tr class="separator:gafb69c7623cc4c26bfad16efa47cfea2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Concept encapsulating the mathematical construct of the same name. </p>
+<p>Functions and interfaces relating to the <a class="el" href="monoidpg.html">Monoid</a> concept. </p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;ftl/monoid.h&gt;</span></div>
-</div><!-- fragment --><p>Mathematically, a monoid is any set <code>S</code>, for which there is an associated binary operation, •, and where there exists an element <code>id</code> of <code>S</code> such that the following laws hold:</p>
-<ul>
-<li><b>Right identity law</b> <div class="fragment"><div class="line">a • <span class="keywordtype">id</span> = a</div>
-</div><!-- fragment --> </li>
-<li><b>Left identity law</b> <div class="fragment"><div class="line"><span class="keywordtype">id</span> • a = a</div>
-</div><!-- fragment --> </li>
-<li><b>Law of associativity</b> <div class="fragment"><div class="line">a • (b • c) = (a • b) • c</div>
-</div><!-- fragment --></li>
-</ul>
-<p>Note, however, that in FTL, the binary monoid operation is denoted either by <code>monoid&lt;instance&gt;::append</code> or by <code>ftl::operator^</code>. This is due to the limited selection of overloadable operators in C++.</p>
-<dl class="section user"><dt>Dependencies</dt><dd><ul>
+</div><!-- fragment --><dl class="section user"><dt>Dependencies</dt><dd><ul>
 <li>&lt;type_traits&gt; </li>
 </ul>
 </dd></dl>
@@ -179,7 +169,7 @@ template&lt;typename M , typename  = typename std::enable_if&lt;monoid&lt;M&gt;:
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 14 2013 19:01:39 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

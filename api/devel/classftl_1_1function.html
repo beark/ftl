@@ -145,12 +145,20 @@ class ftl::function&lt; typename, &gt;</h3>
 <dl class="section user"><dt>Concepts</dt><dd><ul>
 <li><a class="el" href="fullycons.html">FullyConstructible</a></li>
 <li><a class="el" href="assignable.html">Assignable</a></li>
-<li><a class="el" href="fn.html">Function</a>&lt;R(Ps...)&gt;</li>
+<li><a class="el" href="fn.html">Function</a><code>&lt;R(Ps...)&gt;</code></li>
+<li><a class="el" href="fn.html">Function</a><code>&lt;</code><a class="el" href="fn.html">Function</a><code>&lt;R(P2, ..., PN)&gt;(P1)&gt;</code>, assuming <code>sizeof...(Ps) &gt; 2</code> and <code>P1</code>, <code>P2</code>, ..., <code>PN</code> are the elements of <code>Ps</code>.</li>
 <li><a class="el" href="group__applicative.html">Applicative Functor</a></li>
 <li><a class="el" href="group__functor.html">Functor</a></li>
-<li><a class="el" href="group__monoid.html">Monoid</a>, if and only if R is a Monoid. </li>
+<li><a class="el" href="group__monoid.html">Monoid</a>, if and only if R is a Monoid.</li>
 </ul>
 </dd></dl>
+<p>If the second <a class="el" href="fn.html">Function</a> instance above is not completely obvious in what it means, it signifies that <a class="el" href="classftl_1_1function.html" title="Function object encapsulator.">ftl::function</a> supports the notion of curried calling. For example: </p>
+<div class="fragment"><div class="line"><a class="code" href="classftl_1_1function.html" title="Function object encapsulator.">ftl::function&lt;int,int,int&gt;</a> f = ... <span class="comment">// Binary function of integers</span></div>
+<div class="line">f(1,2);        <span class="comment">// Call directly</span></div>
+<div class="line"><span class="keyword">auto</span> g = f(1); <span class="comment">// Curried call, providing one parameter only</span></div>
+<div class="line">g(2);          <span class="comment">// Results in the same as f(1,2);</span></div>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>While often convenient, it may give rise to ambiguous calls to <code>operator()</code> if the function object encapsulated by the <a class="el" href="classftl_1_1function.html" title="Function object encapsulator.">ftl::function</a> has several overloaded <code>operator()</code> that differ only in the number of parameters they take.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Curried calling <em>will</em> result in copies of the parameter being made. Every time you invoke <code>operator()</code> without filling the complete parameter list, you are creating copies. </dd></dl>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="ad5e65d02c7a72aebff9c31f4546f76d9"></a>
 <div class="memitem">
@@ -172,7 +180,7 @@ template&lt;typename , typename... &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 14 2013 19:01:39 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

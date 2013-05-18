@@ -83,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Abstraction of data types that can be "mapped to".  
+<p>Module containg the <a class="el" href="functorpg.html">Functor</a> concept and related functions.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -125,19 +125,9 @@ template&lt;template&lt; typename &gt; class F, typename A , typename R , typena
 <tr class="separator:ga1680c6b58f2618d51534b0e124c2cbac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Abstraction of data types that can be "mapped to". </p>
+<p>Module containg the <a class="el" href="functorpg.html">Functor</a> concept and related functions. </p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;ftl/functor.h&gt;</span></div>
-</div><!-- fragment --><p>Mathematically, functors are mappings from one category to another, following a set of well defined laws. What this means in FTL is that partial types (ie, vector is partial, vector&lt;int&gt; is complete) can often be made functors by giving a means of mapping a morphism (function) from the "pure" universe of plain types, to its own internal type universe.</p>
-<p>Ie, <code>int</code> is a plain type, <code>vector&lt;int&gt;</code> is an <code>int</code> "trapped" in the context of <code>vector</code>, and the mapping should apply the function "inside" that context. The most obvious way of doing so would be to apply the mapped function to every element in the vector.</p>
-<p>All instances of Functor should follow the following laws (which are part of the mathematical definition from which this concept is derived):</p>
-<ul>
-<li>given <div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line">T id(T t) { <span class="keywordflow">return</span> t; }</div>
-</div><!-- fragment --> then, <div class="fragment"><div class="line">map(id&lt;T&gt;, t)          &lt;=&gt; t</div>
-<div class="line">map(<a class="code" href="group__functional.html#ga531e16797e150f533f60b497acfc5e62" title="Function composition first base case.">compose</a>(f, g), t)  &lt;=&gt; <a class="code" href="group__functional.html#ga531e16797e150f533f60b497acfc5e62" title="Function composition first base case.">compose</a>(<a class="code" href="group__functional.html#gae598a3c61d7dc1ff1457deb78d74dd16" title="Curries a binary function.">curry</a>(map)(f), <a class="code" href="group__functional.html#gae598a3c61d7dc1ff1457deb78d74dd16" title="Curries a binary function.">curry</a>(map)(g))(t)</div>
-</div><!-- fragment --></li>
-</ul>
-<dl class="section user"><dt>Dependencies</dt><dd><ul>
+</div><!-- fragment --><dl class="section user"><dt>Dependencies</dt><dd><ul>
 <li><a class="el" href="group__typelevel.html">Type Level Functions</a></li>
 <li>&lt;ftl/function.h&gt; </li>
 </ul>
@@ -167,7 +157,7 @@ template&lt;template&lt; typename...&gt; class F, typename A , typename R , type
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 14 2013 19:01:39 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

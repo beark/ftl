@@ -83,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Abstraction of sequenceable computations in some context.  
+<p><a class="el" href="monadpg.html">Monad</a> concept and related functions.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -200,21 +200,9 @@ template&lt;template&lt; typename &gt; class M, typename F , typename A , typena
 <tr class="separator:ga633f0c46f6a37dc6b30ff12dfc28c971"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Abstraction of sequenceable computations in some context. </p>
+<p><a class="el" href="monadpg.html">Monad</a> concept and related functions. </p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;ftl/monad.h&gt;</span></div>
-</div><!-- fragment --><p>Monads are essentially just a functor with some additional structure. Specifically, types that are monads have the added functionality (on top of what applicative adds) of sequencing computations in the context of the monad.</p>
-<p>While this is technically already possible in C++, the abstraction is useful none the less, because monads also have the power to implicitly pass state or other useful context information forward, without the user having to bother with it.</p>
-<p>The easiest example of the above is probably the maybe monad, where the user does not need to manually check for nothingness except at the very end of a sequence of computations&mdash;because maybe's implementation of <a class="el" href="structftl_1_1monad.html#a2eec9ab7658da121ccca6f2c6576695a" title="Bind a value and execute a computation in M on it.">monad&lt;M&gt;::bind</a> does that for them.</p>
-<p>As with many of the other concepts in FTL, monads have a set of associated laws that instances must follow (though technically, there is nothing enforcing them):</p>
-<ul>
-<li><b>Left identity law</b> <div class="fragment"><div class="line">pure(x) &gt;&gt;= f    &lt;=&gt; f(x)</div>
-</div><!-- fragment --></li>
-<li><b>Right identity law</b> <div class="fragment"><div class="line">m &gt;&gt;= pure&lt;T&gt;    &lt;=&gt; m</div>
-</div><!-- fragment --></li>
-<li><b>Law of associativity</b> <div class="fragment"><div class="line">(m &gt;&gt;= f) &gt;&gt;= g) &lt;=&gt; m &gt;&gt;= ([f](X x){<span class="keywordflow">return</span> f(x);} &gt;&gt;= g)</div>
-</div><!-- fragment --></li>
-</ul>
-<dl class="section user"><dt>Dependencies</dt><dd><ul>
+</div><!-- fragment --><dl class="section user"><dt>Dependencies</dt><dd><ul>
 <li><a class="el" href="group__applicative.html">Applicative Functor</a> </li>
 </ul>
 </dd></dl>
@@ -409,7 +397,7 @@ template&lt;template&lt; typename...&gt; class M, typename F , typename A , type
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 14 2013 19:01:39 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

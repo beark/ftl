@@ -83,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Orderable concept, Ord data type, concept instances, and related.  
+<p><a class="el" href="orderablepg.html">Orderable</a> concept, <code>ord</code> data type, concept instances, and related.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -95,7 +95,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monoid instance for ord.  <a href="structftl_1_1monoid_3_01ord_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1orderable.html">ftl::orderable&lt; T &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concrete definition of orderable concept.  <a href="structftl_1_1orderable.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concrete definition of <a class="el" href="orderablepg.html">Orderable</a> concept.  <a href="structftl_1_1orderable.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -137,7 +137,7 @@ template&lt;typename T &gt; </td></tr>
 <tr class="separator:gad316f1510b83278267e63e06562e5beb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Orderable concept, Ord data type, concept instances, and related. </p>
+<p><a class="el" href="orderablepg.html">Orderable</a> concept, <code>ord</code> data type, concept instances, and related. </p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;ftl/ord.h&gt;</span></div>
 </div><!-- fragment --><p>The <code>ord</code> data type represents an ordering, in the form of "less than", "equal", or "greater than". The Orderable concept relies on this data type to order values.</p>
 <dl class="section user"><dt>Dependencies</dt><dd><ul>
@@ -234,7 +234,7 @@ template&lt;typename A , typename B &gt; </div>
 </dl>
 <p>The use case for this convenience function is similar to the comparing function that works with getter methods, but in this case the comparison is made after a free function has been aplied to the original values.</p>
 <p>Example: </p>
-<div class="fragment"><div class="line">list&lt;maybe&lt;string&gt;&gt; l{<a class="code" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;abc&quot;</span>), <a class="code" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;de&quot;</span>), <a class="code" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;f&quot;</span>)};</div>
+<div class="fragment"><div class="line">list&lt;maybe&lt;string&gt;&gt; l{<a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;abc&quot;</span>), <a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;de&quot;</span>), <a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;f&quot;</span>)};</div>
 <div class="line">sort(l.begin(), l.end(),</div>
 <div class="line">        <a class="code" href="group__ord.html#ga4ed1e8cac1f7f3dfae4a3c46d32f371b" title="Convenience function to ease integration with stdlib&#39;s sort.">lessThan</a>(<a class="code" href="group__ord.html#ga9788b6f4bc73189a374e02b9f7615b01" title="Convenience function to compare objects by getter.">comparing</a>([] (<span class="keyword">const</span> maybe&lt;string&gt;&amp; m) -&gt; <span class="keywordtype">size_t</span> {</div>
 <div class="line">    <span class="keywordflow">if</span>(m) <span class="keywordflow">return</span> m-&gt;size();</div>
@@ -328,7 +328,7 @@ template&lt;typename A &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 14 2013 19:01:39 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

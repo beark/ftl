@@ -88,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1maybe.html">ftl::maybe&lt; A &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1maybe.html">ftl::maybe&lt; T &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abstracts the concept of optional arguments and similar.  <a href="classftl_1_1maybe.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoid_3_01maybe_3_01A_01_4_01_4.html">ftl::monoid&lt; maybe&lt; A &gt; &gt;</a></td></tr>
@@ -97,19 +97,20 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01maybe_01_4.html">ftl::monad&lt; maybe &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of monad for maybe.  <a href="structftl_1_1monad_3_01maybe_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoidA_3_01maybe_01_4.html">ftl::monoidA&lt; maybe &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of <a class="el" href="structftl_1_1monoidA.html" title="Concrete interface of monoidal alternatives concept.">ftl::monoidA</a> concept.  <a href="structftl_1_1monoidA_3_01maybe_01_4.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1foldable_3_01maybe_01_4.html">ftl::foldable&lt; maybe &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Foldable instance for maybe.  <a href="structftl_1_1foldable_3_01maybe_01_4.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gab112e3d39af5f983b8efb8f360456443"><td class="memTemplParams" colspan="2"><a class="anchor" id="gab112e3d39af5f983b8efb8f360456443"></a>
+<tr class="memitem:gafa1d05640c79d83fa80217f4a1784cd8"><td class="memTemplParams" colspan="2"><a class="anchor" id="gafa1d05640c79d83fa80217f4a1784cd8"></a>
 template&lt;typename A &gt; </td></tr>
-<tr class="memitem:gab112e3d39af5f983b8efb8f360456443"><td class="memTemplItemLeft" align="right" valign="top">constexpr maybe&lt; A &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#gab112e3d39af5f983b8efb8f360456443">ftl::value</a> (const A &amp;a) noexcept(std::is_nothrow_copy_constructible&lt; A &gt;::value)</td></tr>
-<tr class="memdesc:gab112e3d39af5f983b8efb8f360456443"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function to create maybe:s. <br/></td></tr>
-<tr class="separator:gab112e3d39af5f983b8efb8f360456443"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6e1507bca7f5062f852ca2814d6a5273"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga6e1507bca7f5062f852ca2814d6a5273"></a>
-template&lt;typename A &gt; </td></tr>
-<tr class="memitem:ga6e1507bca7f5062f852ca2814d6a5273"><td class="memTemplItemLeft" align="right" valign="top">constexpr maybe&lt; A &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#ga6e1507bca7f5062f852ca2814d6a5273">ftl::value</a> (A &amp;&amp;a) noexcept(std::is_nothrow_move_constructible&lt; A &gt;::value)</td></tr>
-<tr class="memdesc:ga6e1507bca7f5062f852ca2814d6a5273"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga6e1507bca7f5062f852ca2814d6a5273"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafa1d05640c79d83fa80217f4a1784cd8"><td class="memTemplItemLeft" align="right" valign="top">constexpr maybe&lt; A &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8">ftl::value</a> (A &amp;&amp;a) noexcept(std::is_nothrow_constructible&lt; A, A &gt;::value)</td></tr>
+<tr class="memdesc:gafa1d05640c79d83fa80217f4a1784cd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function to create maybe:s. <br/></td></tr>
+<tr class="separator:gafa1d05640c79d83fa80217f4a1784cd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4d7d3fd5c54a47c7ea162e52c9cf1ff2"><td class="memTemplParams" colspan="2">template&lt;typename A &gt; </td></tr>
 <tr class="memitem:ga4d7d3fd5c54a47c7ea162e52c9cf1ff2"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#ga4d7d3fd5c54a47c7ea162e52c9cf1ff2">ftl::operator==</a> (const maybe&lt; A &gt; &amp;m1, const maybe&lt; A &gt; &amp;m2)</td></tr>
 <tr class="memdesc:ga4d7d3fd5c54a47c7ea162e52c9cf1ff2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality comparison for maybe.  <a href="#ga4d7d3fd5c54a47c7ea162e52c9cf1ff2">More...</a><br/></td></tr>
@@ -134,7 +135,8 @@ template&lt;typename A &gt; </td></tr>
 <li>&lt;stdexcept&gt;</li>
 <li>&lt;type_traits&gt;</li>
 <li><a class="el" href="group__monoid.html">Monoid</a></li>
-<li><a class="el" href="group__monad.html">Monad</a> </li>
+<li><a class="el" href="group__monad.html">Monad</a></li>
+<li><a class="el" href="group__foldable.html">Foldable</a> </li>
 </ul>
 </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
@@ -265,7 +267,7 @@ template&lt;typename A &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 14 2013 19:01:39 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>
