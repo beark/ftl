@@ -56,9 +56,9 @@ namespace ftl {
 	 * Curries an n-ary function pointer.
 	 *
 	 * Currying is the process of turning a function of e.g. `(a,b) -> c` into
-	 * `a -> b -> c`. In other words, instead of taking two arguments and
+	 * `(a) -> ((b) -> c)`. In other words, instead of taking two arguments and
 	 * returning the answer, the curried function takes one argument and
-	 * returns a function that takes another one and \em then returns the
+	 * returns a function that takes another one and _then_ returns the
 	 * answer.
 	 *
 	 * \note This operation is actually exactly equivalent of wrapping the

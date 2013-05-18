@@ -28,13 +28,9 @@
 namespace ftl {
 
 	/**
-	 * \defgroup monad Monad
+	 * \page monadpg Monad
 	 *
 	 * Abstraction of sequenceable computations in some context.
-	 *
-	 * \code
-	 *   #include <ftl/monad.h>
-	 * \endcode
 	 *
 	 * Monads are essentially just a functor with some additional structure.
 	 * Specifically, types that are monads have the added functionality (on top
@@ -66,6 +62,18 @@ namespace ftl {
 	 *   \code
 	 *     (m >>= f) >>= g) <=> m >>= ([f](X x){return f(x);} >>= g)
 	 *   \endcode
+	 *
+	 * \see \ref monad (module)
+	 */
+
+	/**
+	 * \defgroup monad Monad
+	 *
+	 * \ref monadpg concept and related functions.
+	 *
+	 * \code
+	 *   #include <ftl/monad.h>
+	 * \endcode
 	 *
 	 * \par Dependencies
 	 * - \ref applicative

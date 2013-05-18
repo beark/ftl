@@ -31,13 +31,9 @@ namespace ftl {
 	struct monad;
 
 	/**
-	 * \defgroup applicative Applicative Functor
+	 * \page applicativepg Applicative Functor
 	 *
 	 * One step above a functor and one step below a monad.
-	 *
-	 * \code
-	 *   #include <ftl/applicative.h>
-	 * \endcode
 	 *
 	 * What this means is that it has slightly more structure than a plain
 	 * functor, but less than a monad.  Specifically, what applicative adds on
@@ -51,13 +47,6 @@ namespace ftl {
 	 *
 	 * Finally, an applicative instance must satisfy the following laws:
 	 * - **Identity law**
-	 *
-	 *   given
-	 *   \code
-	 *     template<typename T>
-	 *     T id(T t) { return t; }
-	 *   \endcode
-	 *   then,
 	 *   \code
 	 *     pure(id<T>) * v   <=> v
 	 *   \endcode
@@ -66,6 +55,18 @@ namespace ftl {
 	 *   \code
 	 *     pure(f) * pure(x) <=> pure(f(x))
 	 *   \endcode
+	 *
+	 * \see \ref applicative (module)
+	 */
+
+	/**
+	 * \defgroup applicative Applicative Functor
+	 *
+	 * \brief \ref applicativepg and \ref monoidapg concepts and utilities.
+	 *
+	 * \code
+	 *   #include <ftl/applicative.h>
+	 * \endcode
 	 *
 	 * \par Dependencies
 	 * - \ref functor
@@ -295,12 +296,22 @@ namespace ftl {
 	}
 
 	/**
-	 * Concrete interface of monoidA.
+	 * \page monoidapg Monoidal Alternatives
+	 *
+	 * A monoid where the monoidal operation signifies "choice" somehow.
 	 *
 	 * This concept abstracts applicative functors that in some manner
 	 * encompass the notion of "failure" and are also monoids under some
 	 * binary operation that can result in such a failure state. In monoid
 	 * terms, the failure state is the same as the identity element.
+	 *
+	 * \see \ref applicative (module)
+	 */
+
+	/**
+	 * \interface monoidA
+	 *
+	 * Concrete interface of monoidal alternatives concept.
 	 *
 	 * \tparam F must be an \ref applicative.
 	 *

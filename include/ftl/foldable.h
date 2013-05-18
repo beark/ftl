@@ -28,9 +28,23 @@
 
 namespace ftl {
 	/**
-	 * \defgroup foldable Foldable
+	 * \page foldablepg Foldable
 	 *
 	 * Abstraction of data structures that can be folded to some summary value.
+	 *
+	 * Despite what one may be lead to believe, this concept does not quite
+	 * correspond to the mathematical notion of a catamorphism. Unlike a _true_
+	 * catamorphism, the `Foldable` concept can only traverse structures
+	 * "linearly". I.e., it is impossible to use a fold to build an isomorphic
+	 * representation of a tree.
+	 *
+	 * \see \ref foldable (module)
+	 */
+
+	/**
+	 * \defgroup foldable Foldable
+	 *
+	 * Interface and utilities relating to the \ref foldablepg concept.
 	 *
 	 * \code
 	 *   #include <ftl/foldable.h>

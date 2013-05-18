@@ -32,13 +32,9 @@ namespace ftl {
 	struct applicative;
 
 	/**
-	 * \defgroup functor Functor
+	 * \page functorpg Functor
 	 *
-	 * \brief Abstraction of data types that can be "mapped to".
-	 *
-	 * \code
-	 *   #include <ftl/functor.h>
-	 * \endcode
+	 * Abstraction of contexts that can be mapped to.
 	 *
 	 * Mathematically, functors are mappings from one category to another,
 	 * following a set of well defined laws. What this means in FTL is that
@@ -51,18 +47,28 @@ namespace ftl {
 	 * that context. The most obvious way of doing so would be to apply the
 	 * mapped function to every element in the vector.
 	 *
-	 * All instances of Functor should follow the following laws (which are part
+	 * All instances of Functor should follow the laws below (which are part
 	 * of the mathematical definition from which this concept is derived):
-	 * - given
-	 *   \code
-	 *     template<typename T>
-	 *     T id(T t) { return t; }
-	 *   \endcode
-	 *   then,
+	 * - **Preservation of identity**
 	 *   \code
 	 *     map(id<T>, t)          <=> t
+	 *   \endcode
+	 * - **Preservatin of composition**
+	 *   \code
 	 *     map(compose(f, g), t)  <=> compose(curry(map)(f), curry(map)(g))(t)
 	 *   \endcode
+	 *
+	 * \see \ref functor (module)
+	 */
+
+	/**
+	 * \defgroup functor Functor
+	 *
+	 * Module containg the \ref functorpg concept and related functions.
+	 *
+	 * \code
+	 *   #include <ftl/functor.h>
+	 * \endcode
 	 *
 	 * \par Dependencies
 	 * - \ref typelevel

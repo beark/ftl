@@ -58,6 +58,7 @@ namespace ftl {
 	 *
 	 * Less concrete concepts that are nevertheless referenced in FTL.
 	 *
+	 * \subpage applicativepg
 	 * \subpage assignable
 	 * \subpage container
 	 * \subpage copyassignable
@@ -65,10 +66,16 @@ namespace ftl {
 	 * \subpage defcons
 	 * \subpage deref
 	 * \subpage eq
+	 * \subpage foldablepg
 	 * \subpage fullycons
 	 * \subpage fn
+	 * \subpage functorpg
+	 * \subpage monadpg
+	 * \subpage monoidpg
+	 * \subpage monoidapg
 	 * \subpage moveassignable
 	 * \subpage movecons
+	 * \subpage orderablepg
 	 */
 
 	/**

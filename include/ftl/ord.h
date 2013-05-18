@@ -27,9 +27,21 @@
 
 namespace ftl {
 	/**
+	 * \page orderablepg Orderable
+	 *
+	 * Anything that can be ordered in some strict sense.
+	 *
+	 * In essence, any type that defines the operators `<`, `==`, and `>`.
+	 * Technically, the Orderable concept also requires \ref eq, but there is
+	 * nothing in FTL that enforces this.
+	 *
+	 * \see \ref ord (module)
+	 */
+
+	/**
 	 * \defgroup ord Ord
 	 *
-	 * Orderable concept, Ord data type, concept instances, and related.
+	 * \ref orderablepg concept, `ord` data type, concept instances, and related.
 	 *
 	 * \code
 	 *   #include <ftl/ord.h>
@@ -145,7 +157,7 @@ namespace ftl {
 	/**
 	 * \interface orderable
 	 *
-	 * Concrete definition of orderable concept.
+	 * Concrete definition of \ref orderablepg concept.
 	 *
 	 * In essence, instances of Orderable can be ordered in some strict sense.
 	 *

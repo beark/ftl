@@ -26,14 +26,11 @@
 #include <type_traits>
 
 namespace ftl {
+
 	/**
-	 * \defgroup monoid Monoid
+	 * \page monoidpg Monoid
 	 *
 	 * Concept encapsulating the mathematical construct of the same name.
-	 *
-	 * \code
-	 *   #include <ftl/monoid.h>
-	 * \endcode
 	 *
 	 * Mathematically, a monoid is any set \c S, for which there is an
 	 * associated binary operation, •, and where there exists
@@ -55,6 +52,18 @@ namespace ftl {
 	 * Note, however, that in FTL, the binary monoid operation is denoted either
 	 * by `monoid<instance>::append` or by `ftl::operator^`. This is due to the
 	 * limited selection of overloadable operators in C++.
+	 *
+	 * \see \ref monoid (module)
+	 */
+
+	/**
+	 * \defgroup monoid Monoid
+	 *
+	 * Functions and interfaces relating to the \ref monoidpg concept.
+	 *
+	 * \code
+	 *   #include <ftl/monoid.h>
+	 * \endcode
 	 *
 	 * \par Dependencies
 	 * - <type_traits>
