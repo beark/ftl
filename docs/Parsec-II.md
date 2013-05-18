@@ -224,34 +224,49 @@ parser<std::string> many(parser<char> p) {
 }
 ```
 
-### operator||
-One final combinator: OR-ing two parsers together.
+### operator|
+One final combinator: OR-ing two parsers together. As you may know, this combinator is not actually a stand-alone one, it's part of the monoidal alternative concept&mdash;or `monoidA`. Implementing it is similar to implementing `monad`, except quite a bit easier.
 
 ```cpp
-template<typename T>
-parser<T> operator|| (parser<T> p1, parser<T> p2) {
-    return parser<T>{[p1,p2](std::istream& strm) {
-        // Attempt to run p1
-        auto r = p1.run(strm);
-        if(r) {
-            // Success, short-circuit and yield value!
-            return r;
-        }
-        else {
-            // Ok, p1 failed, so try p2
-            auto r2 = p2.run(strm);
-            if(r2) {
-                return r2;
+template<>
+struct monoidA<parser> {
+    /// Generic fail parser; always fails, never consume input
+    template<typename T>
+    static parser<T> fail() {
+        return parser<T>{
+            [](std::istream&) {
+                return fail<T>("Unknown parse error.");
             }
+        };
+    }
+
+    template<typename T>
+    static parser<T> orDo(parser<T> p1, parser<T> p2) {
+        return parser<T>{[p1,p2](std::istream& is) {
+            // Attempt to run p1
+            auto r = p1.run(is);
+            if(r) // Success, short-circuit and yield value!
+                return r;
+
             else {
-                // Both failed, tell the world what we expected
-                std::ostringstream oss;
-                oss << r.right().message() << " or " << r2.right().message();
-                return ftl::make_right<T>(error(oss.str()));
+                // Ok, p1 failed, so try p2
+                auto r2 = p2.run(is);
+                if(r2)
+                    return r2;
+
+                else {
+                    // Both failed, tell the world what we expected
+                    std::ostringstream oss;
+                    oss << r.right().message()
+                        << " or " << r2.right().message();
+                    return ::fail<T>(oss.str());
+                }
             }
-        }
-    }};
-}
+        }};
+    }
+
+    static constexpr bool instance = true;
+};
 ```
 
 4 - Final Words
