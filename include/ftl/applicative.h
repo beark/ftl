@@ -33,7 +33,7 @@ namespace ftl {
 	/**
 	 * \defgroup applicative Applicative Functor
 	 *
-	 * \breif One step above a functor and one step below a monad.
+	 * One step above a functor and one step below a monad.
 	 *
 	 * \code
 	 *   #include <ftl/applicative.h>
@@ -47,7 +47,7 @@ namespace ftl {
 	 * functor.
 	 *
 	 * All Applicative Functors are also Functors. There is no need to define
-	 * an instance for both concepts.
+	 * an instance for Functor if there is one for Applicative.
 	 *
 	 * Finally, an applicative instance must satisfy the following laws:
 	 * - **Identity law**
@@ -294,6 +294,119 @@ namespace ftl {
 		return applicative<F>::apply(std::move(u), std::move(v));
 	}
 
+	/**
+	 * Concrete interface of monoidA.
+	 *
+	 * This concept abstracts applicative functors that in some manner
+	 * encompass the notion of "failure" and are also monoids under some
+	 * binary operation that can result in such a failure state. In monoid
+	 * terms, the failure state is the same as the identity element.
+	 *
+	 * \note Due to the constraint on `F` that it is already an applicative
+	 *       functor, the monoid operation may be _effectful_, unlike in the
+	 *       \ref monoid concept.
+	 *
+	 * \ingroup applicative
+	 */
+	template<
+			template<typename...> class F,
+			typename = typename std::enable_if<applicative<F>::instance>::type>
+	struct monoidA {
+		/**
+		 * Get an instance of the failure state.
+		 */
+		template<typename...Ts>
+		static F<Ts...> fail();
+
+		/**
+		 * Sequence two applicative computations that can fail.
+		 *
+		 * The implementation of `orDo` should short-circuit if possible. I.e.,
+		 * if it makes sense in the context of `F`, then if computing `f1`
+		 * results in "success", f2 should not also be computed.
+		 */
+		template<typename...Ts>
+		static F<Ts...> orDo(const F<Ts...>& f1, const F<Ts...>& f2);
+
+		static constexpr bool instance = false;
+	};
+
+	/**
+	 * Convenience operator for monoidA::orDo
+	 *
+	 * \ingroup applicative
+	 */
+	template<
+			template<typename...> class F,
+			typename = typename std::enable_if<monoidA<F>::instance>::type,
+			typename...Ts>
+	F<Ts...> operator| (const F<Ts...>& f1, const F<Ts...>& f2) {
+		return monoidA<F>::orDo(f1, f2);
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup applicative
+	 */
+	template<
+			template<typename...> class F,
+			typename = typename std::enable_if<monoidA<F>::instance>::type,
+			typename...Ts>
+	F<Ts...> operator| (F<Ts...>&& f1, const F<Ts...>& f2) {
+		return monoidA<F>::orDo(std::move(f1), f2);
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup applicative
+	 */
+	template<
+			template<typename...> class F,
+			typename = typename std::enable_if<monoidA<F>::instance>::type,
+			typename...Ts>
+	F<Ts...> operator| (const F<Ts...>& f1, F<Ts...>&& f2) {
+		return monoidA<F>::op(f1, std::move(f2));
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup applicative
+	 */
+	template<
+			template<typename...> class F,
+			typename = typename std::enable_if<monoidA<F>::instance>::type,
+			typename...Ts>
+	F<Ts...> operator| (F<Ts...>&& f1, F<Ts...>&& f2) {
+		return monoidA<F>::op(std::move(f1), std::move(f2));
+	}
+
+	// Forward declarations
+	template<typename T>
+	class maybe;
+
+	template<typename A>
+	constexpr maybe<A> value(A&& a)
+	noexcept(std::is_nothrow_constructible<A,A>::value);
+
+	/**
+	 * An optional computation.
+	 *
+	 * If `f` fails, the `optional` computation as a whole "succeeds" but yields
+	 * `nothing`, whereas it otherwise yields `value(x)` where `x` is the
+	 * computed result of `f`.
+	 *
+	 * \tparam F must be an instance of ftl::monoidA
+	 */
+	template<
+			template<typename> class F,
+			typename A,
+			typename = typename std::enable_if<monoidA<F>::instance>::type>
+	F<maybe<A>> optional(const F<A>& f) {
+		return value<A> % f | applicative<F>::pure(maybe<A>{});
+	}
 }
 
 #endif
