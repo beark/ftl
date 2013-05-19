@@ -42,6 +42,10 @@ namespace ftl {
 	 * main reason for this is because the template parameter signature of
 	 * std::list is not compatible with some of the concepts FTL defines.
 	 *
+	 * This module adds the following concept instances to std::list:
+	 * - \ref monoid
+	 * - \ref foldable
+	 *
 	 * \par Dependencies
 	 * - <list>
 	 * - \ref foldable
@@ -56,7 +60,8 @@ namespace ftl {
 	 *
 	 * \par Concepts
 	 * As an ordinary std::list, with the additions:
-	 * - \ref monoid
+	 * - \ref functor
+	 * - \ref applicative
 	 * - \ref monad
 	 *
 	 * \ingroup list
@@ -180,16 +185,13 @@ namespace ftl {
 		 * Produces a singleton list.
 		 *
 		 * That is, pure generates a one element list, where that single element
-		 * is a.
+		 * is `a`.
 		 */
 		template<typename A>
-		static list<A> pure(const A& a) {
-			return list<A>{a};
-		}
-
-		template<typename A, typename Alloc>
 		static list<A> pure(A&& a) {
-			return list<A>{std::move(a)};
+			list<A> l{};
+			l.emplace_back(std::forward<A>(a));
+			return l;
 		}
 
 		/**
@@ -262,8 +264,8 @@ namespace ftl {
 					std::is_same<
 						A,
 						typename decayed_result<Fn(B,A)>::type
-						>::value
-					>::type,
+					>::value
+				>::type,
 				typename...Ts>
 		static A foldl(Fn&& fn, A z, const std::list<B,Ts...>& l) {
 			for(auto& e : l) {
@@ -281,8 +283,8 @@ namespace ftl {
 					std::is_same<
 						B,
 						typename decayed_result<Fn(A,B)>::type
-						>::value
-					>::type,
+					>::value
+				>::type,
 				typename...Ts>
 		static B foldr(Fn&& fn, B z, const std::list<A,Ts...>& l) {
 			for(auto it = l.rbegin(); it != l.rend(); ++it) {
