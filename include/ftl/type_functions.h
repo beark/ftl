@@ -186,6 +186,15 @@ namespace ftl {
 	 * This is really only a composition of std::decay and std::result_of,
 	 * provided for convenience.
 	 *
+	 * Example:
+	 * \code
+	 *   template<typename F>
+	 *   void foo() {
+	 *       // t will be the decayed type of whatever F returns when called
+	 *       // with an int
+	 *       typename decayed_result<F(int)>::type t;
+	 *   }
+	 *
 	 * \ingroup typelevel
 	 */
 	template<typename>
@@ -198,7 +207,7 @@ namespace ftl {
 	};
 
 	/**
-	 * Meta type used to store a type sequence.
+	 * Meta type used to store a variadic type sequence.
 	 *
 	 * \ingroup typelevel
 	 */
@@ -206,7 +215,16 @@ namespace ftl {
 	struct type_seq {};
 
 	/**
-	 * Concatenates two variadic lists together.
+	 * Concatenates two type_seqs.
+	 *
+	 * Example:
+	 * \code
+	 *   // ts has type type_seq<char,int,bool,float>
+	 *   typename concat_type_seqs<
+	 *       type_seq<char,int>,
+	 *       type_seq<bool,float>
+	 *   >::type ts;
+	 * \endcode
 	 *
 	 * \ingroup typelevel
 	 */
@@ -220,6 +238,12 @@ namespace ftl {
 
 	/**
 	 * Repeat a type N times.
+	 *
+	 * Example:
+	 * \code
+	 *   // ts will be of type type_seq<int,int,int>
+	 *   typename repeat<int,3>::type ts;
+	 * \endcode
 	 *
 	 * \ingroup typelevel
 	 */
@@ -240,6 +264,12 @@ namespace ftl {
 
 	/**
 	 * Get the Nth type in a type sequence.
+	 *
+	 * Example:
+	 * \code
+	 *   // t will be of type float
+	 *   typename get_nth<1,bool,float,int>::type t;
+	 * \endcode
 	 *
 	 * \ingroup typelevel
 	 */
@@ -262,6 +292,12 @@ namespace ftl {
 	/**
 	 * Get the final element in a type sequence
 	 *
+	 * Example:
+	 * \code
+	 *   // t will be of type float
+	 *   typename get_last<bool,int,float>::type t;
+	 * \endcode
+	 *
 	 * \ingroup typelevel
 	 */
 	template<typename T, typename...Ts>
@@ -269,6 +305,12 @@ namespace ftl {
 
 	/**
 	 * Get the first N elements in a type sequence
+	 *
+	 * Example:
+	 * \code
+	 *   // ts will be of type type_seq<char,bool>
+	 *   typename take_types<2,char,bool,int,float>::type ts;
+	 * \endcode
 	 *
 	 * \ingroup typelevel
 	 */
@@ -283,7 +325,12 @@ namespace ftl {
 	};
 
 	/**
-	 * Take all elements except the last
+	 * Take all elements except the last one.
+	 *
+	 * Example:
+	 * \code
+	 *   // ts will be of type type_seq<char,bool>
+	 *   typename take_init<char,bool,int>::type ts;
 	 *
 	 * \ingroup typelevel
 	 */
@@ -305,7 +352,16 @@ namespace ftl {
 	/**
 	 * Drops a number of types from a type sequence.
 	 *
+	 * The types are dropped in left-to-right order.
+	 *
 	 * \tparam N The number of types to drop
+	 * \tparam Ts The sequence ot drop from
+	 *
+	 * Example:
+	 * \code
+	 *   // ts will be of type type_seq<char,double>
+	 *   typename drop_types<2,int,float,char,double>::type ts;
+	 * \endcode
 	 *
 	 * \ingroup typelevel
 	 */
@@ -337,7 +393,7 @@ namespace ftl {
 	};
 
 	/**
-	 * A number sequence
+	 * A number sequence.
 	 *
 	 * \ingroup typelevel
 	 */
@@ -349,12 +405,52 @@ namespace ftl {
 	 * \tparam Z The first number in the sequence.
 	 * \tparam N The final number in the sequence.
 	 *
+	 * Example:
+	 * \code
+	 *   // S is of type seq<0,1,2,3,4,5>
+	 *   typename gen_seq<0,5>::type S;
+	 * \endcode
+	 *
 	 * \ingroup typelevel
 	 */
 	template<size_t Z, size_t N, size_t...S> struct gen_seq : gen_seq<Z,N-1,N,S...> {};
 
 	template<size_t Z, size_t...S> struct gen_seq<Z,Z,S...> {
 		using type = seq<Z,S...>;
+	};
+
+	/**
+	 * Find the first contained type of some parametrised type.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   void foo(const T& t) {
+	 *       typename inner_type<T>::type x = ...;
+	 *   }
+	 *
+	 *   void bar() {
+	 *       // x in foo will be an int in this invocation
+	 *       foo(std::vector<int>{});
+	 *   }
+	 * \endcode
+	 *
+	 * \ingroup typelevel
+	 */
+	template<typename...>
+	struct inner_type;
+
+	template<template<typename> class Tt, typename T>
+	struct inner_type<Tt<T>> {
+		using type = T;
+	};
+
+	template<
+			template<typename,typename...> class Tt,
+			typename T,
+			typename...Ts>
+	struct inner_type<Tt<T,Ts...>> {
+		using type = T;
 	};
 }
 
