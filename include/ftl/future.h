@@ -44,18 +44,6 @@ namespace ftl {
 	 * - \ref monoid
 	 */
 
-	// Some silly implementation details
-	// TODO: maybe generalise this and move into type_functions?
-	namespace _dtl {
-		template<typename>
-		struct inner_type;
-
-		template<typename T>
-		struct inner_type<std::future<T>> {
-			using type = T;
-		};
-	}
-
 	/**
 	 * Monad instance for std::future.
 	 *
@@ -113,7 +101,7 @@ namespace ftl {
 		template<
 			typename F,
 			typename A,
-			typename B = typename _dtl::inner_type<
+			typename B = typename inner_type<
 				typename std::result_of<F(A)>::type>::type>
 		static std::future<B> bind(std::future<A>&& fa, F&& f) {
 			return std::async(
