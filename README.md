@@ -31,36 +31,45 @@ Showcases
 ---------
 A couple of quick showcases of some rather neat things the FTL gives you.
 
-### Calculating futures
-Let's say you have a couple of asynchronous function calls you want to make, and whose results you want to use in an algorithm of some kind. Normally, this might look something like
-```cpp
-// Assume these are declared somewhere and do something useful
-std::future<int> eventuallyInt();
-std::future<float> eventuallyFloat();
-std::future<object> eventuallyObject();
+### Expanding The Standard Library
+One of the nice things about FTL is that it does not try to replace or supercede the standard library, it tries to _expand_ it when possible. These expansions include giving existing types concept instances for e.g. [Monad](Monad.md), [Monoid](Monoid.md), and others. For example, in FTL, `std::shared_ptr` is a monad. This means we can sequence a series of operations working on shared pointers without ever having to explicitly check for validity&mdash;while still being assured there are no attempts to access an invalid pointer.
 
-// Then here's where we use those computations
-result_type result = computeAlotOfStuff(
-                         eventuallyInt().get(),
-                         eventuallyFloat().get(),
-                         eventuallyObject().get());
-```
-Not too bad, really. But what if one of the _eventually_ computations takes a long while to complete? Well, we have to wait for it to complete, obviously. But what if we're not even sure we need the result _right now_? What if we simply want another `future` instead, so that all the inputs have a chance to complete while we do other stuff, and so that we are only forced to wait when we really do _need_ `result`?
+For example, given
+    shared_ptr<a> foo();
+    shared_ptr<b> bar(a);
 
-Well, we could always rewrite `computeAlotOfStuff` to take futures as input and spit out a new future as result.
-But that takes effort, and `computeAlotOfStuff` might be a library function too, and thus impossible to rewrite.
+We can simply write
+    shared_ptr<b> ptr = foo() >>= bar;
 
-Right, so let's wrap it in an `async` call, then. We can do that regardless of who defined it and where.
-Sure, but it still takes effort and adds cruft to our code. Let's just use future's [applicative](docs/Applicative.md) instance instead.
-```cpp
-auto result = curry(computeAlotOfStuff) %
-                  eventuallyInt() * eventuallyFloat() * eventuallyObject();
-```
-This might look a bit strange, but once you've learnt applicative style programming, this is actually just as clear as the plain, original function call that `get`ed on the futures. Except, this is even slightly cleaner (less noise with all the `get`s and some parens gone). It helps a bit to read this if you ignore `curry` for now (or, you can read about it [here](http://en.wikipedia.org/wiki/Currying)), and then view `operator%` as an opening parenthesis, `operator*` as comma, and then insert a closing parenthesis at the end of the expression. I.e., like this:
-```cpp
-computeAlotOfStuff(eventuallyInt(), eventuallyFloat(), eventuallyObject());
-```
-This is not really what happens of course, but conceptually it should make it easier to understand what's going on in applicative code.
+Instead of
+    shared_ptr<b> ptr(nullptr);
+    auto ptra = foo();
+    if(ptra) {
+        ptr = bar(*ptra);
+    }
 
-Anyway, the _really_ neat thing about this is that FTL doesn't actually particularly concern itself with asynchronous programming. What we mean is, you might expect a library that is _about_ asynchronous or lazy computations to give you such nice and concise ways of composing asynchronous computations, but in FTL, it is merely one _minor side effect_ of what it actually does: provides C++ with the same, incredibly powerful abstractions as Haskellers have been using for years.
+Which would be the equivalent FTL-less version of the above.
+
+Monadic code may perhaps often look strange if you're not used to all the operators, but once you've got that, reading it becomes amazingly easy and clear. `operator>>=` above is used to sequence two monadic computations, where the second is dependant on the result of the first. Exactly what it does varies with monad instance, but in the case of `shared_ptr`, it essentially performs `nullptr` checks and either aborts the expression (returning a `nullptr` initialised `shared_ptr`), or simply passes the valid result forward.
+
+Other types that have been similarly endowed with new powers include: `std::future`, `std::list`, `std::vector`, and `std::forward_list`.
+
+### Applying Applicatives
+Adding a bit of [Applicative](Applicative.md) to the mix, we can do some quite concise calculations. Now, if we are given:
+    int algorithm(int, int, int);
+    shared_ptr<int> getSomeShared();
+    shared_ptr<int> getOtherShared();
+    shared_ptr<int> getFinalShared();
+
+Then we can compute:
+    auto result = curry(algorithm) % getSomeShared() * getOtherShared() * getFinalShared();
+
+And of course the equivalent plain version:
+    std::shared_ptr<int> result;
+    auto x = getSomeShared(), y = getOtherShared(), z = getFinalShared();
+    if(x && y && z) {
+        result = make_shared(algorithm(*x, *y, *z));
+    }
+
+If `algorithm` had happened to already be wrapped in an `ftl::function`, then the FTL-version would have been even shorter, because the `curry` call could have been elided. `ftl::function` supports both conventional calls and curried calls out of the box. That is, if `f` is an `ftl::function<int,int,int,int>`, it could be called in any of the following ways `f(1,2,3)`, `f(1)(2,3)`, `f(1)(2)(3)`.
 
