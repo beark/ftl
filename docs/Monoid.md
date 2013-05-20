@@ -48,7 +48,7 @@ FTL instances
 The following primitive and standard types have predefined monoid instances in FTL:
 * All primitive integer and floating point types, using either of the two thin wrappers `ftl::sum_monoid<T>` and `ftl::prod_monoid<T>`. The former makes the inner type a monoid by using _0_ as the identity element and _+_ as the associated operation, while the latter uses _1_ and _*_.
 * For booleans there are also two thin wrappers: `ftl::any` and `ftl::all`. These are defined as using _false_ combined with _||_, and _true_ combined with _&&_, respectively.
-* `std::vector<T>` and, isomorphically, `std::list<T>` are both monoids for any _T_. Identity is the empty container, while concatenation is the monoid operation.
+* `std::vector<T>` and, isomorphically, `std::list<T>` and `std::forward_list<T>` are all monoids for any _T_. Identity is the empty container, while concatenation is the monoid operation.
 * For all monoids _M_, ```std::shared_ptr<M>``` is also a monoid, by using an empty pointer as the identity and the following as monoid operation:
   ```
   a • b <=>

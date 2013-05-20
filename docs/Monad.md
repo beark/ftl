@@ -76,7 +76,7 @@ The following standard library types are instances of Monad:
 * `std::future<T>`
 
 Further, the following FTL-native types implement this concept:
-* The type aliases `ftl::list<T>` and `ftl::vector<T>`.
+* The type aliases `ftl::list<T>`, `ftl::vector<T>`, and `ftl::forward_list<T>`
 * `maybe<T>`
 * `either<L,_>`
 

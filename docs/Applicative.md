@@ -59,7 +59,7 @@ The following standard library types have applicative instances defined:
 * `std::future<T>`, basically by waiting for all composed futures to complete before applications.
 
 In addition, the following FTL data structures are applicative functors:
-* The type aliases `ftl::vector<T>` and `ftl::list<T>`.
+* The type aliases `ftl::vector<T>`, `ftl::forward_list<T>`, and `ftl::list<T>`.
 * `maybe<T>`, in a manner isomorphic to `std::shared_ptr<T>`
 * `either<L,R>` on L (details to follow)
 * `function<R,Ps...>` on R (details to follow)

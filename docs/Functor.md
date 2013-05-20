@@ -50,7 +50,7 @@ The following standard library types have been given functor implementations in 
 * `std::future<T>` can map a function to a future value, yielding a future that when `get`ed applies the function after waiting for the original future.
 
 In addition, the following FTL data types are functors:
-* The type aliases `ftl::vector<T>` and, isomorphically, `ftl::list<T>`. For containers, mapping a function has the effect of applying it once to each element in the container, and then collecting all the results and returning them in a new container.
+* The type aliases `ftl::vector<T>` and, isomorphically, `ftl::list<T>` and `ftl::forward_list<T>`. For containers, mapping a function has the effect of applying it once to each element in the container, and then collecting all the results and returning them in a new container.
 * `maybe<T>`, in a way isomorphic to `std::shared_ptr<T>`.
 * `either<L,R>` is a functor on _L_, similar to how `std::tuple<T,Ts...>` is a functor on _T_.
 * `function<R,Ps...>` is a functor on _R_. Mapping a function to this type is exactly equivalent to composing the two functions.

@@ -92,11 +92,13 @@ FTL instances
 -------------
 The following standard types are instances of Foldable:
 * `std::list`
+* `std::forward_list`
 * `std::vector`
 * `std::shared_ptr`
 
 The following FTL-defined types are also instances of Foldable:
 * `ftl::list`
+* `ftl::forward_list`
 * `ftl::vector`
 * `ftl::maybe`
 
