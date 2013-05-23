@@ -130,12 +130,7 @@ namespace ftl {
 		static parser<B> map(F f, parser<A> p) {
 			return parser<B>([f,p](std::istream& s) {
 				auto r = p.run(s);
-				if(r) {
-					return yield(f(*r));
-				}
-				else {
-					return fail<B>(r.right().message());
-				}
+				return f % r;
 			});
 		}
 
