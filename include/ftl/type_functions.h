@@ -23,6 +23,9 @@
 #ifndef FTL_TYPELEVEL_H
 #define FTL_TYPELEVEL_H
 
+#include <type_traits>
+#include <cstddef>
+
 namespace ftl {
 	/**
 	 * \mainpage
@@ -177,7 +180,8 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * None.
+	 * - <type_traits>
+	 * - <cstddef>
 	 */
 
 	/**
@@ -452,6 +456,38 @@ namespace ftl {
 	struct inner_type<Tt<T,Ts...>> {
 		using type = T;
 	};
+
+	/**
+	 * Changes the inner type of some template type.
+	 *
+	 * Example
+	 * \code
+	 *   template<typename V>
+	 *   typename re_parametrise<V,int>::type foo(const V& v) {
+	 *       return ... // Somehow convert v to the promised type
+	 *   }
+	 *
+	 *   void bar() {
+	 *       std::vector<int> v = foo(std::vector<float>{});
+	 *   }
+	 *
+	 * \endcode
+	 */
+	template<typename, typename>
+	struct re_parametrise;
+
+	template<template<typename> class Tt, typename T, typename U>
+	struct re_parametrise<Tt<T>,U> {
+		using type = Tt<U>;
+	};
+
+	template<
+			template<typename...> class Tt,
+			typename T, typename U, typename...Ts>
+	struct re_parametrise<Tt<T,Ts...>,U> {
+		using type = Tt<U,Ts...>;
+	};
+
 }
 
 #endif
