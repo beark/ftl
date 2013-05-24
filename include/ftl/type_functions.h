@@ -458,6 +458,39 @@ namespace ftl {
 	};
 
 	/**
+	 * Traits for various parametric types.
+	 *
+	 * In most cases, the default should suffice, but it is possible to
+	 * specialise if required.
+	 *
+	 * \ingroup typelevel
+	 */
+	template<typename T>
+	struct parametric_type_traits {
+		/**
+		 * Gets the type parameter of `T` on which most concepts are built.
+		 *
+		 * Many of the concepts in FTL are parametric in one type, e.g.
+		 * ftl::functor<ftl::maybe<U>> is parametrised by `U`. This type level
+		 * function should return that type.
+		 *
+		 * The only time this trait needs to be specialised is when the type
+		 * parameter `T` uses in concepts is _not_ the left-most in `T`'s
+		 * parameter list.
+		 */
+		using concept_parameter = typename inner_type<T>::type;
+	};
+
+	/**
+	 * Convenient way of getting the primary concept type of a parametric type.
+	 *
+	 * \ingroup typelevel
+	 */
+	template<typename T>
+	using concept_parameter =
+		typename parametric_type_traits<T>::concept_parameter;
+
+	/**
 	 * Changes the inner type of some template type.
 	 *
 	 * Example
@@ -472,6 +505,8 @@ namespace ftl {
 	 *   }
 	 *
 	 * \endcode
+	 *
+	 * \ingroup typelevel
 	 */
 	template<typename, typename>
 	struct re_parametrise;
@@ -483,9 +518,38 @@ namespace ftl {
 
 	template<
 			template<typename...> class Tt,
-			typename T, typename U, typename...Ts>
+			typename T, typename U, typename...Ts
+	>
 	struct re_parametrise<Tt<T,Ts...>,U> {
 		using type = Tt<U,Ts...>;
+	};
+
+	/**
+	 * Check if two parametric types are the same base.
+	 *
+	 * Example:
+	 * \code
+	 *   std::cout << std::boolalpha;
+	 *   std::cout << is_same_template<maybe<int>,maybe<float>>::value << std::endl;
+	 *   std::cout << is_same_template<maybe<int>,std::vector<int>>::value << std::endl;
+	 *   // The above outputs:
+	 *   // true
+	 *   // false
+	 * \endcode
+	 *
+	 * \ingroup typelevel
+	 */
+	template<typename T, typename U>
+	struct is_same_template;
+
+	template<
+			template<typename...> class T,
+	   		template<typename...> class U,
+			typename...Ts,
+			typename...Us
+	>
+	struct is_same_template<T<Ts...>,U<Us...>> {
+		static constexpr bool value = std::is_same<T<Ts...>, U<Ts...>>::value;
 	};
 
 }
