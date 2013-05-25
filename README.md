@@ -7,23 +7,8 @@ To use the FTL, you need a compiler that implements at least as much of C++11 as
 
 The full API reference can be found [here](http://libftl.org/api/).
 
-Documentation index
--------------------
-### Concepts
-* [Basic concepts](docs/Concepts.md)
-* [Monoids](docs/Monoid.md)
-* [Functors](docs/Functor.md)
-* [Applicative Functors](docs/Applicative.md)
-* [Monads](docs/Monad.md)
-* [Foldables](docs/Foldable.md)
-
-### Data types
-* [function](docs/Function.md)
-* [either](docs/Either.md)
-* [maybe](docs/Maybe.md)
-* [ord](docs/Ord.md)
-
-### Examples & Tutorials
+Tutorials
+---------
 * [Parser Combinator Part I: Simple Parser](docs/Parsec-I.md)
 * [Parser Combinator Part II: Parser Generator Library](docs/Parsec-II.md)
 
