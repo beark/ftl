@@ -92,7 +92,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Concatenates two variadic lists together.  
+<p>Get the basic, "undecorated" return type of a function.  
  <a href="structftl_1_1concat__type__seqs.html#details">More...</a></p>
 
 <p><code>#include &lt;ftl/type_functions.h&gt;</code></p>
@@ -100,11 +100,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock"><h3>template&lt;typename L, typename R&gt;<br/>
 struct ftl::concat_type_seqs&lt; L, R &gt;</h3>
 
-<p>Concatenates two variadic lists together. </p>
-</div></div><!-- contents -->
+<p>Get the basic, "undecorated" return type of a function. </p>
+<p>This is really only a composition of std::decay and std::result_of, provided for convenience.</p>
+<p>Example: </p>
+<div class="fragment"><div class="line">     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> F&gt;</div>
+<div class="line">     <span class="keywordtype">void</span> foo() {</div>
+<div class="line">         <span class="comment">// t will be the decayed type of whatever F returns when called</span></div>
+<div class="line">         <span class="comment">// with an int</span></div>
+<div class="line">         <span class="keyword">typename</span> decayed_result&lt;F(int)&gt;::type t;</div>
+<div class="line">     }</div>
+<div class="line">  </div>
+<div class="line">   \ingroup typelevel</div>
+<div class="line"> */</div>
+<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
+<div class="line"><span class="keyword">struct </span>decayed_result;</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> F, <span class="keyword">typename</span>...Ps&gt;</div>
+<div class="line"><span class="keyword">struct </span>decayed_result&lt;F(Ps...)&gt; {</div>
+<div class="line">    <span class="keyword">using</span> type = plain_type&lt;<span class="keyword">typename</span> std::result_of&lt;F(Ps...)&gt;::type&gt;;</div>
+<div class="line">};</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>...Ts&gt;</div>
+<div class="line"><span class="keyword">struct </span>type_seq {};</div>
+<div class="line"></div>
+</div><!-- fragment --> </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -94,110 +94,35 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gac3d90b9b20f4255f02d4dddae44db6a3"><td class="memTemplParams" colspan="2">template&lt;typename F , template&lt; typename...&gt; class M, typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gac3d90b9b20f4255f02d4dddae44db6a3"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gac3d90b9b20f4255f02d4dddae44db6a3">ftl::operator&gt;&gt;=</a> (const M&lt; A, Ts...&gt; &amp;m, F &amp;&amp;f) -&gt; decltype(monad&lt; M &gt;::bind(m, std::forward&lt; F &gt;(f)))</td></tr>
-<tr class="memdesc:gac3d90b9b20f4255f02d4dddae44db6a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1monad.html#a2eec9ab7658da121ccca6f2c6576695a" title="Bind a value and execute a computation in M on it.">monad::bind</a>.  <a href="#gac3d90b9b20f4255f02d4dddae44db6a3">More...</a><br/></td></tr>
-<tr class="separator:gac3d90b9b20f4255f02d4dddae44db6a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga654bc887d2b03fd0bf87f25bf39088b2"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga654bc887d2b03fd0bf87f25bf39088b2"></a>
-template&lt;typename F , template&lt; typename &gt; class M, typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:ga654bc887d2b03fd0bf87f25bf39088b2"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga654bc887d2b03fd0bf87f25bf39088b2">ftl::operator&gt;&gt;=</a> (const M&lt; A &gt; &amp;m, F &amp;&amp;f) -&gt; decltype(monad&lt; M &gt;::bind(m, std::forward&lt; F &gt;(f)))</td></tr>
-<tr class="memdesc:ga654bc887d2b03fd0bf87f25bf39088b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga654bc887d2b03fd0bf87f25bf39088b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac30e5125063e957c0ca5e94f2a3fd9be"><td class="memTemplParams" colspan="2"><a class="anchor" id="gac30e5125063e957c0ca5e94f2a3fd9be"></a>
-template&lt;typename F , template&lt; typename...&gt; class M, typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gac30e5125063e957c0ca5e94f2a3fd9be"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gac30e5125063e957c0ca5e94f2a3fd9be">ftl::operator&gt;&gt;=</a> (M&lt; A, Ts...&gt; &amp;&amp;m, F &amp;&amp;f) -&gt; decltype(monad&lt; M &gt;::bind(std::move(m), std::forward&lt; F &gt;(f)))</td></tr>
-<tr class="memdesc:gac30e5125063e957c0ca5e94f2a3fd9be"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:gac30e5125063e957c0ca5e94f2a3fd9be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab769810913a21013589b212a6f13b96f"><td class="memTemplParams" colspan="2"><a class="anchor" id="gab769810913a21013589b212a6f13b96f"></a>
-template&lt;typename F , template&lt; typename &gt; class M, typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:gab769810913a21013589b212a6f13b96f"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gab769810913a21013589b212a6f13b96f">ftl::operator&gt;&gt;=</a> (M&lt; A &gt; &amp;&amp;m, F &amp;&amp;f) -&gt; decltype(monad&lt; M &gt;::bind(std::move(m), std::forward&lt; F &gt;(f)))</td></tr>
-<tr class="memdesc:gab769810913a21013589b212a6f13b96f"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:gab769810913a21013589b212a6f13b96f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga566a786e59b6a2a39ea6e827ae235ad8"><td class="memTemplParams" colspan="2">template&lt;typename F , template&lt; typename...&gt; class M, typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;F(A)&gt;::type::value_type, typename... Ts&gt; </td></tr>
-<tr class="memitem:ga566a786e59b6a2a39ea6e827ae235ad8"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga566a786e59b6a2a39ea6e827ae235ad8">ftl::operator&lt;&lt;=</a> (F &amp;&amp;f, const M&lt; A, Ts...&gt; &amp;m) -&gt; decltype(monad&lt; M &gt;::bind(m, std::forward&lt; F &gt;(f)))</td></tr>
-<tr class="memdesc:ga566a786e59b6a2a39ea6e827ae235ad8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1monad.html#a2eec9ab7658da121ccca6f2c6576695a" title="Bind a value and execute a computation in M on it.">monad::bind</a>.  <a href="#ga566a786e59b6a2a39ea6e827ae235ad8">More...</a><br/></td></tr>
-<tr class="separator:ga566a786e59b6a2a39ea6e827ae235ad8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7c48e54cadc0ba599f454f1d9d2c3199"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga7c48e54cadc0ba599f454f1d9d2c3199"></a>
-template&lt;typename F , template&lt; typename &gt; class M, typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;F(A)&gt;::type::value_type&gt; </td></tr>
-<tr class="memitem:ga7c48e54cadc0ba599f454f1d9d2c3199"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga7c48e54cadc0ba599f454f1d9d2c3199">ftl::operator&lt;&lt;=</a> (F &amp;&amp;f, const M&lt; A &gt; &amp;m) -&gt; decltype(monad&lt; M &gt;::bind(m, std::forward&lt; F &gt;(f)))</td></tr>
-<tr class="memdesc:ga7c48e54cadc0ba599f454f1d9d2c3199"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga7c48e54cadc0ba599f454f1d9d2c3199"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaef9c3800cc8f483097156394cfebb4be"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename...&gt; class M, typename A , typename B , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gaef9c3800cc8f483097156394cfebb4be"><td class="memTemplItemLeft" align="right" valign="top">M&lt; B, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gaef9c3800cc8f483097156394cfebb4be">ftl::operator&gt;&gt;</a> (const M&lt; A, Ts...&gt; &amp;m1, M&lt; B, Ts...&gt; m2)</td></tr>
-<tr class="memdesc:gaef9c3800cc8f483097156394cfebb4be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform two monadic computations, discard result of first.  <a href="#gaef9c3800cc8f483097156394cfebb4be">More...</a><br/></td></tr>
-<tr class="separator:gaef9c3800cc8f483097156394cfebb4be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0e974dfb269c2d142cd1e7ea8fb334bc"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga0e974dfb269c2d142cd1e7ea8fb334bc"></a>
-template&lt;template&lt; typename...&gt; class M, typename A , typename B , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:ga0e974dfb269c2d142cd1e7ea8fb334bc"><td class="memTemplItemLeft" align="right" valign="top">M&lt; B, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga0e974dfb269c2d142cd1e7ea8fb334bc">ftl::operator&gt;&gt;</a> (M&lt; A, Ts...&gt; &amp;&amp;m1, M&lt; B, Ts...&gt; m2)</td></tr>
-<tr class="memdesc:ga0e974dfb269c2d142cd1e7ea8fb334bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga0e974dfb269c2d142cd1e7ea8fb334bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga92e5e029432c7f412a4fa1cd56ea49a2"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga92e5e029432c7f412a4fa1cd56ea49a2"></a>
-template&lt;template&lt; typename &gt; class M, typename A , typename B , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:ga92e5e029432c7f412a4fa1cd56ea49a2"><td class="memTemplItemLeft" align="right" valign="top">M&lt; B &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga92e5e029432c7f412a4fa1cd56ea49a2">ftl::operator&gt;&gt;</a> (const M&lt; A &gt; &amp;m1, M&lt; B &gt; m2)</td></tr>
-<tr class="memdesc:ga92e5e029432c7f412a4fa1cd56ea49a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga92e5e029432c7f412a4fa1cd56ea49a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7e011e255863d2016c950fc43c09851d"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga7e011e255863d2016c950fc43c09851d"></a>
-template&lt;template&lt; typename &gt; class M, typename A , typename B , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:ga7e011e255863d2016c950fc43c09851d"><td class="memTemplItemLeft" align="right" valign="top">M&lt; B &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga7e011e255863d2016c950fc43c09851d">ftl::operator&gt;&gt;</a> (M&lt; A &gt; &amp;&amp;m1, M&lt; B &gt; m2)</td></tr>
-<tr class="memdesc:ga7e011e255863d2016c950fc43c09851d"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga7e011e255863d2016c950fc43c09851d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa3d3917cf08b033d80b011e08b377276"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename...&gt; class M, typename A , typename B , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gaa3d3917cf08b033d80b011e08b377276"><td class="memTemplItemLeft" align="right" valign="top">M&lt; A, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gaa3d3917cf08b033d80b011e08b377276">ftl::operator&lt;&lt;</a> (const M&lt; A, Ts...&gt; &amp;m1, M&lt; B, Ts...&gt; m2)</td></tr>
-<tr class="memdesc:gaa3d3917cf08b033d80b011e08b377276"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sequence two monadic computations, return the first.  <a href="#gaa3d3917cf08b033d80b011e08b377276">More...</a><br/></td></tr>
-<tr class="separator:gaa3d3917cf08b033d80b011e08b377276"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga74a7fd8687e9e0219928152ae1a0a1e4"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga74a7fd8687e9e0219928152ae1a0a1e4"></a>
-template&lt;template&lt; typename...&gt; class M, typename A , typename B , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:ga74a7fd8687e9e0219928152ae1a0a1e4"><td class="memTemplItemLeft" align="right" valign="top">M&lt; A, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga74a7fd8687e9e0219928152ae1a0a1e4">ftl::operator&lt;&lt;</a> (M&lt; A, Ts...&gt; &amp;&amp;m1, M&lt; B, Ts...&gt; m2)</td></tr>
-<tr class="memdesc:ga74a7fd8687e9e0219928152ae1a0a1e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga74a7fd8687e9e0219928152ae1a0a1e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga86b5692ac1266254868f984711aa1ba6"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga86b5692ac1266254868f984711aa1ba6"></a>
-template&lt;template&lt; typename &gt; class M, typename A , typename B , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:ga86b5692ac1266254868f984711aa1ba6"><td class="memTemplItemLeft" align="right" valign="top">M&lt; A &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga86b5692ac1266254868f984711aa1ba6">ftl::operator&lt;&lt;</a> (const M&lt; A &gt; &amp;m1, M&lt; B &gt; m2)</td></tr>
-<tr class="memdesc:ga86b5692ac1266254868f984711aa1ba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga86b5692ac1266254868f984711aa1ba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaffa0a820b9a056604b3134e3afc10c02"><td class="memTemplParams" colspan="2"><a class="anchor" id="gaffa0a820b9a056604b3134e3afc10c02"></a>
-template&lt;template&lt; typename &gt; class M, typename A , typename B , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:gaffa0a820b9a056604b3134e3afc10c02"><td class="memTemplItemLeft" align="right" valign="top">M&lt; A &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gaffa0a820b9a056604b3134e3afc10c02">ftl::operator&lt;&lt;</a> (M&lt; A &gt; &amp;&amp;m1, M&lt; B &gt; m2)</td></tr>
-<tr class="memdesc:gaffa0a820b9a056604b3134e3afc10c02"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:gaffa0a820b9a056604b3134e3afc10c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaeca4a23317be98f7481cf9f6ac976a07"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename...&gt; class M, typename F , typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename R  = typename decayed_result&lt;F(A)&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gaeca4a23317be98f7481cf9f6ac976a07"><td class="memTemplItemLeft" align="right" valign="top">M&lt; R, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gaeca4a23317be98f7481cf9f6ac976a07">ftl::liftM</a> (F f, const M&lt; A, Ts...&gt; &amp;m)</td></tr>
-<tr class="memdesc:gaeca4a23317be98f7481cf9f6ac976a07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lifts a function into M.  <a href="#gaeca4a23317be98f7481cf9f6ac976a07">More...</a><br/></td></tr>
-<tr class="separator:gaeca4a23317be98f7481cf9f6ac976a07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gadb4a0a022cdef0b6d6dcf21ba8b3dd53"><td class="memTemplParams" colspan="2"><a class="anchor" id="gadb4a0a022cdef0b6d6dcf21ba8b3dd53"></a>
-template&lt;template&lt; typename...&gt; class M, typename F , typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename R  = typename decayed_result&lt;F(A)&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gadb4a0a022cdef0b6d6dcf21ba8b3dd53"><td class="memTemplItemLeft" align="right" valign="top">M&lt; R, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gadb4a0a022cdef0b6d6dcf21ba8b3dd53">ftl::liftM</a> (F f, M&lt; A, Ts...&gt; &amp;&amp;m)</td></tr>
-<tr class="memdesc:gadb4a0a022cdef0b6d6dcf21ba8b3dd53"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:gadb4a0a022cdef0b6d6dcf21ba8b3dd53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga195bffc42e35a66d38dd319b2f238e7c"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga195bffc42e35a66d38dd319b2f238e7c"></a>
-template&lt;template&lt; typename &gt; class M, typename F , typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename R  = typename decayed_result&lt;F(A)&gt;::type&gt; </td></tr>
-<tr class="memitem:ga195bffc42e35a66d38dd319b2f238e7c"><td class="memTemplItemLeft" align="right" valign="top">M&lt; R &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga195bffc42e35a66d38dd319b2f238e7c">ftl::liftM</a> (F f, const M&lt; A &gt; &amp;m)</td></tr>
-<tr class="memdesc:ga195bffc42e35a66d38dd319b2f238e7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga195bffc42e35a66d38dd319b2f238e7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac2ab60dce5043a21009e3c1d9123d5f8"><td class="memTemplParams" colspan="2"><a class="anchor" id="gac2ab60dce5043a21009e3c1d9123d5f8"></a>
-template&lt;template&lt; typename &gt; class M, typename F , typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename R  = typename decayed_result&lt;F(A)&gt;::type&gt; </td></tr>
-<tr class="memitem:gac2ab60dce5043a21009e3c1d9123d5f8"><td class="memTemplItemLeft" align="right" valign="top">M&lt; R &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gac2ab60dce5043a21009e3c1d9123d5f8">ftl::liftM</a> (F f, M&lt; A &gt; &amp;&amp;m)</td></tr>
-<tr class="memdesc:gac2ab60dce5043a21009e3c1d9123d5f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:gac2ab60dce5043a21009e3c1d9123d5f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gafd504439b061e84f443510f5aad58325"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename...&gt; class M, typename F , typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;F(A)&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gafd504439b061e84f443510f5aad58325"><td class="memTemplItemLeft" align="right" valign="top">M&lt; B, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gafd504439b061e84f443510f5aad58325">ftl::ap</a> (const M&lt; F, Ts...&gt; &amp;f, M&lt; A, Ts...&gt; m)</td></tr>
-<tr class="memdesc:gafd504439b061e84f443510f5aad58325"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply a function in M to a value in M.  <a href="#gafd504439b061e84f443510f5aad58325">More...</a><br/></td></tr>
-<tr class="separator:gafd504439b061e84f443510f5aad58325"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga54bbd19d9db26c2011860b39871877ad"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga54bbd19d9db26c2011860b39871877ad"></a>
-template&lt;template&lt; typename...&gt; class M, typename F , typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;F(A)&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:ga54bbd19d9db26c2011860b39871877ad"><td class="memTemplItemLeft" align="right" valign="top">M&lt; B, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga54bbd19d9db26c2011860b39871877ad">ftl::ap</a> (M&lt; F, Ts...&gt; &amp;&amp;f, M&lt; A, Ts...&gt; m)</td></tr>
-<tr class="memdesc:ga54bbd19d9db26c2011860b39871877ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga54bbd19d9db26c2011860b39871877ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab1802a6317c02914441bea73711b5fd9"><td class="memTemplParams" colspan="2"><a class="anchor" id="gab1802a6317c02914441bea73711b5fd9"></a>
-template&lt;template&lt; typename &gt; class M, typename F , typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;F(A)&gt;::type&gt; </td></tr>
-<tr class="memitem:gab1802a6317c02914441bea73711b5fd9"><td class="memTemplItemLeft" align="right" valign="top">M&lt; B &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gab1802a6317c02914441bea73711b5fd9">ftl::ap</a> (const M&lt; F &gt; &amp;f, M&lt; A &gt; m)</td></tr>
-<tr class="memdesc:gab1802a6317c02914441bea73711b5fd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:gab1802a6317c02914441bea73711b5fd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga633f0c46f6a37dc6b30ff12dfc28c971"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga633f0c46f6a37dc6b30ff12dfc28c971"></a>
-template&lt;template&lt; typename &gt; class M, typename F , typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;F(A)&gt;::type&gt; </td></tr>
-<tr class="memitem:ga633f0c46f6a37dc6b30ff12dfc28c971"><td class="memTemplItemLeft" align="right" valign="top">M&lt; B &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga633f0c46f6a37dc6b30ff12dfc28c971">ftl::ap</a> (M&lt; F &gt; &amp;&amp;f, M&lt; A &gt; m)</td></tr>
-<tr class="memdesc:ga633f0c46f6a37dc6b30ff12dfc28c971"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga633f0c46f6a37dc6b30ff12dfc28c971"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae667046c98546e79b11c780174a0e048"><td class="memTemplParams" colspan="2">template&lt;typename M , typename F , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:gae667046c98546e79b11c780174a0e048"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gae667046c98546e79b11c780174a0e048">ftl::operator&gt;&gt;=</a> (const M &amp;m, F &amp;&amp;f) -&gt; decltype(monad&lt; M &gt;::bind(m, std::forward&lt; F &gt;(f)))</td></tr>
+<tr class="memdesc:gae667046c98546e79b11c780174a0e048"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078" title="Bind a value and execute a computation in M on it.">monad::bind</a>.  <a href="#gae667046c98546e79b11c780174a0e048">More...</a><br/></td></tr>
+<tr class="separator:gae667046c98546e79b11c780174a0e048"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga36ebacf434ea5b5986c76a1f9418b7bb"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga36ebacf434ea5b5986c76a1f9418b7bb"></a>
+template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typename  = typename std::enable_if&lt;monad&lt;M_&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:ga36ebacf434ea5b5986c76a1f9418b7bb"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga36ebacf434ea5b5986c76a1f9418b7bb">ftl::operator&gt;&gt;=</a> (M &amp;&amp;m, F &amp;&amp;f) -&gt; decltype(monad&lt; M_ &gt;::bind(std::move(m), std::forward&lt; F &gt;(f)))</td></tr>
+<tr class="memdesc:ga36ebacf434ea5b5986c76a1f9418b7bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:ga36ebacf434ea5b5986c76a1f9418b7bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad9856f87a004a485f1b99beb250c35f6"><td class="memTemplParams" colspan="2">template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:gad9856f87a004a485f1b99beb250c35f6"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gad9856f87a004a485f1b99beb250c35f6">ftl::operator&lt;&lt;=</a> (F &amp;&amp;f, M &amp;&amp;m) -&gt; decltype(monad&lt; M_ &gt;::bind(std::forward&lt; M_ &gt;(m), std::forward&lt; F &gt;(f)))</td></tr>
+<tr class="memdesc:gad9856f87a004a485f1b99beb250c35f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078" title="Bind a value and execute a computation in M on it.">monad::bind</a>.  <a href="#gad9856f87a004a485f1b99beb250c35f6">More...</a><br/></td></tr>
+<tr class="separator:gad9856f87a004a485f1b99beb250c35f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1dc8cdeb407f99ac95585600c77b3d1b"><td class="memTemplParams" colspan="2">template&lt;typename Mt , typename Mu , typename T  = concept_parameter&lt;Mt&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt&gt;::value			&gt;::type&gt; </td></tr>
+<tr class="memitem:ga1dc8cdeb407f99ac95585600c77b3d1b"><td class="memTemplItemLeft" align="right" valign="top">Mu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga1dc8cdeb407f99ac95585600c77b3d1b">ftl::operator&gt;&gt;</a> (const Mt &amp;m1, const Mu &amp;m2)</td></tr>
+<tr class="memdesc:ga1dc8cdeb407f99ac95585600c77b3d1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform two monadic computations, discard result of first.  <a href="#ga1dc8cdeb407f99ac95585600c77b3d1b">More...</a><br/></td></tr>
+<tr class="separator:ga1dc8cdeb407f99ac95585600c77b3d1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga94d8bce32649e6cae74b153e9fa5b34c"><td class="memTemplParams" colspan="2">template&lt;typename Mt_ , typename Mu , typename Mt  = plain_type&lt;Mt_&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename T  = concept_parameter&lt;Mt&gt;, typename U  = concept_parameter&lt;Mu&gt;, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt&gt;::value			&gt;::type&gt; </td></tr>
+<tr class="memitem:ga94d8bce32649e6cae74b153e9fa5b34c"><td class="memTemplItemLeft" align="right" valign="top">Mt&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga94d8bce32649e6cae74b153e9fa5b34c">ftl::operator&lt;&lt;</a> (Mt_ &amp;&amp;m1, Mu m2)</td></tr>
+<tr class="memdesc:ga94d8bce32649e6cae74b153e9fa5b34c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sequence two monadic computations, return the first.  <a href="#ga94d8bce32649e6cae74b153e9fa5b34c">More...</a><br/></td></tr>
+<tr class="separator:ga94d8bce32649e6cae74b153e9fa5b34c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga599111a0106c7c9a00d71dcbeababacd"><td class="memTemplParams" colspan="2">template&lt;typename Mt_ , typename F , typename Mt  = plain_type&lt;Mt_&gt;, typename T  = concept_parameter&lt;Mt&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename U  = typename decayed_result&lt;F(T)&gt;::type, typename Mu  = typename re_parametrise&lt;Mt,U&gt;::type&gt; </td></tr>
+<tr class="memitem:ga599111a0106c7c9a00d71dcbeababacd"><td class="memTemplItemLeft" align="right" valign="top">Mu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga599111a0106c7c9a00d71dcbeababacd">ftl::liftM</a> (F f, Mt_ &amp;&amp;m)</td></tr>
+<tr class="memdesc:ga599111a0106c7c9a00d71dcbeababacd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lifts a function into M.  <a href="#ga599111a0106c7c9a00d71dcbeababacd">More...</a><br/></td></tr>
+<tr class="separator:ga599111a0106c7c9a00d71dcbeababacd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga83379adbd329f997d47f12a687256573"><td class="memTemplParams" colspan="2">template&lt;typename Mt , typename Mf , typename T  = concept_parameter&lt;Mt&gt;, typename F  = concept_parameter&lt;Mf&gt;, typename U  = typename decayed_result&lt;F(T)&gt;::type, typename Mu  = typename re_parametrise&lt;Mt,U&gt;::type&gt; </td></tr>
+<tr class="memitem:ga83379adbd329f997d47f12a687256573"><td class="memTemplItemLeft" align="right" valign="top">Mu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga83379adbd329f997d47f12a687256573">ftl::ap</a> (const Mf &amp;f, Mt m)</td></tr>
+<tr class="memdesc:ga83379adbd329f997d47f12a687256573"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply a function in M to a value in M.  <a href="#ga83379adbd329f997d47f12a687256573">More...</a><br/></td></tr>
+<tr class="separator:ga83379adbd329f997d47f12a687256573"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p><a class="el" href="monadpg.html">Monad</a> concept and related functions. </p>
@@ -207,16 +132,16 @@ template&lt;template&lt; typename &gt; class M, typename F , typename A , typena
 </ul>
 </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="gac3d90b9b20f4255f02d4dddae44db6a3"></a>
+<a class="anchor" id="gae667046c98546e79b11c780174a0e048"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename F , template&lt; typename...&gt; class M, typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename... Ts&gt; </div>
+template&lt;typename M , typename F , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto ftl::operator&gt;&gt;= </td>
           <td>(</td>
-          <td class="paramtype">const M&lt; A, Ts...&gt; &amp;&#160;</td>
+          <td class="paramtype">const M &amp;&#160;</td>
           <td class="paramname"><em>m</em>, </td>
         </tr>
         <tr>
@@ -233,16 +158,16 @@ template&lt;typename F , template&lt; typename...&gt; class M, typename A , type
       </table>
 </div><div class="memdoc">
 
-<p>Convenience operator for <a class="el" href="structftl_1_1monad.html#a2eec9ab7658da121ccca6f2c6576695a" title="Bind a value and execute a computation in M on it.">monad::bind</a>. </p>
+<p>Convenience operator for <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078" title="Bind a value and execute a computation in M on it.">monad::bind</a>. </p>
 <p>Basically makes monadic code a lot cleaner. </p>
 
 </div>
 </div>
-<a class="anchor" id="ga566a786e59b6a2a39ea6e827ae235ad8"></a>
+<a class="anchor" id="gad9856f87a004a485f1b99beb250c35f6"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename F , template&lt; typename...&gt; class M, typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;F(A)&gt;::type::value_type, typename... Ts&gt; </div>
+template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto ftl::operator&lt;&lt;= </td>
@@ -253,38 +178,38 @@ template&lt;typename F , template&lt; typename...&gt; class M, typename A , type
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const M&lt; A, Ts...&gt; &amp;&#160;</td>
+          <td class="paramtype">M &amp;&amp;&#160;</td>
           <td class="paramname"><em>m</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td> -&gt; decltype(monad&lt;M&gt;::bind(m, std::forward&lt;F&gt;(f))) </td>
+          <td></td><td> -&gt; decltype(monad&lt;M_&gt;::bind(std::forward&lt;M_&gt;(m), std::forward&lt;F&gt;(f))) </td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Convenience operator for <a class="el" href="structftl_1_1monad.html#a2eec9ab7658da121ccca6f2c6576695a" title="Bind a value and execute a computation in M on it.">monad::bind</a>. </p>
+<p>Convenience operator for <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078" title="Bind a value and execute a computation in M on it.">monad::bind</a>. </p>
 <p>Mirror of operator &gt;&gt;= </p>
 
 </div>
 </div>
-<a class="anchor" id="gaef9c3800cc8f483097156394cfebb4be"></a>
+<a class="anchor" id="ga1dc8cdeb407f99ac95585600c77b3d1b"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;template&lt; typename...&gt; class M, typename A , typename B , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename... Ts&gt; </div>
+template&lt;typename Mt , typename Mu , typename T  = concept_parameter&lt;Mt&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt&gt;::value			&gt;::type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">M&lt;B,Ts...&gt; ftl::operator&gt;&gt; </td>
+          <td class="memname">Mu ftl::operator&gt;&gt; </td>
           <td>(</td>
-          <td class="paramtype">const M&lt; A, Ts...&gt; &amp;&#160;</td>
+          <td class="paramtype">const Mt &amp;&#160;</td>
           <td class="paramname"><em>m1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">M&lt; B, Ts...&gt;&#160;</td>
+          <td class="paramtype">const Mu &amp;&#160;</td>
           <td class="paramname"><em>m2</em>&#160;</td>
         </tr>
         <tr>
@@ -300,22 +225,22 @@ template&lt;template&lt; typename...&gt; class M, typename A , typename B , type
 
 </div>
 </div>
-<a class="anchor" id="gaa3d3917cf08b033d80b011e08b377276"></a>
+<a class="anchor" id="ga94d8bce32649e6cae74b153e9fa5b34c"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;template&lt; typename...&gt; class M, typename A , typename B , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename... Ts&gt; </div>
+template&lt;typename Mt_ , typename Mu , typename Mt  = plain_type&lt;Mt_&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename T  = concept_parameter&lt;Mt&gt;, typename U  = concept_parameter&lt;Mu&gt;, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt&gt;::value			&gt;::type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">M&lt;A,Ts...&gt; ftl::operator&lt;&lt; </td>
+          <td class="memname">Mt ftl::operator&lt;&lt; </td>
           <td>(</td>
-          <td class="paramtype">const M&lt; A, Ts...&gt; &amp;&#160;</td>
+          <td class="paramtype">Mt_ &amp;&amp;&#160;</td>
           <td class="paramname"><em>m1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">M&lt; B, Ts...&gt;&#160;</td>
+          <td class="paramtype">Mu&#160;</td>
           <td class="paramname"><em>m2</em>&#160;</td>
         </tr>
         <tr>
@@ -332,14 +257,14 @@ template&lt;template&lt; typename...&gt; class M, typename A , typename B , type
 
 </div>
 </div>
-<a class="anchor" id="gaeca4a23317be98f7481cf9f6ac976a07"></a>
+<a class="anchor" id="ga599111a0106c7c9a00d71dcbeababacd"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;template&lt; typename...&gt; class M, typename F , typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename R  = typename decayed_result&lt;F(A)&gt;::type, typename... Ts&gt; </div>
+template&lt;typename Mt_ , typename F , typename Mt  = plain_type&lt;Mt_&gt;, typename T  = concept_parameter&lt;Mt&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename U  = typename decayed_result&lt;F(T)&gt;::type, typename Mu  = typename re_parametrise&lt;Mt,U&gt;::type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">M&lt;R,Ts...&gt; ftl::liftM </td>
+          <td class="memname">Mu ftl::liftM </td>
           <td>(</td>
           <td class="paramtype">F&#160;</td>
           <td class="paramname"><em>f</em>, </td>
@@ -347,7 +272,7 @@ template&lt;template&lt; typename...&gt; class M, typename F , typename A , type
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const M&lt; A, Ts...&gt; &amp;&#160;</td>
+          <td class="paramtype">Mt_ &amp;&amp;&#160;</td>
           <td class="paramname"><em>m</em>&#160;</td>
         </tr>
         <tr>
@@ -363,22 +288,22 @@ template&lt;template&lt; typename...&gt; class M, typename F , typename A , type
 
 </div>
 </div>
-<a class="anchor" id="gafd504439b061e84f443510f5aad58325"></a>
+<a class="anchor" id="ga83379adbd329f997d47f12a687256573"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;template&lt; typename...&gt; class M, typename F , typename A , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;F(A)&gt;::type, typename... Ts&gt; </div>
+template&lt;typename Mt , typename Mf , typename T  = concept_parameter&lt;Mt&gt;, typename F  = concept_parameter&lt;Mf&gt;, typename U  = typename decayed_result&lt;F(T)&gt;::type, typename Mu  = typename re_parametrise&lt;Mt,U&gt;::type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">M&lt;B,Ts...&gt; ftl::ap </td>
+          <td class="memname">Mu ftl::ap </td>
           <td>(</td>
-          <td class="paramtype">const M&lt; F, Ts...&gt; &amp;&#160;</td>
+          <td class="paramtype">const Mf &amp;&#160;</td>
           <td class="paramname"><em>f</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">M&lt; A, Ts...&gt;&#160;</td>
+          <td class="paramtype">Mt&#160;</td>
           <td class="paramname"><em>m</em>&#160;</td>
         </tr>
         <tr>
@@ -390,14 +315,14 @@ template&lt;template&lt; typename...&gt; class M, typename F , typename A , type
 </div><div class="memdoc">
 
 <p>Apply a function in M to a value in M. </p>
-<p>This is actually exactly equivalent to <a class="el" href="structftl_1_1applicative.html#a0cd7e6888d5dc84dd84dfafc383b3cc6" title="Contextualised function application.">applicative&lt;M&gt;::apply</a>. </p>
+<p>This is actually exactly equivalent to <a class="el" href="structftl_1_1applicative.html#ac360c626517fd6eb3bdb817834864114" title="Contextualised function application.">applicative&lt;M&gt;::apply</a>. </p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -2,9 +2,9 @@ var searchData=
 [
   ['fail',['fail',['../structftl_1_1monoidA.html#ab2056c170b5e5c7c36ef2b9ba8cccfc7',1,'ftl::monoidA']]],
   ['flip',['flip',['../group__prelude.html#ga3b41de5220eeda386e6be837385b5196',1,'ftl::flip(function&lt; R, A, B &gt; f)'],['../group__prelude.html#ga9d56afd16f27e66fdf3b180040405c0f',1,'ftl::flip(R(&amp;f)(A, B))'],['../group__prelude.html#ga262e76958ae85c42f0bdd2631deadeb5',1,'ftl::flip(function&lt; function&lt; R, B &gt;, A &gt; f)']]],
-  ['fold',['fold',['../structftl_1_1foldable.html#a9b5265849f11e4bd2f30f1202c3ca44b',1,'ftl::foldable::fold()'],['../group__foldable.html#ga14572572e972d6a11d65cce2d43f3952',1,'ftl::fold(const F&lt; M, Ts...&gt; &amp;f)'],['../group__foldable.html#ga95baa1aed173960ce6a6e1c187ec3bd7',1,'ftl::fold(const F&lt; M &gt; &amp;f)']]],
-  ['foldl',['foldl',['../structftl_1_1foldable.html#ab8370cb990000d1c81bf028a2abe2688',1,'ftl::foldable::foldl()'],['../group__foldable.html#gaf7e91dfd879228cc97f88398eab75373',1,'ftl::foldl(Fn &amp;&amp;fn, A &amp;&amp;z, const F&lt; B, Ts...&gt; &amp;f)'],['../group__foldable.html#ga28dc0d6d96538c7a857c38ce56ed99e7',1,'ftl::foldl(Fn &amp;&amp;fn, A &amp;&amp;z, const F&lt; B &gt; &amp;f)']]],
-  ['foldmap',['foldMap',['../structftl_1_1foldable.html#a5d1df845ff8c0bb60f150c7d3f1e3470',1,'ftl::foldable']]],
-  ['foldr',['foldr',['../structftl_1_1foldable.html#ac2edd6dda7b6e05fd1daaacaa0e254e1',1,'ftl::foldable::foldr()'],['../group__foldable.html#gac7de788ae5d37e17e9af71320419fb99',1,'ftl::foldr(Fn &amp;&amp;fn, B &amp;&amp;z, const F&lt; A, Ts...&gt; &amp;f)'],['../group__foldable.html#ga2e611e11846fee69e9274de0b514bad0',1,'ftl::foldr(Fn &amp;&amp;fn, B &amp;&amp;z, const F&lt; A &gt; &amp;f)']]],
+  ['fold',['fold',['../structftl_1_1foldable.html#a33277b06b9c8e6a50cd40407eb3b764e',1,'ftl::foldable::fold()'],['../group__foldable.html#gacf13a4a4af69a850d5c96d36a1f61124',1,'ftl::fold()']]],
+  ['foldl',['foldl',['../structftl_1_1foldable.html#ad7590da3fb6b05ca06312b0d8f6bc3c5',1,'ftl::foldable::foldl()'],['../group__foldable.html#ga6a9d7bd768ac15c2bdf218f780ba6d6e',1,'ftl::foldl()']]],
+  ['foldmap',['foldMap',['../structftl_1_1foldable.html#aaf66c4dac7dccf12383037f7cbd35110',1,'ftl::foldable']]],
+  ['foldr',['foldr',['../structftl_1_1foldable.html#aa71d1bd6ba1114e6560b09abe8f5da87',1,'ftl::foldable::foldr()'],['../group__foldable.html#gad4062dbf98b40e6dc902df4c099c4657',1,'ftl::foldr()']]],
   ['function',['function',['../classftl_1_1function.html#ad84656e7734ffd6dfecc8dd4039e5098',1,'ftl::function::function() noexcept'],['../classftl_1_1function.html#a3b97715e3440cd42a4d8737041324eb6',1,'ftl::function::function(std::nullptr_t) noexcept']]]
 ];

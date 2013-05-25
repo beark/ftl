@@ -97,25 +97,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaa1736bdd6b9576f404b221fff70bc00f"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename...&gt; class F, typename Fn , typename A , typename  = typename std::enable_if&lt;applicative&lt;F&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;Fn(A)&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gaa1736bdd6b9576f404b221fff70bc00f"><td class="memTemplItemLeft" align="right" valign="top">F&lt; B, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gaa1736bdd6b9576f404b221fff70bc00f">ftl::operator*</a> (const F&lt; Fn, Ts...&gt; &amp;u, const F&lt; A, Ts...&gt; &amp;v)</td></tr>
-<tr class="memdesc:gaa1736bdd6b9576f404b221fff70bc00f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator to ease applicative style programming.  <a href="#gaa1736bdd6b9576f404b221fff70bc00f">More...</a><br/></td></tr>
-<tr class="separator:gaa1736bdd6b9576f404b221fff70bc00f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae95143ec8fbf1308229a47d947ca1aab"><td class="memTemplParams" colspan="2"><a class="anchor" id="gae95143ec8fbf1308229a47d947ca1aab"></a>
-template&lt;template&lt; typename...&gt; class F, typename Fn , typename A , typename  = typename std::enable_if&lt;applicative&lt;F&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;Fn(A)&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gae95143ec8fbf1308229a47d947ca1aab"><td class="memTemplItemLeft" align="right" valign="top">F&lt; B, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gae95143ec8fbf1308229a47d947ca1aab">ftl::operator*</a> (F&lt; Fn, Ts...&gt; &amp;&amp;u, F&lt; A, Ts...&gt; &amp;&amp;v)</td></tr>
-<tr class="memdesc:gae95143ec8fbf1308229a47d947ca1aab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded for rvalue references. <br/></td></tr>
-<tr class="separator:gae95143ec8fbf1308229a47d947ca1aab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga47eb6cc4d3ace3d64b6333bba15a2a1c"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga47eb6cc4d3ace3d64b6333bba15a2a1c"></a>
-template&lt;template&lt; typename &gt; class F, typename Fn , typename A , typename  = typename std::enable_if&lt;applicative&lt;F&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;Fn(A)&gt;::type&gt; </td></tr>
-<tr class="memitem:ga47eb6cc4d3ace3d64b6333bba15a2a1c"><td class="memTemplItemLeft" align="right" valign="top">F&lt; B &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#ga47eb6cc4d3ace3d64b6333bba15a2a1c">ftl::operator*</a> (const F&lt; Fn &gt; &amp;u, const F&lt; A &gt; &amp;v)</td></tr>
-<tr class="memdesc:ga47eb6cc4d3ace3d64b6333bba15a2a1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded for applicatives parameterised on a single type. <br/></td></tr>
-<tr class="separator:ga47eb6cc4d3ace3d64b6333bba15a2a1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gabcd33ea4494f01aa21d83cb977ab017b"><td class="memTemplParams" colspan="2"><a class="anchor" id="gabcd33ea4494f01aa21d83cb977ab017b"></a>
-template&lt;template&lt; typename &gt; class F, typename Fn , typename A , typename  = typename std::enable_if&lt;applicative&lt;F&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;Fn(A)&gt;::type&gt; </td></tr>
-<tr class="memitem:gabcd33ea4494f01aa21d83cb977ab017b"><td class="memTemplItemLeft" align="right" valign="top">F&lt; B &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gabcd33ea4494f01aa21d83cb977ab017b">ftl::operator*</a> (F&lt; Fn &gt; &amp;&amp;u, F&lt; A &gt; &amp;&amp;v)</td></tr>
-<tr class="memdesc:gabcd33ea4494f01aa21d83cb977ab017b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded for both single parameter types and rvalues. <br/></td></tr>
-<tr class="separator:gabcd33ea4494f01aa21d83cb977ab017b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac5b41f8adf454df426c558903f5f9c81"><td class="memTemplParams" colspan="2">template&lt;typename F , typename Fn , typename F_  = plain_type&lt;F&gt;, typename  = typename std::enable_if&lt;applicative&lt;F_&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:gac5b41f8adf454df426c558903f5f9c81"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gac5b41f8adf454df426c558903f5f9c81">ftl::operator*</a> (Fn &amp;&amp;u, F &amp;&amp;v) -&gt; decltype(applicative&lt; F_ &gt;::apply(std::forward&lt; Fn &gt;(u), std::forward&lt; F_ &gt;(v)))</td></tr>
+<tr class="memdesc:gac5b41f8adf454df426c558903f5f9c81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator to ease applicative style programming.  <a href="#gac5b41f8adf454df426c558903f5f9c81">More...</a><br/></td></tr>
+<tr class="separator:gac5b41f8adf454df426c558903f5f9c81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad840e7ce200860a53c6a05570912d2d7"><td class="memTemplParams" colspan="2"><a class="anchor" id="gad840e7ce200860a53c6a05570912d2d7"></a>
 template&lt;template&lt; typename...&gt; class F, typename  = typename std::enable_if&lt;monoidA&lt;F&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
 <tr class="memitem:gad840e7ce200860a53c6a05570912d2d7"><td class="memTemplItemLeft" align="right" valign="top">F&lt; Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gad840e7ce200860a53c6a05570912d2d7">ftl::operator|</a> (const F&lt; Ts...&gt; &amp;f1, const F&lt; Ts...&gt; &amp;f2)</td></tr>
@@ -145,34 +130,35 @@ template&lt;template&lt; typename...&gt; class F, typename  = typename std::enab
 </ul>
 </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="gaa1736bdd6b9576f404b221fff70bc00f"></a>
+<a class="anchor" id="gac5b41f8adf454df426c558903f5f9c81"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;template&lt; typename...&gt; class F, typename Fn , typename A , typename  = typename std::enable_if&lt;applicative&lt;F&gt;::instance&gt;::type, typename B  = typename decayed_result&lt;Fn(A)&gt;::type, typename... Ts&gt; </div>
+template&lt;typename F , typename Fn , typename F_  = plain_type&lt;F&gt;, typename  = typename std::enable_if&lt;applicative&lt;F_&gt;::instance&gt;::type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">F&lt;B,Ts...&gt; ftl::operator* </td>
+          <td class="memname">auto ftl::operator* </td>
           <td>(</td>
-          <td class="paramtype">const F&lt; Fn, Ts...&gt; &amp;&#160;</td>
+          <td class="paramtype">Fn &amp;&amp;&#160;</td>
           <td class="paramname"><em>u</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const F&lt; A, Ts...&gt; &amp;&#160;</td>
+          <td class="paramtype">F &amp;&amp;&#160;</td>
           <td class="paramname"><em>v</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> -&gt; decltype(applicative&lt;F_&gt;::apply(
+				std::forward&lt;Fn&gt;(u),std::forward&lt;F_&gt;(v))) </td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Convenience operator to ease applicative style programming. </p>
-<div class="fragment"><div class="line">a * b &lt;=&gt; <a class="code" href="structftl_1_1applicative.html#a0cd7e6888d5dc84dd84dfafc383b3cc6" title="Contextualised function application.">applicative&lt;F&gt;::apply</a>(a, b)</div>
+<div class="fragment"><div class="line">a * b &lt;=&gt; <a class="code" href="structftl_1_1applicative.html#ac360c626517fd6eb3bdb817834864114" title="Contextualised function application.">applicative&lt;F&gt;::apply</a>(a, b)</div>
 </div><!-- fragment --><p> Where <code>a</code> and <code>b</code> are complete types of <code>F</code> and <code>F</code> is an applicative functor. </p>
 
 </div>
@@ -180,7 +166,7 @@ template&lt;template&lt; typename...&gt; class F, typename Fn , typename A , typ
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

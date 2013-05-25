@@ -94,32 +94,22 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga4e6d503943046dbd8276507a89c8a70d"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga4e6d503943046dbd8276507a89c8a70d"></a>
-template&lt;template&lt; typename...&gt; class F, typename Fn , typename A , typename  = typename std::enable_if&lt;functor&lt;F&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:ga4e6d503943046dbd8276507a89c8a70d"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#ga4e6d503943046dbd8276507a89c8a70d">ftl::operator%</a> (Fn &amp;&amp;fn, const F&lt; A, Ts...&gt; &amp;f) -&gt; decltype(functor&lt; F &gt;::map(std::forward&lt; Fn &gt;(fn), f))</td></tr>
-<tr class="memdesc:ga4e6d503943046dbd8276507a89c8a70d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1functor.html#aa54140bd5ed21fc1a40176d91f16f583" title="Maps a function to the contained value(s).">functor::map</a>. <br/></td></tr>
-<tr class="separator:ga4e6d503943046dbd8276507a89c8a70d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8374c87ef895ac8949dc28d29dac0866"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga8374c87ef895ac8949dc28d29dac0866"></a>
-template&lt;template&lt; typename...&gt; class F, typename Fn , typename A , typename  = typename std::enable_if&lt;functor&lt;F&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:ga8374c87ef895ac8949dc28d29dac0866"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#ga8374c87ef895ac8949dc28d29dac0866">ftl::operator%</a> (Fn &amp;&amp;fn, F&lt; A, Ts...&gt; &amp;&amp;f) -&gt; decltype(functor&lt; F &gt;::map(std::forward&lt; Fn &gt;(fn), std::move(f)))</td></tr>
-<tr class="memdesc:ga8374c87ef895ac8949dc28d29dac0866"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded for rvalues. <br/></td></tr>
-<tr class="separator:ga8374c87ef895ac8949dc28d29dac0866"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf65a0ceb88cbebddd82383a4a7b807de"><td class="memTemplParams" colspan="2"><a class="anchor" id="gaf65a0ceb88cbebddd82383a4a7b807de"></a>
-template&lt;template&lt; typename &gt; class F, typename Fn , typename A , typename  = typename std::enable_if&lt;functor&lt;F&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:gaf65a0ceb88cbebddd82383a4a7b807de"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#gaf65a0ceb88cbebddd82383a4a7b807de">ftl::operator%</a> (Fn &amp;&amp;fn, const F&lt; A &gt; &amp;f) -&gt; decltype(functor&lt; F &gt;::map(std::forward&lt; Fn &gt;(fn), f))</td></tr>
-<tr class="memdesc:gaf65a0ceb88cbebddd82383a4a7b807de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded for single-type parameterised functors. <br/></td></tr>
-<tr class="separator:gaf65a0ceb88cbebddd82383a4a7b807de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gadeaa209b5b5baed4a191c9eba251f451"><td class="memTemplParams" colspan="2"><a class="anchor" id="gadeaa209b5b5baed4a191c9eba251f451"></a>
-template&lt;template&lt; typename &gt; class F, typename Fn , typename A , typename  = typename std::enable_if&lt;functor&lt;F&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:gadeaa209b5b5baed4a191c9eba251f451"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#gadeaa209b5b5baed4a191c9eba251f451">ftl::operator%</a> (Fn &amp;&amp;fn, F&lt; A &gt; &amp;&amp;f) -&gt; decltype(functor&lt; F &gt;::map(std::forward&lt; Fn &gt;(fn), std::move(f)))</td></tr>
-<tr class="memdesc:gadeaa209b5b5baed4a191c9eba251f451"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded for both rvalues and single type functors. <br/></td></tr>
-<tr class="separator:gadeaa209b5b5baed4a191c9eba251f451"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga79ff5ff7c884b1bacc9abed9dd53aa40"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename...&gt; class F, typename A , typename R , typename  = typename std::enable_if&lt;functor&lt;F&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
+<tr class="memitem:ga395cb731489f99153920d8db3175ac13"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga395cb731489f99153920d8db3175ac13"></a>
+template&lt;typename F , typename Fn , typename  = typename std::enable_if&lt;functor&lt;F&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:ga395cb731489f99153920d8db3175ac13"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#ga395cb731489f99153920d8db3175ac13">ftl::operator%</a> (Fn &amp;&amp;fn, const F &amp;f) -&gt; decltype(functor&lt; F &gt;::map(std::forward&lt; Fn &gt;(fn), f))</td></tr>
+<tr class="memdesc:ga395cb731489f99153920d8db3175ac13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1functor.html#a8bea58a9814e5ab2a3b9ab019d68055b" title="Maps a function to the contained value(s).">functor::map</a>. <br/></td></tr>
+<tr class="separator:ga395cb731489f99153920d8db3175ac13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga21cb0d74ea4d2908bb6a297f47949c2c"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga21cb0d74ea4d2908bb6a297f47949c2c"></a>
+template&lt;typename F , typename Fn , typename F_  = plain_type&lt;F&gt;, typename  = typename std::enable_if&lt;functor&lt;F_&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:ga21cb0d74ea4d2908bb6a297f47949c2c"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#ga21cb0d74ea4d2908bb6a297f47949c2c">ftl::operator%</a> (Fn &amp;&amp;fn, F &amp;&amp;f) -&gt; decltype(functor&lt; F_ &gt;::map(std::forward&lt; Fn &gt;(fn), std::move(f)))</td></tr>
+<tr class="memdesc:ga21cb0d74ea4d2908bb6a297f47949c2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:ga21cb0d74ea4d2908bb6a297f47949c2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga79ff5ff7c884b1bacc9abed9dd53aa40"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename...&gt; class F, typename A , typename R , typename... Ts, typename  = typename std::enable_if&lt;				functor&lt;F&lt;A,Ts...&gt;&gt;::instance&gt;::type&gt; </td></tr>
 <tr class="memitem:ga79ff5ff7c884b1bacc9abed9dd53aa40"><td class="memTemplItemLeft" align="right" valign="top">function&lt; F&lt; R, Ts...&gt;, A &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#ga79ff5ff7c884b1bacc9abed9dd53aa40">ftl::distribute</a> (F&lt; function&lt; R, A &gt;, Ts...&gt; f)</td></tr>
 <tr class="memdesc:ga79ff5ff7c884b1bacc9abed9dd53aa40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distribute function inside a context across entire context.  <a href="#ga79ff5ff7c884b1bacc9abed9dd53aa40">More...</a><br/></td></tr>
 <tr class="separator:ga79ff5ff7c884b1bacc9abed9dd53aa40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1680c6b58f2618d51534b0e124c2cbac"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga1680c6b58f2618d51534b0e124c2cbac"></a>
-template&lt;template&lt; typename &gt; class F, typename A , typename R , typename  = typename std::enable_if&lt;functor&lt;F&gt;::instance&gt;::type&gt; </td></tr>
+template&lt;template&lt; typename &gt; class F, typename A , typename R , typename  = typename std::enable_if&lt;				functor&lt;F&lt;A&gt;&gt;::instance&gt;::type&gt; </td></tr>
 <tr class="memitem:ga1680c6b58f2618d51534b0e124c2cbac"><td class="memTemplItemLeft" align="right" valign="top">function&lt; F&lt; R &gt;, A &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#ga1680c6b58f2618d51534b0e124c2cbac">ftl::distribute</a> (F&lt; function&lt; R, A &gt;&gt; f)</td></tr>
 <tr class="memdesc:ga1680c6b58f2618d51534b0e124c2cbac"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
 <tr class="separator:ga1680c6b58f2618d51534b0e124c2cbac"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,7 +127,7 @@ template&lt;template&lt; typename &gt; class F, typename A , typename R , typena
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;template&lt; typename...&gt; class F, typename A , typename R , typename  = typename std::enable_if&lt;functor&lt;F&gt;::instance&gt;::type, typename... Ts&gt; </div>
+template&lt;template&lt; typename...&gt; class F, typename A , typename R , typename... Ts, typename  = typename std::enable_if&lt;				functor&lt;F&lt;A,Ts...&gt;&gt;::instance&gt;::type&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">function&lt;F&lt;R,Ts...&gt;,A&gt; ftl::distribute </td>
@@ -157,7 +147,7 @@ template&lt;template&lt; typename...&gt; class F, typename A , typename R , type
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -88,14 +88,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1decayed__result.html">ftl::decayed_result&lt; typename &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the basic, "undecorated" return type of a function.  <a href="structftl_1_1decayed__result.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1type__seq.html">ftl::type_seq&lt; Ts &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Meta type used to store a type sequence.  <a href="structftl_1_1type__seq.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1concat__type__seqs.html">ftl::concat_type_seqs&lt; L, R &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concatenates two variadic lists together.  <a href="structftl_1_1concat__type__seqs.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the basic, "undecorated" return type of a function.  <a href="structftl_1_1concat__type__seqs.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1repeat.html">ftl::repeat&lt; T, N &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Repeat a type N times.  <a href="structftl_1_1repeat.html#details">More...</a><br/></td></tr>
@@ -106,11 +100,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1take__types.html">ftl::take_types&lt; N, T, Ts &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the first N elements in a type sequence.  <a href="structftl_1_1take__types.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1take__init.html">ftl::take_init&lt; Ts &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take all elements except the last.  <a href="structftl_1_1take__init.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1drop__types.html">ftl::drop_types&lt; N, Ts &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drops a number of types from a type sequence.  <a href="structftl_1_1drop__types.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take all elements except the last one.  <a href="structftl_1_1drop__types.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1seq.html">ftl::seq&lt;&gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A number sequence.  <a href="structftl_1_1seq.html#details">More...</a><br/></td></tr>
@@ -118,23 +109,63 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1gen__seq.html">ftl::gen_seq&lt; Z, N, S &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a sequence of numbers.  <a href="structftl_1_1gen__seq.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1inner__type.html">ftl::inner_type&lt;&gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the first contained type of some parametrised type.  <a href="structftl_1_1inner__type.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1parametric__type__traits.html">ftl::parametric_type_traits&lt; T &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Traits for various parametric types.  <a href="structftl_1_1parametric__type__traits.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1re__parametrise.html">ftl::re_parametrise&lt; typename, typename &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the concept parameter type of some template type.  <a href="structftl_1_1re__parametrise.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1is__same__template.html">ftl::is_same_template&lt; T, U &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if two parametric types are the same base.  <a href="structftl_1_1is__same__template.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:ga5d3bf2a7c887bde4b59f05cbc0a7098b"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga5d3bf2a7c887bde4b59f05cbc0a7098b"></a>
-template&lt;typename T , typename... Ts&gt; </td></tr>
+<tr class="memitem:ga5d3bf2a7c887bde4b59f05cbc0a7098b"><td class="memTemplParams" colspan="2">template&lt;typename T , typename... Ts&gt; </td></tr>
 <tr class="memitem:ga5d3bf2a7c887bde4b59f05cbc0a7098b"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__typelevel.html#ga5d3bf2a7c887bde4b59f05cbc0a7098b">ftl::get_last</a> = get_nth&lt; sizeof...(Ts), T, Ts...&gt;</td></tr>
-<tr class="memdesc:ga5d3bf2a7c887bde4b59f05cbc0a7098b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the final element in a type sequence. <br/></td></tr>
+<tr class="memdesc:ga5d3bf2a7c887bde4b59f05cbc0a7098b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the final element in a type sequence.  <a href="#ga5d3bf2a7c887bde4b59f05cbc0a7098b">More...</a><br/></td></tr>
 <tr class="separator:ga5d3bf2a7c887bde4b59f05cbc0a7098b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9b2fe7cfd4033787fa2f9c07e7f34839"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga9b2fe7cfd4033787fa2f9c07e7f34839"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ga9b2fe7cfd4033787fa2f9c07e7f34839"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__typelevel.html#ga9b2fe7cfd4033787fa2f9c07e7f34839">ftl::concept_parameter</a> = typename parametric_type_traits&lt; T &gt;::concept_parameter</td></tr>
+<tr class="memdesc:ga9b2fe7cfd4033787fa2f9c07e7f34839"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenient way of getting the primary concept type of a parametric type. <br/></td></tr>
+<tr class="separator:ga9b2fe7cfd4033787fa2f9c07e7f34839"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>A collection of "functions" working at a type level. </p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;ftl/type_functions.h&gt;</span></div>
-</div><!-- fragment --><dl class="section user"><dt>Dependencies</dt><dd>None. </dd></dl>
+</div><!-- fragment --><dl class="section user"><dt>Dependencies</dt><dd><ul>
+<li>&lt;type_traits&gt;</li>
+<li>&lt;cstddef&gt; </li>
+</ul>
+</dd></dl>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a class="anchor" id="ga5d3bf2a7c887bde4b59f05cbc0a7098b"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename... Ts&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="group__typelevel.html#ga5d3bf2a7c887bde4b59f05cbc0a7098b">ftl::get_last</a> = typedef get_nth&lt;sizeof...(Ts), T, Ts...&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the final element in a type sequence. </p>
+<p>Example: </p>
+<div class="fragment"><div class="line"><span class="comment">// t will be of type float</span></div>
+<div class="line"><span class="keyword">typename</span> get_last&lt;bool,int,float&gt;::type t;</div>
+</div><!-- fragment --> 
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

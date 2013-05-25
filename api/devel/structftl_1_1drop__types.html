@@ -92,7 +92,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Drops a number of types from a type sequence.  
+<p>Take all elements except the last one.  
  <a href="structftl_1_1drop__types.html#details">More...</a></p>
 
 <p><code>#include &lt;ftl/type_functions.h&gt;</code></p>
@@ -100,17 +100,32 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock"><h3>template&lt;size_t N, typename... Ts&gt;<br/>
 struct ftl::drop_types&lt; N, Ts &gt;</h3>
 
-<p>Drops a number of types from a type sequence. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">N</td><td>The number of types to drop </td></tr>
-  </table>
-  </dd>
-</dl>
-</div></div><!-- contents -->
+<p>Take all elements except the last one. </p>
+<p>Example: </p>
+<div class="fragment"><div class="line">     <span class="comment">// ts will be of type type_seq&lt;char,bool&gt;</span></div>
+<div class="line">     <span class="keyword">typename</span> take_init&lt;char,bool,int&gt;::type ts;</div>
+<div class="line">  </div>
+<div class="line">   \ingroup typelevel</div>
+<div class="line"> */</div>
+<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>...Ts&gt;</div>
+<div class="line"><span class="keyword">struct </span>take_init {</div>
+<div class="line">    <span class="keyword">using</span> type = <span class="keyword">typename</span> take_types&lt;<span class="keyword">sizeof</span>...(Ts)-1, Ts...&gt;::type;</div>
+<div class="line">};</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><span class="keyword">struct </span>take_init&lt;T&gt; {</div>
+<div class="line">    <span class="keyword">using</span> type = type_seq&lt;&gt;;</div>
+<div class="line">};</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> U&gt;</div>
+<div class="line"><span class="keyword">struct </span>take_init&lt;T,U&gt; {</div>
+<div class="line">    <span class="keyword">using</span> type = type_seq&lt;T&gt;;</div>
+<div class="line">};</div>
+<div class="line"></div>
+</div><!-- fragment --> </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

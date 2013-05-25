@@ -86,7 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock"><p>Abstraction of sequenceable computations in some context.</p>
 <p>Monads are essentially just a functor with some additional structure. Specifically, types that are monads have the added functionality (on top of what applicative adds) of sequencing computations in the context of the monad.</p>
 <p>While this is technically already possible in C++, the abstraction is useful none the less, because monads also have the power to implicitly pass state or other useful context information forward, without the user having to bother with it.</p>
-<p>The easiest example of the above is probably the maybe monad, where the user does not need to manually check for nothingness except at the very end of a sequence of computations&mdash;because maybe's implementation of <a class="el" href="structftl_1_1monad.html#a2eec9ab7658da121ccca6f2c6576695a" title="Bind a value and execute a computation in M on it.">monad&lt;M&gt;::bind</a> does that for them.</p>
+<p>The easiest example of the above is probably the maybe monad, where the user does not need to manually check for nothingness except at the very end of a sequence of computations&mdash;because maybe's implementation of <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078" title="Bind a value and execute a computation in M on it.">monad&lt;M&gt;::bind</a> does that for them.</p>
 <p>As with many of the other concepts in FTL, monads have a set of associated laws that instances must follow (though technically, there is nothing enforcing them):</p>
 <ul>
 <li><b>Left identity law</b> <div class="fragment"><div class="line">pure(x) &gt;&gt;= f    &lt;=&gt; f(x)</div>
@@ -100,7 +100,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -87,8 +87,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1future_01_4.html">ftl::monad&lt; std::future &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monad instance for std::future.  <a href="structftl_1_1monad_3_01std_1_1future_01_4.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html">ftl::monad&lt; std::future&lt; T &gt; &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monad instance for std::future.  <a href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoid_3_01std_1_1future_3_01T_01_4_01_4.html">ftl::monoid&lt; std::future&lt; T &gt; &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monoid instance of std::future.  <a href="structftl_1_1monoid_3_01std_1_1future_3_01T_01_4_01_4.html#details">More...</a><br/></td></tr>
@@ -97,7 +97,14 @@ Classes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Concept instances for std::future. </p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;ftl/future.h&gt;</span></div>
-</div><!-- fragment --><dl class="section user"><dt>Dependencies</dt><dd><ul>
+</div><!-- fragment --><p>This module adds instances of the following concepts to std::future:</p>
+<ul>
+<li><a class="el" href="group__functor.html">Functor</a></li>
+<li><a class="el" href="group__applicative.html">Applicative Functor</a></li>
+<li><a class="el" href="group__monad.html">Monad</a></li>
+<li><a class="el" href="group__monoid.html">Monoid</a></li>
+</ul>
+<dl class="section user"><dt>Dependencies</dt><dd><ul>
 <li>&lt;future&gt;</li>
 <li><a class="el" href="group__monad.html">Monad</a></li>
 <li><a class="el" href="group__monoid.html">Monoid</a> </li>
@@ -106,7 +113,7 @@ Classes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

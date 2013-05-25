@@ -77,14 +77,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Vector</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Run-time sized array container, its concept implementations, and so on.  
+<p>Implementations of concepts, utility functions, and more for std::vector.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -92,72 +91,46 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoid_3_01std_1_1vector_3_01Ts_8_8_8_4_01_4.html">ftl::monoid&lt; std::vector&lt; Ts...&gt; &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monoid implementation for std::vectors.  <a href="structftl_1_1monoid_3_01std_1_1vector_3_01Ts_8_8_8_4_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoid_3_01vector_3_01T_01_4_01_4.html">ftl::monoid&lt; vector&lt; T &gt; &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monoid implementation for vectors.  <a href="structftl_1_1monoid_3_01vector_3_01T_01_4_01_4.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html">ftl::monad&lt; std::vector&lt; T, A&lt; T &gt; &gt; &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monad implementation of vectors.  <a href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01vector_01_4.html">ftl::monad&lt; vector &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monad implementation of vectors.  <a href="structftl_1_1monad_3_01vector_01_4.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1foldable_3_01std_1_1vector_3_01T_00_01A_01_4_01_4.html">ftl::foldable&lt; std::vector&lt; T, A &gt; &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Foldable instance for std::vector.  <a href="structftl_1_1foldable_3_01std_1_1vector_3_01T_00_01A_01_4_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1foldable_3_01std_1_1vector_01_4.html">ftl::foldable&lt; std::vector &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Foldable instance for std::vector.  <a href="structftl_1_1foldable_3_01std_1_1vector_01_4.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:ga9514e34ba1b03d209ef3338f34c90e97"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:ga9514e34ba1b03d209ef3338f34c90e97"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__vector.html#ga9514e34ba1b03d209ef3338f34c90e97">ftl::vector</a> = std::vector&lt; T, std::allocator&lt; T &gt;&gt;</td></tr>
-<tr class="memdesc:ga9514e34ba1b03d209ef3338f34c90e97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Workaround to make vectors compatible with the functor series of concepts.  <a href="#ga9514e34ba1b03d209ef3338f34c90e97">More...</a><br/></td></tr>
-<tr class="separator:ga9514e34ba1b03d209ef3338f34c90e97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga08258d84ae20adde5cc4266d2aa50355"><td class="memTemplParams" colspan="2">template&lt;typename F , typename A , typename B  = typename decayed_result&lt;F(A)&gt;::type::value_type&gt; </td></tr>
-<tr class="memitem:ga08258d84ae20adde5cc4266d2aa50355"><td class="memTemplItemLeft" align="right" valign="top">vector&lt; B &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__vector.html#ga08258d84ae20adde5cc4266d2aa50355">ftl::concatMap</a> (F f, const vector&lt; A &gt; &amp;v)</td></tr>
-<tr class="memdesc:ga08258d84ae20adde5cc4266d2aa50355"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps and concatenates in one step.  <a href="#ga08258d84ae20adde5cc4266d2aa50355">More...</a><br/></td></tr>
-<tr class="separator:ga08258d84ae20adde5cc4266d2aa50355"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa59ac815a3db4d5abce224455748990c"><td class="memTemplParams" colspan="2">template&lt;typename F , typename T , template&lt; typename &gt; class A, typename U  = typename decayed_result&lt;F(T)&gt;::type::value_type&gt; </td></tr>
+<tr class="memitem:gaa59ac815a3db4d5abce224455748990c"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; U, A&lt; U &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__vector.html#gaa59ac815a3db4d5abce224455748990c">ftl::concatMap</a> (F f, const std::vector&lt; T, A&lt; T &gt;&gt; &amp;v)</td></tr>
+<tr class="memdesc:gaa59ac815a3db4d5abce224455748990c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps and concatenates in one step.  <a href="#gaa59ac815a3db4d5abce224455748990c">More...</a><br/></td></tr>
+<tr class="separator:gaa59ac815a3db4d5abce224455748990c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Run-time sized array container, its concept implementations, and so on. </p>
+<p>Implementations of concepts, utility functions, and more for std::vector. </p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;ftl/vector.h&gt;</span></div>
-</div><!-- fragment --><p>Much like ftl::list, this vector type is actually merely a type alias of std::vector. It is used throughout FTL&mdash;and recommended for use in applications and libraries using FTL, unless they need a different allocator&mdash;because the original vector type's template parameters do not mesh well with e.g. the Functor series of concepts.</p>
+</div><!-- fragment --><p>This module adds the following concept instances to std::vector:</p>
+<ul>
+<li><a class="el" href="group__monoid.html">Monoid</a></li>
+<li><a class="el" href="group__foldable.html">Foldable</a></li>
+<li><a class="el" href="group__functor.html">Functor</a></li>
+<li><a class="el" href="group__applicative.html">Applicative Functor</a></li>
+<li><a class="el" href="group__monad.html">Monad</a></li>
+</ul>
 <dl class="section user"><dt>Dependencies</dt><dd><ul>
 <li>&lt;vector&gt;</li>
-<li><a class="el" href="group__monoid.html">Monoid</a></li>
+<li><a class="el" href="group__foldable.html">Foldable</a></li>
 <li><a class="el" href="group__monad.html">Monad</a> </li>
 </ul>
 </dd></dl>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a class="anchor" id="ga9514e34ba1b03d209ef3338f34c90e97"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">using <a class="el" href="group__vector.html#ga9514e34ba1b03d209ef3338f34c90e97">ftl::vector</a> = typedef std::vector&lt;T, std::allocator&lt;T&gt;&gt;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Workaround to make vectors compatible with the functor series of concepts. </p>
-<p>If you require a different allocator than <code>std::allocator</code>, then make a similar type synonym and give it a monad instance of its own.</p>
-<dl class="section user"><dt>Concepts</dt><dd>As an ordinary std::vector, with the additions of:<ul>
-<li><a class="el" href="group__monoid.html">Monoid</a></li>
-<li><a class="el" href="group__monad.html">Monad</a> </li>
-</ul>
-</dd></dl>
-
-</div>
-</div>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ga08258d84ae20adde5cc4266d2aa50355"></a>
+<a class="anchor" id="gaa59ac815a3db4d5abce224455748990c"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename F , typename A , typename B  = typename decayed_result&lt;F(A)&gt;::type::value_type&gt; </div>
+template&lt;typename F , typename T , template&lt; typename &gt; class A, typename U  = typename decayed_result&lt;F(T)&gt;::type::value_type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">vector&lt;B&gt; ftl::concatMap </td>
+          <td class="memname">std::vector&lt;U,A&lt;U&gt; &gt; ftl::concatMap </td>
           <td>(</td>
           <td class="paramtype">F&#160;</td>
           <td class="paramname"><em>f</em>, </td>
@@ -165,7 +138,7 @@ template&lt;typename F , typename A , typename B  = typename decayed_result&lt;F
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const vector&lt; A &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::vector&lt; T, A&lt; T &gt;&gt; &amp;&#160;</td>
           <td class="paramname"><em>v</em>&#160;</td>
         </tr>
         <tr>
@@ -189,7 +162,7 @@ template&lt;typename F , typename A , typename B  = typename decayed_result&lt;F
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

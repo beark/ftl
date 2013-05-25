@@ -89,10 +89,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1foldMap__default.html">ftl::foldMap_default&lt; F &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default implementation of <a class="el" href="structftl_1_1foldable.html#a5d1df845ff8c0bb60f150c7d3f1e3470" title="Map each element to a monoid and fold the result.">foldable::foldMap</a>.  <a href="structftl_1_1foldMap__default.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default implementation of <a class="el" href="structftl_1_1foldable.html#aaf66c4dac7dccf12383037f7cbd35110" title="Map each element to a monoid and fold the result.">foldable::foldMap</a>.  <a href="structftl_1_1foldMap__default.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1fold__default.html">ftl::fold_default&lt; F &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default implementation of <a class="el" href="structftl_1_1foldable.html#a9b5265849f11e4bd2f30f1202c3ca44b" title="Fold a structure containing a monoidal type.">foldable::fold</a>.  <a href="structftl_1_1fold__default.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default implementation of <a class="el" href="structftl_1_1foldable.html#a33277b06b9c8e6a50cd40407eb3b764e" title="Fold a structure containing a monoidal type.">foldable::fold</a>.  <a href="structftl_1_1fold__default.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1foldable.html">ftl::foldable&lt; F &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concrete definition of the foldable concept.  <a href="structftl_1_1foldable.html#details">More...</a><br/></td></tr>
@@ -100,36 +100,21 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga14572572e972d6a11d65cce2d43f3952"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga14572572e972d6a11d65cce2d43f3952"></a>
-template&lt;template&lt; typename...&gt; class F, typename M , typename  = typename std::enable_if&lt;foldable&lt;F&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;monoid&lt;M&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:ga14572572e972d6a11d65cce2d43f3952"><td class="memTemplItemLeft" align="right" valign="top">M&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__foldable.html#ga14572572e972d6a11d65cce2d43f3952">ftl::fold</a> (const F&lt; M, Ts...&gt; &amp;f)</td></tr>
-<tr class="memdesc:ga14572572e972d6a11d65cce2d43f3952"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function alias of <a class="el" href="structftl_1_1foldable.html#a9b5265849f11e4bd2f30f1202c3ca44b" title="Fold a structure containing a monoidal type.">foldable&lt;T&gt;::fold</a>. <br/></td></tr>
-<tr class="separator:ga14572572e972d6a11d65cce2d43f3952"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga95baa1aed173960ce6a6e1c187ec3bd7"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga95baa1aed173960ce6a6e1c187ec3bd7"></a>
-template&lt;template&lt; typename &gt; class F, typename M , typename  = typename std::enable_if&lt;foldable&lt;F&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;monoid&lt;M&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:ga95baa1aed173960ce6a6e1c187ec3bd7"><td class="memTemplItemLeft" align="right" valign="top">M&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__foldable.html#ga95baa1aed173960ce6a6e1c187ec3bd7">ftl::fold</a> (const F&lt; M &gt; &amp;f)</td></tr>
-<tr class="memdesc:ga95baa1aed173960ce6a6e1c187ec3bd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded for singly type parametrised types. <br/></td></tr>
-<tr class="separator:ga95baa1aed173960ce6a6e1c187ec3bd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac7de788ae5d37e17e9af71320419fb99"><td class="memTemplParams" colspan="2"><a class="anchor" id="gac7de788ae5d37e17e9af71320419fb99"></a>
-template&lt;template&lt; typename...&gt; class F, typename Fn , typename A , typename B , typename  = typename std::enable_if&lt;foldable&lt;F&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;					B,					typename decayed_result&lt;Fn(A,B)&gt;::type					&gt;::value				&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gac7de788ae5d37e17e9af71320419fb99"><td class="memTemplItemLeft" align="right" valign="top">B&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__foldable.html#gac7de788ae5d37e17e9af71320419fb99">ftl::foldr</a> (Fn &amp;&amp;fn, B &amp;&amp;z, const F&lt; A, Ts...&gt; &amp;f)</td></tr>
-<tr class="memdesc:gac7de788ae5d37e17e9af71320419fb99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function alias of <a class="el" href="structftl_1_1foldable.html#ac2edd6dda7b6e05fd1daaacaa0e254e1" title="Right associative fold.">foldable&lt;T&gt;::foldr</a>. <br/></td></tr>
-<tr class="separator:gac7de788ae5d37e17e9af71320419fb99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2e611e11846fee69e9274de0b514bad0"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga2e611e11846fee69e9274de0b514bad0"></a>
-template&lt;template&lt; typename &gt; class F, typename Fn , typename A , typename B , typename  = typename std::enable_if&lt;foldable&lt;F&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;					B,					typename decayed_result&lt;Fn(A,B)&gt;::type					&gt;::value				&gt;::type&gt; </td></tr>
-<tr class="memitem:ga2e611e11846fee69e9274de0b514bad0"><td class="memTemplItemLeft" align="right" valign="top">B&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__foldable.html#ga2e611e11846fee69e9274de0b514bad0">ftl::foldr</a> (Fn &amp;&amp;fn, B &amp;&amp;z, const F&lt; A &gt; &amp;f)</td></tr>
-<tr class="memdesc:ga2e611e11846fee69e9274de0b514bad0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded for singly type parametrised types. <br/></td></tr>
-<tr class="separator:ga2e611e11846fee69e9274de0b514bad0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf7e91dfd879228cc97f88398eab75373"><td class="memTemplParams" colspan="2"><a class="anchor" id="gaf7e91dfd879228cc97f88398eab75373"></a>
-template&lt;template&lt; typename...&gt; class F, typename Fn , typename A , typename B , typename  = typename std::enable_if&lt;foldable&lt;F&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;					A,					typename decayed_result&lt;Fn(B,A)&gt;::type					&gt;::value				&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gaf7e91dfd879228cc97f88398eab75373"><td class="memTemplItemLeft" align="right" valign="top">A&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__foldable.html#gaf7e91dfd879228cc97f88398eab75373">ftl::foldl</a> (Fn &amp;&amp;fn, A &amp;&amp;z, const F&lt; B, Ts...&gt; &amp;f)</td></tr>
-<tr class="memdesc:gaf7e91dfd879228cc97f88398eab75373"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function alias of <a class="el" href="structftl_1_1foldable.html#ab8370cb990000d1c81bf028a2abe2688" title="Left associative fold.">foldable&lt;T&gt;::foldl</a>. <br/></td></tr>
-<tr class="separator:gaf7e91dfd879228cc97f88398eab75373"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga28dc0d6d96538c7a857c38ce56ed99e7"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga28dc0d6d96538c7a857c38ce56ed99e7"></a>
-template&lt;template&lt; typename &gt; class F, typename Fn , typename A , typename B , typename  = typename std::enable_if&lt;foldable&lt;F&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;					A,					typename decayed_result&lt;Fn(B,A)&gt;::type					&gt;::value				&gt;::type&gt; </td></tr>
-<tr class="memitem:ga28dc0d6d96538c7a857c38ce56ed99e7"><td class="memTemplItemLeft" align="right" valign="top">A&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__foldable.html#ga28dc0d6d96538c7a857c38ce56ed99e7">ftl::foldl</a> (Fn &amp;&amp;fn, A &amp;&amp;z, const F&lt; B &gt; &amp;f)</td></tr>
-<tr class="memdesc:ga28dc0d6d96538c7a857c38ce56ed99e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded for singly type parametrised types. <br/></td></tr>
-<tr class="separator:ga28dc0d6d96538c7a857c38ce56ed99e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacf13a4a4af69a850d5c96d36a1f61124"><td class="memTemplParams" colspan="2"><a class="anchor" id="gacf13a4a4af69a850d5c96d36a1f61124"></a>
+template&lt;typename F , typename M  = concept_parameter&lt;F&gt;, typename  = typename std::enable_if&lt;foldable&lt;F&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;monoid&lt;M&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:gacf13a4a4af69a850d5c96d36a1f61124"><td class="memTemplItemLeft" align="right" valign="top">M&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__foldable.html#gacf13a4a4af69a850d5c96d36a1f61124">ftl::fold</a> (const F &amp;f)</td></tr>
+<tr class="memdesc:gacf13a4a4af69a850d5c96d36a1f61124"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function alias of <a class="el" href="structftl_1_1foldable.html#a33277b06b9c8e6a50cd40407eb3b764e" title="Fold a structure containing a monoidal type.">foldable&lt;T&gt;::fold</a>. <br/></td></tr>
+<tr class="separator:gacf13a4a4af69a850d5c96d36a1f61124"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad4062dbf98b40e6dc902df4c099c4657"><td class="memTemplParams" colspan="2"><a class="anchor" id="gad4062dbf98b40e6dc902df4c099c4657"></a>
+template&lt;typename F , typename Fn , typename U , typename T  = concept_parameter&lt;F&gt;, typename  = typename std::enable_if&lt;foldable&lt;F&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;					U,					typename decayed_result&lt;Fn(T,U)&gt;::type				&gt;::value			&gt;::type&gt; </td></tr>
+<tr class="memitem:gad4062dbf98b40e6dc902df4c099c4657"><td class="memTemplItemLeft" align="right" valign="top">U&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__foldable.html#gad4062dbf98b40e6dc902df4c099c4657">ftl::foldr</a> (Fn &amp;&amp;fn, U &amp;&amp;z, const F &amp;f)</td></tr>
+<tr class="memdesc:gad4062dbf98b40e6dc902df4c099c4657"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function alias of <a class="el" href="structftl_1_1foldable.html#aa71d1bd6ba1114e6560b09abe8f5da87" title="Right associative fold.">foldable&lt;T&gt;::foldr</a>. <br/></td></tr>
+<tr class="separator:gad4062dbf98b40e6dc902df4c099c4657"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6a9d7bd768ac15c2bdf218f780ba6d6e"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga6a9d7bd768ac15c2bdf218f780ba6d6e"></a>
+template&lt;typename F , typename Fn , typename U , typename T  = concept_parameter&lt;F&gt;, typename  = typename std::enable_if&lt;foldable&lt;F&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;					U,					typename decayed_result&lt;Fn(U,T)&gt;::type				&gt;::value			&gt;::type&gt; </td></tr>
+<tr class="memitem:ga6a9d7bd768ac15c2bdf218f780ba6d6e"><td class="memTemplItemLeft" align="right" valign="top">U&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__foldable.html#ga6a9d7bd768ac15c2bdf218f780ba6d6e">ftl::foldl</a> (Fn &amp;&amp;fn, U &amp;&amp;z, const F &amp;f)</td></tr>
+<tr class="memdesc:ga6a9d7bd768ac15c2bdf218f780ba6d6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function alias of <a class="el" href="structftl_1_1foldable.html#ad7590da3fb6b05ca06312b0d8f6bc3c5" title="Left associative fold.">foldable&lt;T&gt;::foldl</a>. <br/></td></tr>
+<tr class="separator:ga6a9d7bd768ac15c2bdf218f780ba6d6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Interface and utilities relating to the <a class="el" href="foldablepg.html">Foldable</a> concept. </p>
@@ -142,7 +127,7 @@ template&lt;template&lt; typename &gt; class F, typename Fn , typename A , typen
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 18 2013 18:25:31 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>
