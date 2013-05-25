@@ -72,8 +72,8 @@ public:
 	friend parser<char> oneOf(std::string);
 	friend parser<std::string> many(parser<char>);
 	friend parser<std::string> many1(parser<char>);
-	friend class ftl::monad<parser>;
 	friend class ftl::monoidA<parser>;
+	template<typename U> friend struct ftl::monad;
 
 	using value_type = T;
 
@@ -102,15 +102,14 @@ namespace ftl {
 	 *
 	 * Also gives us Applicative and Functor.
 	 */
-	template<>
-	struct monad<parser> {
+	template<typename T>
+	struct monad<parser<T>> {
 
 		/**
 		 * Consume no input, yield a.
 		 */
-		template<typename A>
-		static parser<A> pure(A a) {
-			return parser<A>{
+		static parser<T> pure(T a) {
+			return parser<T>{
 				[a](std::istream& stream) {
 					return yield(a);
 				}
@@ -125,10 +124,9 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename A,
-				typename B = typename decayed_result<F(A)>::type>
-		static parser<B> map(F f, parser<A> p) {
-			return parser<B>([f,p](std::istream& s) {
+				typename U = typename decayed_result<F(T)>::type>
+		static parser<U> map(F f, parser<T> p) {
+			return parser<U>([f,p](std::istream& s) {
 				auto r = p.run(s);
 				return f % r;
 			});
@@ -139,19 +137,18 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename A,
-				typename B = typename decayed_result<F(A)>::type::value_type>
-		static parser<B> bind(parser<A> p, F f) {
-			return parser<B>([p,f](std::istream& strm) {
+				typename U = typename decayed_result<F(T)>::type::value_type>
+		static parser<U> bind(parser<T> p, F f) {
+			return parser<U>([p,f](std::istream& strm) {
 
 				auto r = p.run(strm);
 				if(r) {
-					parser<B> p2 = f(*r);
+					parser<U> p2 = f(*r);
 					return p2.run(strm);
 				}
 
 				else {
-					return fail<B>(r.right().message());
+					return fail<U>(r.right().message());
 				}
 			});
 		}

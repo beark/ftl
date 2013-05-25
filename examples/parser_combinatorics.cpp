@@ -14,7 +14,7 @@ template<typename T>
 parser<T> option(parser<T> p, T&& t) {
 	using ftl::operator|;
 
-	return p | ftl::monad<parser>::pure<T>(std::forward<T>(t));
+	return p | ftl::monad<parser<T>>::pure(std::forward<T>(t));
 }
 
 parser<int> parseNatural() {
