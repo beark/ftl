@@ -220,6 +220,21 @@ namespace ftl {
 	 * \ingroup monad
 	 */
 	template<
+			typename Mt,
+			typename Mu,
+			typename T = concept_parameter<Mt>,
+			typename = typename std::enable_if<monad<Mt>::instance>::type,
+			typename = typename std::enable_if<
+				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
+			>::type
+	>
+	Mu operator>> (const Mt& m1, const Mu& m2) {
+		return monad<Mt>::bind(m1, [m2](const T&) {
+			return m2;
+		});
+	}
+
+	template<
 			typename Mt_,
 			typename Mu_,
 			typename Mt = plain_type<Mt_>,
@@ -227,11 +242,11 @@ namespace ftl {
 			typename T = concept_parameter<Mt>,
 			typename = typename std::enable_if<monad<Mt>::instance>::type,
 			typename = typename std::enable_if<
-				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::valueA
+				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
 			>::type
 	>
 	Mu operator>> (Mt_&& m1, Mu_&& m2) {
-		return monad<Mt_>::bind(std::forward<Mt>(m1), [m2](T&&) {
+		return monad<Mt_>::bind(std::forward<Mt>(m1), [m2](const T&) {
 			return m2;
 		});
 	}
@@ -252,16 +267,16 @@ namespace ftl {
 			typename Mt_,
 			typename Mu,
 			typename Mt = plain_type<Mt_>,
+			typename = typename std::enable_if<monad<Mt>::instance>::type,
 			typename T = concept_parameter<Mt>,
 			typename U = concept_parameter<Mu>,
-			typename = typename std::enable_if<monad<Mt>::instance>::type,
 			typename = typename std::enable_if<
 				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
 			>::type
 	>
 	Mt operator<< (Mt_&& m1, Mu m2) {
 		return monad<Mt>::bind(std::forward<Mt>(m1), [m2](T t) {
-			return monad<Mu>::bind(m2, [t](U&&) {
+			return monad<Mu>::bind(m2, [t](const U&) {
 				return monad<Mt>::pure(t);
 			});
 		});
