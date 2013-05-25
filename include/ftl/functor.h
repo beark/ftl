@@ -28,7 +28,7 @@
 
 namespace ftl {
 	// Forward declaration so we can mention applicatives
-	template<template<typename...> class F>
+	template<typename F>
 	struct applicative;
 
 	/**
@@ -86,49 +86,36 @@ namespace ftl {
 	 * similar. For types that cannot be copied, for instance, it makes sense
 	 * that all of the functor interface functions accept an rvalue reference.
 	 *
-	 * \note There exists a second functor interface struct, declared as
-	 *       \code
-	 *       template<template<typename> class F>
-	 *       struct functor<F> { ... };
-	 *       \endcode
-	 *       The reason for this is that it is presently impossible to unify the
-	 *       two signatures, and FTL must allow functors to be parameterised on
-	 *       more than just the type they're a functor in. Each member of the
-	 *       interface will further document how the second version looks.
-	 *
 	 * \ingroup functor
 	 */
-	template<template<typename...> class F>
+	template<typename F>
 	struct functor {
 		/**
 		 * Maps a function to the contained value(s).
 		 *
-		 * For instances parameterised on _only_ `A`, `map`'s signature is
-		 * \code
-		 * static F<B> map(Fn&& fn, const F<A>& f);
-		 * \endcode
-		 * where the template parameters `A`, `B`, and `Fn` are declared
-		 * equivalently to this version.
-		 *
-		 * \tparam Fn must satisfy \ref fn<B(A)>, where \c B is any arbitrary
-		 *         type that can be put into the context of \c F.
+		 * \tparam Fn must satisfy \ref fn<U(T)>, where `T` is the type `F` is
+		 *            parametrised on, and `U` is a type the unparametrised
+		 *            `F` _can_ encapsulate.
 		 */
 		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type,
-			typename...Ts>
-		static F<B,Ts...> map(Fn&& fn, const F<A,Ts...>& f) {
-			return applicative<F>::map(std::forward<Fn>(fn), f);
+				typename Fn,
+				typename T = concept_parameter<F>,
+				typename U = typename decayed_result<Fn(T)>::type,
+				typename Fu = typename re_parametrise<F,U>::type>
+		static Fu map(Fn&& fn, const F& f) {
+			return applicative<F>::map(
+					std::forward<Fn>(fn), f);
 		}
 
 		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type,
-			typename...Ts>
-		static F<B,Ts...> map(Fn&& fn, F<A,Ts...>&& f) {
-			return applicative<F>::map(std::forward<Fn>(fn), std::move(f));
+				typename Fn,
+				typename T = concept_parameter<F>,
+				typename U = typename decayed_result<Fn(T)>::type,
+				typename Fu = typename re_parametrise<F,U>::type>
+		static Fu map(Fn&& fn, F&& f) {
+			return applicative<F>::map(
+					std::forward<Fn>(fn),
+					std::move(f));
 		}
 
 		/**
@@ -140,87 +127,33 @@ namespace ftl {
 		static constexpr bool instance = applicative<F>::instance;
 	};
 
-	template<template<typename> class F>
-	struct functor<F> {
-		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type>
-		static F<B> map(Fn&& fn, const F<A>& f) {
-			return applicative<F>::map(std::forward<Fn>(fn), f);
-		}
-
-		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type>
-		static F<B> map(Fn&& fn, F<A>&& f) {
-			return applicative<F>::map(std::forward<Fn>(fn), std::move(f));
-		}
-
-		static constexpr bool instance = applicative<F>::instance;
-	};
-
 	/**
 	 * Convenience operator for functor::map.
 	 *
 	 * \ingroup functor
 	 */
 	template<
-		template<typename...> class F,
+		typename F,
 		typename Fn,
-		typename A,
-		typename = typename std::enable_if<functor<F>::instance>::type,
-		typename...Ts>
-	auto operator% (Fn&& fn, const F<A,Ts...>& f)
+		typename = typename std::enable_if<functor<F>::instance>::type>
+	auto operator% (Fn&& fn, const F& f)
 	-> decltype(functor<F>::map(std::forward<Fn>(fn), f)) {
 		return functor<F>::map(std::forward<Fn>(fn), f);
 	}
 
 	/**
-	 * Overloaded for rvalues.
+	 * \overload
 	 *
 	 * \ingroup functor
 	 */
 	template<
-		template<typename...> class F,
+		typename F,
 		typename Fn,
-		typename A,
-		typename = typename std::enable_if<functor<F>::instance>::type,
-		typename...Ts>
-	auto operator% (Fn&& fn, F<A,Ts...>&& f)
-	-> decltype(functor<F>::map(std::forward<Fn>(fn), std::move(f))) {
-		return functor<F>::map(std::forward<Fn>(fn), std::move(f));
-	}
-
-	/**
-	 * Overloaded for single-type parameterised functors.
-	 *
-	 * \ingroup functor
-	 */
-	template<
-		template<typename> class F,
-		typename Fn,
-		typename A,
-		typename = typename std::enable_if<functor<F>::instance>::type>
-	auto operator% (Fn&& fn, const F<A>& f)
-	-> decltype(functor<F>::map(std::forward<Fn>(fn), f)) {
-		return functor<F>::map(std::forward<Fn>(fn), f);
-	}
-
-	/**
-	 * Overloaded for both rvalues and single type functors.
-	 *
-	 * \ingroup functor
-	 */
-	template<
-		template<typename> class F,
-		typename Fn,
-		typename A,
-		typename = typename std::enable_if<functor<F>::instance>::type>
-	auto operator% (Fn&& fn, F<A>&& f)
-	-> decltype(functor<F>::map(std::forward<Fn>(fn), std::move(f))) {
-		return functor<F>::map(std::forward<Fn>(fn), std::move(f));
+		typename F_ = plain_type<F>,
+		typename = typename std::enable_if<functor<F_>::instance>::type>
+	auto operator% (Fn&& fn, F&& f)
+	-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::move(f))) {
+		return functor<F_>::map(std::forward<Fn>(fn), std::move(f));
 	}
 
 	/**
@@ -237,14 +170,15 @@ namespace ftl {
 	 * with any Representable.
 	 */
 	template<
-		template<typename...> class F,
-		typename A,
-		typename R,
-		typename = typename std::enable_if<functor<F>::instance>::type,
-		typename...Ts>
+			template<typename...> class F,
+			typename A,
+			typename R,
+			typename...Ts,
+			typename = typename std::enable_if<
+				functor<F<A,Ts...>>::instance>::type>
 	function<F<R,Ts...>,A> distribute(F<function<R,A>,Ts...> f) {
 		return [f](A a) {
-			functor<F>::map(
+			functor<F<A,Ts...>>::map(
 				[f,a](function<R,A> fn) {
 					return f(a);
 				},
@@ -258,13 +192,14 @@ namespace ftl {
 	 * \ingroup functor
 	 */
 	template<
-		template<typename> class F,
-		typename A,
-		typename R,
-		typename = typename std::enable_if<functor<F>::instance>::type>
+			template<typename> class F,
+			typename A,
+			typename R,
+			typename = typename std::enable_if<
+				functor<F<A>>::instance>::type>
 	function<F<R>,A> distribute(F<function<R,A>> f) {
 		return [f](A a) {
-			functor<F>::map(
+			functor<F<A>>::map(
 				[f,a](function<R,A> fn) {
 					return f(a);
 				},

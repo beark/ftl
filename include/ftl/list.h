@@ -32,19 +32,18 @@ namespace ftl {
 	/**
 	 * \defgroup list List
 	 *
-	 * Doubly linked list, its concept implementations, and so on.
+	 * Concept implementations and utility functions for std::list.
 	 *
 	 * \code
 	 *   #include <ftl/list.h>
 	 * \endcode
 	 *
-	 * The list type is in reality just a simple type alias of std::list. The
-	 * main reason for this is because the template parameter signature of
-	 * std::list is not compatible with some of the concepts FTL defines.
-	 *
 	 * This module adds the following concept instances to std::list:
 	 * - \ref monoid
 	 * - \ref foldable
+	 * - \ref functor
+	 * - \ref applicative
+	 * - \ref monad
 	 *
 	 * \par Dependencies
 	 * - <list>
@@ -53,36 +52,33 @@ namespace ftl {
 	 */
 
 	/**
-	 * Workaround to make lists compatible with the functor series of concepts.
+	 * Specialisation of re_parametrise for lists.
 	 *
-	 * If you require a different allocator than \c std::allocator, then make
-	 * a similar type synonym and give it a monad instance of its own.
-	 *
-	 * \par Concepts
-	 * As an ordinary std::list, with the additions:
-	 * - \ref functor
-	 * - \ref applicative
-	 * - \ref monad
+	 * This makes sure the allocator is also properly parametrised on the
+	 * new element type.
 	 *
 	 * \ingroup list
 	 */
-	template<typename T>
-	using list = std::list<T, std::allocator<T>>;
+	template<typename T, typename U, template<typename> class A>
+	struct re_parametrise<std::list<T,A<T>>,U> {
+		using type = std::list<U,A<U>>;
+	};
 
 	/**
 	 * Maps and concatenates in one step.
 	 *
-	 * \tparam F must satisfy \ref fn`<`\ref container`<B>(A)>`
+	 * \tparam F must satisfy \ref fn`<`\ref container`<U>(T)>`
 	 *
 	 * \ingroup list
 	 */
 	template<
 		typename F,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type::value_type>
-	list<B> concatMap(F f, const list<A>& l) {
+		typename T,
+		template<typename> class A,
+		typename U = typename decayed_result<F(T)>::type::value_type>
+	std::list<U,A<U>> concatMap(F f, const std::list<T,A<T>>& l) {
 
-		list<B> result;
+		std::list<U,A<U>> result;
 		auto nested = f % l;
 
 		for(auto& el : nested) {
@@ -136,50 +132,16 @@ namespace ftl {
 	};
 
 	/**
-	 * Monoid instance for list.
+	 * Monad implementation for std::list.
 	 *
-	 * Exactly equivalent of monoid<std::list<Ts...>>.
-	 *
-	 * \ingroup list
-	 */
-	template<typename T>
-	struct monoid<list<T>> {
-		static list<T> id() {
-			return list<T>();
-		}
-
-		static list<T> append(const list<T>& l1, const list<T>& l2) {
-			auto l3 = l1;
-			l3.insert(l3.end(), l2.begin(), l2.end());
-			return l3;
-		}
-
-		static list<T> append(list<T>&& l1, const list<T>& l2) {
-			l1.insert(l1.end(), l2.begin(), l2.end());
-			return std::move(l1);
-		}
-
-		static list<T> append(const list<T>& l1, list<T>&& l2) {
-			l2.insert(l2.end(), l1.begin(), l1.end());
-			return std::move(l2);
-		}
-
-		static constexpr bool instance = true;
-	};
-
-	/**
-	 * Monad implementation for list.
-	 *
-	 * \note This concept instance is only valid for the list alias commonly
-	 *       used in FTL. It is not valid for regular std::lists. If you
-	 *       require the use of an allocator aside from std::allocator, then
-	 *       you must create your own alias of std::list and give it a monad
-	 *       instance.
+	 * Note that this instance is only valid for std::lists using an
+	 * allocator of the form `template<typename> class Allocator`, where the
+	 * template parameter to the allocator is the elment type of the list.
 	 *
 	 * \ingroup list
 	 */
-	template<>
-	struct monad<list> {
+	template<typename T, template<typename> class A>
+	struct monad<std::list<T,A<T>>> {
 
 		/**
 		 * Produces a singleton list.
@@ -187,10 +149,9 @@ namespace ftl {
 		 * That is, pure generates a one element list, where that single element
 		 * is `a`.
 		 */
-		template<typename A>
-		static list<A> pure(A&& a) {
-			list<A> l{};
-			l.emplace_back(std::forward<A>(a));
+		static std::list<T,A<T>> pure(T&& a) {
+			std::list<T,A<T>> l{};
+			l.emplace_back(std::forward<T>(a));
 			return l;
 		}
 
@@ -201,11 +162,11 @@ namespace ftl {
 		 * in the list returned by the call to map.
 		 */
 		template<
-			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type>
-		static list<B> map(F&& f, const list<A>& l) {
-			list<B> ret;
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static std::list<U,A<U>> map(F&& f, const std::list<T,A<T>>& l) {
+			std::list<U,A<U>> ret;
 			for(const auto& e : l) {
 				ret.push_back(f(e));
 			}
@@ -214,34 +175,33 @@ namespace ftl {
 		}
 
 		/**
-		 * Move optimised version enabled when f does not change domain.
+		 * Move optimised version enabled when `f` does not change domain.
 		 *
-		 * Basically, if the return type of f is the same as its parameter type
-		 * and l is a temporary (rvalue reference), then l is re-used. This
+		 * Basically, if the return type of `f` is the same as its parameter type
+		 * and `l` is a temporary (rvalue reference), then l is re-used. This
 		 * means no copies are made.
 		 */
 		template<
-			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type,
-			typename = typename std::enable_if<std::is_same<A,B>::value>::type>
-		static list<A> map(F&& f, list<A>&& l) {
+				typename F,
+				typename U = typename decayed_result<F(T)>::type,
+				typename = typename std::enable_if<
+					std::is_same<T,U>::value
+				>::type
+		>
+		static std::list<T,A<T>> map(F&& f, std::list<T,A<T>>&& l) {
 			for(auto& e : l) {
 				e = f(e);
 			}
 
-			// Make sure compiler remembers l is a temporary.
-			// This is safe, because we're returning it to the context from
-			// whence it came.
-			return std::move(l);
+			return std::list<T,A<T>>{std::move(l)};
 		}
 
 		/// Equivalent of flip(concatMap)
 		template<
-			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type::value_type>
-		static list<B> bind(const list<A>& l, F&& f) {
+				typename F,
+				typename U = typename decayed_result<F(T)>::type::value_type
+		>
+		static std::list<U,A<U>> bind(const std::list<T,A<T>>& l, F&& f) {
 			return concatMap(std::forward<F>(f), l);
 		}
 
@@ -253,21 +213,24 @@ namespace ftl {
 	 *
 	 * \ingroup list
 	 */
-	template<>
-	struct foldable<std::list>
-	: fold_default<std::list>, foldMap_default<std::list> {
+	template<
+			typename T,
+			typename A
+	>
+	struct foldable<std::list<T,A>>
+	: fold_default<std::list<T,A>>, foldMap_default<std::list<T,A>> {
+
 		template<
 				typename Fn,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						A,
-						typename decayed_result<Fn(B,A)>::type
+						U,
+						typename decayed_result<Fn(U,T)>::type
 					>::value
-				>::type,
-				typename...Ts>
-		static A foldl(Fn&& fn, A z, const std::list<B,Ts...>& l) {
+				>::type
+		>
+		static U foldl(Fn&& fn, U z, const std::list<T,A>& l) {
 			for(auto& e : l) {
 				z = fn(z, e);
 			}
@@ -277,63 +240,15 @@ namespace ftl {
 
 		template<
 				typename Fn,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						B,
-						typename decayed_result<Fn(A,B)>::type
+						U,
+						typename decayed_result<Fn(T,U)>::type
 					>::value
-				>::type,
-				typename...Ts>
-		static B foldr(Fn&& fn, B z, const std::list<A,Ts...>& l) {
-			for(auto it = l.rbegin(); it != l.rend(); ++it) {
-				z = fn(*it, z);
-			}
-
-			return z;
-		}
-
-		static constexpr bool instance = true;
-	};
-
-	/**
-	 * Foldable instance for ftl::lists.
-	 *
-	 * \ingroup list
-	 */
-	template<>
-	struct foldable<list>
-	: fold_default<list>, foldMap_default<list> {
-		template<
-				typename Fn,
-				typename A,
-				typename B,
-				typename = typename std::enable_if<
-					std::is_same<
-						A,
-						typename decayed_result<Fn(B,A)>::type
-						>::value
-					>::type>
-		static A foldl(Fn&& fn, A z, const list<B>& l) {
-			for(auto& e : l) {
-				z = fn(z, e);
-			}
-
-			return z;
-		}
-
-		template<
-				typename Fn,
-				typename A,
-				typename B,
-				typename = typename std::enable_if<
-					std::is_same<
-						B,
-						typename decayed_result<Fn(A,B)>::type
-						>::value
-					>::type>
-		static B foldr(Fn&& fn, B z, const list<A>& l) {
+				>::type
+		>
+		static U foldr(Fn&& fn, U z, const std::list<T,A>& l) {
 			for(auto it = l.rbegin(); it != l.rend(); ++it) {
 				z = fn(*it, z);
 			}

@@ -74,87 +74,38 @@ namespace ftl {
 	 *
 	 * \ingroup functional
 	 */
-	template<>
-	struct applicative<function> {
+	template<typename R, typename P, typename...Ps>
+	struct applicative<function<R,P,Ps...>> {
 
 		/// Creates a function that returns `a`, regardless of its parameters.
-		template<typename A, typename...Ts>
-		static function<A,Ts...> pure(A a) {
-			return [a] (Ts...) { return a; };
+		static function<R,P,Ps...> pure(R a) {
+			return [a](P,Ps...) { return a; };
 		}
 
 		/// Equivalent of function composition
 		template<
-			typename F,
-			typename A,
-			typename B = typename std::result_of<F(A)>::type,
-			typename...Ps>
-		static function<B,Ps...> map(F f, function<A,Ps...> fn) {
-			return [f,fn] (Ps...ps) {
-				return f(fn(std::forward<Ps>(ps)...));
+				typename F,
+				typename S = typename std::result_of<F(R)>::type
+		>
+		static function<S,P,Ps...> map(F f, function<R,P,Ps...> fn) {
+			return [f,fn] (P p, Ps...ps) {
+				return f(fn(std::forward<P>(p), std::forward<Ps>(ps)...));
 			};
 		}
 
 		template<
 			typename F,
-			typename A,
-			typename B = typename std::result_of<F(A)>::type,
-			typename...Ts>
-		static function<B,Ts...> apply(
-				function<function<B,A>, Ts...> fn,
-				const function<A,Ts...>& f) {
-			return [=] (Ts...ts) {
-				auto fab = fn(ts...);
-				return fab(f(ts...));
+			typename S = typename std::result_of<F(R)>::type
+		>
+		static function<S,P,Ps...> apply(function<F,P,Ps...> f, function<R,P,Ps...> g) {
+
+			return [=] (P x,Ps...xs) {
+				return f(x,xs...)(g(x,xs...));
 			};
 		}
 
 		static constexpr bool instance = true;
 	};
-
-	/*
-	 * N-ary curry, commented out until GCC fixes the bug where template
-	 * parameter packs cannot be captured in lambds...
-	 * TODO: Enable once gcc has fixed this
-	namespace {
-
-		template<
-			typename R,
-			typename T,
-			typename...Ts,
-			typename...Ps>
-		auto curry_rec(function<R,Ts...> f, type_vec<T> dummy, Ps...ps)
-		-> function<R,T> {
-			return [f,ps...] (T t) {
-				return f(std::forward<T>(t), std::forward<Ps>(ps)...);
-			};
-		}
-
-		template<
-			typename R,
-			typename T,
-			typename...OTs,
-			typename...Ts,
-			typename...Ps>
-		auto curry_rec(function<R,OTs..> f, type_vec<T,Ts...> dummy, Ps...ps)
-		-> function<decltype(curry_rec(f,type_vec<Ts...>(),std::forward<T>(T()),std::forward<Ps>(ps)...)),T> {
-			return  [f,ps...] (T t) {
-				return curry_rec(f, type_vec<Ts...>(), std::forward<T>(t), std::forward<Ps>(ps)...);
-			};
-		}
-	}
-
-	template<
-		typename R,
-		typename T,
-		typename...Ts>
-	auto curry(function<R,T,Ts...> f)
-	-> function<decltype(curry_rec(f,type_vec<Ts...>(), std::forward<T>(T()))), T> {
-		return [f] (T t) {
-			return curry_rec(f, type_vec<Ts...>(), std::forward<T>(t));
-		};
-	}
-	*/
 
 	/**
 	 * Monoid instance for std::functions returning monoids.

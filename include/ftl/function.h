@@ -31,6 +31,7 @@
 #define FTL_FUNCTION_H
 
 #include <memory>
+#include <stdexcept>
 #include <functional>
 #include "type_functions.h"
 #include "monoid.h"

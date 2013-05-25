@@ -24,10 +24,8 @@
 #define FTL_FORWARDS_LIST_H
 
 #include <forward_list>
-#include <tuple>
 #include "foldable.h"
 #include "monad.h"
-#include "maybe.h"
 
 namespace ftl {
 
@@ -43,32 +41,28 @@ namespace ftl {
 	 * This module adds the following concept instances to std::forward_list:
 	 * - \ref monoid
 	 * - \ref foldable
-	 *
-	 * \par Dependencies
-	 * - <forward_list>
-	 * - <tuple>
-	 * - \ref foldable
-	 * - \ref monad
-	 * - \ref maybe
-	 */
-
-	/**
-	 * Workaround to make forward lists compatible with the functor series of
-	 * concepts.
-	 *
-	 * If you require a different allocator than \c std::allocator, then make
-	 * a similar type synonym and give it a monad instance of its own.
-	 *
-	 * \par Concepts
-	 * As a regular std::forward_list, with the additions:
 	 * - \ref functor
 	 * - \ref applicative
 	 * - \ref monad
 	 *
-	 * \ingroup fwdlist
+	 * \par Dependencies
+	 * - <forward_list>
+	 * - \ref foldable
+	 * - \ref monad
 	 */
-	template<typename T>
-	using forward_list = std::forward_list<T, std::allocator<T>>;
+
+	/**
+	 * Specialisation of re_parametrise for forward_lists.
+	 *
+	 * This makes sure the allocator is also properly parametrised on the
+	 * new element type.
+	 *
+	 * \ingroup list
+	 */
+	template<typename T, typename U, template<typename> class A>
+	struct re_parametrise<std::forward_list<T,A<T>>,U> {
+		using type = std::forward_list<U,A<U>>;
+	};
 
 	/**
 	 * Maps and concatenates in one step.
@@ -78,12 +72,15 @@ namespace ftl {
 	 * \ingroup fwdlist
 	 */
 	template<
-		typename F,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type::value_type>
-	forward_list<B> concatMap(F&& f, const forward_list<A>& l) {
+			typename F,
+			typename T,
+			template<typename> class A,
+			typename U = typename decayed_result<F(T)>::type::value_type>
+	std::forward_list<U,A<U>> concatMap(
+			F&& f,
+			const std::forward_list<T,A<T>>& l) {
 
-		forward_list<B> result;
+		std::forward_list<U,A<U>> result;
 		auto nested = f % l;
 
 		auto it = result.before_begin();
@@ -134,7 +131,8 @@ namespace ftl {
 
 			std::forward_list<Ts...> rl(l1);
 
-			for(auto it = rl.begin(); it != rl.end(); ++it)
+			auto it = rl.begin();
+			for(; it != rl.end(); ++it)
 				;
 
 			rl.splice_after(it, std::move(l2));
@@ -145,77 +143,31 @@ namespace ftl {
 	};
 
 	/**
-	 * Monoid implementation for ftl::forward_list
-	 *
-	 * Exactly equivalent of the monoid instance for std::forward_list.
-	 * 
-	 * \ingroup fwdlist
-	 */
-	template<typename T>
-	struct monoid<forward_list<T>> {
-		static forward_list<T> id() {
-			return forward_list<T>();
-		}
-
-		static forward_list<T> append(
-				const forward_list<T>& l1,
-				const forward_list<T>& l2) {
-
-			forward_list<T> rl(l2);
-
-			rl.insert_after(rl.before_begin(), l2.begin(), l2.end());
-			return rl;
-		}
-
-		// Optimised cases for when one list can be spliced into the other
-		static forward_list<T> append(
-				forward_list<T>&& l1,
-				const forward_list<T>& l2) {
-
-			forward_list<T> rl(l2);
-			rl.splice_after(rl.before_begin(), std::move(l1));
-			return rl;
-		}
-
-		static forward_list<T> append(
-				const forward_list<T>& l1,
-				forward_list<T>&& l2) {
-
-			forward_list<T> rl(l1);
-
-			for(auto it = rl.begin(); it != rl.end(); ++it)
-				;
-
-			rl.splice_after(it, std::move(l2));
-			return rl;
-		}
-
-		static constexpr bool instance = true;
-	};
-
-	/**
-	 * Monad instance of FTL's alias of forward_list
+	 * Monad instance of forward_lists
 	 *
 	 * This instance is equivalent to the other container monads, e.g.
-	 * monad<ftl::list>, and monad<ftl::vector>.
+	 * monad<std::list<T>>, and monad<std::vector<T>>.
 	 *
 	 * \ingroup fwdlist
 	 */
-	template<>
-	struct monad<forward_list> {
-		template<typename T>
-		static forward_list<T> pure(T&& t) {
-			forward_list<T> l;
+	template<typename T, template<typename> class A>
+	struct monad<std::forward_list<T,A<T>>> {
+
+		static std::forward_list<T,A<T>> pure(T&& t) {
+			std::forward_list<T> l;
 			l.emplace_front(std::forward<T>(t));
 			return l;
 		}
 
 		template<
 				typename F,
-				typename A,
-				typename B = typename decayed_result<F(A)>::type>
-		static forward_list<B> map(F&& f, const forward_list<A>& l) {
-			forward_list<B> rl;
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static std::forward_list<U,A<U>> map(
+				F&& f,
+				const std::forward_list<T,A<T>>& l) {
+
+			std::forward_list<U,A<U>> rl;
 			auto it = rl.before_begin();
 			for(const auto& e : l) {
 				it = rl.insert_after(it, f(e));
@@ -227,26 +179,32 @@ namespace ftl {
 		// No copy version available when F is an endofuntion
 		template<
 				typename F,
-				typename A,
 				typename = typename std::enable_if<
 					std::is_same<
-						A,
-						typename decayed_result<F(A)>::type
+						T,
+						typename decayed_result<F(T)>::type
 					>::value
 				>::type>
-		static forward_list<A> map(F&& f, forward_list<A>&& l) {
-			for(auto& e : l) {
+		static std::forward_list<T,A<T>> map(
+				F&& f,
+				std::forward_list<T,A<T>>&& l) {
+
+			auto rl = std::move(l);
+			for(auto& e : rl) {
 				e = f(e);
 			}
 
-			return std::move(l);
+			return rl;
 		}
 
 		template<
 				typename F,
-				typename A,
-				typename B = typename decayed_result<F(A)>::type::value_type>
-		static forward_list<B> bind(const forward_list<B> l, F&& f) {
+				typename U = typename decayed_result<F(T)>::type::value_type
+		>
+		static std::forward_list<U,A<U>> bind(
+				const std::forward_list<T,A<T>> l,
+				F&& f) {
+
 			return concatMap(std::forward<F>(f), l);
 		}
 
@@ -270,21 +228,22 @@ namespace ftl {
 	 *
 	 * \ingroup fwdlist
 	 */
-	template<>
-	struct foldable<std::forward_list>
-	: fold_default<std::forward_list>, foldMap_default<std::forward_list> {
+	template<typename T, typename A>
+	struct foldable<std::forward_list<T,A>> :
+			fold_default<std::forward_list<T,A>>,
+			foldMap_default<std::forward_list<T,A>> {
+
 		template<
 				typename F,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						A,
-						typename decayed_result<F(B,A)>::type
+						U,
+						typename decayed_result<F(U,T)>::type
 					>::value
-				>::type,
-				typename...Ts>
-		static A foldl(F&& f, A z, const std::forward_list<B,Ts...>& l) {
+				>::type
+		>
+		static U foldl(F&& f, U z, const std::forward_list<T,A>& l) {
 			for(auto& e : l) {
 				z = f(z, e);
 			}
@@ -294,63 +253,18 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						B,
-						typename decayed_result<F(A,B)>::type
+						U,
+						typename decayed_result<F(T,U)>::type
 					>::value
-				>::type,
-				typename...Ts>
-		static B foldr(F&& f, B&& z, const std::forward_list<A,Ts...>& l) {
+				>::type
+		>
+		static U foldr(F&& f, U&& z, const std::forward_list<T,A>& l) {
 			return _dtl::fwdfoldr(
 					std::forward<F>(f),
-					std::forward<B>(z),
-					l.begin(), l.end());
-		}
-	};
-
-	/**
-	 * Instance implementation of Foldable for ftl::forward_lists.
-	 *
-	 * \ingroup fwdlist
-	 */
-	template<>
-	struct foldable<forward_list>
-	: fold_default<forward_list>, foldMap_default<forward_list> {
-		template<
-				typename F,
-				typename A,
-				typename B,
-				typename = typename std::enable_if<
-					std::is_same<
-						A,
-						typename decayed_result<F(B,A)>::type
-					>::value
-				>::type>
-		static A foldl(F&& f, A z, const forward_list<B>& l) {
-			for(auto& e : l) {
-				z = f(z, e);
-			}
-
-			return z;
-		}
-
-		template<
-				typename F,
-				typename A,
-				typename B,
-				typename = typename std::enable_if<
-					std::is_same<
-						B,
-						typename decayed_result<F(A,B)>::type
-					>::value
-				>::type>
-		static B foldr(F&& f, B&& z, const forward_list<A>& l) {
-			return _dtl::fwdfoldr(
-					std::forward<F>(f),
-					std::forward<B>(z),
+					std::forward<U>(z),
 					l.begin(), l.end());
 		}
 	};

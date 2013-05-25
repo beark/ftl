@@ -24,7 +24,7 @@
 #define FTL_VECTOR_H
 
 #include <vector>
-#include "monoid.h"
+#include "foldable.h"
 #include "monad.h"
 
 namespace ftl {
@@ -32,40 +32,37 @@ namespace ftl {
 	/**
 	 * \defgroup vector Vector
 	 *
-	 * Run-time sized array container, its concept implementations, and so on.
+	 * Implementations of concepts, utility functions, and more for std::vector.
 	 *
 	 * \code
 	 *   #include <ftl/vector.h>
 	 * \endcode
 	 *
-	 * Much like ftl::list, this vector type is actually merely a type alias of
-	 * std::vector. It is used throughout FTL&mdash;and recommended for use in
-	 * applications and libraries using FTL, unless they need a different
-	 * allocator&mdash;because the original vector type's template parameters
-	 * do not mesh well with e.g. the Functor series of concepts.
+	 * This module adds the following concept instances to std::vector:
+	 * - \ref monoid
+	 * - \ref foldable
+	 * - \ref functor
+	 * - \ref applicative
+	 * - \ref monad
 	 *
 	 * \par Dependencies
 	 * - <vector>
-	 * - \ref monoid
+	 * - \ref foldable
 	 * - \ref monad
 	 */
 
 	/**
-	 * Workaround to make vectors compatible with the functor series of
-	 * concepts.
+	 * Specialisation of re_parametrise for vectors.
 	 *
-	 * If you require a different allocator than \c std::allocator, then make
-	 * a similar type synonym and give it a monad instance of its own.
+	 * This makes sure the allocator is also properly parametrised on the
+	 * new element type.
 	 *
-	 * \par Concepts
-	 * As an ordinary std::vector, with the additions of:
-	 * - \ref monoid
-	 * - \ref monad
-	 *
-	 * \ingroup vector
+	 * \ingroup list
 	 */
-	template<typename T>
-	using vector = std::vector<T, std::allocator<T>>;
+	template<typename T, typename U, template<typename> class A>
+	struct re_parametrise<std::vector<T,A<T>>,U> {
+		using type = std::vector<U,A<U>>;
+	};
 
 	/**
 	 * Maps and concatenates in one step.
@@ -76,11 +73,12 @@ namespace ftl {
 	 */
 	template<
 		typename F,
-		typename A,
-		typename B = typename decayed_result<F(A)>::type::value_type>
-	vector<B> concatMap(F f, const vector<A>& v) {
+		typename T,
+		template<typename> class A,
+		typename U = typename decayed_result<F(T)>::type::value_type>
+	std::vector<U,A<U>> concatMap(F f, const std::vector<T,A<T>>& v) {
 
-		std::vector<B> result;
+		std::vector<U,A<U>> result;
 		result.reserve(v.size() * 2);	// Reasonable assumption? TODO: test!
 		auto nested = f % v;
 
@@ -135,66 +133,27 @@ namespace ftl {
 	};
 
 	/**
-	 * Monoid implementation for vectors.
-	 *
-	 * Exactly equivalent of the std::vector instance.
-	 *
-	 * \ingroup vector
-	 */
-	template<typename T>
-	struct monoid<vector<T>> {
-		static vector<T> id() {
-			return vector<T>();
-		}
-
-		static vector<T> append(const vector<T>& v1, const vector<T>& v2) {
-			auto rv(v1);
-			rv.reserve(v2.size());
-			rv.insert(rv.end(), v2.begin(), v2.end());
-			return rv;
-		}
-
-		static vector<T> append(vector<T>&& v1, const vector<T>& v2) {
-			v1.reserve(v2.size());
-			v1.insert(v1.end(), v2.begin(), v2.end());
-			return v1;
-		}
-
-		static vector<T> append(const vector<T>& v1, vector<T>&& v2) {
-			v2.reserve(v1.size());
-			v2.insert(v2.begin(), v1.begin(), v1.end());
-			return v1;
-		}
-
-		static constexpr bool instance = true;
-	};
-
-	/**
 	 * Monad implementation of vectors
 	 *
 	 * \ingroup vector
 	 */
-	template<>
-	struct monad<vector> {
-		/// Creates a one element vector
-		template<typename T>
-		static vector<T> pure(const T& t) {
-			return vector{t};
-		}
+	template<typename T, template<typename> class A>
+	struct monad<std::vector<T,A<T>>> {
 
-		/// As above, but using move semantics
-		template<typename T>
-		static vector<T> pure(T&& t) {
-			return vector{std::move(t)};
+		/// Creates a one element vector
+		static std::vector<T,A<T>> pure(T&& t) {
+			std::vector<T,A<T>> v{};
+			v.emplace_back(std::forward<T>(t));
+			return v;
 		}
 
 		/// Applies f to each element
 		template<
-			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type>
-		static vector<B> map(F&& f, const vector<A>& v) {
-			vector<B> ret;
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static std::vector<U,A<U>> map(F&& f, const std::vector<T,A<T>>& v) {
+			std::vector<U,A<U>> ret;
 			ret.reserve(v.size());
 			for(const auto& e : v) {
 				ret.push_back(f(e));
@@ -211,26 +170,27 @@ namespace ftl {
 		 * means no copies are made.
 		 */
 		template<
-			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type,
-			typename = typename std::enable_if<std::is_same<A,B>::value>::type>
-		static vector<A> map(F&& f, vector<A>&& v) {
+				typename F,
+				typename U = typename decayed_result<F(T)>::type,
+				typename =
+					typename std::enable_if<std::is_same<T,U>::value>::type
+		>
+		static std::vector<T,A<T>> map(F&& f, std::vector<T,A<T>>&& v) {
 			for(auto& e : v) {
 				e = f(e);
 			}
 
 			// Move into new (temporary) container, so reference does not go
 			// and die
-			return vector<A>(std::move(v));
+			return std::vector<T,A<T>>(std::move(v));
 		}
 
 		/// Equivalent of flip(concatMap)
 		template<
 			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type::value_type>
-		static vector<B> bind(const vector<A>& v, F&& f) {
+			typename U = typename decayed_result<F(T)>::type::value_type
+		>
+		static std::vector<U,A<U>> bind(const std::vector<T,A<T>>& v, F&& f) {
 			return concatMap(std::forward<F>(f), v);
 		}
 
@@ -242,21 +202,21 @@ namespace ftl {
 	 *
 	 * \ingroup vector
 	 */
-	template<>
-	struct foldable<std::vector>
-	: fold_default<std::vector>, foldMap_default<std::vector> {
+	template<typename T, typename A>
+	struct foldable<std::vector<T,A>>
+	: fold_default<std::vector<T,A>>, foldMap_default<std::vector<T,A>> {
+
 		template<
 				typename Fn,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						A,
-						typename decayed_result<Fn(B,A)>::type
+						U,
+						typename decayed_result<Fn(U,T)>::type
 						>::value
-					>::type,
-				typename...Ts>
-		static A foldl(Fn&& fn, A z, const std::vector<B,Ts...>& v) {
+					>::type
+		>
+		static U foldl(Fn&& fn, U z, const std::vector<T,A>& v) {
 			for(auto& e : v) {
 				z = fn(z, e);
 			}
@@ -266,63 +226,15 @@ namespace ftl {
 
 		template<
 				typename Fn,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						B,
-						typename decayed_result<Fn(A,B)>::type
+						U,
+						typename decayed_result<Fn(T,U)>::type
 						>::value
-					>::type,
-				typename...Ts>
-		static B foldr(Fn&& fn, B z, const std::vector<A,Ts...>& v) {
-			for(auto it = v.rbegin(); it != v.rend(); ++it) {
-				z = fn(*it, z);
-			}
-
-			return z;
-		}
-
-		static constexpr bool instance = true;
-	};
-
-	/*
-	 * Foldable instance for ftl::vector.
-	 *
-	 * \ingroup vector
-	 */
-	template<>
-	struct foldable<vector>
-	: fold_default<vector>, foldMap_default<vector> {
-		template<
-				typename Fn,
-				typename A,
-				typename B,
-				typename = typename std::enable_if<
-					std::is_same<
-						A,
-						typename decayed_result<Fn(B,A)>::type
-						>::value
-					>::type>
-		static A foldl(Fn&& fn, A z, const vector<B>& v) {
-			for(auto& e : v) {
-				z = fn(z, e);
-			}
-
-			return z;
-		}
-
-		template<
-				typename Fn,
-				typename A,
-				typename B,
-				typename = typename std::enable_if<
-					std::is_same<
-						B,
-						typename decayed_result<Fn(A,B)>::type
-						>::value
-					>::type>
-		static B foldr(Fn&& fn, B z, const vector<A>& v) {
+					>::type
+		>
+		static U foldr(Fn&& fn, U z, const std::vector<T,A>& v) {
 			for(auto it = v.rbegin(); it != v.rend(); ++it) {
 				z = fn(*it, z);
 			}

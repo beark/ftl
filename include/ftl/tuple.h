@@ -209,18 +209,18 @@ namespace ftl {
 	 *
 	 * \ingroup tuple
 	 */
-	template<>
-	struct functor<std::tuple> {
+	template<typename T, typename...Ts>
+	struct functor<std::tuple<T,Ts...>> {
 		/// Apply `f` to first element in the tuple
 		template<
-			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type,
-			typename...Ts>
-		std::tuple<B, Ts...> map(F&& f, const std::tuple<A, Ts...>& t) {
+				typename F,
+				typename U = typename decayed_result<F(T)>::type,
+				typename...Ts
+		>
+		std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
 
-			std::tuple<B, Ts...> ret;
-			tup<sizeof...(Ts)-1, std::tuple<B, Ts...>>::fmap(
+			std::tuple<U,Ts...> ret;
+			tup<sizeof...(Ts)-1, std::tuple<U,Ts...>>::fmap(
 					std::forward<F>(f), t, ret);
 			return ret;
 		}
@@ -234,30 +234,29 @@ namespace ftl {
 	 *
 	 * \ingroup tuple
 	 */
-	template<>
-	struct applicative<std::tuple> {
-		template<typename A, typename...Ts>
-		static std::tuple<A,Ts...> pure(A&& a) {
-			return std::make_tuple(std::forward<A>(a), monoid<Ts>::id()...);
+	template<typename T, typename...Ts>
+	struct applicative<std::tuple<T,Ts...>> {
+
+		static std::tuple<T,Ts...> pure(T&& a) {
+			return std::make_tuple(std::forward<T>(a), monoid<Ts>::id()...);
 		}
 
 		template<
 			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type,
+			typename U = typename decayed_result<F(T)>::type,
 			typename...Ts>
-		static std::tuple<B,Ts...> map(F&& f, const std::tuple<A,Ts...>& t) {
+		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
 			return functor<std::tuple>::map(std::forward<F>(f), t);
 		}
 
 		template<
 			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type,
+			typename T,
+			typename U = typename decayed_result<F(T)>::type,
 			typename...Ts>
-		static std::tuple<B,Ts...> apply(
+		static std::tuple<U,Ts...> apply(
 				const std::tuple<F,Ts...>& tfn,
-				const std::tuple<A,Ts...>& t) {
+				const std::tuple<T,Ts...>& t) {
 			return applicative_implementation(tfn, t);
 		}
 

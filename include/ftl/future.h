@@ -38,6 +38,12 @@ namespace ftl {
 	 *   #include <ftl/future.h>
 	 * \endcode
 	 *
+	 * This module adds instances of the following concepts to std::future:
+	 * - \ref functor
+	 * - \ref applicative
+	 * - \ref monad
+	 * - \ref monoid
+	 *
 	 * \par Dependencies
 	 * - <future>
 	 * - \ref monad
@@ -54,13 +60,12 @@ namespace ftl {
 	 *
 	 * \ingroup future
 	 */
-	template<>
-	struct monad<std::future> {
+	template<typename T>
+	struct monad<std::future<T>> {
 
 		/**
 		 * Creates a future that returns `t`.
 		 */
-		template<typename T>
 		static std::future<T> pure(T&& t) {
 			return std::async(
 					std::launch::deferred,
@@ -77,16 +82,16 @@ namespace ftl {
 		 * \li `fa` finishes waiting from the resulting call to its `get`
 		 */
 		template<
-			typename F,
-			typename A,
-			typename B = typename std::result_of<F(A)>::type>
-		static std::future<B> map(F&& f, std::future<A>&& fa) {
+				typename F,
+				typename U = typename std::result_of<F(T)>::type
+		>
+		static std::future<U> map(F f, std::future<T>&& fa) {
 			return std::async(
 				std::launch::deferred,
-				[](F&& f, std::future<A>&& fa) {
+				[](F f, std::future<T>&& fa) {
 					return f(fa.get());
 				},
-				std::forward<F>(f),
+				f,
 				std::move(fa)
 			);
 		}
@@ -99,14 +104,14 @@ namespace ftl {
 		 * future, which we also wait for and finally return the value of.
 		 */
 		template<
-			typename F,
-			typename A,
-			typename B = typename inner_type<
-				typename std::result_of<F(A)>::type>::type>
-		static std::future<B> bind(std::future<A>&& fa, F&& f) {
+				typename F,
+				typename U = typename inner_type<
+					typename std::result_of<F(T)>::type>::type
+		>
+		static std::future<U> bind(std::future<T>&& fa, F&& f) {
 			return std::async(
 				std::launch::deferred,
-				[](std::future<A>&& fa, F&& f) {
+				[](std::future<T>&& fa, F&& f) {
 					return f(fa.get()).get();
 				},
 				std::move(fa),
@@ -133,7 +138,7 @@ namespace ftl {
 
 			std::future<B> operator() (function<B,A> fn) {
 				return std::move(_f) >>= [fn](A&& a) {
-					return monad<std::future>::pure(fn(std::forward<A>(a)));
+					return monad<std::future<B>>::pure(fn(std::forward<A>(a)));
 				};
 			}
 

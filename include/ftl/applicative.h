@@ -27,7 +27,7 @@
 
 namespace ftl {
 
-	template<template<typename...> class M>
+	template<typename M>
 	struct monad;
 
 	/**
@@ -77,43 +77,33 @@ namespace ftl {
 	 *
 	 * Struct that must be specialised to implement the applicative concept.
 	 *
-	 * \note There exists a second, essentially duplicate interface, used by
-	 *       types parameterised _only_ on the type they're an applicative
-	 *       functor on. I.e., there is an interface with the appearance
-	 *       \code
-	 *         template<template<typename> class F>
-	 *         struct applicative;
-	 *       \endcode
-	 *
 	 * \ingroup applicative
 	 */
-	template<template<typename...> class F>
+	template<typename F>
 	struct applicative {
+
+		/**
+		 * The type F is an applicative functor on.
+		 *
+		 * For example, in the case of `maybe<int>`, `T = int`.
+		 */
+		using T = concept_parameter<F>;
 
 		/**
 		 * Encapsulate a pure value in the applicative functor.
 		 *
-		 * Defaults to monad<A>::pure, because any monad is also an
+		 * Defaults to monad<F>::pure, because any monad is also an
 		 * applicative functor.
 		 *
-		 * For single parameter types implementing applicative, `pure` has the
-		 * signature
-		 * \code
-		 *   template<typename A>
-		 *   static F<A> pure(A&& a);
-		 * \endcode
-		 * instead.
-		 *
-		 * \note Default implementation only works if F has a monad instance
+		 * \note Default implementation only works if `F` has a monad instance
 		 *       defined.
 		 *
 		 * \note If implementing applicative directly (instead of implicitly by
 		 *       way of monad), then `pure` may be overloaded or replaced with a
 		 *       `const` reference version, or even a pass by value version.
 		 */
-		template<typename A, typename...Ts>
-		static F<A,Ts...> pure(A&& a) {
-			return monad<F>::pure(std::forward<A>(a));
+		static F pure(T&& x) {
+			return monad<F>::pure(std::forward<T>(x));
 		}
 
 		/**
@@ -122,59 +112,46 @@ namespace ftl {
 		 * \see functor<F>::map
 		 */
 		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type,
-			typename...Ts>
-		static F<B,Ts...> map(Fn&& fn, const F<A,Ts...>& f) {
+				typename Fn,
+				typename U = typename decayed_result<Fn(T)>::type,
+				typename Fu = typename re_parametrise<F,U>::type>
+		static Fu map(Fn&& fn, const F& f) {
 			return monad<F>::map(std::forward<Fn>(fn), f);
 		}
 
 		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type,
-			typename...Ts>
-		static F<B,Ts...> map(Fn&& fn, F<A,Ts...>&& f) {
+				typename Fn,
+				typename U = typename decayed_result<Fn(T)>::type,
+				typename Fu = typename re_parametrise<F,U>::type>
+		static Fu map(Fn&& fn, F&& f) {
 			return monad<F>::map(std::forward<Fn>(fn), std::move(f));
 		}
 
 		/**
 		 * Contextualised function application.
 		 *
-		 * Applies the wrapped/contextualised function fn to the similarly
-		 * wrapped value f.
+		 * Applies the wrapped/contextualised function `fn` to the similarly
+		 * wrapped value `f`.
 		 *
 		 * Default implementation is to use monad's \c ap().
 		 *
-		 * For functors parameterised only on `A`, `apply` is declared as
-		 * \code
-		 *   static F<B> apply(const F<Fn>& fn, const F<A>& f);
-		 * \endcode
-		 * with the template parameters defined equivalently to this version.
-		 *
-		 * \tparam Fn must satisfy \ref fn<B(A)>, where `B` is an arbitrary
-		 *         type that can be wrapped in `F`.
+		 * \tparam Ff must satisfy
+		 *         `std::is_same<typename re_parametrise<Ff,T>::type, F>::value`
 		 *
 		 * \note Default implementation only works if F is already a monad.
 		 */
 		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type,
-			typename...Ts>
-		static F<B,Ts...> apply(const F<Fn,Ts...>& fn, const F<A,Ts...>& f) {
-			return ap(fn, f);
-		}
-
-		/// \overload
-		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type,
-			typename...Ts>
-		static F<B,Ts...> apply(F<Fn,Ts...>&& fn, F<A,Ts...>&& f) {
-			return ap(std::move(fn), std::move(f));
+			typename Ff_,
+			typename Ff = plain_type<Ff_>,
+			typename Fn = concept_parameter<Ff>,
+			typename U = typename decayed_result<Fn(T)>::type,
+			typename Fu = typename re_parametrise<F,U>::type,
+			typename = typename std::enable_if<std::is_same<
+				typename re_parametrise<Ff,T>::type, F
+			>::value>::type
+		>
+		static Fu apply(Ff_&& fn, F&& f) {
+			return ap(std::forward<Ff>(fn), std::forward<F>(f));
 		}
 
 		/**
@@ -185,114 +162,29 @@ namespace ftl {
 		static constexpr bool instance = monad<F>::instance;
 	};
 
-	template<template<typename> class F>
-	struct applicative<F> {
-		template<typename A>
-		static F<A> pure(A a) {
-			return monad<F>::pure(std::forward<A>(a));
-		}
-
-		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type>
-		static F<B> map(Fn&& fn, const F<A>& f) {
-			return monad<F>::map(std::forward<Fn>(fn), f);
-		}
-
-		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type>
-		static F<B> map(Fn&& fn, F<A>&& f) {
-			return monad<F>::map(std::forward<Fn>(fn), std::move(f));
-		}
-
-		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type>
-		static F<B> apply(const F<Fn>& fn, const F<A>& f) {
-			return ap(fn, f);
-		}
-
-		template<
-			typename Fn,
-			typename A,
-			typename B = typename decayed_result<Fn(A)>::type>
-		static F<B> apply(F<Fn>&& fn, F<A>&& f) {
-			return ap(std::move(fn), std::move(f));
-		}
-
-		static constexpr bool instance = monad<F>::instance;
-	};
-
 	/**
 	 * Convenience operator to ease applicative style programming.
 	 *
 	 * \code
 	 *   a * b <=> applicative<F>::apply(a, b)
 	 * \endcode
-	 * Where \c a and \c b are complete types of \c F and \c F is an applicative
+	 * Where `a` and `b` are complete types of `F` and `F` is an applicative
 	 * functor.
 	 *
 	 * \ingroup applicative
 	 */
 	template<
-		template<typename...> class F,
-		typename Fn,
-		typename A,
-		typename = typename std::enable_if<applicative<F>::instance>::type,
-		typename B = typename decayed_result<Fn(A)>::type,
-		typename...Ts>
-	F<B,Ts...> operator* (const F<Fn,Ts...>& u, const F<A,Ts...>& v) {
-		return applicative<F>::apply(u, v);
-	}
+			typename F,
+			typename Fn,
+			typename F_ = plain_type<F>,
+			typename = typename std::enable_if<applicative<F_>::instance>::type
+	>
+	auto operator* (Fn&& u, F&& v)
+	-> decltype(applicative<F_>::apply(
+				std::forward<Fn>(u),std::forward<F_>(v))) {
 
-	/**
-	 * Overloaded for rvalue references.
-	 *
-	 * \ingroup applicative
-	 */
-	template<
-		template<typename...> class F,
-		typename Fn,
-		typename A,
-		typename = typename std::enable_if<applicative<F>::instance>::type,
-		typename B = typename decayed_result<Fn(A)>::type,
-		typename...Ts>
-	F<B,Ts...> operator* (F<Fn,Ts...>&& u, F<A,Ts...>&& v) {
-		return applicative<F>::apply(std::move(u), std::move(v));
-	}
-
-	/**
-	 * Overloaded for applicatives parameterised on a single type.
-	 *
-	 * \ingroup applicative
-	 */
-	template<
-		template<typename> class F,
-		typename Fn,
-		typename A,
-		typename = typename std::enable_if<applicative<F>::instance>::type,
-		typename B = typename decayed_result<Fn(A)>::type>
-	F<B> operator* (const F<Fn>& u, const F<A>& v) {
-		return applicative<F>::apply(u, v);
-	}
-
-	/**
-	 * Overloaded for both single parameter types and rvalues.
-	 *
-	 * \ingroup applicative
-	 */
-	template<
-		template<typename> class F,
-		typename Fn,
-		typename A,
-		typename = typename std::enable_if<applicative<F>::instance>::type,
-		typename B = typename decayed_result<Fn(A)>::type>
-	F<B> operator* (F<Fn>&& u, F<A>&& v) {
-		return applicative<F>::apply(std::move(u), std::move(v));
+		return applicative<F_>::apply(
+				std::forward<Fn>(u), std::forward<F_>(v));
 	}
 
 	/**
@@ -416,7 +308,7 @@ namespace ftl {
 			typename A,
 			typename = typename std::enable_if<monoidA<F>::instance>::type>
 	F<maybe<A>> optional(const F<A>& f) {
-		return value<A> % f | applicative<F>::pure(maybe<A>{});
+		return value<A> % f | applicative<F<maybe<A>>>::pure(maybe<A>{});
 	}
 }
 

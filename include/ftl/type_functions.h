@@ -184,6 +184,9 @@ namespace ftl {
 	 * - <cstddef>
 	 */
 
+	template<typename T>
+	using plain_type = typename std::decay<T>::type;
+
 	/**
 	 * Get the basic, "undecorated" return type of a function.
 	 *
@@ -206,8 +209,7 @@ namespace ftl {
 
 	template<typename F, typename...Ps>
 	struct decayed_result<F(Ps...)> {
-		using type =
-			typename std::decay<typename std::result_of<F(Ps...)>::type>::type;
+		using type = plain_type<typename std::result_of<F(Ps...)>::type>;
 	};
 
 	/**
@@ -491,7 +493,7 @@ namespace ftl {
 		typename parametric_type_traits<T>::concept_parameter;
 
 	/**
-	 * Changes the inner type of some template type.
+	 * Changes the concept parameter type of some template type.
 	 *
 	 * Example
 	 * \code
@@ -503,8 +505,11 @@ namespace ftl {
 	 *   void bar() {
 	 *       std::vector<int> v = foo(std::vector<float>{});
 	 *   }
-	 *
 	 * \endcode
+	 *
+	 * Any parametric type that specialises parametric_type_traits should
+	 * specialice re_parametrise too (more specifically, if their specialisation
+	 * changed the behaviour of concept_parameter.
 	 *
 	 * \ingroup typelevel
 	 */

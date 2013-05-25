@@ -66,35 +66,33 @@ namespace ftl {
 	 *
 	 * \ingroup foldable
 	 */
-	template<template<typename...> class F>
+	template<typename F>
 	struct foldable {
+		/// Typedef for easier reference to the type to fold on
+		using T = concept_parameter<F>;
+
 // Just as in monad, we don't want the compiler to find these, but the API
 // reference generator should.
 #ifdef SILLY_WORKAROUND
 		/**
 		 * Fold a structure containing a monoidal type.
 		 *
-		 * \tparam M must be a \ref monoid
+		 * \tparam T must be a \ref monoid
 		 */
-		template<
-				typename M,
-				typename = typename std::enable_if<monoid<M>::instance>::type,
-				typename...Ts>
-		static M fold(const F<M,Ts...>& f);
+		template<typename = typename std::enable_if<monoid<T>::instance>::type>
+		static T fold(const F& f);
 
 		/**
 		 * Map each element to a monoid and fold the result.
 		 *
-		 * \tparam M must be a \ref monoid.
 		 * \tparam Fn must satisfy \ref fn`<M(A)>`
 		 */
 		template<
-				typename A,
 				typename Fn,
-				typename M = typename std::result_of<Fn(A)>::type,
-				typename = typename std::enable_if<monoid<M>::instance>::type,
-				typename...Ts>
-		static M foldMap(Fn&& fn, const F<A,Ts...>& f);
+				typename M = typename std::result_of<Fn(T)>::type,
+				typename = typename std::enable_if<monoid<M>::instance>::type
+		>
+		static M foldMap(Fn&& fn, const F& f);
 
 		/**
 		 * Right associative fold.
@@ -103,20 +101,19 @@ namespace ftl {
 		 * \param z Zero value to combine the first element with
 		 * \param f Structure to fold
 		 *
-		 * \tparam Fn must satisfy \ref fn`<B(A,B)>`
+		 * \tparam Fn must satisfy \ref fn`<U(T,U)>`
 		 */
 		template<
 				typename Fn,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						B,
-						typename decayed_result<Fn(A,B)>::type
-						>::value
-					>::type,
-				typename...Ts>
-		static B foldr(Fn&& fn, B&& z, const F<A,Ts...>& f);
+						U,
+						typename decayed_result<Fn(T,U)>::type
+					>::value
+				>::type
+		>
+		static U foldr(Fn&& fn, U&& z, const F& f);
 
 		/**
 		 * Left associative fold.
@@ -125,29 +122,23 @@ namespace ftl {
 		 * \param z Zero value to combine first element with
 		 * \param f Structure to fold
 		 *
-		 * \tparam Fn must satisfy \ref fn`<A(B,A)>`
+		 * \tparam Fn must satisfy \ref fn`<U(U,T)>`
 		 */
 		template<
 				typename Fn,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						A,
-						typename decayed_result<Fn(B,A)>::type
-						>::value
-					>::type,
-				typename...Ts>
-		static A foldl(Fn&& fn, A&& z, const F<B,Ts...>& f);
+						U,
+						typename decayed_result<Fn(U,T)>::type
+					>::value
+				>::type,
+		>
+		static U foldl(Fn&& fn, U&& z, const F& f);
 
 #endif
 
 		/// Compile time constant to check if a type is an instance.
-		static constexpr bool instance = false;
-	};
-
-	template<template<typename> class F>
-	struct foldable<F> {
 		static constexpr bool instance = false;
 	};
 
@@ -159,36 +150,17 @@ namespace ftl {
 	 *
 	 * \ingroup foldable
 	 */
-	template<template<typename...> class F>
+	template<typename F>
 	struct foldMap_default {
 		template<
-				typename A,
 				typename Fn,
-				typename M = typename decayed_result<Fn(A)>::type,
-				typename = typename std::enable_if<monoid<M>::instance>::type,
-				typename...Ts>
-		static M foldMap(Fn fn, const F<A,Ts...>& f) {
+				typename T = concept_parameter<F>,
+				typename M = typename decayed_result<Fn(T)>::type,
+				typename = typename std::enable_if<monoid<M>::instance>::type
+		>
+		static M foldMap(Fn fn, const F& f) {
 			return foldable<F>::foldl(
-					[fn](const A& a, const M& b) {
-						return monoid<M>::append(
-							fn(a),
-							b);
-					},
-					monoid<M>::id(),
-					f);
-		}
-	};
-
-	template<template<typename> class F>
-	struct foldMap_default<F> {
-		template<
-				typename A,
-				typename Fn,
-				typename M = typename decayed_result<Fn(A)>::type,
-				typename = typename std::enable_if<monoid<M>::instance>::type>
-		static M foldMap(Fn fn, const F<A>& f) {
-			return foldable<F>::foldl(
-					[fn](const A& a, const M& b) {
+					[fn](const T& a, const M& b) {
 						return monoid<M>::append(
 							fn(a),
 							b);
@@ -206,23 +178,13 @@ namespace ftl {
 	 *
 	 * \ingroup foldable
 	 */
-	template<template<typename...> class F>
+	template<typename F>
 	struct fold_default {
 		template<
-				typename M,
-				typename = typename std::enable_if<monoid<M>::instance>::type,
-				typename...Ts>
-		static M fold(const F<M,Ts...>& f) {
-			return foldable<F>::foldMap(id<M>, f);
-		}
-	};
-
-	template<template<typename> class F>
-	struct fold_default<F> {
-		template<
-				typename M,
-				typename = typename std::enable_if<monoid<M>::instance>::type>
-		static M fold(const F<M>& f) {
+				typename M = concept_parameter<F>,
+				typename = typename std::enable_if<monoid<M>::instance>::type
+		>
+		static M fold(const F& f) {
 			return foldable<F>::foldMap(id<M>, f);
 		}
 	};
@@ -233,26 +195,12 @@ namespace ftl {
 	 * \ingroup foldable
 	 */
 	template<
-			template<typename...> class F,
-			typename M,
+			typename F,
+			typename M = concept_parameter<F>,
 			typename = typename std::enable_if<foldable<F>::instance>::type,
-			typename = typename std::enable_if<monoid<M>::instance>::type,
-			typename...Ts>
-	M fold(const F<M,Ts...>& f) {
-		return foldable<F>::fold(f);
-	}
-
-	/**
-	 * Overloaded for singly type parametrised types.
-	 *
-	 * \ingroup foldable
-	 */
-	template<
-			template<typename> class F,
-			typename M,
-			typename = typename std::enable_if<foldable<F>::instance>::type,
-			typename = typename std::enable_if<monoid<M>::instance>::type>
-	M fold(const F<M>& f) {
+			typename = typename std::enable_if<monoid<M>::instance>::type
+	>
+	M fold(const F& f) {
 		return foldable<F>::fold(f);
 	}
 
@@ -262,30 +210,14 @@ namespace ftl {
 	 * \ingroup foldable
 	 */
 	template<
-			template<typename...> class F,
-			typename A,
+			typename F,
+			typename T = concept_parameter<F>,
 			typename Fn,
-			typename M = typename std::result_of<Fn(A)>::type,
+			typename M = typename std::result_of<Fn(T)>::type,
 			typename = typename std::enable_if<foldable<F>::instance>::type,
-			typename = typename std::enable_if<monoid<M>::instance>::type,
-			typename...Ts>
-	static M foldMap(Fn&& fn, const F<A,Ts...>& f) {
-		return foldable<F>::foldMap(std::forward<Fn>(fn), f);
-	}
-
-	/**
-	 * Overloaded for singly type parametrised types.
-	 *
-	 * \ingroup foldable
-	 */
-	template<
-			template<typename> class F,
-			typename A,
-			typename Fn,
-			typename M = typename std::result_of<Fn(A)>::type,
-			typename = typename std::enable_if<foldable<F>::instance>::type,
-			typename = typename std::enable_if<monoid<M>::instance>::type>
-	static M foldMap(Fn&& fn, const F<A>& f) {
+			typename = typename std::enable_if<monoid<M>::instance>::type
+	>
+	static M foldMap(Fn&& fn, const F& f) {
 		return foldable<F>::foldMap(std::forward<Fn>(fn), f);
 	}
 
@@ -295,41 +227,20 @@ namespace ftl {
 	 * \ingroup foldable
 	 */
 	template<
-			template<typename...> class F,
+			typename F,
 			typename Fn,
-			typename A,
-			typename B,
+			typename U,
+			typename T = concept_parameter<F>,
 			typename = typename std::enable_if<foldable<F>::instance>::type,
 			typename = typename std::enable_if<
 				std::is_same<
-					B,
-					typename decayed_result<Fn(A,B)>::type
-					>::value
-				>::type,
-			typename...Ts>
-	B foldr(Fn&& fn, B&& z, const F<A,Ts...>& f) {
-		return foldable<F>::foldr(std::forward<Fn>(fn), std::forward<B>(z), f);
-	}
-
-	/**
-	 * Overloaded for singly type parametrised types.
-	 *
-	 * \ingroup foldable
-	 */
-	template<
-			template<typename> class F,
-			typename Fn,
-			typename A,
-			typename B,
-			typename = typename std::enable_if<foldable<F>::instance>::type,
-			typename = typename std::enable_if<
-				std::is_same<
-					B,
-					typename decayed_result<Fn(A,B)>::type
-					>::value
-				>::type>
-	B foldr(Fn&& fn, B&& z, const F<A>& f) {
-		return foldable<F>::foldr(std::forward<Fn>(fn), std::forward<B>(z), f);
+					U,
+					typename decayed_result<Fn(T,U)>::type
+				>::value
+			>::type
+	>
+	U foldr(Fn&& fn, U&& z, const F& f) {
+		return foldable<F>::foldr(std::forward<Fn>(fn), std::forward<U>(z), f);
 	}
 
 	/**
@@ -338,41 +249,20 @@ namespace ftl {
 	 * \ingroup foldable
 	 */
 	template<
-			template<typename...> class F,
+			typename F,
 			typename Fn,
-			typename A,
-			typename B,
+			typename U,
+			typename T = concept_parameter<F>,
 			typename = typename std::enable_if<foldable<F>::instance>::type,
 			typename = typename std::enable_if<
 				std::is_same<
-					A,
-					typename decayed_result<Fn(B,A)>::type
-					>::value
-				>::type,
-			typename...Ts>
-	A foldl(Fn&& fn, A&& z, const F<B,Ts...>& f) {
-		return foldable<F>::foldl(std::forward<Fn>(fn), std::forward<A>(z), f);
-	}
-
-	/**
-	 * Overloaded for singly type parametrised types.
-	 *
-	 * \ingroup foldable
-	 */
-	template<
-			template<typename> class F,
-			typename Fn,
-			typename A,
-			typename B,
-			typename = typename std::enable_if<foldable<F>::instance>::type,
-			typename = typename std::enable_if<
-				std::is_same<
-					A,
-					typename decayed_result<Fn(B,A)>::type
-					>::value
-				>::type>
-	A foldl(Fn&& fn, A&& z, const F<B>& f) {
-		return foldable<F>::foldl(std::forward<Fn>(fn), std::forward<A>(z), f);
+					U,
+					typename decayed_result<Fn(U,T)>::type
+				>::value
+			>::type
+	>
+	U foldl(Fn&& fn, U&& z, const F& f) {
+		return foldable<F>::foldl(std::forward<Fn>(fn), std::forward<U>(z), f);
 	}
 
 }

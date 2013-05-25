@@ -430,18 +430,12 @@ namespace ftl {
 	 *
 	 * \ingroup maybe
 	 */
-	template<>
-	struct monad<maybe> {
-		template<typename A>
-		static constexpr maybe<A> pure(const A& a)
-		noexcept(std::is_nothrow_copy_constructible<A>::value) {
-			return value(a);
-		}
+	template<typename T>
+	struct monad<maybe<T>> {
 
-		template<typename A>
-		static constexpr maybe<A> pure(A&& a)
-		noexcept(std::is_nothrow_move_constructible<A>::value) {
-			return value(std::move(a));
+		static constexpr maybe<T> pure(T&& t)
+		noexcept(std::is_nothrow_copy_constructible<T>::value) {
+			return value(std::forward<T>(t));
 		}
 
 		/**
@@ -449,24 +443,22 @@ namespace ftl {
 		 */
 		template<
 			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type>
-		static maybe<B> map(F f, const maybe<A>& m) {
-			return m ? value(f(*m)) : maybe<B>();
+			typename U = typename decayed_result<F(T)>::type>
+		static maybe<U> map(const F& f, const maybe<T>& m) {
+			return m ? value(f(*m)) : maybe<U>();
 		}
 		
 
 		/**
 		 * Applies a function to unwrapped maybe value.
 		 *
-		 * \tparam F must satisfy \ref fn<maybe<B>(A)>
+		 * \tparam F must satisfy \ref fn`<maybe<U>(T)>`
 		 */
 		template<
 			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type::value_type>
-		static maybe<B> bind(const maybe<A>& m, F f) {
-			return m ? f(*m) : maybe<B>();
+			typename U = typename decayed_result<F(T)>::type::value_type>
+		static maybe<U> bind(const maybe<T>& m, F f) {
+			return m ? f(*m) : maybe<U>();
 		}
 
 		static constexpr bool instance = true;
@@ -503,22 +495,23 @@ namespace ftl {
 	 *
 	 * \ingroup maybe
 	 */
-	template<>
-	struct foldable<maybe> : foldMap_default<maybe>, fold_default<maybe> {
+	template<typename T>
+	struct foldable<maybe<T>>
+	: foldMap_default<maybe<T>>, fold_default<maybe<T>> {
+
 		template<
 				typename Fn,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						A,
-						typename decayed_result<Fn(B,A)>::type
-						>::value
-					>::type
-				>
-		static A foldl(Fn&& fn, A&& z, const maybe<B>& m) {
+						U,
+						typename decayed_result<Fn(U,T)>::type
+					>::value
+				>::type
+		>
+		static U foldl(Fn&& fn, U&& z, const maybe<T>& m) {
 			if(m) {
-				return fn(std::forward<A>(z), *m);
+				return fn(std::forward<U>(z), *m);
 			}
 
 			return z;
@@ -526,18 +519,17 @@ namespace ftl {
 
 		template<
 				typename Fn,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						B,
-						typename decayed_result<Fn(A,B)>::type
-						>::value
-					>::type
-				>
-		static B foldl(Fn&& fn, B&& z, const maybe<A>& m) {
+						U,
+						typename decayed_result<Fn(T,U)>::type
+					>::value
+				>::type
+		>
+		static U foldr(Fn&& fn, U&& z, const maybe<T>& m) {
 			if(m) {
-				return fn(std::forward<B>(z), *m);
+				return fn(std::forward<U>(z), *m);
 			}
 
 			return z;

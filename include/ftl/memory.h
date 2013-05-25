@@ -38,6 +38,12 @@ namespace ftl {
 	 *   #include <ftl/memory.h>
 	 * \endcode
 	 *
+	 * This module adds the following concept instances to std::share_ptr:
+	 * - \ref monoid
+	 * - \ref functor
+	 * - \ref applicative
+	 * - \ref monad
+	 *
 	 * \par Dependencies
 	 * - <memory>
 	 * - \ref monoid
@@ -107,40 +113,34 @@ namespace ftl {
 	 *
 	 * \ingroup memory
 	 */
-	template<>
-	struct monad<std::shared_ptr> {
+	template<typename T>
+	struct monad<std::shared_ptr<T>> {
 
-		template<typename A>
-		static std::shared_ptr<A> pure(const A& a) {
-			return std::make_shared(a);
-		}
-
-		template<typename A>
-		static std::shared_ptr<A> pure(A&& a) {
-			return std::make_shared(std::move(a));
+		static std::shared_ptr<T> pure(T&& a) {
+			return std::make_shared(std::forward<T>(a));
 		}
 
 		template<
-			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type>
-		std::shared_ptr<B> map(F f, std::shared_ptr<A> p) {
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		std::shared_ptr<U> map(F f, std::shared_ptr<T> p) {
 			if(p)
 				return std::make_shared(f(*p));
 
 			else
-				return std::shared_ptr<B>();
+				return std::shared_ptr<U>();
 		}
 
 		template<
-			typename F,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type>
-		static std::shared_ptr<B> bind(std::shared_ptr<A> a, F f) {
+				typename F,
+				typename U = typename decayed_result<F(T)>::type::element_type
+		>
+		static std::shared_ptr<U> bind(std::shared_ptr<T> a, F f) {
 			if(a)
-				return std::make_shared(f(*a));
+				return f(*a);
 
-			return std::shared_ptr<B>();
+			return std::shared_ptr<U>();
 		}
 
 		static constexpr bool instance = true;
@@ -151,23 +151,22 @@ namespace ftl {
 	 *
 	 * \ingroup memory
 	 */
-	template<>
-	struct foldable<std::shared_ptr>
-	: foldMap_default<std::shared_ptr>, fold_default<std::shared_ptr> {
+	template<T>
+	struct foldable<std::shared_ptr<T>>
+	: foldMap_default<std::shared_ptr<T>>, fold_default<std::shared_ptr<T>> {
 		template<
 				typename Fn,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						A,
-						typename decayed_result<Fn(B,A)>::type
+						U,
+						typename decayed_result<Fn(U,T)>::type
 						>::value
 					>::type
-				>
-		static A foldl(Fn&& fn, A&& z, std::shared_ptr<B> p) {
+		>
+		static U foldl(Fn&& fn, U&& z, std::shared_ptr<T> p) {
 			if(p) {
-				return fn(std::forward<A>(z), *p);
+				return fn(std::forward<U>(z), *p);
 			}
 
 			return z;
@@ -175,18 +174,17 @@ namespace ftl {
 
 		template<
 				typename Fn,
-				typename A,
-				typename B,
+				typename U,
 				typename = typename std::enable_if<
 					std::is_same<
-						B,
-						typename decayed_result<Fn(A,B)>::type
+						U,
+						typename decayed_result<Fn(T,U)>::type
 						>::value
 					>::type
 				>
-		static B foldl(Fn&& fn, B&& z, std::shared_ptr<A> p) {
+		static U foldl(Fn&& fn, U&& z, std::shared_ptr<T> p) {
 			if(p) {
-				return fn(std::forward<B>(z), *p);
+				return fn(std::forward<U>(z), *p);
 			}
 
 			return z;

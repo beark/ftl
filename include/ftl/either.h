@@ -382,40 +382,35 @@ namespace ftl {
 	 *
 	 * \ingroup either
 	 */
-	template<>
-	struct monad<either> {
-		template<typename A, typename R>
-		static either<A,R> pure(const A& a) {
-			return either<A,R>(left_tag_t(), a);
+	template<typename T, typename R>
+	struct monad<either<T,R>> {
+
+		static either<T,R> pure(const T& l) {
+			return either<T,R>(left_tag_t(), l);
 		}
 
-		template<typename A, typename R>
-		static either<A,R> pure(A&& a) {
-			return either<A,R>(left_tag_t(), std::move(a));
+		static either<T,R> pure(T&& l) {
+			return either<T,R>(left_tag_t(), std::move(l));
 		}
 
 		template<
 			typename F,
-			typename A,
-			typename R,
-			typename B = typename decayed_result<F(A)>::type>
-		static either<B,R> map(F f, const either<A,R>& e) {
+			typename U = typename decayed_result<F(T)>::type>
+		static either<U,R> map(F f, const either<T,R>& e) {
 			if(e.isLeft())
-				return either<B,R>(left_tag_t(), f(e.left()));
+				return either<U,R>(left_tag_t(), f(e.left()));
 			else
-				return either<B,R>(right_tag_t(), e.right());
+				return either<U,R>(right_tag_t(), e.right());
 		}
 
 		template<
 			typename F,
-			typename R,
-			typename A,
-			typename B = typename decayed_result<F(A)>::type::value_type>
-		static either<B,R> bind(const either<A,R>& e, F f) {
+			typename U = typename decayed_result<F(T)>::type::value_type>
+		static either<U,R> bind(const either<T,R>& e, F f) {
 			if(e.isLeft())
 				return f(e.left());
 			else
-				return either<B,R>(right_tag_t(), e.right());
+				return either<U,R>(right_tag_t(), e.right());
 		}
 
 		static constexpr bool instance = true;
