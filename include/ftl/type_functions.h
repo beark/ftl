@@ -492,6 +492,11 @@ namespace ftl {
 	using concept_parameter =
 		typename parametric_type_traits<T>::concept_parameter;
 
+	template<template<typename...> class Tt, typename...Ts>
+	struct parametrise {
+		using type = Tt<Ts...>;
+	};
+
 	/**
 	 * Changes the concept parameter type of some template type.
 	 *
