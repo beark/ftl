@@ -128,12 +128,9 @@ namespace ftl {
 				typename U = typename decayed_result<F(T)>::type
 		>
 		static mT<U> map(F&& f, const mT<T>& m) {
-			return mT<U>{monad<M_<maybe<T>>>::map(
-				[f](const maybe<T>& t) {
-					return monad<maybe<T>>::map(f, t);
-				},
-				*m
-			)};
+			return mT<U>{
+				[f](const maybe<T>& t) { return f % t; } % *m
+			};
 		}
 
 		template<
