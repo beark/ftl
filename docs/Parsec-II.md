@@ -15,7 +15,7 @@ Now that that's out of the way, let's get started.
 The primary data type of the library deserves to go first, don't you think? To arrive at a first draft, we ask ourselves, "What is a parser?" One answer would be, "Something that can be run on an input stream, the result of which is either a parse error or a representation of whatever it was we wanted to parse." Turning that into code is quite easy:
 ```cpp
 template<typename T>
-using parser = ftl::function<ftl::either<T,error>,std::istream&>;
+using parser = ftl::function<ftl::either<error,T>,std::istream&>;
 ```
 But this definition is a bit naïve; it gives us no encapsulation, no way of gauranteeing internal consistency (because a user of the library could provide _any_ function they like and call it a parser). To mitigate these issues as much as we can, we declare the parser type as a thin wrapper instead.
 ```cpp
@@ -29,13 +29,13 @@ public:
     parser(parser&&) = default;
     ~parser() = default;
 
-    ftl::either<T,error> run(std::istream& is) const;
+    ftl::either<error,T> run(std::istream& is) const;
 
 private:
-    explicit parser(ftl::function<ftl::either<T,error>,std::istream&> f)
+    explicit parser(ftl::function<ftl::either<error,T>,std::istream&> f)
     : runP(f) {}
 
-    ftl::function<ftl::either<T,error>,std::istream&> runP;
+    ftl::function<ftl::either<error,T>,std::istream&> runP;
 };
 ```
 This looks better. We've prevented users from constructing nullary parsers, as well as using arbitrary functions as parsers. Instead, parsers must now be built by combining the building blocks we design. Of course, making all constructors private except copy/move means that&mdash;as we add them&mdash;our library of combinator blocks must be made friends of the `parser` data type. If that is not desirable, one could opt to create e.g. a `make_parser` function that is friends with `parser` but part of a private or anonymous namespace instead.
@@ -98,19 +98,19 @@ Alright, time to implement the details. `pure` seems simple enough, it's just su
 static parser<T> pure(T t) {
     return parser<T>{
         [t](std::istream& istrm) {
-            return ftl::make_left<error>(t);
+            return ftl::make_right<error>(t);
         }
     };
 }
 ```
-Looks good, though on closer inspection, we realise the whole `ftl::make_left<error>` call is a bit clunky. The template parameter will always be `error` for `make_left`, so a convenience function to save repetition might be in order
+Looks good, though on closer inspection, we realise the whole `ftl::make_right<error>` call is a bit clunky. The template parameter will always be `error` for `make_right`, so a convenience function to save repetition might be in order
 ```cpp
 template<typename T>
-auto yield(T&& t) -> decltype(ftl::make_left<error>(std::forward<T>(t))) {
-    return ftl::make_left<error>(std::forward<T>(t));
+auto yield(T&& t) -> decltype(ftl::make_right<error>(std::forward<T>(t))) {
+    return ftl::make_right<error>(std::forward<T>(t));
 }
 ```
-Cool, now we can just call `yield(some_value)` to get an `ftl::either<some_type,error>`.
+Cool, now we can just call `yield(some_value)` to get an `ftl::either<error,some_type>`.
 
 Moving on, we get to the implementation of `map`. It's supposed to map a function into the context of our monad. That is, the function we're mapping should be applied in the context of `parser`. What could this mean? Just looking at its conceptualised type&mdash;something like `parser<B> map(Function<B(A)>, parser<A>)`&mdash;should give us a pretty good idea. In fact, after that, it almost writes itself:
 ```cpp
@@ -129,7 +129,7 @@ static parser<B> map(F f, parser<A> p) {
             return yield(f(*r));
         }
         else {
-            return ftl::make_right<B>(r.right());
+            return ftl::make_left<B>(r.left());
         }
     });
 }
@@ -151,12 +151,12 @@ static parser<B> bind(parser<A> p, F f) {
         }
 
         else {
-            return ftl::make_right<B>(r.right());
+            return ftl::make_left<B>(r.left());
         }
     });
 }
 ```
-The template parameter `B` might look a bit confusing, but it's not really that complicated. By definition of the monad concept, the result of `F` is supposed to be a parser of some type&mdash;say, `B`. So, because we had the foresight of providing a `value_type` member in `parser`, we can find out what `B` that is supposed to be, and this way gaurantee that our `bind` only accepts `F`s that actually result in a `parser`.
+The template parameter `B` might look a bit confusing, but it's not really that complicated. By definition of the monad concept, the result of `F` is supposed to be a parser of some type&mdash;say, `B`. So, because we had the foresight of providing a `value_type` member in `parser`, we can find out what `B` that is supposed to be, and this way guarantee that our `bind` only accepts `F`s that actually result in a `parser`.
 
 As for the implmentation itself, it might not be obvious this is how it should be done until we think about what `bind` is supposed to do. By its definition, it is supposed to return a new "computation" that somehow represents sequencing the two "computations" given as its input, with the result of the first one acting as input to the second one. In the case of parsers, "computing" would of course mean _running_ the parser. So, that's what we do: return a new parser that simply runs first `p`, then uses its result to produce the second parser and run that too. Any error encountered aborts the "computations".
 
@@ -176,7 +176,7 @@ parser<char> anyChar() {
             return yield(ch);
         }
 
-        return ftl::make_right<char>(error("any character"));
+        return ftl::make_left<char>(error("any character"));
     });
 }
 ```
@@ -235,7 +235,7 @@ struct monoidA<parser> {
     static parser<T> fail() {
         return parser<T>{
             [](std::istream&) {
-                return fail<T>("Unknown parse error.");
+                return make_left<T>("Unknown parse error.");
             }
         };
     }
@@ -257,9 +257,9 @@ struct monoidA<parser> {
                 else {
                     // Both failed, tell the world what we expected
                     std::ostringstream oss;
-                    oss << r.right().message()
-                        << " or " << r2.right().message();
-                    return ::fail<T>(oss.str());
+                    oss << r.left().message()
+                        << " or " << r2.left().message();
+                    return make_left<T>(oss.str());
                 }
             }
         }};

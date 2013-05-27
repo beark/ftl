@@ -21,12 +21,12 @@ On to the good stuff. A central part of the API is the type `parser<T>`, which d
 template<typename T>
 class parser {
 public:
-    ftl::either<T,error> run(std::istream&);
+    ftl::either<error,T> run(std::istream&);
 };
 ```
 What's that? Only one single, lonely little method? Something must surely be wrong? Well, let's give it a chance to prove itself at least...
 
-So, what else does this interface tell us? First, apparently parsers are monads. This actually tells us quite a bit: we now know we can use all of the [functor](Functor.md), [applicative functor](Applicative.md), and [monad](Monad.md) interfaces to interact with parsers. Neat. Second, we also know that the `run` method apparently can fail: its return type of `either<T,error>` clearly indicates that it will either return whatever we wanted it to parse, or an error. Third, we know parsers are also instances of monoidal alternatives, which gives us one more way of combining parsers, as well as the ability to create parsers that automatically fail.
+So, what else does this interface tell us? First, apparently parsers are monads. This actually tells us quite a bit: we now know we can use all of the [functor](Functor.md), [applicative functor](Applicative.md), and [monad](Monad.md) interfaces to interact with parsers. Neat. Second, we also know that the `run` method apparently can fail: its return type of `either<error,T>` clearly indicates that it will either return whatever we wanted it to parse, or an error. Third, we know parsers are also instances of monoidal alternatives, which gives us one more way of combining parsers, as well as the ability to create parsers that automatically fail.
 
 Alright, now we've deduced quite a bit about this `parser<T>` type, but we still can't do much, because we're missing a rather fundamental thing: how do we actually create parsers (that _do_ something, besides failing)? Because looking at the interface, there are no public constructors! Let's browse further down the parser combinator API, and see if there is something there to enlighten us.
 ```cpp
@@ -183,12 +183,12 @@ int main(int arc, char** argv) {
     // declaration, but as this tutorial aims to be clear and easy to grasp,
     // they're included.
     parser<vector<int>> parser = parseLispList();
-    ftl::either<vector<int>,error> res = parser.run(cin);
+    ftl::either<error,vector<int>> res = parser.run(cin);
 
     while(!res) {
         // error has the single method message() to get a string describing what
         // the parser expected to find, but didn't.
-        cout << "expected " << res.right().message() << endl;
+        cout << "expected " << res.left().message() << endl;
 
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
@@ -204,7 +204,7 @@ int main(int arc, char** argv) {
     return 0;
 }
 ```
-We start by creating an instance of our parser, and then we run it on `std::cin` so we can try giving it various input and see how it reacts. This is not ideal, but it works as a test. In any case, after we've run it, we simply _keep_ running it until we get an input that parses. We do this using [either](Either.md)'s error-handling related interface, which among other things provides us with the ability to do the whole `while(!res)` thing.
+We start by creating an instance of our parser, and then we run it on `std::cin` so we can try giving it various input and see how it reacts. This is not ideal, but it works as a test. In any case, after we've run it, we simply _keep_ running it until we get an input that parses. We do this using either's error-handling related interface, which among other things provides us with the ability to do the whole `while(!res)` thing.
 
 Running the test, you'll note that giving the input
 ```
