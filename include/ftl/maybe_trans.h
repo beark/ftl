@@ -48,55 +48,79 @@ namespace ftl {
 	 *
 	 * \ingroup maybeT
 	 */
-	template<typename T, template<typename...> class M, typename...Ts>
+	template<typename M>
 	class maybeT {
 	public:
-		using value_type = typename parametrise<M,maybe<T>,Ts...>::type;
+		using T = concept_parameter<M>;
+		using Mmt = typename re_parametrise<M,maybe<T>>::type;
 
-		explicit constexpr maybeT(const value_type& v)
-		noexcept(std::is_nothrow_copy_constructible<value_type>::value)
-		: mMaybe(v) {}
+		explicit constexpr maybeT(const Mmt& m)
+		noexcept(std::is_nothrow_copy_constructible<Mmt>::value)
+		: mMaybe(m) {}
 
-		explicit constexpr maybeT(value_type&& v)
-		noexcept(std::is_nothrow_move_constructible<value_type>::value)
-		: mMaybe(std::move(v)) {}
+		explicit constexpr maybeT(Mmt&& m)
+		noexcept(std::is_nothrow_move_constructible<M>::value)
+		: mMaybe(std::move(m)) {}
 
 		template<typename...Args>
 		maybeT(inplace_tag, Args&&...args)
-		noexcept(std::is_nothrow_constructible<value_type,Args...>::value)
+		noexcept(std::is_nothrow_constructible<M,Args...>::value)
 		: mMaybe{std::forward<Args>(args)...} {}
 
-		value_type& operator* () noexcept {
+		Mmt& operator* () noexcept {
 			return mMaybe;
 		}
 
-		constexpr value_type& operator* () const noexcept {
+		const Mmt& operator* () const noexcept {
 			return mMaybe;
 		}
 
-		value_type* operator-> () noexcept {
+		Mmt* operator-> () noexcept {
 			return &mMaybe;
 		}
 
-		constexpr value_type* operator-> () const noexcept {
+		const Mmt* operator-> () const noexcept {
 			return &mMaybe;
 		}
 		
 	private:
-		value_type mMaybe;
+		Mmt mMaybe;
 	};
 
-	template<template<typename...> class M, typename T, typename...Ts>
-	struct functor<maybeT<T,M,Ts...>> {
+	/**
+	 * ftl::maybeT specialisation of re_parametrise.
+	 *
+	 * Necessary because maybeT isn't parametrised in quite the default manner.
+	 */
+	template<typename M, typename U>
+	struct re_parametrise<maybeT<M>,U> {
+		/// Simply re-parametrises the inner/base monad.
+		using type = maybeT<typename re_parametrise<M,U>::type>;
+	};
 
-	private:
-		template<typename U>
-		using M_ = typename parametrise<M,maybe<U>,Ts...>::type;
+	/**
+	 * Parametric type traits for ftl::maybeT.
+	 */
+	template<typename M>
+	struct parametric_type_traits<maybeT<M>> {
+		/// The concept parameter of a maybeT is the same as its base monad's.
+		using concept_parameter = concept_parameter<M>;
+	};
 
-	public:
-		/// Short-hand to refer to the maybe transformer's own full type.
+	template<typename M>
+	struct monad<maybeT<M>> {
+		/// Shorthand for the concept parameter
+		using T = typename maybeT<M>::T;
+
 		template<typename U>
-		using mT = maybeT<U,M,Ts...>;
+		using M_ = typename re_parametrise<M,U>::type;
+
+		template<typename U>
+		using mT = maybeT<M_<U>>;
+
+		static mT<T> pure(T&& t) {
+			return mT<T>{monad<M_<maybe<T>>>::pure(value(std::forward<T>(t)))};
+		}
 
 		/// Composition of `M`'s and maybe's map
 		template<
@@ -104,13 +128,30 @@ namespace ftl {
 				typename U = typename decayed_result<F(T)>::type
 		>
 		static mT<U> map(F&& f, const mT<T>& m) {
-			return functor<M_<T>>::map(
+			return mT<U>{monad<M_<maybe<T>>>::map(
 				[f](const maybe<T>& t) {
-					functor<maybe<T>>::map(f, t);
+					return monad<maybe<T>>::map(f, t);
 				},
-				m.mMaybe
-			);
+				*m
+			)};
 		}
+
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type::T
+		>
+		static mT<U> bind(const mT<T>& m, F&& f) {
+			return mT<U>{
+				*m >>= [f](const maybe<T>& m) {
+					if(m)
+						return *f(*m);
+					else
+						return monad<M_<maybe<U>>>::pure(maybe<U>{});
+				}
+			};
+		}
+
+		static constexpr bool instance = true;
 	};
 }
 
