@@ -30,14 +30,14 @@ private:
 
 /// Convenience function to reduce template gibberish
 template<typename T>
-ftl::either<T,error> fail(const std::string& s) {
-	return ftl::make_right<T>(error(s));
+ftl::either<error,T> fail(const std::string& s) {
+	return ftl::make_left<T>(error(s));
 }
 
 /// Convenience function to reduce template gibberish
 template<typename T>
-auto yield(T&& t) -> decltype(ftl::make_left<error>(std::forward<T>(t))) {
-	return ftl::make_left<error>(std::forward<T>(t));
+auto yield(T&& t) -> decltype(ftl::make_right<error>(std::forward<T>(t))) {
+	return ftl::make_right<error>(std::forward<T>(t));
 }
 
 // Forward declarations required for later friend declarations, sigh
@@ -85,12 +85,12 @@ public:
 	/**
 	 * Run the parser, reading characters from some input stream.
 	 */
-	ftl::either<T,error> run(std::istream& s) const {
+	ftl::either<error,T> run(std::istream& s) const {
 		return runP(s);
 	}
 
 private:
-	using fn_t = ftl::function<ftl::either<T,error>,std::istream&>;
+	using fn_t = ftl::function<ftl::either<error,T>,std::istream&>;
 	explicit parser(fn_t f) : runP(f) {}
 
 	fn_t runP;
@@ -148,7 +148,7 @@ namespace ftl {
 				}
 
 				else {
-					return fail<U>(r.right().message());
+					return fail<U>(r.left().message());
 				}
 			});
 		}
@@ -160,7 +160,7 @@ namespace ftl {
 	/**
 	 * monoidA instance for parser.
 	 *
-	 * Parsers have a well defined fail state (when the either is of right
+	 * Parsers have a well defined fail state (when the either is of left
 	 * type), so this concept makes perfect sense.
 	 */
 	template<>
@@ -198,8 +198,8 @@ namespace ftl {
 
 					else {
 						std::ostringstream oss;
-						oss << r.right().message()
-							<< " or " << r2.right().message();
+						oss << r.left().message()
+							<< " or " << r2.left().message();
 						return ::fail<T>(oss.str());
 					}
 				}

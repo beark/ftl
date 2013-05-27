@@ -58,7 +58,7 @@ int main(int arc, char** argv) {
 	auto res = parser.run(std::cin);
 
 	while(!res) {
-		std::cout << "expected " << res.right().message() << std::endl;
+		std::cout << "expected " << res.left().message() << std::endl;
 
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
