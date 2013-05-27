@@ -254,7 +254,7 @@ namespace ftl {
 		 */
 		R* operator-> () {
 			if(tag == _dtl::LEFT)
-				return &l;
+				return &r;
 
 			throw std::logic_error(
 					"Attempting to access 'right' value of left type.");
