@@ -86,19 +86,18 @@ namespace ftl {
 	 *
 	 * \li \ref copycons
 	 * \li \ref deref
-	 * \li \ref functor (in L)
-	 * \li \ref applicative (in L)
-	 * \li \ref monad (in L)
+	 * \li \ref functor (in R)
+	 * \li \ref applicative (in R)
+	 * \li \ref monad (in R)
 	 *
 	 * \note Either is \em not \ref defcons.
 	 *
 	 * \tparam L The "left" type, must satisfy \ref copycons
-	 * \tparam R The "right" type (sometimes used to signal an error), must
-	 *           satisfy \ref copycons
+	 * \tparam R The "right" type , must satisfy \ref copycons
 	 *
 	 * \ingroup either
 	 */
-	// TODO: Specialise for L = void
+	// TODO: Specialise for R = void
 	template<typename L, typename R>
 	class either {
 	public:
@@ -220,54 +219,54 @@ namespace ftl {
 		/**
 		 * Convenience operator when using either for error handling.
 		 *
-		 * \return true if the instance is of \em left type.
+		 * \return true if the instance is of \em right type.
 		 */
 		explicit constexpr operator bool () const noexcept {
-			return tag == _dtl::LEFT;
+			return tag == _dtl::RIGHT;
 		}
 
 		/**
-		 * Alternate, concise way of accessing left values.
+		 * Alternate, concise way of accessing right values.
 		 *
-		 * \throws std::logic_error if called on a right type.
+		 * \throws std::logic_error if called on a left type.
 		 */
-		L& operator* () {
-			if(tag == _dtl::LEFT)
-				return l;
+		R& operator* () {
+			if(tag == _dtl::RIGHT)
+				return r;
 
 			throw std::logic_error(
-					"Attempting to access 'left' value of right type.");
+					"Attempting to access 'right' value of left type.");
 		}
 
 		/// \overload
-		const L& operator* () const {
-			if(tag == _dtl::LEFT)
-				return l;
+		const R& operator* () const {
+			if(tag == _dtl::RIGHT)
+				return r;
 
 			throw std::logic_error(
-					"Attempting to access 'left' value of right type.");
+					"Attempting to access 'right' value of right left.");
 		}
 
 		/**
-		 * Concise way of accessing member of left values.
+		 * Concise way of accessing member of right values.
 		 *
-		 * \throws std::logic_error if called one a right type.
+		 * \throws std::logic_error if called one a left type.
 		 */
-		L* operator-> () {
+		R* operator-> () {
 			if(tag == _dtl::LEFT)
 				return &l;
 
 			throw std::logic_error(
-					"Attempting to access 'left' value of right type.");
+					"Attempting to access 'right' value of left type.");
 		}
 
 		/// \overload
-		const L* operator-> () const {
-			if(tag == _dtl::LEFT)
-				return &l;
+		const R* operator-> () const {
+			if(tag == _dtl::RIGHT)
+				return &r;
 
 			throw std::logic_error(
-					"Attempting to access 'left' value of right type.");
+					"Attempting to access 'right' value of left type.");
 		}
 
 		const either& operator= (const either& e) {
@@ -378,39 +377,56 @@ namespace ftl {
 	};
 
 	/**
+	 * Either-specialised re_parametrise.
+	 *
+	 * Required because either implements parametric concepts on its R type.
+	 * 
+	 * \ingroup either
+	 */
+	template<typename L, typename R, typename R2>
+	struct re_parametrise<either<L,R>,R2> {
+		using type = either<L,R2>;
+	};
+
+	template<typename L, typename R>
+	struct parametric_type_traits<either<L,R>> {
+		using concept_parameter = R;
+	};
+
+	/**
 	 * Monad implementation for either.
 	 *
 	 * \ingroup either
 	 */
-	template<typename T, typename R>
-	struct monad<either<T,R>> {
+	template<typename L, typename T>
+	struct monad<either<L,T>> {
 
-		static either<T,R> pure(const T& l) {
-			return either<T,R>(left_tag_t(), l);
+		static either<L,T> pure(const T& t) {
+			return either<L,T>(right_tag_t(), t);
 		}
 
-		static either<T,R> pure(T&& l) {
-			return either<T,R>(left_tag_t(), std::move(l));
+		static either<L,T> pure(T&& t) {
+			return either<L,T>(right_tag_t(), std::move(t));
 		}
 
 		template<
 			typename F,
 			typename U = typename decayed_result<F(T)>::type>
-		static either<U,R> map(F f, const either<T,R>& e) {
-			if(e.isLeft())
-				return either<U,R>(left_tag_t(), f(e.left()));
+		static either<L,U> map(F f, const either<L,T>& e) {
+			if(e)
+				return either<L,U>(right_tag_t(), f(*e));
 			else
-				return either<U,R>(right_tag_t(), e.right());
+				return either<L,U>(left_tag_t(), e.left());
 		}
 
 		template<
 			typename F,
 			typename U = typename decayed_result<F(T)>::type::value_type>
-		static either<U,R> bind(const either<T,R>& e, F f) {
-			if(e.isLeft())
-				return f(e.left());
+		static either<L,U> bind(const either<L,T>& e, F f) {
+			if(e)
+				return f(*e);
 			else
-				return either<U,R>(right_tag_t(), e.right());
+				return either<L,U>(left_tag_t(), e.left());
 		}
 
 		static constexpr bool instance = true;
