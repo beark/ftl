@@ -44,8 +44,8 @@ namespace ftl {
 	 * - \ref applicative
 	 */
 
-	// Unnamed private namespace for various tuple helpers
-	namespace {
+	// Private namespace for various tuple helpers
+	namespace _dtl {
 
 		template<std::size_t N, typename T>
 		struct tup {
@@ -180,7 +180,7 @@ namespace ftl {
 	struct monoid<std::tuple<Ts...>> {
 		static auto id()
 		-> typename std::enable_if<
-				allMonoids<Ts...>::value,
+				_dtl::allMonoids<Ts...>::value,
 				std::tuple<Ts...>>::type {
 			return std::make_tuple(monoid<Ts>::id()...);
 		}
@@ -189,15 +189,15 @@ namespace ftl {
 				const std::tuple<Ts...>& t1,
 				const std::tuple<Ts...>& t2)
 		-> typename std::enable_if<
-				allMonoids<Ts...>::value,
+				_dtl::allMonoids<Ts...>::value,
 				std::tuple<Ts...>>::type {
 
 			auto ret = t1;
-			tup<sizeof...(Ts)-1, std::tuple<Ts...>>::app(ret, t2);
+			_dtl::tup<sizeof...(Ts)-1, std::tuple<Ts...>>::app(ret, t2);
 			return ret;
 		}
 
-		static constexpr bool instance = allMonoids<Ts...>::value;
+		static constexpr bool instance = _dtl::allMonoids<Ts...>::value;
 	};
 
 	/**
@@ -219,7 +219,7 @@ namespace ftl {
 		std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
 
 			std::tuple<U,Ts...> ret;
-			tup<sizeof...(Ts)-1, std::tuple<U,Ts...>>::fmap(
+			_dtl::tup<sizeof...(Ts)-1, std::tuple<U,Ts...>>::fmap(
 					std::forward<F>(f), t, ret);
 			return ret;
 		}
@@ -255,7 +255,7 @@ namespace ftl {
 		static std::tuple<U,Ts...> apply(
 				const std::tuple<F,Ts...>& tfn,
 				const std::tuple<T,Ts...>& t) {
-			return applicative_implementation(tfn, t);
+			return _dtl::applicative_implementation(tfn, t);
 		}
 
 		static constexpr bool instance = true;
@@ -269,7 +269,8 @@ namespace ftl {
 	template<typename F, typename...Ts>
 	auto apply(F&& f, const std::tuple<Ts...>& t)
 	-> typename std::result_of<F(Ts...)>::type {
-		return tup_apply(seq<0,sizeof...(Ts)-1>(), std::forward<F>(f), t);
+		using indices_t = typename gen_seq<0,sizeof...(Ts)-1>::type;
+		return _dtl::tup_apply(indices_t(), std::forward<F>(f), t);
 	}
 
 	/**
@@ -280,7 +281,8 @@ namespace ftl {
 	template<typename F, typename...Ts>
 	auto apply(F&& f, std::tuple<Ts...>&& t)
 	-> typename std::result_of<F(Ts...)>::type {
-		return tup_apply(seq<0,sizeof...(Ts)-1>(), std::forward<F>(f), std::move(t));
+		using indices_t = typename gen_seq<0,sizeof...(Ts)-1>::type;
+		return _dtl::tup_apply(indices_t(), std::forward<F>(f), std::move(t));
 	}
 
 }
