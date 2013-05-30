@@ -214,8 +214,7 @@ namespace ftl {
 		/// Apply `f` to first element in the tuple
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type,
-				typename...Ts
+				typename U = typename decayed_result<F(T)>::type
 		>
 		std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
 
@@ -242,18 +241,17 @@ namespace ftl {
 		}
 
 		template<
-			typename F,
-			typename U = typename decayed_result<F(T)>::type,
-			typename...Ts>
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
 		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
-			return functor<std::tuple>::map(std::forward<F>(f), t);
+			return functor<std::tuple<T,Ts...>>::map(std::forward<F>(f), t);
 		}
 
 		template<
-			typename F,
-			typename T,
-			typename U = typename decayed_result<F(T)>::type,
-			typename...Ts>
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
 		static std::tuple<U,Ts...> apply(
 				const std::tuple<F,Ts...>& tfn,
 				const std::tuple<T,Ts...>& t) {
