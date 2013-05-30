@@ -52,6 +52,9 @@ namespace ftl {
 		return t;
 	}
 
+	/// Used to distinguish in-place constructors from others
+	struct inplace_tag {};
+
 	/**
 	 * Curries an n-ary function pointer.
 	 *

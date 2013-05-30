@@ -25,15 +25,12 @@
 
 #include <stdexcept>
 #include <type_traits>
+#include "prelude.h"
 #include "monoid.h"
 #include "monad.h"
 #include "foldable.h"
 
 namespace ftl {
-
-	/// Used to distinguish in-place constructors from others
-	// TODO: Move to someplace more generic (might be used by other data types)
-	struct inplace_tag {};
 
 	/**
 	 * \defgroup maybe Maybe
@@ -47,6 +44,7 @@ namespace ftl {
 	 * \par Dependencies
 	 * - <stdexcept>
 	 * - <type_traits>
+	 * - \ref prelude
 	 * - \ref monoid
 	 * - \ref monad
 	 * - \ref foldable

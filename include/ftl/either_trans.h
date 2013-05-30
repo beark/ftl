@@ -23,6 +23,7 @@
 #ifndef FTL_EITHER_TRANS_H
 #define FTL_EITHER_TRANS_H
 
+#include "prelude.h"
 #include "either.h"
 
 namespace ftl {
@@ -36,6 +37,7 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
+	 * - \ref prelude
 	 * - \ref either
 	 */
 
@@ -131,7 +133,7 @@ namespace ftl {
 	};
 
 	/**
-	 * Monad instance for eitherT.
+	 * Monad instance for `eitherT`.
 	 *
 	 * In essence, composes the basic monadic operations of `M` with
 	 * `ftl::either`.
