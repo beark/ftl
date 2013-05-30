@@ -158,12 +158,9 @@ namespace ftl {
 				typename U = typename decayed_result<F(T)>::type
 		>
 		static eT<U> map(F&& f, const eT<T>& e) {
-			return eT<U>{monad<M_<either<L,T>>>::map(
-				[f](const either<L,T>& e) {
-					return monad<either<L,T>>::map(f, e);
-				},
-				*e
-			)};
+			return eT<U>{
+				[f](const either<L,T>& e) { return f % e; } % *e
+			};
 		}
 
 		/**
@@ -173,20 +170,13 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type::T
+				typename U =
+					concept_parameter<typename decayed_result<F(T)>::type>
 		>
 		static eT<U> bind(const eT<T>& e, F&& f) {
-			return eT<U>{
-				*e >>= [f](const either<L,T>& e) {
-					if(e)
-						return *f(*e);
-					else {
-						return monad<M_<either<L,U>>>::pure(
-							make_left<U>(e.left())
-						);
-					}
-				}
-			};
+			using monad_t = typename decayed_result<F(T)>::type;
+
+			return bind_helper<monad_t>::bind(e, std::forward<F>(f));
 		}
 
 		/// \overload
@@ -195,20 +185,64 @@ namespace ftl {
 				typename U = typename decayed_result<F(T)>::type::T
 		>
 		static eT<U> bind(eT<T>&& e, F&& f) {
-			return eT<U>{
-				std::move(*e) >>= [f](const either<L,T>& e) {
-					if(e)
-						return *f(std::move(*e));
-					else {
-						return monad<M_<either<L,U>>>::pure(
-							make_left<U>(e.left())
-						);
-					}
-				}
-			};
+			using monad_t = typename decayed_result<F(T)>::type;
+
+			return bind_helper<monad_t>::bind(std::move(e), std::forward<F>(f));
 		}
 
 		static constexpr bool instance = true;
+
+	private:
+		template<typename M2>
+		struct bind_helper {
+			using U = concept_parameter<M2>;
+
+			template<
+					typename F,
+					typename = typename std::enable_if<
+						std::is_same<
+							typename re_parametrise<M,U>::type,
+							M2
+						>::value
+					>
+			>
+			static eT<U> bind(const eT<T>& e, F f) {
+				return eT<U>{
+					*e >>= [f](const either<L,T>& e) {
+						if(e)
+							return *f(*e);
+						else {
+							return monad<M_<either<L,U>>>::pure(
+								make_left<U>(e.left())
+							);
+						}
+					}
+				};
+			}
+
+			template<
+					typename F,
+					typename = typename std::enable_if<
+						std::is_same<
+							typename re_parametrise<M,U>::type,
+							M2
+						>::value
+					>
+			>
+			static eT<U> bind(eT<T>&& e, F f) {
+				return eT<U>{
+					std::move(*e) >>= [f](const either<L,T>& e) {
+						if(e)
+							return *f(std::move(*e));
+						else {
+							return monad<M_<either<L,U>>>::pure(
+								make_left<U>(e.left())
+							);
+						}
+					}
+				};
+			}
+		};
 	};
 }	
 
