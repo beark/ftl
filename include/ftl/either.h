@@ -390,7 +390,7 @@ namespace ftl {
 
 	template<typename L, typename R>
 	struct parametric_type_traits<either<L,R>> {
-		using concept_parameter = R;
+		using parameter_type = R;
 	};
 
 	/**

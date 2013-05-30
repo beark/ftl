@@ -113,7 +113,7 @@ namespace ftl {
 	template<typename M>
 	struct parametric_type_traits<maybeT<M>> {
 		/// The concept parameter of a maybeT is the same as its base monad's.
-		using concept_parameter = concept_parameter<M>;
+		using parameter_type = concept_parameter<M>;
 	};
 
 	/**

@@ -129,7 +129,7 @@ namespace ftl {
 	/// eitherT's parametric traits are non-default.
 	template<typename L, typename M>
 	struct parametric_type_traits<eitherT<L,M>> {
-		using concept_parameter = concept_parameter<M>;
+		using parameter_type = concept_parameter<M>;
 	};
 
 	/**

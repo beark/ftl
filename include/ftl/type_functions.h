@@ -480,7 +480,7 @@ namespace ftl {
 		 * parameter `T` uses in concepts is _not_ the left-most in `T`'s
 		 * parameter list.
 		 */
-		using concept_parameter = typename inner_type<T>::type;
+		using parameter_type = typename inner_type<T>::type;
 	};
 
 	/**
@@ -490,7 +490,7 @@ namespace ftl {
 	 */
 	template<typename T>
 	using concept_parameter =
-		typename parametric_type_traits<T>::concept_parameter;
+		typename parametric_type_traits<T>::parameter_type;
 
 	template<template<typename...> class Tt, typename...Ts>
 	struct parametrise {
