@@ -175,6 +175,8 @@ namespace ftl {
 				return *(f(*l));
 			}};
 		}
+
+		static constexpr bool instance = true;
 	};
 
 }
