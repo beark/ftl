@@ -73,7 +73,7 @@ namespace ftl {
 
 		template<typename...Args>
 		maybeT(inplace_tag, Args&&...args)
-		noexcept(std::is_nothrow_constructible<M,Args...>::value)
+		noexcept(std::is_nothrow_constructible<Mmt,Args...>::value)
 		: mMaybe{std::forward<Args>(args)...} {}
 
 		Mmt& operator* () noexcept {
