@@ -278,9 +278,9 @@ namespace ftl {
 			template<typename F>
 			static eT<U> bind(eT<T>&& e, F f) {
 				return eT<U>{
-					std::move(*e) >>= [f](const either<L,T>& e) {
+					std::move(*e) >>= [f](either<L,T>&& e) {
 						if(e)
-							return *f(*e);
+							return *f(std::move(*e));
 
 						else {
 							return monad<M_<either<L,U>>>::pure(
