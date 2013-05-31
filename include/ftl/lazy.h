@@ -156,6 +156,7 @@ namespace ftl {
 		static lazy<T> pure(T t) {
 			return lazy<T>{[t](){ return t; }};
 		}
+		// TODO: C++14: Add a pure that captures Ts by move
 
 		template<
 				typename F,

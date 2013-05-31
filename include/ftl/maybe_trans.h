@@ -143,9 +143,19 @@ namespace ftl {
 				typename F,
 				typename U = typename decayed_result<F(T)>::type
 		>
-		static mT<U> map(F&& f, const mT<T>& m) {
+		static mT<U> map(F f, const mT<T>& m) {
 			return mT<U>{
 				[f](const maybe<T>& t) { return f % t; } % *m
+			};
+		}
+
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static mT<U> map(F f, mT<T>&& m) {
+			return mT<U>{
+				[f](const maybe<T>& t) { return f % t; } % std::move(*m)
 			};
 		}
 
@@ -170,6 +180,21 @@ namespace ftl {
 			return bind_helper<monad_t>::bind(m, std::forward<F>(f));
 		}
 
+		/**
+		 * \overload
+		 */
+		template<
+				typename F,
+				typename U =
+					concept_parameter<typename decayed_result<F(T)>::type>
+		>
+		static mT<U> bind(mT<T>&& m, F&& f) {
+
+			using monad_t = typename decayed_result<F(T)>::type;
+
+			return bind_helper<monad_t>::bind(std::move(m), std::forward<F>(f));
+		}
+
 		static constexpr bool instance = true;
 
 	private:
@@ -187,7 +212,7 @@ namespace ftl {
 						>::value
 					>
 			>
-			static mT<U> bind(const mT<T>& m, F&& f) {
+			static mT<U> bind(const mT<T>& m, F f) {
 				return mT<U>{
 					*m >>= [f](const maybe<T>& m) {
 						if(m)
@@ -198,6 +223,25 @@ namespace ftl {
 				};
 			}
 
+			template<
+					typename F,
+					typename = typename std::enable_if<
+						std::is_same<
+							typename re_parametrise<M,U>::type,
+							M2
+						>::value
+					>
+			>
+			static mT<U> bind(mT<T>&& m, F f) {
+				return mT<U>{
+					std::move(*m) >>= [f](maybe<T>&& m) {
+						if(m)
+							return f(std::move(*m));
+						else
+							return monad<M_<maybe<U>>>::pure(maybe<U>{});
+					}
+				};
+			}
 		};
 
 		template<typename M2>
@@ -205,11 +249,23 @@ namespace ftl {
 			using U = concept_parameter<M2>;
 
 			template<typename F>
-			static mT<U> bind(const mT<T>& m, F&& f) {
+			static mT<U> bind(const mT<T>& m, F f) {
 				return mT<U>{
 					*m >>= [f](const maybe<T>& m) {
 						if(m)
 							return *f(*m);
+						else
+							return monad<M_<maybe<U>>>::pure(maybe<U>{});
+					}
+				};
+			}
+
+			template<typename F>
+			static mT<U> bind(mT<T>&& m, F f) {
+				return mT<U>{
+					std::move(*m) >>= [f](maybe<T>&& m) {
+						if(m)
+							return *f(std::move(*m));
 						else
 							return monad<M_<maybe<U>>>::pure(maybe<U>{});
 					}
