@@ -157,6 +157,30 @@ namespace ftl {
 	}
 
 	/**
+	 * Convenience function object.
+	 *
+	 * Provided to make it easier to pass functor::map as parameter to
+	 * higher order functions, as one might otherwise have to wrap such calls
+	 * in a lambda to deal with the ambiguity in face of overloads.
+	 *
+	 * \ingroup functor
+	 */
+	template<typename F>
+	struct fMap {
+		template<typename Fn>
+		auto operator() (Fn&& fn, const F& f) const
+		-> decltype(functor<F>::map(std::forward<Fn>(fn), f)) {
+			return functor<F>::map(std::forward<Fn>(fn), f);
+		}
+
+		template<typename Fn>
+		auto operator() (Fn&& fn, F&& f) const
+		-> decltype(functor<F>::map(std::forward<Fn>(fn), std::move(f))) {
+			return functor<F>::map(std::forward<Fn>(fn), std::move(f));
+		}
+	};
+
+	/**
 	 * Distribute function inside a context across entire context.
 	 *
 	 * A practical example would be if you had a list of functions from

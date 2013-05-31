@@ -188,6 +188,28 @@ namespace ftl {
 	}
 
 	/**
+	 * Convenience function object.
+	 *
+	 * Provided to make it easier to pass applicative::pure as parameter to
+	 * higher order functions, as one might otherwise have to wrap such calls
+	 * in a lambda to deal with the ambiguity in face of overloads.
+	 *
+	 * \ingroup applicative
+	 */
+	template<typename F>
+	struct aPure {
+		using T = concept_parameter<F>;
+
+		F operator() (const T& t) const {
+			return applicative<F>::pure(t);
+		}
+
+		F operator() (T&& t) const {
+			return applicative<F>::pure(std::move(t));
+		}
+	};
+
+	/**
 	 * \page monoidapg Monoidal Alternatives
 	 *
 	 * A monoid where the monoidal operation signifies "choice" somehow.

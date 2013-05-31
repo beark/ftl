@@ -345,6 +345,33 @@ namespace ftl {
 		};
 	}
 
+	/**
+	 * Convenience function object.
+	 *
+	 * Provided to make it easier to treat monadic bind as a first class
+	 * function, even though many/all monad instances have overloaded
+	 * versions. I.e., in many cases where one might want to pass monad::bind
+	 * as a parameter to a function, it is not possible due to ambiguous
+	 * overloads. In these cases, one could either use a lambda, or&mdash;more
+	 * concisely&mdash;this function object.
+	 *
+	 * \ingroup monad
+	 */
+	template<typename M>
+	struct mBind {
+		template<typename F>
+		auto operator() (const M& m, F&& f) const
+		-> decltype(monad<M>::bind(m, std::forward<F>(f))) {
+			return monad<M>::bind(m, std::forward<F>(f));
+		}
+
+		template<typename F>
+		auto operator() (M&& m, F&& f) const
+		-> decltype(monad<M>::bind(std::move(m), std::forward<F>(f))) {
+			return monad<M>::bind(std::move(m), std::forward<F>(f));
+		}
+	};
+
 }
 
 #endif
