@@ -157,7 +157,7 @@ namespace ftl {
 				typename F,
 				typename U = typename decayed_result<F(T)>::type
 		>
-		static eT<U> map(F&& f, const eT<T>& e) {
+		static eT<U> map(F f, const eT<T>& e) {
 			return eT<U>{
 				[f](const either<L,T>& e) { return f % e; } % *e
 			};
@@ -167,7 +167,7 @@ namespace ftl {
 				typename F,
 				typename U = typename decayed_result<F(T)>::type
 		>
-		static eT<U> map(F&& f, eT<T>&& e) {
+		static eT<U> map(F f, eT<T>&& e) {
 			return eT<U>{
 				[f](either<L,T>&& e) {return f % std::move(e);} % std::move(*e)
 			};
