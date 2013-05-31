@@ -409,24 +409,68 @@ namespace ftl {
 			return either<L,T>(right_tag_t(), std::move(t));
 		}
 
+		/**
+		 * Apply `f` to right values.
+		 *
+		 * If `e` is a left value, it's simply passed on without any
+		 * modification. However, if `e` is a right value, `f` is applied and
+		 * its result is what's passed on.
+		 */
 		template<
-			typename F,
-			typename U = typename decayed_result<F(T)>::type>
-		static either<L,U> map(F f, const either<L,T>& e) {
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static either<L,U> map(const F& f, const either<L,T>& e) {
 			if(e)
 				return either<L,U>(right_tag_t(), f(*e));
 			else
 				return either<L,U>(left_tag_t(), e.left());
 		}
 
+		/// \overload
 		template<
-			typename F,
-			typename U = typename decayed_result<F(T)>::type::value_type>
-		static either<L,U> bind(const either<L,T>& e, F f) {
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static either<L,U> map(const F& f, either<L,T>&& e) {
+			if(e)
+				return either<L,U>(right_tag_t(), f(std::move(*e)));
+			else
+				return either<L,U>(left_tag_t(), std::move(e.left()));
+		}
+
+		/**
+		 * Bind `e` with the monadic computation `f`.
+		 *
+		 * If `e` is a right value, then it's extracted and passed to `f`,
+		 * the result of which is the monadic action returned by `bind`. If
+		 * `e` is a left value however, `f` is never invoked; `e.left()` is
+		 * simply passed on.
+		 *
+		 * \tparam F must satisy \ref fn`<either<L,U>(T)>` where `U` is any
+		 *           type that can be contained in an `either`.
+		 */
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type::value_type
+		>
+		static either<L,U> bind(const either<L,T>& e, const F& f) {
 			if(e)
 				return f(*e);
 			else
 				return either<L,U>(left_tag_t(), e.left());
+		}
+
+		/// \overload
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type::value_type
+		>
+		static either<L,U> bind(either<L,T>&& e, const F& f) {
+			if(e)
+				return f(std::move(*e));
+			else
+				return either<L,U>(left_tag_t(), std::move(e.left()));
 		}
 
 		static constexpr bool instance = true;
