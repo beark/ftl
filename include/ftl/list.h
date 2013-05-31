@@ -72,20 +72,36 @@ namespace ftl {
 	 * \ingroup list
 	 */
 	template<
-		typename F,
-		typename T,
-		template<typename> class A,
-		typename U = typename decayed_result<F(T)>::type::value_type>
+			typename F,
+			typename T,
+			template<typename> class A,
+			typename U = typename decayed_result<F(T)>::type::value_type
+	>
 	std::list<U,A<U>> concatMap(F f, const std::list<T,A<T>>& l) {
 
 		std::list<U,A<U>> result;
 		auto nested = f % l;
 
 		for(auto& el : nested) {
-			for(auto& e : el) {
-				result.push_back(e);
-			}
+			result.splice(result.end(), el);
 		}
+
+		return result;
+	}
+
+	template<
+			typename F,
+			typename T,
+			template<typename> class A,
+			typename U = typename decayed_result<F(T)>::type::value_type
+	>
+	std::list<U,A<U>> concatMap(F f, std::list<T,A<T>>&& l) {
+
+		std::list<U,A<U>> result;
+		auto nested = f % std::move(l);
+
+		for(auto& el : nested)
+			result.splice(result.end(), el);
 
 		return result;
 	}
@@ -174,6 +190,19 @@ namespace ftl {
 			return ret;
 		}
 
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static std::list<U,A<U>> map(F&& f, std::list<T,A<T>>&& l) {
+			std::list<U,A<U>> ret;
+			for(auto& e : l) {
+				ret.push_back(f(std::move(e)));
+			}
+
+			return ret;
+		}
+
 		/**
 		 * Move optimised version enabled when `f` does not change domain.
 		 *
@@ -203,6 +232,14 @@ namespace ftl {
 		>
 		static std::list<U,A<U>> bind(const std::list<T,A<T>>& l, F&& f) {
 			return concatMap(std::forward<F>(f), l);
+		}
+
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type::value_type
+		>
+		static std::list<U,A<U>> bind(std::list<T,A<T>>&& l, F&& f) {
+			return concatMap(std::forward<F>(f), std::move(l));
 		}
 
 		static constexpr bool instance = true;
