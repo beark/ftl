@@ -72,20 +72,52 @@ namespace ftl {
 	 * \ingroup vector
 	 */
 	template<
-		typename F,
-		typename T,
-		template<typename> class A,
-		typename U = typename decayed_result<F(T)>::type::value_type>
+			typename F,
+			typename T,
+			template<typename> class A,
+			typename U = typename decayed_result<F(T)>::type::value_type
+	>
 	std::vector<U,A<U>> concatMap(F f, const std::vector<T,A<T>>& v) {
 
 		std::vector<U,A<U>> result;
-		result.reserve(v.size() * 2);	// Reasonable assumption? TODO: test!
+		result.reserve(v.size() * 2);
 		auto nested = f % v;
 
 		for(auto& el : nested) {
-			for(auto& e : el) {
-				result.push_back(e);
-			}
+			result.insert(
+					result.end(),
+					std::make_move_iterator(el.begin()),
+					std::make_move_iterator(el.end())
+			);
+		}
+
+		return result;
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup vector
+	 */
+	template<
+			typename F,
+			typename T,
+			template<typename> class A,
+			typename U = typename decayed_result<F(T)>::type::value_type
+	>
+	std::vector<U,A<U>> concatMap(F f, std::vector<T,A<T>>&& v) {
+
+		auto nested = f % std::move(v);
+
+		std::vector<U,A<U>> result;
+		result.reserve(nested.size() * 2);
+
+		for(auto& el : nested) {
+			result.insert(
+					result.end(),
+					std::make_move_iterator(el.begin()),
+					std::make_move_iterator(el.end())
+			);
 		}
 
 		return result;
@@ -162,6 +194,21 @@ namespace ftl {
 			return ret;
 		}
 
+		/// Rvalue version of map
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static std::vector<U,A<U>> map(F&& f, std::vector<T,A<T>>&& v) {
+			std::vector<U,A<U>> ret;
+			ret.reserve(v.size());
+			for(auto& e : v) {
+				ret.push_back(f(std::move(e)));
+			}
+
+			return ret;
+		}
+
 		/**
 		 * Move optimised version enabled when `f` does not change domain.
 		 *
@@ -192,6 +239,15 @@ namespace ftl {
 		>
 		static std::vector<U,A<U>> bind(const std::vector<T,A<T>>& v, F&& f) {
 			return concatMap(std::forward<F>(f), v);
+		}
+
+		/// Rvalue reference version of bind
+		template<
+			typename F,
+			typename U = typename decayed_result<F(T)>::type::value_type
+		>
+		static std::vector<U,A<U>> bind(std::vector<T,A<T>>&& v, F&& f) {
+			return concatMap(std::forward<F>(f), std::move(v));
 		}
 
 		static constexpr bool instance = true;
