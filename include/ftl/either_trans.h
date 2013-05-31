@@ -163,6 +163,16 @@ namespace ftl {
 			};
 		}
 
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static eT<U> map(F&& f, eT<T>&& e) {
+			return eT<U>{
+				[f](either<L,T>&& e) {return f % std::move(e);} % std::move(*e)
+			};
+		}
+
 		/**
 		 * Monadic bind.
 		 *
@@ -209,8 +219,9 @@ namespace ftl {
 			static eT<U> bind(const eT<T>& e, F f) {
 				return eT<U>{
 					*e >>= [f](const either<L,T>& e) {
-						if(e)
-							return *f(*e);
+						if(e) {
+							return aPure<either<L,U>>() % f(*e);
+						}
 						else {
 							return monad<M_<either<L,U>>>::pure(
 								make_left<U>(e.left())
@@ -231,9 +242,46 @@ namespace ftl {
 			>
 			static eT<U> bind(eT<T>&& e, F f) {
 				return eT<U>{
+					std::move(*e) >>= [f](either<L,T>&& e) {
+						if(e)
+							return aPure<either<L,U>>() % f(std::move(*e));
+						else {
+							return monad<M_<either<L,U>>>::pure(
+								make_left<U>(e.left())
+							);
+						}
+					}
+				};
+			}
+		};
+
+		template<typename M2>
+		struct bind_helper<eitherT<L,M2>> {
+			using U = concept_parameter<M2>;
+
+			template<typename F>
+			static eT<U> bind(const eT<T>& e, F f) {
+				return eT<U>{
+					*e >>= [f](const either<L,T>& e) {
+						if(e)
+							return *f(*e);
+
+						else {
+							return monad<M_<either<L,U>>>::pure(
+								make_left<U>(e.left())
+							);
+						}
+					}
+				};
+			}
+
+			template<typename F>
+			static eT<U> bind(eT<T>&& e, F f) {
+				return eT<U>{
 					std::move(*e) >>= [f](const either<L,T>& e) {
 						if(e)
-							return *f(std::move(*e));
+							return *f(*e);
+
 						else {
 							return monad<M_<either<L,U>>>::pure(
 								make_left<U>(e.left())
