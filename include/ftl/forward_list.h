@@ -81,11 +81,45 @@ namespace ftl {
 			const std::forward_list<T,A<T>>& l) {
 
 		std::forward_list<U,A<U>> result;
-		auto nested = f % l;
+		auto nested = std::forward<F>(f) % l;
 
 		auto it = result.before_begin();
 		for(auto& el : nested) {
-			it = result.insert_after(it, el.begin(), el.end());
+			it = result.insert_after(
+					it,
+					std::make_move_iterator(el.begin()),
+					std::make_move_iterator(el.end())
+			);
+		}
+
+		return result;
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup fwdlist
+	 */
+	template<
+			typename F,
+			typename T,
+			template<typename> class A,
+			typename U = typename decayed_result<F(T)>::type::value_type>
+	std::forward_list<U,A<U>> concatMap(
+			F&& f,
+			std::forward_list<T,A<T>>&& l) {
+
+		auto nested = std::forward<F>(f) % std::move(l);
+
+		std::forward_list<U,A<U>> result;
+
+		auto it = result.before_begin();
+		for(auto& el : nested) {
+			it = result.insert_after(
+					it,
+					std::make_move_iterator(el.begin()),
+					std::make_move_iterator(el.end())
+			);
 		}
 
 		return result;
@@ -164,7 +198,7 @@ namespace ftl {
 				typename U = typename decayed_result<F(T)>::type
 		>
 		static std::forward_list<U,A<U>> map(
-				F&& f,
+				const F& f,
 				const std::forward_list<T,A<T>>& l) {
 
 			std::forward_list<U,A<U>> rl;
@@ -176,7 +210,24 @@ namespace ftl {
 			return rl;
 		}
 
-		// No copy version available when F is an endofuntion
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static std::forward_list<U,A<U>> map(
+				const F& f,
+				std::forward_list<T,A<T>>&& l) {
+
+			std::forward_list<U,A<U>> rl;
+			auto it = rl.before_begin();
+			for(auto& e : l) {
+				it = rl.insert_after(it, f(std::move(e)));
+			}
+
+			return rl;
+		}
+
+		// No copy version available when F is an endofuntion, and l is a temp
 		template<
 				typename F,
 				typename = typename std::enable_if<
@@ -186,7 +237,7 @@ namespace ftl {
 					>::value
 				>::type>
 		static std::forward_list<T,A<T>> map(
-				F&& f,
+				const F& f,
 				std::forward_list<T,A<T>>&& l) {
 
 			auto rl = std::move(l);
@@ -206,6 +257,17 @@ namespace ftl {
 				F&& f) {
 
 			return concatMap(std::forward<F>(f), l);
+		}
+
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type::value_type
+		>
+		static std::forward_list<U,A<U>> bind(
+				std::forward_list<T,A<T>>&& l,
+				F&& f) {
+
+			return concatMap(std::forward<F>(f), std::move(l));
 		}
 
 		static constexpr bool instance = true;

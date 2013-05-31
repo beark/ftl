@@ -59,6 +59,12 @@ namespace ftl {
 				tup<N-1,T>::fmap(f, ret, o);
 				std::get<N>(ret) = std::get<N>(o);
 			}
+
+			template<typename F, typename O>
+			static void fmap(const F& f, T& ret, O&& o) {
+				tup<N-1,T>::fmap(f, ret, std::move(o));
+				std::get<N>(ret) = std::get<N>(std::move(o));
+			}
 		};
 
 		template<typename T>
@@ -70,6 +76,11 @@ namespace ftl {
 			template<typename F, typename O>
 			static void fmap(const F& f, T& ret, const O& o) {
 				std::get<0>(ret) = f(std::get<0>(o));
+			}
+
+			template<typename F, typename O>
+			static void fmap(const F& f, T& ret, O&& o) {
+				std::get<0>(ret) = f(std::get<0>(std::move(o)));
 			}
 		};
 
@@ -223,6 +234,18 @@ namespace ftl {
 					std::forward<F>(f), t, ret);
 			return ret;
 		}
+
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		std::tuple<U,Ts...> map(F&& f, std::tuple<T,Ts...>&& t) {
+
+			std::tuple<U,Ts...> ret;
+			_dtl::tup<sizeof...(Ts)-1, std::tuple<U,Ts...>>::fmap(
+					std::forward<F>(f), std::move(t), ret);
+			return ret;
+		}
 	};
 
 	/**
@@ -246,6 +269,17 @@ namespace ftl {
 		>
 		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
 			return functor<std::tuple<T,Ts...>>::map(std::forward<F>(f), t);
+		}
+
+		template<
+				typename F,
+				typename U = typename decayed_result<F(T)>::type
+		>
+		static std::tuple<U,Ts...> map(F&& f, std::tuple<T,Ts...>&& t) {
+			return functor<std::tuple<T,Ts...>>::map(
+					std::forward<F>(f),
+					std::move(t)
+			);
 		}
 
 		template<
