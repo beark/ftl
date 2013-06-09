@@ -277,22 +277,31 @@ namespace ftl {
 
 	};
 
+	template<template<typename...> class> struct monoidA;
+
 	/**
 	 * Monoidal alternative instance for maybeT.
 	 *
 	 * \ingroup maybeT
 	 */
-	template<typename M>
-	struct monoidA<maybeT<M>> {
-		using T = concept_parameter<M>;
-		using Mmt = typename maybeT<M>::Mmt;
+	template<>
+	struct monoidA<maybeT> {
 
 		/// Embeds a `nothing` in `M`.
+		template<typename M>
 		static maybeT<M> fail() {
+			using Mmt = typename maybeT<M>::Mmt;
+			using T = concept_parameter<M>;
+
 			return monad<Mmt>::pure(maybe<T>{});
 		}
 
+		template<typename M>
 		static maybeT<M> orDo(const maybeT<M>& mm1, maybeT<M> mm2) {
+
+			using T = concept_parameter<M>;
+			using Mmt = typename maybeT<M>::Mmt;
+
 			return maybeT<M> {
 				*mm1 >>= [mm2](const maybe<T>& m) {
 					if(m)
