@@ -59,20 +59,26 @@ namespace ftl {
 	 * - \ref functor
 	 * - \ref applicative
 	 * - \ref monad
+	 * - \ref monoidapg, if `L` is a \ref monoidpg.
+	 * - \ref foldablepg, if `M` is foldable.
 	 *
 	 * \tparam L The left type in the either values.
 	 * \tparam M A complete monad type, e.g. `std::list<some_type>`.
+	 *
+	 * \ingroup eitherT
 	 */
 	template<typename L, typename M>
 	class eitherT {
 	public:
-		/// Easy reference to type concepts are implemented on
+		/// Quick reference to the type concepts are implemented on
 		using T = concept_parameter<M>;
 
 		/// The transformed type `eitherT` wraps
 		using Met = typename re_parametrise<M,either<L,T>>::type;
 
-		/// Construct from an unwrapped equivalent of the transformed type
+		/**
+		 * Construct from an unwrapped equivalent of the transformed type.
+		 */
 		explicit constexpr eitherT(const Met& m)
 		noexcept(std::is_nothrow_copy_constructible<Met>::value)
 		: mEither(m) {}
@@ -94,6 +100,9 @@ namespace ftl {
 
 		/**
 		 * Unwraps the inner, transformed, monad.
+		 *
+		 * This can be used to "regain" some functionality of `M` that was
+		 * "hidden" by wrapping it in `eitherT`.
 		 */
 		Met& operator* () noexcept {
 			return mEither;
@@ -106,6 +115,8 @@ namespace ftl {
 
 		/**
 		 * Access members of the wrapped monad.
+		 *
+		 * Completes the \ref deref concept.
 		 */
 		Met* operator-> () noexcept {
 			return &mEither;
@@ -120,13 +131,13 @@ namespace ftl {
 		Met mEither;
 	};
 
-	/// Re-parametrising an eitherT requires non-default actions.
+	// Re-parametrising an eitherT requires non-default actions.
 	template<typename M, typename L, typename U>
 	struct re_parametrise<eitherT<L,M>,U> {
 		using type = eitherT<L,typename re_parametrise<M,U>::type>;
 	};
 
-	/// eitherT's parametric traits are non-default.
+	// eitherT's parametric traits are non-default.
 	template<typename L, typename M>
 	struct parametric_type_traits<eitherT<L,M>> {
 		using parameter_type = concept_parameter<M>;
@@ -137,6 +148,8 @@ namespace ftl {
 	 *
 	 * In essence, composes the basic monadic operations of `M` with
 	 * `ftl::either`.
+	 *
+	 * \ingroup eitherT
 	 */
 	template<typename L, typename M>
 	struct monad<eitherT<L,M>> {
@@ -145,6 +158,13 @@ namespace ftl {
 		template<typename U>
 		using M_ = typename re_parametrise<M,U>::type;
 
+		/** 
+		 * Type define to make remaining type signatures easier to read.
+		 *
+		 * `M_` in this case can be thought of as the unparametrised base monad
+		 * `M` (i.e., the type parameter of `M_` is applied as the concept
+		 * parameter of `M` in a `re_parametrise` call).
+		 */
 		template<typename U>
 		using eT = eitherT<L,M_<U>>;
 
@@ -153,6 +173,17 @@ namespace ftl {
 					make_right<L>(std::forward<T>(t)))};
 		}
 
+		/**
+		 * Functorial mapping.
+		 *
+		 * In essence, a composition of `functor<either>::map` and 
+		 * `functor<M>::map`. Formulated in a more wordy sense, "drills down" to
+		 * right values embedded in either, embedded in `M`.
+		 *
+		 * \tparam F must satisfy \ref fn`<U(T)>`, where `T` is the concept
+		 *           parameter of `M` and `U` is any type that can be contained
+		 *           in an `M` _and_ in an `either`.
+		 */
 		template<
 				typename F,
 				typename U = typename decayed_result<F(T)>::type
@@ -163,6 +194,7 @@ namespace ftl {
 			};
 		}
 
+		/// \overload
 		template<
 				typename F,
 				typename U = typename decayed_result<F(T)>::type
@@ -203,10 +235,12 @@ namespace ftl {
 		static constexpr bool instance = true;
 
 	private:
+		// Helper struct required to implement automatic lift and hoist
 		template<typename M2>
 		struct bind_helper {
 			using U = concept_parameter<M2>;
 
+			// Automatic lift when binding to operations in M_
 			template<
 					typename F,
 					typename = typename std::enable_if<
@@ -255,6 +289,7 @@ namespace ftl {
 			}
 		};
 
+		// Normal case, we're binding with a computation in eitherT
 		template<typename M2>
 		struct bind_helper<eitherT<L,M2>> {
 			using U = concept_parameter<M2>;
@@ -291,6 +326,152 @@ namespace ftl {
 				};
 			}
 		};
+
+		// Automatic hoisting of plain either
+		template<typename U>
+		struct bind_helper<either<L,U>> {
+
+			template<typename F>
+			static eT<U> bind(const eT<T>& e, F f) {
+				return e >>= [f](const T& t) {
+					return eT<U>{
+						monad<M_<either<L,U>>>::pure(
+							make_right<L>(t) >>= f
+						)
+					};
+				};
+			}
+
+			template<typename F>
+			static eT<U> bind(eT<T>&& e, F f) {
+				return std::move(e) >>= [f](T&& t) {
+					return eT<U>{
+						monad<M_<either<L,U>>>::pure(
+							make_right<L>(std::move(t)) >>= f
+						)
+					};
+				};
+			}
+		};
+	};
+
+	/**
+	 * EitherT's monoidal alternative instance.
+	 *
+	 * \tparam L must be a monoid for this instance to be available.
+	 *
+	 * \ingroup eitherT
+	 */
+	template<typename L, typename M>
+	struct monoidA<eitherT<L,M>> {
+		using T = concept_parameter<M>;
+
+		/**
+		 * Invoke the failure state.
+		 *
+		 * Failing embeds a left value of `monoid<L>`'s identity element with
+		 * `monad<M>::pure`.
+		 */
+		static eitherT<L,M> fail() {
+			return eitherT<L,M>{
+				monad<M>::pure(make_left<T>(monoid<L>::id()))
+			};
+		}
+
+		/**
+		 * Evaluate two alternatives.
+		 *
+		 * If `e1` wraps a right value, it is instantly returned. Otherwise,
+		 * `e2` is checked for rightness. If both `e1` and `e2` wrap left
+		 * values, they are combined using `monoid<L>::append` and a new left
+		 * value (embedded as if by `monad<M>::pure`) is returned.
+		 */
+		static eitherT<L,M> orDo(const eitherT<L,M>& e1, eitherT<L,M> e2) {
+			return eitherT<L,M> {
+				*e1 >>= [e2](const either<L,T>& e) {
+					if(e) {
+						return monad<eitherT<L,M>>::pure(e);
+					}
+					else {
+						return liftM(
+							[e](const either<L,T>& e2){
+								if(e2)
+									return e2;
+								else
+									return make_left<T>(e.left() ^ e2.left());
+							},
+							*e2
+						);
+					}
+				}
+			};
+		}
+	};
+
+	// Forward declaration
+	template<typename> struct foldable;
+
+	/**
+	 * Foldable instance for eitherT.
+	 *
+	 * \tparam M must be \ref foldablepg
+	 */
+	template<typename L, typename M>
+	struct foldable<eitherT<L,M>>
+	: foldMap_default<eitherT<L,M>>, fold_default<eitherT<L,M>> {
+
+		using T = concept_parameter<M>;
+		using Met = typename eitherT<L,M>::Met;
+
+		template<
+				typename F,
+				typename U,
+				typename = typename std::enable_if<
+					std::is_same<
+						U,
+						typename decayed_result<F(U,T)>::type
+					>::value
+				>::type
+		>
+		static U foldl(F f, U z, const eitherT<L,M>& me) {
+			return foldable<Met>::foldl(
+				[f,z](const either<L,T>& e, U z){
+					if(e)
+						return f(z, *e);
+
+					else
+						return z;
+				},
+				z
+				*me
+			);
+		}
+
+		template<
+				typename F,
+				typename U,
+				typename = typename std::enable_if<
+					std::is_same<
+						U,
+						typename decayed_result<F(T,U)>::type
+					>::value
+				>::type
+		>
+		static U foldr(F f, U z, const eitherT<L,M>& me) {
+			return foldable<Met>::foldr(
+				[f,z](const either<L,T>& e, U z){
+					if(e)
+						return f(*e, z);
+
+					else
+						return z;
+				},
+				z
+				*me
+			);
+		}
+
+		static constexpr bool instance = foldable<M>::instance;
 	};
 }	
 
