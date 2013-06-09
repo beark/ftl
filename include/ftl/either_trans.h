@@ -355,62 +355,6 @@ namespace ftl {
 		};
 	};
 
-	/**
-	 * EitherT's monoidal alternative instance.
-	 *
-	 * \tparam L must be a monoid for this instance to be available.
-	 *
-	 * \ingroup eitherT
-	 */
-	template<typename L, typename M>
-	struct monoidA<eitherT<L,M>> {
-		using T = concept_parameter<M>;
-		using Met = typename eitherT<L,M>::Met;
-
-		/**
-		 * Invoke the failure state.
-		 *
-		 * Failing embeds a left value of `monoid<L>`'s identity element with
-		 * `monad<M>::pure`.
-		 */
-		static eitherT<L,M> fail() {
-			return eitherT<L,M>{
-				monad<Met>::pure(make_left<T>(monoid<L>::id()))
-			};
-		}
-
-		/**
-		 * Evaluate two alternatives.
-		 *
-		 * If `e1` wraps a right value, it is instantly returned. Otherwise,
-		 * `e2` is checked for rightness. If both `e1` and `e2` wrap left
-		 * values, they are combined using `monoid<L>::append` and a new left
-		 * value (embedded as if by `monad<M>::pure`) is returned.
-		 */
-		static eitherT<L,M> orDo(const eitherT<L,M>& e1, eitherT<L,M> e2) {
-			return eitherT<L,M> {
-				*e1 >>= [e2](const either<L,T>& e) {
-					if(e) {
-						return monad<Met>::pure(e);
-					}
-					else {
-						return liftM(
-							[e](const either<L,T>& e2){
-								if(e2)
-									return e2;
-								else
-									return make_left<T>(e.left() ^ e2.left());
-							},
-							*e2
-						);
-					}
-				}
-			};
-		}
-
-		static constexpr bool instance = monoid<L>::value;
-	};
-
 	// Forward declaration
 	template<typename> struct foldable;
 
