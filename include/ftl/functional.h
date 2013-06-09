@@ -23,7 +23,7 @@
 #ifndef FTL_FUNCTIONAL_H
 #define FTL_FUNCTIONAL_H
 
-#include "applicative.h"
+#include "monad.h"
 
 namespace ftl {
 	/**
@@ -66,16 +66,16 @@ namespace ftl {
 	 * composing them, flipping the order of their parameters, and so on.
 	 *
 	 * \par Dependencies
-	 * - \ref applicative
+	 * - \ref monad
 	 */
 
 	/**
-	 * Applicative Functor instance for ftl::functions.
+	 * Monad instance for ftl::functions.
 	 *
 	 * \ingroup functional
 	 */
 	template<typename R, typename P, typename...Ps>
-	struct applicative<function<R,P,Ps...>> {
+	struct monad<function<R,P,Ps...>> {
 
 		/// Creates a function that returns `a`, regardless of its parameters.
 		static function<R,P,Ps...> pure(R a) {
@@ -93,6 +93,7 @@ namespace ftl {
 			};
 		}
 
+		/*
 		template<
 			typename F,
 			typename S = typename std::result_of<F(R)>::type
@@ -101,6 +102,18 @@ namespace ftl {
 
 			return [=] (P x,Ps...xs) {
 				return f(x,xs...)(g(x,xs...));
+			};
+		}
+		*/
+
+		template<
+				typename Fn,
+				typename Fs = typename std::result_of<Fn(R)>::type,
+				typename S = typename std::result_of<Fs(P,Ps...)>::type
+		>
+		static function<S,P,Ps...> bind(function<R,P,Ps...> f, Fn fn) {
+			return [=](P p, Ps...ps) {
+				return fn(f(p, ps...))(p, ps...);
 			};
 		}
 
@@ -135,6 +148,52 @@ namespace ftl {
 		}
 
 		static constexpr bool instance = monoid<M>::instance;
+	};
+
+	template<typename R, typename S, typename P, typename...Ps>
+	struct re_parametrise<std::function<R(P,Ps...)>,S> {
+		using type = std::function<S(P,Ps...)>;
+	};
+
+	template<typename R, typename P, typename...Ps>
+	struct parametric_type_traits<std::function<R(P,Ps...)>> {
+		using parameter_type = R;
+	};
+
+	/**
+	 * Monad instance for std::function.
+	 *
+	 * Exactly equivalent of `monad<ftl::function>`.
+	 */
+	template<typename R, typename P, typename...Ps>
+	struct monad<std::function<R(P,Ps...)>> {
+		static std::function<R(P,Ps...)> pure(R r) {
+			return std::function<R(P,Ps...)> {
+				[r](P,Ps...) { return r; }
+			};
+		}
+
+		template<typename F, typename S = typename std::result_of<F(R)>::type>
+		static std::function<S(P,Ps...)> map(F fn, std::function<R(P,Ps...)> f) {
+			return std::function<S(P,Ps...)>{
+				[fn, f](P&& p,Ps&&...ps) {
+					return fn(f(std::forward<P>(p), std::forward<Ps>(ps)...));
+				}
+			};
+		}
+
+		template<
+				typename Fn,
+				typename Fs = typename std::result_of<Fn(R)>::type,
+				typename S = typename std::result_of<Fs(P,Ps...)>::type
+		>
+		static std::function<S(P,Ps...)> bind(std::function<R(P,Ps...)> f, Fn fn) {
+			return [=](P p, Ps...ps) {
+				return fn(f(p, ps...))(p, ps...);
+			};
+		}
+
+		static constexpr bool instance = true;
 	};
 
 }
