@@ -253,7 +253,7 @@ namespace ftl {
 		 * \throws std::logic_error if called one a left type.
 		 */
 		R* operator-> () {
-			if(tag == _dtl::LEFT)
+			if(tag == _dtl::RIGHT)
 				return &r;
 
 			throw std::logic_error(
