@@ -365,6 +365,7 @@ namespace ftl {
 	template<typename L, typename M>
 	struct monoidA<eitherT<L,M>> {
 		using T = concept_parameter<M>;
+		using Met = typename eitherT<L,M>::Met;
 
 		/**
 		 * Invoke the failure state.
@@ -374,7 +375,7 @@ namespace ftl {
 		 */
 		static eitherT<L,M> fail() {
 			return eitherT<L,M>{
-				monad<M>::pure(make_left<T>(monoid<L>::id()))
+				monad<Met>::pure(make_left<T>(monoid<L>::id()))
 			};
 		}
 
@@ -390,7 +391,7 @@ namespace ftl {
 			return eitherT<L,M> {
 				*e1 >>= [e2](const either<L,T>& e) {
 					if(e) {
-						return monad<eitherT<L,M>>::pure(e);
+						return monad<Met>::pure(e);
 					}
 					else {
 						return liftM(
@@ -406,6 +407,8 @@ namespace ftl {
 				}
 			};
 		}
+
+		static constexpr bool instance = monoid<L>::value;
 	};
 
 	// Forward declaration
