@@ -158,7 +158,7 @@ namespace ftl {
 		}
 
 		/// Copy assignment
-		const maybe& operator= (const maybe& m)
+		maybe& operator= (const maybe& m)
 		/* TODO: Enable noexcept specifier once is_nothrow_destructible is
 		 * available.
 		noexcept(  std::is_nothrow_copy_constructible<A>::value
@@ -171,14 +171,14 @@ namespace ftl {
 
 			isValid = m.isValid;
 			if(isValid) {
-				new (&val) value_type(m.val);
+				new (&val) value_type(reinterpret_cast<const A&>(m.val));
 			}
 
 			return *this;
 		}
 
 		/// Move assignment
-		const maybe& operator= (maybe&& m)
+		maybe& operator= (maybe&& m)
 		/* TODO: Enable noexcept specifier once is_nothrow_destructible is
 		 * available.
 		noexcept(  std::is_nothrow_copy_constructible<A>::value
@@ -191,7 +191,8 @@ namespace ftl {
 
 			isValid = m.isValid;
 			if(isValid) {
-				new (&val) value_type(std::move(m.val));
+				new (&val) value_type(
+						std::move(reinterpret_cast<A&>(m.val)));
 				m.isValid = false;
 			}
 
@@ -242,7 +243,7 @@ namespace ftl {
 			if(!isValid)
 				throw std::logic_error("Attempting to read the value of Nothing.");
 
-			return reinterpret_cast<const A*>(&val);
+			return reinterpret_cast<A*>(&val);
 		}
 
 		/// \overload
