@@ -132,7 +132,7 @@ namespace ftl {
 						U,
 						typename decayed_result<Fn(U,T)>::type
 					>::value
-				>::type,
+				>::type
 		>
 		static U foldl(Fn&& fn, U&& z, const F& f);
 
