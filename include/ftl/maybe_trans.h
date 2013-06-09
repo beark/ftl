@@ -277,8 +277,6 @@ namespace ftl {
 
 	};
 
-	template<template<typename...> class> struct monoidA;
-
 	/**
 	 * Monoidal alternative instance for maybeT.
 	 *
