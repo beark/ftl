@@ -120,6 +120,8 @@ namespace ftl {
 	 * `maybeT`'s monad instance.
 	 *
 	 * "Stacks" `M` on top of `maybe`.
+	 *
+	 * \ingroup maybeT
 	 */
 	template<typename M>
 	struct monad<maybeT<M>> {
@@ -273,6 +275,34 @@ namespace ftl {
 			}
 		};
 
+	};
+
+	/**
+	 * Monoidal alternative instance for maybeT.
+	 *
+	 * \ingroup maybeT
+	 */
+	template<typename M>
+	struct monoidA<maybeT<M>> {
+		using T = concept_parameter<M>;
+		using Mmt = typename maybeT<M>::Mmt;
+
+		/// Embeds a `nothing` in `M`.
+		static maybeT<M> fail() {
+			return monad<Mmt>::pure(maybe<T>{});
+		}
+
+		static maybeT<M> orDo(const maybeT<M>& mm1, maybeT<M> mm2) {
+			return maybeT<M> {
+				*mm1 >>= [mm2](const maybe<T>& m) {
+					if(m)
+						return monad<Mmt>::pure(m);
+
+					else
+						return *mm2;
+				}
+			};
+		}
 	};
 }
 
