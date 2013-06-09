@@ -15,9 +15,9 @@ OLVL=-O2
 
 all: release
 
-release: main.cpp either_tests.h base.h
+release: main.cpp either_tests.h maybe_tests.h base.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OLVL) -o ftl_tests main.cpp
 
-debug: main.cpp either_tests.h base.h
+debug: main.cpp either_tests.h maybe_tests.h base.h
 	$(CC) $(CFLAGS) $(LDFLAGS) -g -o ftl_tests main.cpp
 
