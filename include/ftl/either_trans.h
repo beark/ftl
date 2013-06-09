@@ -355,8 +355,10 @@ namespace ftl {
 		};
 	};
 
-	// Forward declaration
+	// Forward declarations
 	template<typename> struct foldable;
+	template<typename> struct foldMap_default;
+	template<typename> struct fold_default;
 
 	/**
 	 * Foldable instance for eitherT.
