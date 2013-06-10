@@ -32,7 +32,7 @@ namespace ftl {
 	template<>
 	struct monoid<error> {
 		static error id() {
-			return error(std::string("Unspecified error."));
+			return error(std::string(""));
 		}
 
 		static error append(const error& e1, const error& e2) {
