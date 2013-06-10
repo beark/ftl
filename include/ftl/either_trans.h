@@ -168,9 +168,14 @@ namespace ftl {
 		template<typename U>
 		using eT = eitherT<L,M_<U>>;
 
+		static eT<T> pure(const T& t) {
+			return eT<T>{monad<M_<either<L,T>>>::pure(
+					make_right<L>(t))};
+		}
+
 		static eT<T> pure(T&& t) {
 			return eT<T>{monad<M_<either<L,T>>>::pure(
-					make_right<L>(std::forward<T>(t)))};
+					make_right<L>(std::move(t)))};
 		}
 
 		/**
@@ -313,7 +318,7 @@ namespace ftl {
 			template<typename F>
 			static eT<U> bind(eT<T>&& e, F f) {
 				return eT<U>{
-					std::move(*e) >>= [f](either<L,T>&& e) {
+					std::move(*e) >>= [f](either<L,T>&& e) -> M_<either<L,U>> {
 						if(e)
 							return *f(std::move(*e));
 
@@ -422,6 +427,63 @@ namespace ftl {
 
 		static constexpr bool instance = foldable<M>::instance;
 	};
+
+	/**
+	 * EitherT's monoidal alternative instance.
+	 *
+	 * \tparam L must be a monoid for this instance to be available.
+	 *
+	 * \ingroup eitherT
+	 */
+	template<typename L, typename M>
+	struct monoidA<eitherT<L,M>> {
+		using T = concept_parameter<M>;
+		using Met = typename eitherT<L,M>::Met;
+
+		/**
+		 * Invoke the failure state.
+		 *
+		 * Failing embeds a left value of `monoid<L>`'s identity element with
+		 * `monad<M>::pure`.
+		 */
+		static eitherT<L,M> fail() {
+			return eitherT<L,M>{
+				monad<Met>::pure(make_left<T>(monoid<L>::id()))
+			};
+		}
+
+		/**
+		 * Evaluate two alternatives.
+		 *
+		 * If `e1` wraps a right value, it is instantly returned. Otherwise,
+		 * `e2` is checked for rightness. If both `e1` and `e2` wrap left
+		 * values, they are combined using `monoid<L>::append` and a new left
+		 * value (embedded as if by `monad<M>::pure`) is returned.
+		 */
+		static eitherT<L,M> orDo(const eitherT<L,M>& e1, eitherT<L,M> e2) {
+			return eitherT<L,M> {
+				*e1 >>= [e2](const either<L,T>& e) -> Met {
+					if(e) {
+						return monad<Met>::pure(e);
+					}
+					else {
+						return liftM(
+							[e](const either<L,T>& e2) -> either<L,T> {
+								if(e2)
+									return e2;
+								else
+									return make_left<T>(e.left() ^ e2.left());
+							},
+							*e2
+						);
+					}
+				}
+			};
+		}
+
+		static constexpr bool instance = monoid<L>::instance;
+	};
+
 }	
 
 #endif
