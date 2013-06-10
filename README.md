@@ -106,7 +106,7 @@ So, pretty much a list of `maybe`s then, what's the point? The point is, the new
 ``` 
 Same deal, but if `ms` was a regular, untransformed list of `maybe`:
 ```cpp
-    auto ns = [](maybe<int> x){ if(x) return maybe<int>((*x)-1); } % ms;
+    auto ns = [](maybe<int> x){ return x ? maybe<int>((*x)-1) : return x; } % ms;
 
     print(ns);
 ``` 
