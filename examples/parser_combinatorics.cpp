@@ -55,14 +55,14 @@ int main(int arc, char** argv) {
 	using std::string;
 
 	auto parser = parseLispList();
-	auto res = parser.run(std::cin);
+	auto res = run(parser, std::cin);
 
 	while(!res) {
 		std::cout << "expected " << res.left().message() << std::endl;
 
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-		res = parser.run(std::cin);
+		res = run(parser, std::cin);
 	}
 
 	for(auto e : *res) {

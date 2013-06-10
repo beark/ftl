@@ -64,11 +64,11 @@ parser<char> oneOf(std::string str) {
 
 parser<std::string> many(parser<char> p) {
 	return parser<std::string>([p](std::istream& s) {
-		auto r = p.run(s);
+		auto r = (*p)(s);
 		std::ostringstream oss;
 		while(r) {
 			oss << *r;
-			r = p.run(s);
+			r = (*p)(s);
 		}
 
 		return yield(oss.str());
@@ -81,7 +81,7 @@ parser<std::string> many1(parser<char> p) {
 	// Run p once normally, bind with what's essentially "many"
 	return p >>= [p](char t) {
 		return parser<std::string>([p,t](std::istream& strm) {
-			auto r = many(p).run(strm);
+			auto r = (*many(p))(strm);
 			if(r) {
 				r->insert(r->begin(), t);
 				return r;
