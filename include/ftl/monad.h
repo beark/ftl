@@ -235,18 +235,16 @@ namespace ftl {
 	}
 
 	template<
-			typename Mt_,
-			typename Mu_,
-			typename Mt = plain_type<Mt_>,
-			typename Mu = plain_type<Mu_>,
+			typename Mt,
+			typename Mu,
 			typename T = concept_parameter<Mt>,
 			typename = typename std::enable_if<monad<Mt>::instance>::type,
 			typename = typename std::enable_if<
 				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
 			>::type
 	>
-	Mu operator>> (Mt_&& m1, Mu_&& m2) {
-		return monad<Mt_>::bind(std::forward<Mt>(m1), [m2](const T&) {
+	Mu operator>> (Mt&& m1, Mu m2) {
+		return monad<Mt>::bind(std::move(m1), [m2](T&&) {
 			return m2;
 		});
 	}
@@ -264,19 +262,38 @@ namespace ftl {
 	 * \ingroup monad
 	 */
 	template<
-			typename Mt_,
+			typename Mt,
 			typename Mu,
-			typename Mt = plain_type<Mt_>,
+			typename Mu_ = plain_type<Mu>,
 			typename = typename std::enable_if<monad<Mt>::instance>::type,
 			typename T = concept_parameter<Mt>,
 			typename U = concept_parameter<Mu>,
 			typename = typename std::enable_if<
-				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
+				std::is_same<typename re_parametrise<Mu_,T>::type, Mt>::value
 			>::type
 	>
-	Mt operator<< (Mt_&& m1, Mu m2) {
-		return monad<Mt>::bind(std::forward<Mt>(m1), [m2](T t) {
-			return monad<Mu>::bind(m2, [t](const U&) {
+	Mt operator<< (const Mt& m1, Mu m2) {
+		return monad<Mt>::bind(m1, [m2](T t) {
+			return monad<Mu_>::bind(m2, [t](const U&) {
+				return monad<Mt>::pure(t);
+			});
+		});
+	}
+
+	template<
+			typename Mt,
+			typename Mu,
+			typename Mu_ = plain_type<Mu>,
+			typename = typename std::enable_if<monad<Mt>::instance>::type,
+			typename T = concept_parameter<Mt>,
+			typename U = concept_parameter<Mu>,
+			typename = typename std::enable_if<
+				std::is_same<typename re_parametrise<Mu_,T>::type, Mt>::value
+			>::type
+	>
+	Mt operator<< (Mt&& m1, Mu m2) {
+		return monad<Mt>::bind(m1, [m2](T t) {
+			return monad<Mu_>::bind(m2, [t](const U&) {
 				return monad<Mt>::pure(t);
 			});
 		});
@@ -292,19 +309,34 @@ namespace ftl {
 	 * \ingroup monad
 	 */
 	template<
-			typename Mt_,
+			typename Mt,
 			typename F,
-			typename Mt = plain_type<Mt_>,
 			typename T = concept_parameter<Mt>,
 			typename = typename std::enable_if<monad<Mt>::instance>::type,
 			typename U = typename decayed_result<F(T)>::type,
 			typename Mu = typename re_parametrise<Mt,U>::type
 	>
-	Mu liftM(F f, Mt_&& m) {
-		return std::forward<Mt>(m) >>= [f] (T&& t) {
-			return monad<Mu>::pure(f(std::forward<T>(t)));
+	Mu liftM(F f, const Mt& m) {
+		return m >>= [f] (const T& t) {
+			return monad<Mu>::pure(f(t));
 		};
 	}
+
+	/*
+	template<
+			typename Mt,
+			typename F,
+			typename T = concept_parameter<Mt>,
+			typename = typename std::enable_if<monad<Mt>::instance>::type,
+			typename U = typename decayed_result<F(T)>::type,
+			typename Mu = typename re_parametrise<Mt,U>::type
+	>
+	Mu liftM(F f, Mt&& m) {
+		return std::move(m) >>= [f] (T&& t) {
+			return monad<Mu>::pure(f(std::move(t)));
+		};
+	}
+	*/
 
 	/**
 	 * Apply a function in M to a value in M.
