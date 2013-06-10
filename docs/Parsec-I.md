@@ -19,14 +19,20 @@ On to the good stuff. A central part of the API is the type `parser<T>`, which d
  * \li MonoidAlternative
  */
 template<typename T>
-class parser {
-public:
-    ftl::either<error,T> run(std::istream&);
-};
+using parser = /* some strange type */
 ```
-What's that? Only one single, lonely little method? Something must surely be wrong? Well, let's give it a chance to prove itself at least...
+What's that? Parsers are just an alias of some weird type, with essentially no public interface that we can find? Something must surely be wrong? Well, let's give it a chance to prove itself at least...
 
-So, what else does this interface tell us? First, apparently parsers are monads. This actually tells us quite a bit: we now know we can use all of the [functor](Functor.md), [applicative functor](Applicative.md), and [monad](Monad.md) interfaces to interact with parsers. Neat. Second, we also know that the `run` method apparently can fail: its return type of `either<error,T>` clearly indicates that it will either return whatever we wanted it to parse, or an error. Third, we know parsers are also instances of monoidal alternatives, which gives us one more way of combining parsers, as well as the ability to create parsers that automatically fail.
+So, what else does this interface tell us? First, apparently parsers are monads. This actually tells us quite a bit: we now know we can use all of the [functor](Functor.md), [applicative functor](Applicative.md), and [monad](Monad.md) interfaces to interact with parsers. Second, we know parsers are also instances of monoidal alternatives, which gives us one more way of combining parsers, as well as the ability to create parsers that automatically fail. Ok, this is all good and stuff, but how do we use a parser?
+
+```cpp
+    /**
+     * Function for running parsers.
+     */
+    template<typename T>
+    ftl::either<error,T> run(parser<T> p, std::istream& is) {
+```
+Ah, that makes things easier. So, we're just supposed to invoke `run` on a parser and an input stream, and in return we get either an error&mdash;presumably if the parser failes&mdash;or whatever it was we wanted to parse.
 
 Alright, now we've deduced quite a bit about this `parser<T>` type, but we still can't do much, because we're missing a rather fundamental thing: how do we actually create parsers (that _do_ something, besides failing)? Because looking at the interface, there are no public constructors! Let's browse further down the parser combinator API, and see if there is something there to enlighten us.
 ```cpp
@@ -127,7 +133,7 @@ template<typename T>
 parser<T> option(parser<T> p, T t) {
     using ftl::operator|;
 
-	return p | ftl::monad<parser>::pure(t);
+    return p | ftl::monad<parser>::pure(t);
 }
 ```
 Easily! The OR-combinator from the monoidal alternative instance, and monad's `pure` gives us the final piece. Our `option` above quite simply reads as "parse p, but if that fails, default to t".
