@@ -493,14 +493,12 @@ namespace ftl {
 	 *
 	 * \ingroup maybe
 	 */
-	template<>
-	struct monoidA<maybe> {
-		template<typename T>
+	template<typename T>
+	struct monoidA<maybe<T>> {
 		static constexpr maybe<T> fail() noexcept {
 			return maybe<T>{};
 		}
 
-		template<typename T>
 		static maybe<T> orDo(const maybe<T>& m1, const maybe<T>& m2) {
 			return m1 ? m1 : m2;
 		}

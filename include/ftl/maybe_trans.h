@@ -282,11 +282,10 @@ namespace ftl {
 	 *
 	 * \ingroup maybeT
 	 */
-	template<>
-	struct monoidA<maybeT> {
+	template<typename M>
+	struct monoidA<maybeT<M>> {
 
 		/// Embeds a `nothing` in `M`.
-		template<typename M>
 		static maybeT<M> fail() {
 			using Mmt = typename maybeT<M>::Mmt;
 			using T = concept_parameter<M>;
@@ -294,7 +293,6 @@ namespace ftl {
 			return monad<Mmt>::pure(maybe<T>{});
 		}
 
-		template<typename M>
 		static maybeT<M> orDo(const maybeT<M>& mm1, maybeT<M> mm2) {
 
 			using T = concept_parameter<M>;

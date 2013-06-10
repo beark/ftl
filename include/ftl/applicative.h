@@ -235,13 +235,13 @@ namespace ftl {
 	 *
 	 * \ingroup applicative
 	 */
-	template<template<typename...> class F>
+	template<typename F>
 	struct monoidA {
+#ifdef SILLY_WORKAROUND
 		/**
 		 * Get an instance of the failure state.
 		 */
-		template<typename...Ts>
-		static F<Ts...> fail();
+		static F fail();
 
 		/**
 		 * Sequence two applicative computations that can fail.
@@ -250,8 +250,9 @@ namespace ftl {
 		 * if it makes sense in the context of `F`, then if computing `f1`
 		 * results in "success", f2 should not also be computed.
 		 */
-		template<typename...Ts>
-		static F<Ts...> orDo(const F<Ts...>& f1, const F<Ts...>& f2);
+		static F orDo(const F& f1, const F& f2);
+
+#endif
 
 		static constexpr bool instance = false;
 	};
@@ -262,10 +263,10 @@ namespace ftl {
 	 * \ingroup applicative
 	 */
 	template<
-			template<typename...> class F,
-			typename = typename std::enable_if<monoidA<F>::instance>::type,
-			typename...Ts>
-	F<Ts...> operator| (const F<Ts...>& f1, const F<Ts...>& f2) {
+			typename F,
+			typename = typename std::enable_if<monoidA<F>::instance>::type
+	>
+	F operator| (const F& f1, const F& f2) {
 		return monoidA<F>::orDo(f1, f2);
 	}
 
@@ -275,10 +276,10 @@ namespace ftl {
 	 * \ingroup applicative
 	 */
 	template<
-			template<typename...> class F,
-			typename = typename std::enable_if<monoidA<F>::instance>::type,
-			typename...Ts>
-	F<Ts...> operator| (F<Ts...>&& f1, const F<Ts...>& f2) {
+			typename F,
+			typename = typename std::enable_if<monoidA<F>::instance>::type
+	>
+	F operator| (F&& f1, const F& f2) {
 		return monoidA<F>::orDo(std::move(f1), f2);
 	}
 
@@ -288,10 +289,10 @@ namespace ftl {
 	 * \ingroup applicative
 	 */
 	template<
-			template<typename...> class F,
-			typename = typename std::enable_if<monoidA<F>::instance>::type,
-			typename...Ts>
-	F<Ts...> operator| (const F<Ts...>& f1, F<Ts...>&& f2) {
+			typename F,
+			typename = typename std::enable_if<monoidA<F>::instance>::type
+	>
+	F operator| (const F& f1, F&& f2) {
 		return monoidA<F>::orDo(f1, std::move(f2));
 	}
 
@@ -301,10 +302,10 @@ namespace ftl {
 	 * \ingroup applicative
 	 */
 	template<
-			template<typename...> class F,
-			typename = typename std::enable_if<monoidA<F>::instance>::type,
-			typename...Ts>
-	F<Ts...> operator| (F<Ts...>&& f1, F<Ts...>&& f2) {
+			typename F,
+			typename = typename std::enable_if<monoidA<F>::instance>::type
+	>
+	F operator| (F&& f1, F&& f2) {
 		return monoidA<F>::orDo(std::move(f1), std::move(f2));
 	}
 
@@ -326,11 +327,13 @@ namespace ftl {
 	 * \tparam F must be an instance of ftl::monoidA
 	 */
 	template<
-			template<typename> class F,
-			typename A,
-			typename = typename std::enable_if<monoidA<F>::instance>::type>
-	F<maybe<A>> optional(const F<A>& f) {
-		return value<A> % f | applicative<F<maybe<A>>>::pure(maybe<A>{});
+			typename F,
+			typename A = concept_parameter<F>,
+			typename = typename std::enable_if<monoidA<F>::instance>::type
+	>
+	typename re_parametrise<F,maybe<A>>::type optional(const F& f) {
+		using Fm = typename re_parametrise<F,maybe<A>>::type;
+		return value<A> % f | applicative<Fm>::pure(maybe<A>{});
 	}
 }
 
