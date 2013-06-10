@@ -70,3 +70,45 @@ And of course the equivalent plain version:
 
 If `algorithm` had happened to already be wrapped in an `ftl::function`, then the FTL-version would have been even shorter, because the `curry` call could have been elided. `ftl::function` supports both conventional calls and curried calls out of the box. That is, if `f` is an `ftl::function<int,int,int,int>`, it could be called in any of the following ways `f(1,2,3)`, `f(1)(2,3)`, `f(1)(2)(3)`.
 
+### Transformers
+No, not as in Optimus Prime! As in a monad transformer: a type transformer that takes one monad as parameter and "magically" adds functionality to it in the form of one of many other monads. For example, let's say you want to add the functionality of the `maybe` monad to the list monad. You'd have to create a new type that combines the powers, then write all of those crazy monad instances and whatnot, right? Wrong!
+
+```cpp
+    template<typename T>
+    using listM = ftl::maybeT<std::list<T>>;
+```
+Bam! All the powers of lists and `maybe`s in one! What exactly does that mean though? Well, let's see if we can get an intuition for it.
+
+```cpp
+    // With the inplace tag, we can call list's constructor directly
+    listM<int> ms{ftl::inplace_tag(), ftl::value(1), ftl::maybe<int>{}, ftl::value(2)};
+
+    // Kind of useless, but demonstrates what's going on
+    for(auto m : *ms) {
+        if(m)
+            std::cout << *m << ", ";
+        else
+            std::cout << "nothing, ";
+    }
+    std::cout << std::endl;
+```
+If run, the above would produce:
+```
+    1, nothing, 2, 
+```
+So, pretty much a list of `maybe`s then, what's the point? The point is, the new type `listM` is a monad, in pretty much the same way as `std::list` is, _except_ we can apply, bind, and map functions that work with `T`s. That is, given the above list, `ms`, we can do:
+
+```cpp
+    auto ns = [](int x){ return x-1; } % ms;
+
+    // Let's say this invokes the same print loop as before
+    print(ns);
+``` 
+Output:
+```
+    0, nothing, 1, 
+```
+So, basically, this saves us the trouble of having to check for nothingness in the elements of `ns` (coincidentally&mdash;or not&mdash;exactly what the maybe monad does: allow us to elide lots of ifs). 
+
+Right, this is kinda neat, but not really all that exciting yet. The excitement comes when we stop to think a bit before we just arbitrarily throw together a couple of monads. For instance, check out the magic of the `either`-transformer on top of the `function` monad in the parser generator tutorial [part 2](docs/Parsec-II.md).
+
