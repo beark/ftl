@@ -104,7 +104,13 @@ So, pretty much a list of `maybe`s then, what's the point? The point is, the new
     // Let's say this invokes the same print loop as before
     print(ns);
 ``` 
-Output:
+Same deal, but if `ms` was a regular, untransformed list of `maybe`:
+```cpp
+    auto ns = [](maybe<int> x){ if(x) return maybe<int>((*x)-1); } % ms;
+
+    print(ns);
+``` 
+Output (in both cases):
 ```
     0, nothing, 1, 
 ```
