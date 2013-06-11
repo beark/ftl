@@ -23,6 +23,7 @@
 #include <iostream>
 #include "either_tests.h"
 #include "maybe_tests.h"
+#include "future_tests.h"
 
 int main(int argc, char** argv) {
 
@@ -30,6 +31,7 @@ int main(int argc, char** argv) {
 
 	flawless &= run_test_set(either_tests, std::cout);
 	flawless &= run_test_set(maybe_tests, std::cout);
+	flawless &= run_test_set(future_tests, std::cout);
 
 	if(!flawless)
 		return -1;
