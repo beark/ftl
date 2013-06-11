@@ -36,6 +36,11 @@
 #include "type_functions.h"
 #include "monoid.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
+
 namespace ftl {
 
 	template<typename,typename...> class function;
@@ -678,6 +683,11 @@ namespace ftl {
 	};
 
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
 
 #endif
 
