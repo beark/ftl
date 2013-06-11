@@ -129,6 +129,18 @@ namespace ftl {
 	}
 
 	/**
+	 * \overload
+	 *
+	 * \ingroup monoid
+	 */
+	template<
+		typename M,
+		typename = typename std::enable_if<monoid<M>::instance>::type>
+	M operator^ (M&& m1, M&& m2) {
+		return monoid<M>::append(std::move(m1), std::move(m2));
+	}
+
+	/**
 	 * Implementation of monoid for numbers, interpreted as sums.
 	 *
 	 * The reason for wrapping numbers in this struct when using the monoid
