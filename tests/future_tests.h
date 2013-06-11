@@ -93,7 +93,7 @@ test_set future_tests{
 					^
 					std::async(std::launch::async, [](){ return ftl::sum(1); });
 
-				return (int)f.get() == 2;
+				return static_cast<int>(f.get()) == 2;
 			})
 		),
 	}
