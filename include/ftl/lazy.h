@@ -41,6 +41,18 @@ namespace ftl {
 	 */
 
 	/**
+	 * Enumeration of the states a lazy computation can be in.
+	 *
+	 * Mainly used in combination with ftl::lazy::valueStatus().
+	 */
+	enum class value_status {
+		/// The computation still has not been performed
+		deferred,
+		/// The value is computed and ready
+		ready
+	};
+
+	/**
 	 * The lazy data type.
 	 *
 	 * Wraps a value of type `T`, causing its evaluation to be deferred until
@@ -118,6 +130,19 @@ namespace ftl {
 		lazy& operator= (const lazy&) = default;
 		lazy& operator= (lazy&&) = default;
 
+		/**
+		 * Check the state of the deferred computation.
+		 *
+		 * \return value_status::deferred if computation has not yet been run,
+		 *         and value_status::ready if it has.
+		 */
+		value_status status() const {
+			if(*val)
+				return value_status::ready;
+
+			return value_status::deferred;
+		}
+
 	private:
 		void force() const {
 			if(*val)
@@ -134,10 +159,12 @@ namespace ftl {
 	 *
 	 * Currently, all parameters are _copied_ when `defer` is called. If you
 	 * want to call by reference on some parameter, you should use `std::cref`
-	 * (the use of `std::ref` is _not_ supported, because it would allow
-	 * mutation of the parameter and all lazy computations are assumed to be
-	 * _pure_, in the sense that they should have no side effects, nor contain
-	 * any state).
+	 * (the use of `std::ref` is not encouraged, because it allows mutation
+	 * of the parameter and all lazy computations are assumed to be pure, in
+	 * the sense that they should have no side effects, nor contain any state).
+	 *
+	 * \note `f` is assumed to be of unary or greater arity. If a deferred zero
+	 *       argument computation is desired, use lazy's constructor directly.
 	 */
 	template<
 			typename F,
@@ -145,6 +172,8 @@ namespace ftl {
 			typename T = typename decayed_result<F(Args...)>::type
 	>
 	lazy<T> defer(F f, Args&&...args) {
+		// TODO: C++14: _move_ tuple of args into lambda
+		// TODO: Make this work with zero-argument fs
 		auto t = std::make_tuple(std::forward<Args>(args)...);
 		return lazy<T>{[f,t]() {
 				return apply(f, t);
