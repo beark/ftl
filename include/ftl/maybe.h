@@ -367,9 +367,7 @@ namespace ftl {
 				return true;
 			}
 		}
-		else if(m2) {
-			return false;
-		}
+
 		else {
 			return false;
 		}
