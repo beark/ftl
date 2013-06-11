@@ -269,7 +269,7 @@ namespace ftl {
 					"Attempting to access 'right' value of left type.");
 		}
 
-		const either& operator= (const either& e) {
+		either& operator= (const either& e) {
 			// Deal with self assignment
 			if(this == &e)
 				return *this;
@@ -318,7 +318,7 @@ namespace ftl {
 			return *this;
 		}
 
-		const either& operator= (either&& e) {
+		either& operator= (either&& e) {
 			switch(tag) {
 			case _dtl::LEFT:
 				if(e.tag == _dtl::LEFT)
