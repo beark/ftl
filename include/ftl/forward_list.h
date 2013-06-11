@@ -253,7 +253,7 @@ namespace ftl {
 				typename U = typename decayed_result<F(T)>::type::value_type
 		>
 		static std::forward_list<U,A<U>> bind(
-				const std::forward_list<T,A<T>> l,
+				const std::forward_list<T,A<T>>& l,
 				F&& f) {
 
 			return concatMap(std::forward<F>(f), l);
