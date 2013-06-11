@@ -93,7 +93,7 @@ test_set either_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 				auto e = ftl::make_right<int>(10);
-				ftl::either<int,std::string> e2 = [](int x){ return std::string("test"); } % e;
+				ftl::either<int,std::string> e2 = [](int){ return std::string("test"); } % e;
 
 				return *e2 == std::string("test");
 			})
@@ -103,7 +103,7 @@ test_set either_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 				auto e = ftl::make_left<int>(10);
-				ftl::either<int,std::string> e2 = [](int x){ return std::string("test"); } % e;
+				ftl::either<int,std::string> e2 = [](int){ return std::string("test"); } % e;
 
 				return e2.left() == 10;
 			})

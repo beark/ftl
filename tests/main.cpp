@@ -25,7 +25,7 @@
 #include "maybe_tests.h"
 #include "future_tests.h"
 
-int main(int argc, char** argv) {
+int main(int, char**) {
 
 	bool flawless = true;
 

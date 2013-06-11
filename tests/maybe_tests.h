@@ -86,7 +86,7 @@ test_set maybe_tests{
 				using ftl::operator%;
 
 				auto m = ftl::value(10);
-				ftl::maybe<std::string> m2 = [](int x){ return std::string("test"); } % m;
+				ftl::maybe<std::string> m2 = [](int){ return std::string("test"); } % m;
 
 				return *m2 == std::string("test");
 			})
@@ -175,7 +175,7 @@ test_set maybe_tests{
 				using ftl::operator %;
 				using ftl::operator *;
 
-				auto fn = [](int x){ return ftl::maybe<int>{}; };
+				auto fn = [](int){ return ftl::maybe<int>{}; };
 
 				auto m = ftl::value(1) >>= fn;
 
