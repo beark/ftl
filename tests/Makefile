@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-std=c++11 -I../include/ -Wall
+CFLAGS=-std=c++11 -I../include/ -Wall -Wextra
 LDFLAGS=-pthread
 OLVL=-O2
 TESTS=either_tests.h maybe_tests.h future_tests.h
