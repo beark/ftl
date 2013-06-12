@@ -82,6 +82,7 @@ namespace ftl {
 	 * - \ref monad
 	 * - \ref eq, if `T` is EqualityComparable.
 	 * - \ref orderable, if `T` is Orderable.
+	 * - \ref monoid, if `T` is a Monoid.
 	 *
 	 * \ingroup lazy
 	 */
@@ -265,11 +266,27 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct monad<lazy<T>> {
+		/**
+		 * Create a computation that computes `t`
+		 *
+		 * Sounds a bit silly&mdash;we already know `t` after all&mdash;but
+		 * there are situations when it can be useful (e.g. algorithms
+		 * generalised over any monad).
+		 */
 		static lazy<T> pure(T t) {
 			return lazy<T>{[t](){ return t; }};
 		}
 		// TODO: C++14: Add a pure that captures Ts by move
 
+		/**
+		 * Map a function to the deferred value.
+		 *
+		 * As expected, this does not actually compute the deferred value
+		 * in `l`. Instead, we simply defer both the invocation of `f` and
+		 * the computation of `l` until someone forces the _returned_ lazy
+		 * copmutation (though technically, `l` could be forced by another,
+		 * independant computation ahead of that).
+		 */
 		template<
 				typename F,
 				typename U = typename decayed_result<F(T)>::type
@@ -278,6 +295,17 @@ namespace ftl {
 			return lazy<U>{function<U>{[f,l]() { return f(*l); }}};
 		}
 
+		/**
+		 * Sequences two lazy computations.
+		 *
+		 * As with functor<lazy<T>>::map, the whole bind is deferred until
+		 * the returned computation is forced.
+		 *
+		 * Note that, again as with `map`, the lazy computation `l` could be
+		 * forced ahead of time by unrelated code elsewhere. This is due to the
+		 * shared nature of lazy values (copies always refer to the same
+		 * internal object as the original).
+		 */
 		template<
 				typename F,
 				typename U =
@@ -292,12 +320,32 @@ namespace ftl {
 		static constexpr bool instance = true;
 	};
 
+	/**
+	 * Monoid instance of lazy computations.
+	 *
+	 * \tparam T must be a monoid to begin with.
+	 *
+	 * This instance is exactly equivalent of `T`'s monoid instance, except
+	 * that the computations of `monoid<T>::id()` and `monoid<T>::append()` are
+	 * of course deferred until forced. 
+	 *
+	 * \ingroup lazy
+	 */
 	template<typename T>
 	struct monoid<lazy<T>> {
+		/**
+		 * Lazily "computes" monoid<T>::id()
+		 */
 		static lazy<T> id() {
 			return lazy<T>{monoid<T>::id};
 		}
 
+		/**
+		 * Lazily computes monoid<T>::append(*l1, *l2).
+		 *
+		 * Note that neither `l1` nor `l2` are forced by invoking this function.
+		 * They are, of course, forced when the result of this computation is.
+		 */
 		static lazy<T> append(lazy<T> l1, lazy<T> l2) {
 			return lazy<T>([l1,l2](){ return monoid<T>::append(*l1, *l2); });
 		}
