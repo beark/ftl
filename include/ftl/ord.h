@@ -23,6 +23,7 @@
 #ifndef FTL_ORD_H
 #define FTL_ORD_H
 
+#include "type_traits.h"
 #include "monoid.h"
 
 namespace ftl {
@@ -163,7 +164,7 @@ namespace ftl {
 	 *
 	 * For a type to become an instance of Orderable, it must either implement
 	 * all of the operators `<`, `==`, and `>`, or it must specialise this
-	 * struct. Both of these have equivalent results.
+	 * struct. Both of these work equally well.
 	 *
 	 * A type that is orderable must also implement \ref eq.
 	 *
@@ -182,6 +183,12 @@ namespace ftl {
 		static ord compare(const T& lhs, const T& rhs) {
 			return lhs < rhs ? ord::Lt : (lhs == rhs ? ord::Eq : ord::Gt);
 		}
+
+		static constexpr bool instance =
+			has_eq<T>::value
+			&& has_neq<T>::value
+			&& has_lt<T>::value
+			&& has_gt<T>::value;
 	};
 
 	/**
@@ -192,7 +199,8 @@ namespace ftl {
 	 * \ingroup ord
 	 */
 	template<typename T>
-	ord compare(const T& a, const T& b) {
+	auto compare(const T& a, const T& b)
+	-> decltype(orderable<T>::compare(a, b)) {
 		return orderable<T>::compare(a, b);
 	}
 
