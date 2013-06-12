@@ -80,6 +80,10 @@ namespace ftl {
 	 * - \ref functor
 	 * - \ref applicative
 	 * - \ref monad
+	 * - \ref eq, if `T` is EqualityComparable.
+	 * - \ref orderable, if `T` is Orderable.
+	 *
+	 * \ingroup lazy
 	 */
 	template<typename T>
 	class lazy {
@@ -107,9 +111,6 @@ namespace ftl {
 		 * This method forces evaluation.
 		 */
 		const T& operator*() const {
-			if(*val)
-				return **val;
-
 			force();
 			return **val;
 		}
@@ -148,7 +149,7 @@ namespace ftl {
 			if(*val)
 				return;
 
-			*val = make_right<function<T>>((val->left())());
+			*val = make_right<function<T>>(val->left()());
 		}
 
 		mutable std::shared_ptr<either<function<T>,T>> val;
@@ -165,6 +166,8 @@ namespace ftl {
 	 *
 	 * \note `f` is assumed to be of unary or greater arity. If a deferred zero
 	 *       argument computation is desired, use lazy's constructor directly.
+	 *
+	 * \ingroup lazy
 	 */
 	template<
 			typename F,
@@ -180,6 +183,86 @@ namespace ftl {
 		}};
 	}
 
+	/**
+	 * Equality comparison.
+	 *
+	 * This function forces _both_ `l1` and `l2`.
+	 *
+	 * \tparam T must have an `operator==`.
+	 *
+	 * \ingroup lazy
+	 */
+	template<typename T>
+	auto operator==(const lazy<T>& l1, const lazy<T>& l2)
+	-> decltype(std::declval<T>() == std::declval<T>()) {
+		return *l1 == *l2;
+	}
+
+	/**
+	 * Not equal comparison.
+	 *
+	 * This function forces _both_ `l1` and `l2`.
+	 *
+	 * \tparam T must have an `operator!=`.
+	 *
+	 * \ingroup lazy
+	 */
+	template<typename T>
+	auto operator!=(const lazy<T>& l1, const lazy<T>& l2)
+	-> decltype(std::declval<T>() != std::declval<T>()) {
+		return *l1 == *l2;
+	}
+
+	/**
+	 * Less than comparison
+	 *
+	 * This function forces _both_ `lhs` and `rhs`.
+	 *
+	 * \tparam T must have an `operator<`.
+	 *
+	 * \ingroup lazy
+	 */
+	template<typename T>
+	auto operator< (const lazy<T>& lhs, const lazy<T>& rhs)
+	-> decltype(std::declval<T>() < std::declval<T>()) {
+		return *lhs < *rhs;
+	}
+
+	/**
+	 * Greater than comparison
+	 *
+	 * This function forces _both_ `lhs` and `rhs`.
+	 *
+	 * \tparam T must have an `operator>`.
+	 *
+	 * \ingroup lazy
+	 */
+	template<typename T>
+	auto operator> (const lazy<T>& lhs, const lazy<T>& rhs)
+	-> decltype(std::declval<T>() > std::declval<T>()) {
+		return *lhs > *rhs;
+	}
+
+	/**
+	 * TODO: Evaluate how wise the following would be
+	template<typename T>
+	struct oderable<lazy<T>> {
+		static lazy<ord> compare(lazy<T> lhs, lazy<T> rhs) {
+			return lazy<ord>{[lhs,rhs](){ return *lhs == *rhs;  }};
+		}
+
+		static constexpr bool instance = orderable<T>::instance;
+	};
+	*/
+
+	/**
+	 * Monad instance for lazy values.
+	 *
+	 * Allows users to build "thunks" of computations, all left uncomputed until
+	 * forced.
+	 *
+	 * \ingroup lazy
+	 */
 	template<typename T>
 	struct monad<lazy<T>> {
 		static lazy<T> pure(T t) {
@@ -192,7 +275,7 @@ namespace ftl {
 				typename U = typename decayed_result<F(T)>::type
 		>
 		static lazy<U> map(F f, lazy<T> l) {
-			return lazy<U>{[f,l]() { return f(*l); }};
+			return lazy<U>{function<U>{[f,l]() { return f(*l); }}};
 		}
 
 		template<
@@ -209,6 +292,18 @@ namespace ftl {
 		static constexpr bool instance = true;
 	};
 
+	template<typename T>
+	struct monoid<lazy<T>> {
+		static lazy<T> id() {
+			return lazy<T>{monoid<T>::id};
+		}
+
+		static lazy<T> append(lazy<T> l1, lazy<T> l2) {
+			return lazy<T>([l1,l2](){ return monoid<T>::append(*l1, *l2); });
+		}
+
+		static constexpr bool instance = monoid<T>::instance;
+	};
 }
 
 #endif
