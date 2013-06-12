@@ -141,12 +141,12 @@ namespace ftl {
 			return o >= order.o;
 		}
 
-		const ord& operator= (const ord& order) noexcept {
+		ord& operator= (const ord& order) noexcept {
 			o = order.o;
 			return *this;
 		}
 
-		const ord& operator= (ord&& order) noexcept {
+		ord& operator= (ord&& order) noexcept {
 			o = std::move(order.o);
 			return *this;
 		}
@@ -286,7 +286,7 @@ namespace ftl {
 	 * \ingroup ord
 	 */
 	template<typename A, typename B>
-	function<ord,const A&,const A&> comparing(function<B,A> cmp) {
+	function<ord,const A&,const A&> comparing(function<B,A> f) {
 		return [=] (const A& a, const A& b) {
 			return orderable<typename std::decay<B>::type>::compare(
 					f(a), f(b));
