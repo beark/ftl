@@ -135,25 +135,11 @@ namespace ftl {
 	template<
 		typename F,
 		typename Fn,
-		typename = typename std::enable_if<functor<F>::instance>::type>
-	auto operator% (Fn&& fn, const F& f)
-	-> decltype(functor<F>::map(std::forward<Fn>(fn), f)) {
-		return functor<F>::map(std::forward<Fn>(fn), f);
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup functor
-	 */
-	template<
-		typename F,
-		typename Fn,
 		typename F_ = plain_type<F>,
 		typename = typename std::enable_if<functor<F_>::instance>::type>
 	auto operator% (Fn&& fn, F&& f)
-	-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::move(f))) {
-		return functor<F_>::map(std::forward<Fn>(fn), std::move(f));
+	-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f))) {
+		return functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f));
 	}
 
 	/**

@@ -168,27 +168,12 @@ namespace ftl {
 	template<
 			typename M,
 			typename F,
-			typename = typename std::enable_if<monad<M>::instance>::type
-	>
-	auto operator>>= (const M& m, F&& f)
-	-> decltype(monad<M>::bind(m, std::forward<F>(f))) {
-		return monad<M>::bind(m, std::forward<F>(f));
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup monad
-	 */
-	template<
-			typename M,
-			typename F,
 			typename M_ = plain_type<M>,
 			typename = typename std::enable_if<monad<M_>::instance>::type
 	>
 	auto operator>>= (M&& m, F&& f)
-	-> decltype(monad<M_>::bind(std::move(m), std::forward<F>(f))) {
-		return monad<M_>::bind(std::move(m), std::forward<F>(f));
+	-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
+		return monad<M_>::bind(std::forward<M>(m), std::forward<F>(f));
 	}
 
 	/**
@@ -202,11 +187,11 @@ namespace ftl {
 			typename M,
 			typename F,
 			typename M_ = plain_type<M>,
-			typename = typename std::enable_if<monad<M>::instance>::type
+			typename = typename std::enable_if<monad<M_>::instance>::type
 	>
 	auto operator<<= (F&& f, M&& m)
-	-> decltype(monad<M_>::bind(std::forward<M_>(m), std::forward<F>(f))) {
-		return monad<M_>::bind(std::forward<M_>(m), std::forward<F>(f));
+	-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
+		return monad<M_>::bind(std::forward<M>(m), std::forward<F>(f));
 	}
 
 	/**
@@ -222,29 +207,15 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mu,
-			typename T = concept_parameter<Mt>,
-			typename = typename std::enable_if<monad<Mt>::instance>::type,
+			typename Mt_ = plain_type<Mt>,
+			typename T = concept_parameter<Mt_>,
+			typename = typename std::enable_if<monad<Mt_>::instance>::type,
 			typename = typename std::enable_if<
-				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
+				std::is_same<typename re_parametrise<Mu,T>::type, Mt_>::value
 			>::type
 	>
-	Mu operator>> (const Mt& m1, const Mu& m2) {
-		return monad<Mt>::bind(m1, [m2](const T&) {
-			return m2;
-		});
-	}
-
-	template<
-			typename Mt,
-			typename Mu,
-			typename T = concept_parameter<Mt>,
-			typename = typename std::enable_if<monad<Mt>::instance>::type,
-			typename = typename std::enable_if<
-				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
-			>::type
-	>
-	Mu operator>> (Mt&& m1, Mu m2) {
-		return monad<Mt>::bind(std::move(m1), [m2](T&&) {
+	Mu operator>> (Mt&& m1, const Mu& m2) {
+		return monad<Mt_>::bind(std::forward<Mt>(m1), [m2](const T&) {
 			return m2;
 		});
 	}
