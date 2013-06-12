@@ -210,7 +210,7 @@ namespace ftl {
 	template<typename T>
 	auto operator!=(const lazy<T>& l1, const lazy<T>& l2)
 	-> decltype(std::declval<T>() != std::declval<T>()) {
-		return *l1 == *l2;
+		return *l1 != *l2;
 	}
 
 	/**
