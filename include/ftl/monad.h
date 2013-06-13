@@ -319,29 +319,14 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mf,
+			typename Mf_ = plain_type<Mf>,
 			typename T = concept_parameter<Mt>,
-			typename F = concept_parameter<Mf>,
-			typename U = typename decayed_result<F(T)>::type,
-			typename Mu = typename re_parametrise<Mt,U>::type
-	>
-	Mu ap(const Mf& f, Mt m) {
-		return f >>= [m] (F fn) {
-			return m >>= [fn] (const T& t) {
-				return monad<Mu>::pure(fn(t));
-			};
-		};
-	}
-
-	template<
-			typename Mt,
-			typename Mf,
-			typename T = concept_parameter<Mt>,
-			typename F = concept_parameter<Mf>,
+			typename F = concept_parameter<Mf_>,
 			typename U = typename decayed_result<F(T)>::type,
 			typename Mu = typename re_parametrise<Mt,U>::type
 	>
 	Mu ap(Mf&& f, Mt m) {
-		return std::move(f) >>= [m] (F fn) {
+		return std::forward<Mf>(f) >>= [m] (F fn) {
 			return m >>= [fn] (const T& t) {
 				return monad<Mu>::pure(fn(t));
 			};
