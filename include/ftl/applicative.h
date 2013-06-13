@@ -102,8 +102,13 @@ namespace ftl {
 		 *       way of monad), then `pure` may be overloaded or replaced with a
 		 *       `const` reference version, or even a pass by value version.
 		 */
+		static F pure(const T& x) {
+			return monad<F>::pure(x);
+		}
+
+		/// \overload
 		static F pure(T&& x) {
-			return monad<F>::pure(std::forward<T>(x));
+			return monad<F>::pure(std::move(x));
 		}
 
 		/**
