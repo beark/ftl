@@ -359,6 +359,8 @@ namespace ftl {
 			return monad<M>::bind(std::move(m), std::forward<F>(f));
 		}
 	};
+	// TODO: C++14: Make a templated value of this function object, e.g.
+	// constexpr mBind<M> mbind = mBind<M>();
 
 }
 
