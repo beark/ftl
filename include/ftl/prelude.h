@@ -49,7 +49,7 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct identity {
-		constexpr T& operator()(const T& t) const noexcept {
+		constexpr const T& operator()(const T& t) const noexcept {
 			return t;
 		}
 
