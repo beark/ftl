@@ -51,7 +51,12 @@ namespace ftl {
 	 */
 
 	/**
-	 * \brief Abstracts the concept of optional arguments and similar.
+	 * Abstracts the concept of optional arguments and similar.
+	 *
+	 * \tparam A Must be a completely "plain" type, as in, it must not be
+	 *           a reference, nor have `const`, `volatile`, or similar
+	 *           qualifiers. It _may_ be of pointer type (incl. function
+	 *           and method pointer).
 	 *
 	 * In essence, an instance of maybe is either a value, or nothing.
 	 * 
@@ -283,12 +288,15 @@ namespace ftl {
 	/**
 	 * Convenience function to create maybe:s.
 	 *
+	 * Creates a maybe, the exact type of which is automatically inferred from
+	 * the parameter type.
+	 *
 	 * \ingroup maybe
 	 */
 	template<typename A>
-	constexpr maybe<A> value(A&& a)
-	noexcept(std::is_nothrow_constructible<A,A>::value) {
-		return maybe<A>(std::forward<A>(a));
+	constexpr maybe<plain_type<A>> value(A&& a)
+	noexcept(std::is_nothrow_constructible<plain_type<A>,A>::value) {
+		return maybe<plain_type<A>>(std::forward<A>(a));
 	}
 
 	/**

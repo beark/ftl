@@ -319,8 +319,8 @@ namespace ftl {
 	class maybe;
 
 	template<typename A>
-	constexpr maybe<A> value(A&& a)
-	noexcept(std::is_nothrow_constructible<A,A>::value);
+	constexpr maybe<plain_type<A>> value(A&& a)
+	noexcept(std::is_nothrow_constructible<plain_type<A>,A>::value);
 
 	/**
 	 * An optional computation.
