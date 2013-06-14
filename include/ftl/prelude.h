@@ -40,7 +40,7 @@ namespace ftl {
 	 */
 
 	/**
-	 * Identity function.
+	 * Identity function object.
 	 *
 	 * Returns whatever is given as parameter. This can be useful in combination
 	 * with certain higher order functions.
@@ -48,9 +48,17 @@ namespace ftl {
 	 * \ingroup prelude
 	 */
 	template<typename T>
-	const T& id(const T& t) {
-		return t;
-	}
+	struct identity {
+		constexpr T& operator()(const T& t) const noexcept {
+			return t;
+		}
+
+		T& operator()(T& t) const noexcept {
+			return t;
+		}
+	};
+	// TODO: C++14: Make template value of identity, e.g.
+	// constexpr identity<T> id = identity<T>();
 
 	/// Used to distinguish in-place constructors from others
 	struct inplace_tag {};
