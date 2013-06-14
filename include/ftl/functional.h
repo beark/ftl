@@ -150,13 +150,13 @@ namespace ftl {
 		static constexpr bool instance = monoid<M>::instance;
 	};
 
-	template<typename R, typename S, typename P, typename...Ps>
-	struct re_parametrise<std::function<R(P,Ps...)>,S> {
-		using type = std::function<S(P,Ps...)>;
+	template<typename R, typename S, typename...Ps>
+	struct re_parametrise<std::function<R(Ps...)>,S> {
+		using type = std::function<S(Ps...)>;
 	};
 
-	template<typename R, typename P, typename...Ps>
-	struct parametric_type_traits<std::function<R(P,Ps...)>> {
+	template<typename R, typename...Ps>
+	struct parametric_type_traits<std::function<R(Ps...)>> {
 		using parameter_type = R;
 	};
 
