@@ -75,7 +75,7 @@ namespace ftl {
             if(e2.message().empty())
                 return error(e1.message());
 
-            return error(e1.message() + e2.message());
+            return error(e1.message() + " or " + e2.message());
         }
 
         static constexpr bool instance = true;
