@@ -36,7 +36,12 @@ namespace ftl {
 		}
 
 		static error append(const error& e1, const error& e2) {
-			return error(e1.message() + e2.message());
+			if(e1.message().empty())
+				return error(e2.message());
+			if(e2.message().empty())
+				return error(e1.message());
+
+			return error(e1.message() + " or " + e2.message());
 		}
 
 		static constexpr bool instance = true;

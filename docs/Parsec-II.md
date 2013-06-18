@@ -70,6 +70,11 @@ namespace ftl {
 
         // Appending is... well, appending
         static error append(const error& e1, const error& e2) {
+            if(e1.message().empty())
+                return error(e2.message());
+            if(e2.message().empty())
+                return error(e1.message());
+
             return error(e1.message() + e2.message());
         }
 
