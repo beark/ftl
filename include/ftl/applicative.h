@@ -146,17 +146,32 @@ namespace ftl {
 		 * \note Default implementation only works if F is already a monad.
 		 */
 		template<
-			typename Ff_,
-			typename Ff = plain_type<Ff_>,
-			typename Fn = concept_parameter<Ff>,
+			typename Ff,
+			typename Ff_ = plain_type<Ff>,
+			typename Fn = concept_parameter<Ff_>,
 			typename U = typename decayed_result<Fn(T)>::type,
 			typename Fu = typename re_parametrise<F,U>::type,
 			typename = typename std::enable_if<std::is_same<
-				typename re_parametrise<Ff,T>::type, F
+				typename re_parametrise<Ff_,T>::type, F
 			>::value>::type
 		>
-		static Fu apply(Ff_&& fn, F&& f) {
-			return ap(std::forward<Ff>(fn), std::forward<F>(f));
+		static Fu apply(Ff&& fn, const F& f) {
+			return ap(std::forward<Ff>(fn), f);
+		}
+
+		/// \overload
+		template<
+			typename Ff,
+			typename Ff_ = plain_type<Ff>,
+			typename Fn = concept_parameter<Ff_>,
+			typename U = typename decayed_result<Fn(T)>::type,
+			typename Fu = typename re_parametrise<F,U>::type,
+			typename = typename std::enable_if<std::is_same<
+				typename re_parametrise<Ff_,T>::type, F
+			>::value>::type
+		>
+		static Fu apply(Ff&& fn, F&& f) {
+			return ap(std::forward<Ff>(fn), std::move(f));
 		}
 
 		/**
@@ -186,10 +201,10 @@ namespace ftl {
 	>
 	auto operator* (Fn&& u, F&& v)
 	-> decltype(applicative<F_>::apply(
-				std::forward<Fn>(u),std::forward<F_>(v))) {
+				std::forward<Fn>(u),std::forward<F>(v))) {
 
 		return applicative<F_>::apply(
-				std::forward<Fn>(u), std::forward<F_>(v));
+				std::forward<Fn>(u), std::forward<F>(v));
 	}
 
 	/**
@@ -213,6 +228,37 @@ namespace ftl {
 			return applicative<F>::pure(std::move(t));
 		}
 	};
+
+	// TODO: C++14: template variable instance of aPure.
+
+	/**
+	 * Convenience function object.
+	 *
+	 * Provided as a short-cut for applicative<T>::apply, when operator*
+	 * can not be used. Particularly useful when passing `apply` as argument to
+	 * higher order functions.
+	 *
+	 * \ingroup applicative
+	 */
+	struct aApply {
+		template<typename Fn, typename F, typename F_ = plain_type<F>>
+		auto operator()(Fn&& u, F&& v)
+		-> decltype(applicative<F_>::apply(
+				std::forward<Fn>(u), std::forward<F>(v))) {
+
+			return applicative<F_>::apply(
+				std::forward<Fn>(u), std::forward<F>(v));
+		}
+	};
+
+	/**
+	 * Compile time instance of aApply.
+	 *
+	 * For added convenience.
+	 *
+	 * \ingroup applicative
+	 */
+	constexpr aApply aapply{};
 
 	/**
 	 * \page monoidapg Monoidal Alternatives

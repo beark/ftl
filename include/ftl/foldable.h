@@ -185,7 +185,7 @@ namespace ftl {
 				typename = typename std::enable_if<monoid<M>::instance>::type
 		>
 		static M fold(const F& f) {
-			return foldable<F>::foldMap(identity<M>(), f);
+			return foldable<F>::foldMap(id, f);
 		}
 	};
 

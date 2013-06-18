@@ -345,22 +345,22 @@ namespace ftl {
 	 *
 	 * \ingroup monad
 	 */
-	template<typename M>
 	struct mBind {
-		template<typename F>
-		auto operator() (const M& m, F&& f) const
-		-> decltype(monad<M>::bind(m, std::forward<F>(f))) {
-			return monad<M>::bind(m, std::forward<F>(f));
-		}
-
-		template<typename F>
+		template<typename M, typename F, typename M_ = plain_type<M>>
 		auto operator() (M&& m, F&& f) const
-		-> decltype(monad<M>::bind(std::move(m), std::forward<F>(f))) {
-			return monad<M>::bind(std::move(m), std::forward<F>(f));
+		-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
+			return monad<M_>::bind(std::forward<M>(m), std::forward<F>(f));
 		}
 	};
-	// TODO: C++14: Make a templated value of this function object, e.g.
-	// constexpr mBind<M> mbind = mBind<M>();
+
+	/**
+	 * Compile time instance of mBind.
+	 *
+	 * Makes higher order passing of monad<T>::bind even more convenient.
+	 *
+	 * \ingroup monad
+	 */
+	constexpr mBind mbind{};
 
 }
 

@@ -151,20 +151,23 @@ namespace ftl {
 	 *
 	 * \ingroup functor
 	 */
-	template<typename F>
 	struct fMap {
-		template<typename Fn>
-		auto operator() (Fn&& fn, const F& f) const
-		-> decltype(functor<F>::map(std::forward<Fn>(fn), f)) {
-			return functor<F>::map(std::forward<Fn>(fn), f);
-		}
-
-		template<typename Fn>
+		template<typename Fn, typename F, typename F_ = plain_type<F>>
 		auto operator() (Fn&& fn, F&& f) const
-		-> decltype(functor<F>::map(std::forward<Fn>(fn), std::move(f))) {
-			return functor<F>::map(std::forward<Fn>(fn), std::move(f));
+		-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f))) {
+			return functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f));
 		}
 	};
+
+	/**
+	 * Compile time instance of fMap.
+	 *
+	 * Makes it even more convenient to pass functor<T>::map as parameter to
+	 * higher order functions.
+	 *
+	 * \ingroup functor
+	 */
+	constexpr fMap fmap{};
 
 	/**
 	 * Distribute function inside a context across entire context.

@@ -47,18 +47,27 @@ namespace ftl {
 	 *
 	 * \ingroup prelude
 	 */
-	template<typename T>
 	struct identity {
+		template<typename T>
 		constexpr const T& operator()(const T& t) const noexcept {
 			return t;
 		}
 
-		T& operator()(T& t) const noexcept {
+		template<typename T>
+		constexpr T& operator()(T& t) const noexcept {
 			return t;
 		}
 	};
-	// TODO: C++14: Make template value of identity, e.g.
-	// constexpr identity<T> id = identity<T>();
+
+	/**
+	 * Compile time instance of identity.
+	 *
+	 * Makes passing the identity function to higher order functions even more
+	 * convenient.
+	 *
+	 * \ingroup prelude
+	 */
+	constexpr identity id{};
 
 	/// Used to distinguish in-place constructors from others
 	struct inplace_tag {};
