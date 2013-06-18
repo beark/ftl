@@ -20,7 +20,7 @@ using parser = ftl::function<ftl::either<error,T>,std::istream&>;
 While very straight forward, we can be a lot more clever than that. To save ourselves a lot of trouble implementing all sorts of functions or concepts or whatnot for combining parsers (remember, it's a parser _combinator_ library), we could just use a transformer.
 ```cpp
     template<typename T>
-    using parser = ftl::eitherT<ftl::function<ftl::either<error,T>,std::istream&>;
+    using parser = ftl::eitherT<error,ftl::function<T,std::istream&>>;
 ```
 And that's it. Done. Two lines of code and we have a fully functional monad instance and monoidal alternative instance, just like that. Well, technically, the first type alias was already a monad (though not a monoidal alternative), but it wouldn't have worked the way users of our library expects. For one, when creating a new parser that depends on the result of one sequenced before it, it would have to accept an `either<error,T>` as parameter instead of just `T` and would have had to explicitly handle the case where the either was an error. This conflicts with the point of a library: to save work for users.
 
