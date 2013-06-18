@@ -93,6 +93,16 @@ namespace ftl {
 	}
 
 	/**
+	 * \overload
+	 *
+	 * \ingroup prelude
+	 */
+	template<typename R, typename P1, typename P2, typename...Ps>
+	function<R,P1,P2,Ps...> curry(const std::function<R(P1,P2,Ps...)>& f) {
+		return function<R,P1,P2,Ps...>(f);
+	}
+
+	/**
 	 * Uncurries a binary function.
 	 *
 	 * \ingroup prelude
