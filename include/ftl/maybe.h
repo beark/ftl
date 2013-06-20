@@ -51,6 +51,30 @@ namespace ftl {
 	 */
 
 	/**
+	 * Type that can be used to compare any maybe to `nothing`.
+	 *
+	 * \ingroup maybe
+	 */
+	struct nothing_t {};
+
+	/**
+	 * Convenience instance value of `nothing_t`.
+	 *
+	 * Useful when one wants to be more explicit that just using the implicit
+	 * bool cast of `maybe`.
+	 *
+	 * Example:
+	 * \code
+	 *   ftl::maybe<T> m = ...;
+	 *   if(m != ftl::nothing)
+	 *       do_something();
+	 * \endcode
+	 *
+	 * \ingroup maybe
+	 */
+	constexpr nothing_t nothing;
+
+	/**
 	 * Abstracts the concept of optional arguments and similar.
 	 *
 	 * \tparam A Must be a completely "plain" type, as in, it must not be
@@ -321,6 +345,26 @@ namespace ftl {
 	}
 
 	/**
+	 * \overload
+	 *
+	 * \ingroup maybe
+	 */
+	template<typename T>
+	bool operator== (const maybe<T>& m, nothing_t) noexcept {
+		return !static_cast<bool>(m);
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup maybe
+	 */
+	template<typename T>
+	bool operator== (nothing_t, const maybe<T>& m) noexcept {
+		return !static_cast<bool>(m);
+	}
+
+	/**
 	 * Not equal to operator for maybe.
 	 *
 	 * \note Instantiating this operator for `A`s that have no `operator!=`
@@ -331,6 +375,26 @@ namespace ftl {
 	template<typename A>
 	bool operator!= (const maybe<A>& m1, const maybe<A>& m2) {
 		return !(m1 == m2);
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup maybe
+	 */
+	template<typename T>
+	bool operator!= (const maybe<T>& m, nothing_t) noexcept {
+		return static_cast<bool>(m);
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup maybe
+	 */
+	template<typename T>
+	bool operator!= (nothing_t, const maybe<T>& m) noexcept {
+		return static_cast<bool>(m);
 	}
 
 	/**
