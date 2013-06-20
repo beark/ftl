@@ -133,7 +133,7 @@ namespace ftl {
 		-> typename std::enable_if<
 				monoid<M>::instance,
 				std::function<M(Ps...)>>::type {
-			return [](Ps...ps) { return monoid<M>::id(); };
+			return [](Ps...) { return monoid<M>::id(); };
 		}
 
 		static auto append(

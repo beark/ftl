@@ -341,7 +341,7 @@ namespace ftl {
 
 		template<typename R, typename P>
 		struct curried<R,P> {
-			function<R> operator()(P p) const {
+			function<R> operator()(P) const {
 				throw(std::logic_error("Curried calling of parameterless function"));
 			}
 		};
@@ -652,7 +652,7 @@ namespace ftl {
 		-> typename std::enable_if<
 				monoid<M>::instance,
 				function<M,Ps...>>::type {
-			return [](Ps...ps) { return monoid<M>::id(); };
+			return [](Ps...) { return monoid<M>::id(); };
 		}
 
 		/**

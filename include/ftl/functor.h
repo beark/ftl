@@ -192,7 +192,7 @@ namespace ftl {
 	function<F<R,Ts...>,A> distribute(F<function<R,A>,Ts...> f) {
 		return [f](A a) {
 			functor<F<A,Ts...>>::map(
-				[f,a](function<R,A> fn) {
+				[f,a](function<R,A>) {
 					return f(a);
 				},
 				f);
@@ -213,7 +213,7 @@ namespace ftl {
 	function<F<R>,A> distribute(F<function<R,A>> f) {
 		return [f](A a) {
 			functor<F<A>>::map(
-				[f,a](function<R,A> fn) {
+				[f,a](function<R,A>) {
 					return f(a);
 				},
 				f);
