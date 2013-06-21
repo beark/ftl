@@ -55,7 +55,11 @@ namespace ftl {
 	 *
 	 * \ingroup maybe
 	 */
-	struct nothing_t {};
+	struct nothing_t {
+		constexpr nothing_t() noexcept {}
+		constexpr nothing_t(const nothing_t&) noexcept {}
+		constexpr nothing_t(nothing_t&&) noexcept {}
+	};
 
 	/**
 	 * Convenience instance value of `nothing_t`.
@@ -72,7 +76,7 @@ namespace ftl {
 	 *
 	 * \ingroup maybe
 	 */
-	constexpr nothing_t nothing;
+	constexpr nothing_t nothing{};
 
 	/**
 	 * Abstracts the concept of optional arguments and similar.
