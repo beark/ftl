@@ -28,6 +28,7 @@
 #include "ord_tests.h"
 #include "functional_tests.h"
 #include "prelude_tests.h"
+#include "maybet_tests.h"
 
 bool run_test_set(test_set& ts, std::ostream& os) {
 	os << "Running test set '" << std::get<0>(ts) << "'...";
@@ -66,6 +67,7 @@ int main(int, char**) {
 	flawless &= run_test_set(prelude_tests, std::cout);
 	flawless &= run_test_set(either_tests, std::cout);
 	flawless &= run_test_set(maybe_tests, std::cout);
+	flawless &= run_test_set(maybet_tests, std::cout);
 	flawless &= run_test_set(future_tests, std::cout);
 	flawless &= run_test_set(lazy_tests, std::cout);
 	flawless &= run_test_set(ord_tests, std::cout);
