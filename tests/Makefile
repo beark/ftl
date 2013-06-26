@@ -2,7 +2,7 @@ CC=g++
 CFLAGS=-std=c++11 -I../include/ -Wall -Wextra
 LDFLAGS=-pthread
 OLVL=-O2
-TESTS=either_tests.h maybe_tests.h future_tests.h ord_tests.h functional_tests.h
+TESTS=either_tests.h maybe_tests.h future_tests.h ord_tests.h functional_tests.h maybet_tests.h eithert_tests.h
 
 # NOTE: This Makefile has only been used on the author's personal system, you
 # may well have to tweak the above parameters to get it to work on your own
