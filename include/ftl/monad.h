@@ -90,13 +90,6 @@ namespace ftl {
 	struct monad {
 
 		/**
-		 * The type `M` is a monad on.
-		 *
-		 * For example, in the case of `maybe<int>`, `T = int`.
-		 */
-		using T = concept_parameter<M>;
-
-		/**
 		 * Used for compile time checks.
 		 *
 		 * Implementors _must_ override this default.
@@ -107,6 +100,12 @@ namespace ftl {
 // definitions, while allowing a doc generator to find them and generate the
 // proper documentation for the monad concept.
 #ifdef SILLY_WORKAROUND
+		/**
+		 * The type `M` is a monad on.
+		 *
+		 * For example, in the case of `maybe<int>`, `T = int`.
+		 */
+		using T = concept_parameter<M>;
 
 		/**
 		 * Encapsulate a "pure" value.
