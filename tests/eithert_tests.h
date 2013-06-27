@@ -25,6 +25,7 @@
 
 #include <string>
 #include <ftl/either_trans.h>
+#include <ftl/list.h>
 #include "base.h"
 
 test_set eithert_tests{
@@ -195,6 +196,85 @@ test_set eithert_tests{
 				return (*g)(2) == make_left<float>(0.f);
 			})
 		),
+		std::make_tuple(
+			std::string("foldable::foldl"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+				using eitherL = eitherT<char,std::list<int>>;
+
+				eitherL el{
+					inplace_tag(),
+					make_right<char>(2),
+					make_right<char>(2),
+					make_left<int>('3'),
+					make_right<char>(2)
+				};
+
+				auto r = foldl([](int x, int y){ return x/y; }, 64, el);
+
+				return r == 8;
+			})
+		),
+		std::make_tuple(
+			std::string("foldable::foldr"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+				using eitherL = eitherT<char,std::list<float>>;
+
+				eitherL el{
+					inplace_tag(),
+					make_right<char>(4.f),
+					make_right<char>(4.f),
+					make_left<float>('3'),
+					make_right<char>(2.f)
+				};
+
+				auto r = foldr([](float x, float y){ return x/y; }, 16.f, el);
+
+				return r == .125f;
+			})
+		),
+		std::make_tuple(
+			std::string("foldable::fold"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+				using eitherL = eitherT<char,std::list<sum_monoid<int>>>;
+
+				eitherL el{
+					inplace_tag(),
+					make_right<char>(sum(1)),
+					make_right<char>(sum(2)),
+					make_left<sum_monoid<int>>('3'),
+					make_right<char>(sum(4))
+				};
+
+				auto r = fold(el);
+
+				return r == 7;
+			})
+		)
+		/* Crashes gcc, works as it should in clang
+		,
+		std::make_tuple(
+			std::string("foldable::foldMap"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+				using eitherL = eitherT<char,std::list<int>>;
+
+				eitherL el{
+					inplace_tag(),
+					make_right<char>(1),
+					make_right<char>(2),
+					make_left<int>('3'),
+					make_right<char>(4)
+				};
+
+				auto r = foldMap(sum<int>, el);
+
+				return r == 7;
+			})
+		)
+		*/
 	}
 };
 
