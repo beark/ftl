@@ -389,14 +389,14 @@ namespace ftl {
 		>
 		static U foldl(F f, U z, const eitherT<L,M>& me) {
 			return foldable<Met>::foldl(
-				[f,z](const either<L,T>& e, U z){
+				[f](U z, const either<L,T>& e){
 					if(e)
 						return f(z, *e);
 
 					else
 						return z;
 				},
-				z
+				z,
 				*me
 			);
 		}
@@ -413,14 +413,14 @@ namespace ftl {
 		>
 		static U foldr(F f, U z, const eitherT<L,M>& me) {
 			return foldable<Met>::foldr(
-				[f,z](const either<L,T>& e, U z){
+				[f](const either<L,T>& e, U z){
 					if(e)
 						return f(*e, z);
 
 					else
 						return z;
 				},
-				z
+				z,
 				*me
 			);
 		}
