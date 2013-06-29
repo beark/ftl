@@ -257,6 +257,58 @@ test_set maybet_tests{
 
 				return *m3 == *(maybeT<std::vector<int>>{});
 			})
+		),
+		std::make_tuple(
+			std::string("foldable::foldl"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				maybeT<std::vector<int>> m1{
+					inplace_tag(),
+					value(1),
+					value(2),
+					maybe<int>{},
+					value(4)
+				};
+
+				auto r = foldl([](int x, int y){ return x+y; }, 0, m1);
+
+				return r == 7;
+			})
+		),
+		std::make_tuple(
+			std::string("foldable::foldr"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				maybeT<std::vector<float>> m1{
+					inplace_tag(),
+					value(4.f),
+					value(4.f),
+					maybe<float>{},
+					value(2.f)
+				};
+
+				auto r = foldr([](float x, float y){ return x/y; }, 16.f, m1);
+
+				return r == .125f;
+			})
+		),
+		std::make_tuple(
+			std::string("foldable::fold"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				maybeT<std::vector<sum_monoid<int>>> m1{
+					inplace_tag(),
+					value(sum(1)),
+					value(sum(2)),
+					maybe<sum_monoid<int>>{},
+					value(sum(4))
+				};
+
+				return fold(m1) == 7;
+			})
 		)
 	}
 };
