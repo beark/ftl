@@ -24,6 +24,8 @@
 #define FTL_MAYBET_TESTS_H
 
 #include <ftl/maybe_trans.h>
+#include <ftl/foldable.h>
+#include <ftl/vector.h>
 #include "base.h"
 
 test_set maybet_tests{
@@ -202,6 +204,58 @@ test_set maybet_tests{
 					};
 				};
 				return (*g)(2) == ftl::nothing;
+			})
+		),
+		std::make_tuple(
+			std::string("monoidA::orDo[value,value]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto m1 = monad<maybeT<std::vector<int>>>::pure(2);
+				auto m2 = monad<maybeT<std::vector<int>>>::pure(4);
+
+				auto m3 = m1 | m2;
+
+				return *m1 == *m3;
+			})
+		),
+		std::make_tuple(
+			std::string("monoidA::orDo[value,nothing]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto m1 = monad<maybeT<std::vector<int>>>::pure(2);
+				maybeT<std::vector<int>> m2;
+
+				auto m3 = m1 | m2;
+
+				return *m1 == *m3;
+			})
+		),
+		std::make_tuple(
+			std::string("monoidA::orDo[nothing,value]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				maybeT<std::vector<int>> m1;
+				auto m2 = monad<maybeT<std::vector<int>>>::pure(2);
+
+				auto m3 = m1 | m2;
+
+				return *m2 == *m3;
+			})
+		),
+		std::make_tuple(
+			std::string("monoidA::orDo[nothing,nothing]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				maybeT<std::vector<int>> m1;
+				maybeT<std::vector<int>> m2;
+
+				auto m3 = m1 | m2;
+
+				return *m3 == *(maybeT<std::vector<int>>{});
 			})
 		)
 	}
