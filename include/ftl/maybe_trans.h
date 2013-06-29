@@ -53,6 +53,7 @@ namespace ftl {
 	 * - \ref functor
 	 * - \ref applicative
 	 * - \ref monad
+	 * - \ref monoida
 	 * - \ref foldable, if `M` is Foldable.
 	 *
 	 * \ingroup maybeT
@@ -62,6 +63,21 @@ namespace ftl {
 	public:
 		using T = concept_parameter<M>;
 		using Mmt = typename re_parametrise<M,maybe<T>>::type;
+
+		/**
+		 * Default construction.
+		 *
+		 * Initialises the wrapped value with monad::pure(nothing).
+		 */
+		maybeT() : mMaybe(monad<Mmt>::pure(maybe<T>{})) {}
+
+		maybeT(const maybeT&)
+		noexcept(std::is_nothrow_copy_constructible<Mmt>::value) = default;
+
+		maybeT(maybeT&&)
+		noexcept(std::is_nothrow_move_constructible<Mmt>::value) = default;
+
+		~maybeT() = default;
 
 		explicit constexpr maybeT(const Mmt& m)
 		noexcept(std::is_nothrow_copy_constructible<Mmt>::value)
@@ -293,13 +309,17 @@ namespace ftl {
 			return monad<Mmt>::pure(maybe<T>{});
 		}
 
+		/**
+		 * Performs the monadic computation `mm1`. If it fails, `mm2` is
+		 * returned, otherwise the result is (re-wrapped).
+		 */
 		static maybeT<M> orDo(const maybeT<M>& mm1, maybeT<M> mm2) {
 
 			using T = concept_parameter<M>;
 			using Mmt = typename maybeT<M>::Mmt;
 
 			return maybeT<M> {
-				*mm1 >>= [mm2](const maybe<T>& m) {
+				*mm1 >>= [mm2](const maybe<T>& m) -> Mmt {
 					if(m)
 						return monad<Mmt>::pure(m);
 
@@ -308,6 +328,79 @@ namespace ftl {
 				}
 			};
 		}
+
+		static constexpr bool instance = monad<M>::instance;
+	};
+
+	// Forward declarations
+	template<typename> struct foldable;
+	template<typename> struct foldMap_default;
+	template<typename> struct fold_default;
+
+	/**
+	 * Foldable instance for maybeT.
+	 *
+	 * Elements in `M` that are `nothing` are simply skipped, for all
+	 * other elements, the fold function is applied to their unwrapped value.
+	 *
+	 * \tparam M must be \ref foldablepg
+	 */
+	template<typename M>
+	struct foldable<maybeT<M>>
+	: fold_default<maybeT<M>>, foldMap_default<maybeT<M>> {
+
+		using T = concept_parameter<M>;
+		using Mmt = typename maybeT<M>::Mmt;
+
+		template<
+				typename F,
+				typename U,
+				typename = typename std::enable_if<
+					std::is_same<
+						U,
+						typename decayed_result<F(T,U)>::type
+					>::value
+				>::type
+		>
+		static U foldl(F f, U z, const maybeT<M>& mT) {
+			foldable<M>::foldl(
+				[f](U z, const maybe<T>& m) {
+					if(m)
+						return f(z, *m);
+
+					return z;
+				},
+				z,
+				*mT
+			);
+		}
+
+		template<
+				typename F,
+				typename U,
+				typename = typename std::enable_if<
+					std::is_same<
+						U,
+						typename decayed_result<F(T,U)>::type
+					>::value
+				>::type
+		>
+		static U foldr(F f, U z, const maybeT<M>& mT) {
+			return foldable<Mmt>::foldr(
+				[f](const maybe<T>& m, U z){
+					if(m)
+						return f(*m, z);
+
+					else
+						return z;
+				},
+				z,
+				*mT
+			);
+		}
+
+
+		static constexpr bool instance = foldable<M>::instance;
 	};
 }
 
