@@ -363,7 +363,7 @@ namespace ftl {
 				>::type
 		>
 		static U foldl(F f, U z, const maybeT<M>& mT) {
-			foldable<M>::foldl(
+			return foldable<Mmt>::foldl(
 				[f](U z, const maybe<T>& m) {
 					if(m)
 						return f(z, *m);
