@@ -173,9 +173,15 @@ namespace ftl {
 	struct monad<std::vector<T,A<T>>> {
 
 		/// Creates a one element vector
+		static std::vector<T,A<T>> pure(const T& t) {
+			std::vector<T,A<T>> v{};
+			v.push_back(t);
+			return v;
+		}
+
 		static std::vector<T,A<T>> pure(T&& t) {
 			std::vector<T,A<T>> v{};
-			v.emplace_back(std::forward<T>(t));
+			v.emplace_back(std::move(t));
 			return v;
 		}
 
