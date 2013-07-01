@@ -234,6 +234,58 @@ test_set maybe_tests{
 				return m.isNothing();
 			})
 		),
+		std::make_tuple(
+			std::string("monoidA::fail"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				return monoidA<maybe<int>>::fail() == nothing;
+			})
+		),
+		std::make_tuple(
+			std::string("monoidA::orDo[value,value]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto a = value(1);
+				auto b = value(2);
+
+				return (a | b) == value(1);
+			})
+		),
+		std::make_tuple(
+			std::string("monoidA::orDo[value,nothing]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto a = value(1);
+				maybe<int> b;
+
+				return (a | b) == value(1);
+			})
+		),
+		std::make_tuple(
+			std::string("monoidA::orDo[nothing,value]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				maybe<int> a;
+				auto b = value(2);
+
+				return (a | b) == value(2);
+			})
+		),
+		std::make_tuple(
+			std::string("monoidA::orDo[nothing,nothing]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				maybe<int> a;
+				maybe<int> b;
+
+				return (a | b) == nothing;
+			})
+		)
 	}
 };
 
