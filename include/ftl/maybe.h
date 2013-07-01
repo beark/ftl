@@ -462,8 +462,10 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * In other words, the append operation is simply lifted into the
-	 * \c value_type of the maybe and all nothings are ignored (unless
+	 * `value_type` of the maybe and all nothings are ignored (unless
 	 * everything is nothing).
+	 *
+	 * \tparam A must be a \ref monoid
 	 *
 	 * \ingroup maybe
 	 */
