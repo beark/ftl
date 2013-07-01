@@ -310,6 +310,25 @@ test_set maybet_tests{
 				return fold(m1) == 7;
 			})
 		)
+		/* Crashed gcc, works as it should in clang
+		,
+		std::make_tuple(
+			std::string("foldable::foldMap"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				maybeT<std::vector<int>> m1{
+					inplace_tag(),
+					value(1),
+					value(2),
+					maybe<int>{},
+					value(4)
+				};
+
+				return foldMap(sum<int>, m1) == 7;
+			})
+		)
+		*/
 	}
 };
 

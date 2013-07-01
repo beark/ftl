@@ -81,6 +81,58 @@ test_set maybe_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("monoid::id"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				return monoid<maybe<sum_monoid<int>>>::id() == nothing;
+			})
+		),
+		std::make_tuple(
+			std::string("monoid::append[value,value]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto m1 = value(sum(2));
+				auto m2 = value(sum(3));
+
+				return (m1 ^ m2) == value(sum(5));
+			})
+		),
+		std::make_tuple(
+			std::string("monoid::append[value,nothing]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto m1 = value(sum(2));
+				maybe<sum_monoid<int>> m2;
+
+				return (m1 ^ m2) == m1;
+			})
+		),
+		std::make_tuple(
+			std::string("monoid::append[nothing,value]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				maybe<sum_monoid<int>> m1;
+				auto m2 = value(sum(3));
+
+				return (m1 ^ m2) == m2;
+			})
+		),
+		std::make_tuple(
+			std::string("monoid::append[nothing,nothing]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				maybe<sum_monoid<int>> m1;
+				maybe<sum_monoid<int>> m2;
+
+				return (m1 ^ m2) == nothing;
+			})
+		),
+		std::make_tuple(
 			std::string("functor::map[value] on lvalues"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
