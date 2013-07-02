@@ -165,9 +165,16 @@ namespace ftl {
 		 * That is, pure generates a one element list, where that single element
 		 * is `a`.
 		 */
+		static std::list<T,A<T>> pure(const T& a) {
+			std::list<T,A<T>> l{};
+			l.emplace_back(a);
+			return l;
+		}
+
+		/// \overload
 		static std::list<T,A<T>> pure(T&& a) {
 			std::list<T,A<T>> l{};
-			l.emplace_back(std::forward<T>(a));
+			l.emplace_back(std::move(a));
 			return l;
 		}
 
