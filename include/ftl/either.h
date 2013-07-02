@@ -455,11 +455,11 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type::value_type
+				typename U = typename decayed_result<F(T)>::type::right_type
 		>
-		static either<L,U> bind(const either<L,T>& e, const F& f) {
+		static either<L,U> bind(const either<L,T>& e, F&& f) {
 			if(e)
-				return f(*e);
+				return std::forward<F>(f)(*e);
 			else
 				return either<L,U>(left_tag_t(), e.left());
 		}
@@ -467,11 +467,11 @@ namespace ftl {
 		/// \overload
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type::value_type
+				typename U = typename decayed_result<F(T)>::type::right_type
 		>
-		static either<L,U> bind(either<L,T>&& e, const F& f) {
+		static either<L,U> bind(either<L,T>&& e, F&& f) {
 			if(e)
-				return f(std::move(*e));
+				return std::forward<F>(f)(std::move(*e));
 			else
 				return either<L,U>(left_tag_t(), std::move(e.left()));
 		}
@@ -517,9 +517,9 @@ namespace ftl {
 	template<
 		typename L,
 		typename _R,
-		typename R = typename std::decay<_R>::type>
+		typename R = plain_type<_R>>
 	constexpr either<L,R> make_right(_R&& r)
-	noexcept(std::is_nothrow_constructible<either<L,R>,R>::value) {
+	noexcept(std::is_nothrow_constructible<either<L,R>,_R>::value) {
 		return either<L,R>(right_tag_t(), std::forward<_R>(r));
 	}
 
