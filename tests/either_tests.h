@@ -119,8 +119,8 @@ test_set either_tests{
 		std::make_tuple(
 			std::string("applicative::apply[R,R]"),
 			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
+				using ftl::operator%;
+				using ftl::operator*;
 				auto fn = [](int x){ return [x](int y){ return x+y; }; };
 				auto e = fn % ftl::make_right<int>(1) * ftl::make_right<int>(1);
 
@@ -130,8 +130,8 @@ test_set either_tests{
 		std::make_tuple(
 			std::string("applicative::apply[L,R]"),
 			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
+				using ftl::operator%;
+				using ftl::operator*;
 				auto fn = [](int x){ return [x](int y){ return x+y; }; };
 				auto e = fn % ftl::make_left<int>(1) * ftl::make_right<int>(1);
 
@@ -141,8 +141,8 @@ test_set either_tests{
 		std::make_tuple(
 			std::string("applicative::apply[R,L]"),
 			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
+				using ftl::operator%;
+				using ftl::operator*;
 				auto fn = [](int x){ return [x](int y){ return x+y; }; };
 				auto e = fn % ftl::make_right<int>(1) * ftl::make_left<int>(1);
 
@@ -152,8 +152,8 @@ test_set either_tests{
 		std::make_tuple(
 			std::string("applicative::apply[L,L]"),
 			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
+				using ftl::operator%;
+				using ftl::operator*;
 				auto fn = [](int x){ return [x](int y){ return x+y; }; };
 				auto e = fn % ftl::make_left<int>(1) * ftl::make_left<int>(1);
 
@@ -163,8 +163,7 @@ test_set either_tests{
 		std::make_tuple(
 			std::string("monad::bind[R,->R]"),
 			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
+				using ftl::operator>>=;
 
 				auto fn = [](int x){ return ftl::make_right<int>(x+1); };
 
@@ -176,8 +175,7 @@ test_set either_tests{
 		std::make_tuple(
 			std::string("monad::bind[L,->R]"),
 			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
+				using ftl::operator>>=;
 
 				auto fn = [](int x){ return ftl::make_right<int>(x+1); };
 
@@ -189,8 +187,7 @@ test_set either_tests{
 		std::make_tuple(
 			std::string("monad::bind[R,->L]"),
 			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
+				using ftl::operator>>=;
 
 				auto fn = [](int x){ return ftl::make_left<int>(x+1); };
 
