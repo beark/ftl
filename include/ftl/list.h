@@ -77,10 +77,10 @@ namespace ftl {
 			template<typename> class A,
 			typename U = typename decayed_result<F(T)>::type::value_type
 	>
-	std::list<U,A<U>> concatMap(F f, const std::list<T,A<T>>& l) {
+	std::list<U,A<U>> concatMap(F&& f, const std::list<T,A<T>>& l) {
 
 		std::list<U,A<U>> result;
-		auto nested = f % l;
+		auto nested = std::forward<F>(f) % l;
 
 		for(auto& el : nested) {
 			result.splice(result.end(), el);
@@ -95,10 +95,10 @@ namespace ftl {
 			template<typename> class A,
 			typename U = typename decayed_result<F(T)>::type::value_type
 	>
-	std::list<U,A<U>> concatMap(F f, std::list<T,A<T>>&& l) {
+	std::list<U,A<U>> concatMap(F&& f, std::list<T,A<T>>&& l) {
 
 		std::list<U,A<U>> result;
-		auto nested = f % std::move(l);
+		auto nested = std::forward<F>(f) % std::move(l);
 
 		for(auto& el : nested)
 			result.splice(result.end(), el);
@@ -140,8 +140,22 @@ namespace ftl {
 		static std::list<Ts...> append(
 				const std::list<Ts...>& l1,
 				std::list<Ts...>&& l2) {
-			l2.insert(l2.end(), l1.begin(), l1.end());
+			l2.insert(l2.begin(), l1.begin(), l1.end());
 			return std::move(l2);
+		}
+
+		static std::list<Ts...> append(
+				std::list<Ts...>&& l1,
+				std::list<Ts...>&& l2) {
+			if(l1.get_allocator() == l2.get_allocator()) {
+				l1.splice(l1.end(), std::move(l2));
+			}
+
+			else {
+				std::move(l2.begin(), l2.end(), std::back_inserter(l1));
+			}
+
+			return l1;
 		}
 
 		static constexpr bool instance = true;
