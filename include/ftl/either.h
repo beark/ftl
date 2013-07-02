@@ -101,8 +101,11 @@ namespace ftl {
 	template<typename L, typename R>
 	class either {
 	public:
-		/// The type either implements various concepts on
-		using value_type = L;
+		/// Convenient access to Left type
+		using left_type = L;
+
+		/// Convenient access to Right type
+		using right_type = R;
 
 		either() = delete;
 
