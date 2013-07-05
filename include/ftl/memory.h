@@ -151,7 +151,7 @@ namespace ftl {
 	 *
 	 * \ingroup memory
 	 */
-	template<T>
+	template<typename T>
 	struct foldable<std::shared_ptr<T>>
 	: foldMap_default<std::shared_ptr<T>>, fold_default<std::shared_ptr<T>> {
 		template<
