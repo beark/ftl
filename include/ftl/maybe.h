@@ -585,6 +585,10 @@ namespace ftl {
 	/**
 	 * Foldable instance for maybe
 	 *
+	 * Folds as if maybe was a container like any other. Naturally, a particular
+	 * maybe instance will only ever contain zero or one elements ("nothing" or
+	 * "value").
+	 *
 	 * \ingroup maybe
 	 */
 	template<typename T>
