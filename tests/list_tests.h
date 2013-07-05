@@ -109,6 +109,88 @@ test_set list_tests{
 				return
 					(std::move(l1) ^ std::move(l2)) == std::list<int>{1,2,2,3};
 			})
+		),
+		std::make_tuple(
+			std::string("functor::map"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto f = [](int x){ return x+1; };
+				auto l = f % std::list<int>{1,2,3};
+
+				return l == std::list<int>{2,3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("applicative::pure"),
+			std::function<bool()>([]() -> bool {
+
+				auto l = ftl::applicative<std::list<int>>::pure(2);
+
+				return l == std::list<int>{2};
+			})
+		),
+		std::make_tuple(
+			std::string("applicative::apply"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator*;
+
+				std::list<ftl::function<int,int>> lf{
+					[](int x){ return x-1; },
+					[](int x){ return x+1; }
+				};
+
+				std::list<int> l = lf * std::list<int>{1,2,3};
+
+				return l == std::list<int>{0,1,2,2,3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("monad::bind"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator>>=;
+
+				std::list<int> l{1,2,3};
+
+				auto f = [](int x){ return std::list<int>{x,x+1}; };
+
+				return (l >>= f) == std::list<int>{1,2,2,3,3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("foldable::foldl"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::list<int> l{1,2,3};
+				auto f = [](int x, int y){ return x+y; };
+
+
+				return foldl(f, 0, l) == 6;
+			})
+		),
+		std::make_tuple(
+			std::string("foldable::foldr"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::list<float> l{4.f,4.f,2.f};
+				auto f = [](float x, float y){ return x/y; };
+
+
+				return foldr(f, 16.f, l) == .125f;
+			})
+		),
+		std::make_tuple(
+			std::string("foldable::fold"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::list<prod_monoid<int>> l{prod(2),prod(3),prod(2)};
+
+
+				return fold(l) == 12;
+			})
 		)
 	}
 };
