@@ -535,6 +535,36 @@ namespace ftl {
 	};
 
 	/**
+	 * Check if a type is just a parametrised version of some templated base.
+	 *
+	 * Example:
+	 * \code
+	 *   std::cout << std::boolalpha;
+	 *   std::cout << is_base_template<maybe<int>,maybe>::value << std::endl;
+	 *   std::cout << is_base_template<either<int,int>,maybe>::value << std::endl;
+	 *   
+	 *   // The above outputs:
+	 *   // true
+	 *   // false
+	 * \endcode
+	 */
+	template<
+			typename T,
+			template<typename...> class Tb
+	>
+	struct is_base_template {
+		static constexpr bool value = false;
+	};
+
+	template<
+			template<typename...> class Tb,
+			typename...Ts
+	>
+	struct is_base_template<Tb<Ts...>,Tb> {
+		static constexpr bool value = true;
+	};
+
+	/**
 	 * Check if two parametric types are the same base.
 	 *
 	 * Example:
