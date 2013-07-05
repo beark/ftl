@@ -213,7 +213,10 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type
+				typename U = typename decayed_result<F(T)>::type,
+				typename = typename std::enable_if<
+					!std::is_same<T,U>::value
+				>::type
 		>
 		static std::list<U,A<U>> map(F&& f, std::list<T,A<T>>&& l) {
 			std::list<U,A<U>> ret;
