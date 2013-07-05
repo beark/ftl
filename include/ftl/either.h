@@ -24,7 +24,7 @@
 #define FTL_EITHER_H
 
 #include <stdexcept>
-#include "monad.h"
+#include "concepts/monad.h"
 
 namespace ftl {
 

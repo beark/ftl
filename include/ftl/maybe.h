@@ -26,9 +26,9 @@
 #include <stdexcept>
 #include <type_traits>
 #include "prelude.h"
-#include "monoid.h"
-#include "monad.h"
-#include "foldable.h"
+#include "concepts/monoid.h"
+#include "concepts/monad.h"
+#include "concepts/foldable.h"
 
 namespace ftl {
 

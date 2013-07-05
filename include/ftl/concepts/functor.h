@@ -23,8 +23,8 @@
 #ifndef FTL_FUNCTOR_H
 #define FTL_FUNCTOR_H
 
-#include "type_functions.h"
-#include "function.h"
+#include "../type_functions.h"
+#include "../function.h"
 
 namespace ftl {
 	// Forward declaration so we can mention applicatives

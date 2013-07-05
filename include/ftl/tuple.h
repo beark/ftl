@@ -24,8 +24,8 @@
 #define FTL_TUPLE_H
 
 #include <tuple>
-#include "monoid.h"
-#include "applicative.h"
+#include "concepts/monoid.h"
+#include "concepts/applicative.h"
 
 namespace ftl {
 

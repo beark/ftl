@@ -24,8 +24,8 @@
 #define FTL_MEMORY_H
 
 #include <memory>
-#include "monoid.h"
-#include "monad.h"
+#include "concepts/monoid.h"
+#include "concepts/monad.h"
 
 namespace ftl {
 

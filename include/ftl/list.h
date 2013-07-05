@@ -24,8 +24,9 @@
 #define FTL_LIST_H
 
 #include <list>
-#include "foldable.h"
-#include "monad.h"
+#include "concepts/foldable.h"
+#include "concepts/monad.h"
+#include "concepts/container.h"
 
 namespace ftl {
 

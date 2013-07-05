@@ -24,8 +24,8 @@
 #define FTL_VECTOR_H
 
 #include <vector>
-#include "foldable.h"
-#include "monad.h"
+#include "concepts/foldable.h"
+#include "concepts/monad.h"
 
 namespace ftl {
 

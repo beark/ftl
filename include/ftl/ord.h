@@ -24,7 +24,7 @@
 #define FTL_ORD_H
 
 #include "type_traits.h"
-#include "monoid.h"
+#include "concepts/monoid.h"
 
 namespace ftl {
 	/**

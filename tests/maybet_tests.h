@@ -24,7 +24,6 @@
 #define FTL_MAYBET_TESTS_H
 
 #include <ftl/maybe_trans.h>
-#include <ftl/foldable.h>
 #include <ftl/vector.h>
 #include "base.h"
 

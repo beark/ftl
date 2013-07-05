@@ -24,8 +24,8 @@
 #define FTL_FUTURE_H
 
 #include <future>
-#include "monad.h"
-#include "monoid.h"
+#include "concepts/monad.h"
+#include "concepts/monoid.h"
 
 namespace ftl {
 

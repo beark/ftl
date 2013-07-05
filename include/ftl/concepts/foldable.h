@@ -24,7 +24,7 @@
 #define FTL_FOLDABLE_H
 
 #include "monoid.h"
-#include "prelude.h"
+#include "../prelude.h"
 
 namespace ftl {
 	/**

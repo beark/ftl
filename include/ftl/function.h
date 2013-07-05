@@ -34,7 +34,7 @@
 #include <stdexcept>
 #include <functional>
 #include "type_functions.h"
-#include "monoid.h"
+#include "concepts/monoid.h"
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push

@@ -24,8 +24,8 @@
 #define FTL_FORWARDS_LIST_H
 
 #include <forward_list>
-#include "foldable.h"
-#include "monad.h"
+#include "concepts/foldable.h"
+#include "concepts/monad.h"
 
 namespace ftl {
 
