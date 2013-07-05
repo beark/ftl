@@ -55,8 +55,8 @@ namespace ftl {
 	 *
 	 * This is a pretty powerful instance. It lets us perform all sorts of
 	 * computations on future values, without actually waiting for them. Only
-	 * when we explicitly \em need the value will it be computed (when we call
-	 * \c get on the final future).
+	 * when we explicitly _need_ the value will it be computed (when we call
+	 * `get` on the final future).
 	 *
 	 * \ingroup future
 	 */
@@ -65,12 +65,15 @@ namespace ftl {
 
 		/**
 		 * Creates a future that returns `t`.
+		 *
+		 * Note that `t` is copied in all cases. This is because it's generally
+		 * a bad idea to pass references to an async call.
 		 */
-		static std::future<T> pure(T&& t) {
+		static std::future<T> pure(T t) {
 			return std::async(
 					std::launch::deferred,
 					[](T t){ return t; },
-					std::forward<T>(t));
+					t);
 		}
 
 		/**
