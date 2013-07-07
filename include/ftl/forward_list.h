@@ -145,7 +145,7 @@ namespace ftl {
 
 			std::forward_list<Ts...> rl(l2);
 
-			rl.insert_after(rl.before_begin(), l2.begin(), l2.end());
+			rl.insert_after(rl.before_begin(), l1.begin(), l1.end());
 			return rl;
 		}
 
@@ -155,7 +155,9 @@ namespace ftl {
 				const std::forward_list<Ts...>& l2) {
 
 			std::forward_list<Ts...> rl(l2);
+
 			rl.splice_after(rl.before_begin(), std::move(l1));
+
 			return rl;
 		}
 
@@ -163,14 +165,20 @@ namespace ftl {
 				const std::forward_list<Ts...>& l1,
 				std::forward_list<Ts...>&& l2) {
 
-			std::forward_list<Ts...> rl(l1);
+			std::forward_list<Ts...> l(l1);
 
-			auto it = rl.begin();
-			for(; it != rl.end(); ++it)
-				;
+			l2.splice_after(l2.before_begin(), std::move(l));
 
-			rl.splice_after(it, std::move(l2));
-			return rl;
+			return l2;
+		}
+
+		static std::forward_list<Ts...> append(
+				std::forward_list<Ts...>&& l1,
+				std::forward_list<Ts...>&& l2) {
+
+			l2.splice_after(l2.before_begin(), std::move(l1));
+
+			return l2;
 		}
 
 		static constexpr bool instance = true;
@@ -212,7 +220,10 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type
+				typename U = typename decayed_result<F(T)>::type,
+				typename =
+					typename std::enable_if<!std::is_same<T,U>::value>::type
+
 		>
 		static std::forward_list<U,A<U>> map(
 				const F& f,
@@ -278,7 +289,16 @@ namespace ftl {
 		template<typename F, typename Z, typename It>
 		Z fwdfoldr(F&& f, Z&& z, It it, It end) {
 			if(it != end) {
-				return f(*it, fwdfoldr(f, std::forward<Z>(z), ++it, end));
+				auto& x = *it;
+				return f(
+					x,
+					fwdfoldr(
+						std::forward<F>(f),
+						std::forward<Z>(z),
+						++it,
+						end
+					)
+				);
 			}
 
 			return z;
@@ -327,8 +347,10 @@ namespace ftl {
 			return _dtl::fwdfoldr(
 					std::forward<F>(f),
 					std::forward<U>(z),
-					l.begin(), l.end());
+					l.cbegin(), l.cend());
 		}
+
+		static constexpr bool instance = true;
 	};
 
 }
