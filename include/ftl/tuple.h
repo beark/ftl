@@ -55,15 +55,15 @@ namespace ftl {
 			}
 
 			template<typename F, typename O>
-			static void fmap(const F& f, T& ret, const O& o) {
-				tup<N-1,T>::fmap(f, ret, o);
-				std::get<N>(ret) = std::get<N>(o);
+			static void fmap(F&& f, const T& tupl, O& out) {
+				tup<N-1,T>::fmap(std::forward<F>(f), tupl, out);
+				std::get<N>(out) = std::get<N>(tupl);
 			}
 
 			template<typename F, typename O>
-			static void fmap(const F& f, T& ret, O&& o) {
-				tup<N-1,T>::fmap(f, ret, std::move(o));
-				std::get<N>(ret) = std::get<N>(std::move(o));
+			static void fmap(F&& f, T&& tupl, O& out) {
+				tup<N-1,T>::fmap(std::forward<F>(f), std::move(tupl), out);
+				std::get<N>(out) = std::get<N>(std::move(tupl));
 			}
 		};
 
@@ -74,13 +74,14 @@ namespace ftl {
 			}
 
 			template<typename F, typename O>
-			static void fmap(const F& f, T& ret, const O& o) {
-				std::get<0>(ret) = f(std::get<0>(o));
+			static void fmap(F&& f, const T& tupl, O& out) {
+				std::get<0>(out) = std::forward<F>(f)(std::get<0>(tupl));
 			}
 
 			template<typename F, typename O>
-			static void fmap(const F& f, T& ret, O&& o) {
-				std::get<0>(ret) = f(std::get<0>(std::move(o)));
+			static void fmap(F&& f, T&& tupl, O& out) {
+				std::get<0>(out)
+					= std::forward<F>(f)(std::get<0>(std::move(tupl)));
 			}
 		};
 
@@ -227,10 +228,10 @@ namespace ftl {
 				typename F,
 				typename U = typename decayed_result<F(T)>::type
 		>
-		std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
+		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
 
 			std::tuple<U,Ts...> ret;
-			_dtl::tup<sizeof...(Ts)-1, std::tuple<U,Ts...>>::fmap(
+			_dtl::tup<sizeof...(Ts), std::tuple<T,Ts...>>::fmap(
 					std::forward<F>(f), t, ret);
 			return ret;
 		}
@@ -239,13 +240,15 @@ namespace ftl {
 				typename F,
 				typename U = typename decayed_result<F(T)>::type
 		>
-		std::tuple<U,Ts...> map(F&& f, std::tuple<T,Ts...>&& t) {
+		static std::tuple<U,Ts...> map(F&& f, std::tuple<T,Ts...>&& t) {
 
 			std::tuple<U,Ts...> ret;
-			_dtl::tup<sizeof...(Ts)-1, std::tuple<U,Ts...>>::fmap(
+			_dtl::tup<sizeof...(Ts), std::tuple<T,Ts...>>::fmap(
 					std::forward<F>(f), std::move(t), ret);
 			return ret;
 		}
+
+		static constexpr bool instance = true;
 	};
 
 	/**
@@ -259,8 +262,12 @@ namespace ftl {
 	template<typename T, typename...Ts>
 	struct applicative<std::tuple<T,Ts...>> {
 
+		static std::tuple<T,Ts...> pure(const T& a) {
+			return std::make_tuple(a, monoid<Ts>::id()...);
+		}
+
 		static std::tuple<T,Ts...> pure(T&& a) {
-			return std::make_tuple(std::forward<T>(a), monoid<Ts>::id()...);
+			return std::make_tuple(std::move(a), monoid<Ts>::id()...);
 		}
 
 		template<
