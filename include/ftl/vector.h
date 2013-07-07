@@ -140,7 +140,7 @@ namespace ftl {
 				const std::vector<Ts...>& v1,
 				const std::vector<Ts...>& v2) {
 			auto rv(v1);
-			rv.reserve(v2.size());
+			rv.reserve(v1.size() + v2.size());
 			rv.insert(rv.end(), v2.begin(), v2.end());
 			return rv;
 		}
@@ -148,7 +148,7 @@ namespace ftl {
 		static std::vector<Ts...> append(
 				std::vector<Ts...>&& v1,
 				const std::vector<Ts...>& v2) {
-			v1.reserve(v2.size());
+			v1.reserve(v1.size() + v2.size());
 			v1.insert(v1.end(), v2.begin(), v2.end());
 			return v1;
 		}
@@ -156,8 +156,16 @@ namespace ftl {
 		static std::vector<Ts...> append(
 				const std::vector<Ts...>& v1,
 				std::vector<Ts...>&& v2) {
-			v2.reserve(v1.size());
+			v2.reserve(v2.size() + v1.size());
 			v2.insert(v2.begin(), v1.begin(), v1.end());
+			return v2;
+		}
+
+		static std::vector<Ts...> append(
+				std::vector<Ts...>&& v1,
+				std::vector<Ts...>&& v2) {
+			v1.reserve(v1.size() + v2.size());
+			std::move(v2.begin(), v2.end(), std::back_inserter(v1));
 			return v1;
 		}
 
@@ -203,7 +211,9 @@ namespace ftl {
 		/// Rvalue version of map
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type
+				typename U = typename decayed_result<F(T)>::type,
+				typename =
+					typename std::enable_if<!std::is_same<T,U>::value>::type
 		>
 		static std::vector<U,A<U>> map(F&& f, std::vector<T,A<T>>&& v) {
 			std::vector<U,A<U>> ret;
