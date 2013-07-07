@@ -26,7 +26,6 @@
 #include <list>
 #include "concepts/foldable.h"
 #include "concepts/monad.h"
-#include "concepts/container.h"
 
 namespace ftl {
 
