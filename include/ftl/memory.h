@@ -89,7 +89,7 @@ namespace ftl {
 				std::shared_ptr<T>>::type {
 			if(a) {
 				if(b)
-					return std::make_shared(monoid<T>::append(*a, *b));
+					return std::make_shared<T>(monoid<T>::append(*a, *b));
 
 				else
 					return a;
@@ -117,16 +117,16 @@ namespace ftl {
 	struct monad<std::shared_ptr<T>> {
 
 		static std::shared_ptr<T> pure(T&& a) {
-			return std::make_shared(std::forward<T>(a));
+			return std::make_shared<T>(std::forward<T>(a));
 		}
 
 		template<
 				typename F,
 				typename U = typename decayed_result<F(T)>::type
 		>
-		std::shared_ptr<U> map(F f, std::shared_ptr<T> p) {
+		static std::shared_ptr<U> map(F f, std::shared_ptr<T> p) {
 			if(p)
-				return std::make_shared(f(*p));
+				return std::make_shared<U>(f(*p));
 
 			else
 				return std::shared_ptr<U>();
@@ -182,7 +182,7 @@ namespace ftl {
 						>::value
 					>::type
 				>
-		static U foldl(Fn&& fn, U&& z, std::shared_ptr<T> p) {
+		static U foldr(Fn&& fn, U&& z, std::shared_ptr<T> p) {
 			if(p) {
 				return fn(std::forward<U>(z), *p);
 			}
