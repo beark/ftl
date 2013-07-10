@@ -1,0 +1,16 @@
+---
+layout: page
+---
+<section>
+	<table>
+	{% for post in site.categories[page.category] %}
+		<tr>
+			<td><time datetime="{{post.date|date:"%F"}}">{{post.date|date:"%b %d, %Y"}}</time></td>
+			<td><a href="{{site.baseurl}}{{ post.url }}">{{ post.title }}</a></td>
+			<td>{{post.categories | category_links}}</span></td>
+		</tr>
+	{% endfor %}
+	</table>
+</section>
+
+
