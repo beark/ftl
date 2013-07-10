@@ -6,4 +6,5 @@ markdown: rdiscount
 auto: true
 permalink: pretty
 pygments: true
+baseurl: http://libftl.org
 
