@@ -3,14 +3,6 @@ body {
 	background-color: rgb(80, 99, 102);
 }
 
-body > * {
-	text-align: left;
-}
-
-nav {
-	display: inline-block;
-}
-
 main {
 	display: inline-block;
 }
@@ -37,18 +29,17 @@ div.main > header a {
 }
 
 div.main > header > h1 {
+	display: inline-block;
+	vertical-align: middle;
 	margin: 0;
 }
 
-div.main > nav {
-	display: inline;
+div.main > header > nav {
+	display: inline-block;
+	vertical-align: middle;
 }
 
-div.main > nav > ul {
-	display: inline;
-}
-
-div.main > nav > ul > li {
+div.main > header > nav > ul > li {
 	display: inline-block;
 }
 
