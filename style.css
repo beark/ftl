@@ -41,9 +41,22 @@ div.main > header > nav {
 
 div.main > header > nav > ul > li {
 	display: inline-block;
+	margin: 0 1em;
+}
+
+div.main > header > nav > ul > li:first-child {
+	margin-left: 0;
 }
 
 div.main > header > nav a:hover {
 	text-shadow: 0 0 12px white;
+}
+
+main > article {
+	overflow: hidden;
+}
+
+main > article > header {
+	box-shadow: 0 2px 3px #333;
 }
 

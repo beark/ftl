@@ -6,7 +6,7 @@ title: News
 <article>
 	<header>
 		<h2><a href="{{site.baseurl}}{{post.url}}">{{ post.title }}</a></h2>
-		<time datetime="{{post.date|date: "%F"}}">{{ post.date|date: "%y-%d-%m"}}</time>
+		<time datetime="{{post.date|date: "%F"}}">{{ post.date|date: "%Y-%m-%d"}}</time>
 		<span class="category">{{post.categories | category_links}}</span>
 		<span class="author"> {% if post.author %}{{post.author}}{% else %}{{site.author}}{% endif%}</span>
 	</header>
