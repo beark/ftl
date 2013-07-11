@@ -43,3 +43,7 @@ div.main > header > nav > ul > li {
 	display: inline-block;
 }
 
+div.main > header > nav a:hover {
+	text-shadow: 0 0 12px white;
+}
+
