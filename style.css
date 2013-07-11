@@ -1,7 +1,6 @@
 body {
 	margin: 0;
-	background-color: #efefef;
-	text-align: center;
+	background-color: rgb(80, 99, 102);
 }
 
 body > * {
@@ -25,7 +24,7 @@ a {
 }
 
 div.main > header {
-	color: #fafafa
+	color: #fafafa;
 	background-color: #56a0d3;
 	margin-top: 1em;
 	border: 0.2em solid #66b0e3;
@@ -37,11 +36,19 @@ div.main > header a {
 	color: #fafafa;
 }
 
-div.main header > hgroup > h1 {
+div.main > header > h1 {
 	margin: 0;
 }
 
-div.main > nav li {
+div.main > nav {
+	display: inline;
+}
+
+div.main > nav > ul {
+	display: inline;
+}
+
+div.main > nav > ul > li {
 	display: inline-block;
 }
 
