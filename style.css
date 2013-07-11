@@ -1,4 +1,47 @@
 body {
+	margin: 0;
 	background-color: #efefef;
+	text-align: center;
+}
+
+body > * {
+	text-align: left;
+}
+
+nav {
+	display: inline-block;
+}
+
+main {
+	display: inline-block;
+}
+
+ul {
+	list-style-type: none;
+}
+
+a {
+	text-decoration: none;
+}
+
+div.main > header {
+	color: #fafafa
+	background-color: #56a0d3;
+	margin-top: 1em;
+	border: 0.2em solid #66b0e3;
+	box-shadow: 0 0 8px #56a0d3;
+	padding: 0.25em;
+}
+
+div.main > header a {
+	color: #fafafa;
+}
+
+div.main header > hgroup > h1 {
+	margin: 0;
+}
+
+div.main > nav li {
+	display: inline-block;
 }
 

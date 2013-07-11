@@ -1,38 +1,37 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8"/>
-        <title>{% if page.title %} {{ page.title }} | {% endif %} {{ site.name }}</title>
-        <link rel="stylesheet" href="{{site.baseurl}}/style.css" />
-        <meta name="description" content="{{site.description}}"/>
-        <meta name="author" content="{{site.author}}"/>
-    </head>
 
-    <body>
-        <header>
-            <hgroup>
-            <h1><a href="{{site.baseurl}}/">libFTL.org</a></h1>
-                <h4>{{ site.description }}</h4>
-            </hgroup>
-            <hr />
-        </header>
+	<head>
+		<meta charset="utf-8"/>
+		<title>{% if page.title %} {{ page.title }} | {% endif %} {{ site.name }}</title>
+		<link rel="stylesheet" href="{{site.baseurl}}/style.css" />
+		<meta name="description" content="{{site.description}}"/>
+		<meta name="author" content="{{site.author}}"/>
+	</head>
 
-        <nav>
+	<body>
+		<div class="main">
 
-            <ul>
-                <li><a href="{{site.baseurl}}/">News/Blog</a></li>
-                <li><a href="{{site.baseurl}}/api/">API Reference</a></li>
-                <li><a href="https://github.com/beark/ftl">Source Code</a></li>
-            </ul>
+			<header>
+				<hgroup>
+					<h1><a href="{{site.baseurl}}/">λftl.</a></h1>
+				</hgroup>
 
-        </nav>
+				<nav>
+					<ul>
+						<li><a href="{{site.baseurl}}/">News/Blog</a></li>
+						<li><a href="{{site.baseurl}}/api/">API Reference</a></li>
+						<li><a href="https://github.com/beark/ftl">Source Code</a></li>
+					</ul>
+				</nav>
+			</header>
 
-        <main>
+			<main>
 
-            {{ content }}
+				{{ content }}
 
-        </main>
-
-    </body>
+			</main>
+		</div>
+	</body>
 
 </html>
