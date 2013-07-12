@@ -4,10 +4,13 @@ layout: default
 <article>
 
         <header>
-            <h2>{{ page.title }}</h2>
-            <span><time datetime="{{page.date|date:"%F"}}">{{page.date|date:"%b %d, %Y"}}</time></span><br/>
-            <span class="category">{{ page.categories | category_links }}</span>
-            <span class="author">{% if page.author %}{{page.author}}{% else %}{{site.author}}{% endif%}</span>
+		<div class="info-container">
+		    <h2>{{ page.title }}</h2>
+		    <span><time class="info" datetime="{{page.date|date:"%F"}}">{{page.date|date:"%b %d, %Y"}}</time></span><br/>
+		    <span class="category info">{{ page.categories | category_links }}</span>
+		    <span class="author info">{% if page.author %}{{page.author}}{% else %}{{site.author}}{% endif%}</span>
+		</div>
+		<hr></hr>
         </header>
 
         <div class="entry">{{ content }}</div>

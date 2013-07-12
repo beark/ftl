@@ -1,10 +1,6 @@
 body {
 	margin: 0;
-	background-color: rgb(80, 99, 102);
-}
-
-main {
-	display: inline-block;
+	background-color: #c0c5ca;
 }
 
 ul {
@@ -19,9 +15,10 @@ div.main > header {
 	color: #fafafa;
 	background-color: #56a0d3;
 	margin-top: 1em;
+	margin-bottom: 2em;
 	border: 0.2em solid #66b0e3;
 	box-shadow: 0 0 8px #56a0d3;
-	padding: 0.25em;
+	padding: 0.25em 1em;
 }
 
 div.main > header a {
@@ -54,9 +51,41 @@ div.main > header > nav a:hover {
 
 main > article {
 	overflow: hidden;
+	margin-left: 5%;
 }
 
 main > article > header {
 	box-shadow: 0 2px 3px #333;
+	display: inline-block;
+}
+
+main > article > hr {
+	background-color: #333;
+	border: none;
+	box-shadow: 0 1px 2px #333;
+	height: 1px;
+	margin-top: 0.1em;
+}
+
+article > header {
+	color: #222;
+	padding: 0 0.25em;
+}
+
+article > header > h2 {
+	margin: 0.25em 0;
+}
+
+article > header a {
+	color: #222;
+}
+
+article > header .info-container {
+	margin: 0;
+	padding: 0 0.25em;
+}
+
+article > header .info {
+	font-size: smaller;
 }
 
