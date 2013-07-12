@@ -5,10 +5,13 @@ title: News
 {% for post in site.posts limit: 7 %}
 <article>
 	<header>
-		<h2><a href="{{site.baseurl}}{{post.url}}">{{ post.title }}</a></h2>
-		<time datetime="{{post.date|date: "%F"}}">{{ post.date|date: "%Y-%m-%d"}}</time>
-		<span class="category">{{post.categories | category_links}}</span>
-		<span class="author"> {% if post.author %}{{post.author}}{% else %}{{site.author}}{% endif%}</span>
+		<div class="info-container">
+			<h2><a href="{{site.baseurl}}{{post.url}}">{{ post.title }}</a></h2>
+			<time class="info" datetime="{{post.date|date: "%F"}}">{{ post.date|date: "%Y-%m-%d"}}</time>
+			<span class="category info">{{post.categories | category_links}}</span>
+			<span class="author info"> {% if post.author %}{{post.author}}{% else %}{{site.author}}{% endif%}</span>
+		</div>
+		<hr></hr>
 	</header>
 	<div class="entry">{{post.excerpt}}</div>
 </article>

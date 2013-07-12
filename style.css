@@ -54,22 +54,17 @@ main > article {
 	margin-left: 5%;
 }
 
-main > article > header {
-	box-shadow: 0 2px 3px #333;
-	display: inline-block;
+article > header {
+	color: #222;
+	padding: 0 0.25em;
 }
 
-main > article > hr {
+article > header > hr {
 	background-color: #333;
 	border: none;
 	box-shadow: 0 1px 2px #333;
 	height: 1px;
 	margin-top: 0.1em;
-}
-
-article > header {
-	color: #222;
-	padding: 0 0.25em;
 }
 
 article > header > h2 {
