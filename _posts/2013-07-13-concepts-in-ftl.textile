@@ -1,3 +1,8 @@
+---
+layout: post
+title: Concepts in FTL
+category: history
+---
 When starting the development of FTL, I was faced with an immediate problem: how to represent the type classes (in simple terms, Haskell's name for concepts)? Functionally, whatever implementation I chose had the following hard requirements:
 
 * A concept must be open, i.e. it must be possible for types unknown to me to implement a particular concept.
