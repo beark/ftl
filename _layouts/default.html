@@ -25,6 +25,11 @@
 			</header>
 
 			<main>
+				{% if page.title %}
+				<header>
+					<h2>{{ page.title }}</h2>
+				</header>
+				{% endif %}
 
 				{{ content }}
 
@@ -37,3 +42,4 @@
 	</body>
 
 </html>
+

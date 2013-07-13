@@ -28,6 +28,11 @@ div.main > header {
 
 div.main > header a {
 	color: #fafafa;
+	font-weight: bold;
+}
+
+div.main > header a:hover {
+	text-shadow: 0 0 12px white;
 }
 
 div.main > header > h1 {
@@ -50,13 +55,17 @@ div.main > header > nav > ul > li:first-child {
 	margin-left: 0;
 }
 
-div.main > header > nav a:hover {
-	text-shadow: 0 0 12px white;
-}
-
 main > article {
 	overflow: hidden;
 	margin-left: 5%;
+}
+
+main > article a {
+	color: #56A0D3;
+}
+
+main > article a:hover {
+	text-shadow: 0 0 12px #56A0D3;
 }
 
 article > header {

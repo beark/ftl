@@ -5,7 +5,7 @@ layout: default
 
         <header>
 		<div class="info-container">
-		    <h2>{{ page.title }}</h2>
+		    <h3>{{ page.title }}</h3>
 		    <time class="info" datetime="{{page.date|date:"%F"}}">⌚ {{page.date|date:"%Y-%m-%d"}}</time>
 		    <span class="category info">☑ {{ page.categories | category_links }}</span>
 		    <span class="author info">✍ {% if page.author %}{{page.author}}{% else %}{{site.author}}{% endif%}</span>
@@ -16,5 +16,4 @@ layout: default
         <div class="entry">{{ content }}</div>
 
 </article>
-
 
