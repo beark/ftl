@@ -1,22 +1,9 @@
 ---
 layout: default
-title: News
 ---
-{% for post in site.posts limit: 7 %}
 <article>
-	<header>
-		<div class="info-container">
-			<h3><a href="{{site.baseurl}}{{post.url}}">{{ post.title }}</a></h3>
-			<time class="info" datetime="{{post.date|date:"%F"}}">⌚ {{post.date|date:"%Y-%m-%d"}}</time>
-			<span class="category info">☑ {{ post.categories | category_links }}</span>
-			<span class="author info">✍ {% if post.author %}{{post.author}}{% else %}{{site.author}}{% endif%}</span>
-		</div>
-		<hr></hr>
-	</header>
-	<div class="entry">
-		{{post.excerpt}}
-		<p class="read-more"><a href="{{site.baseurl}}{{post.url}}">Read more</a></p>
+	<div class="page">
+		Generic welcome page.
 	</div>
 </article>
-{% endfor %}
 
