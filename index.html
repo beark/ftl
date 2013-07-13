@@ -13,7 +13,10 @@ title: News
 		</div>
 		<hr></hr>
 	</header>
-	<div class="entry">{{post.excerpt}}</div>
+	<div class="entry">
+		{{post.excerpt}}
+		<p class="read-more"><a href="{{site.baseurl}}{{post.url}}">Read more</a></p>
+	</div>
 </article>
 {% endfor %}
 

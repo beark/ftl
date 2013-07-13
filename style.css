@@ -55,9 +55,27 @@ div.main > header > nav > ul > li:first-child {
 	margin-left: 0;
 }
 
+main {
+	margin-left: 5%;
+}
+
+main > header {
+	display: inline-block;
+}
+
+main > header .title {
+	padding: 0 0.25em;
+}
+
+main > header > hr {
+	background-color: #333;
+	border: none;
+	box-shadow: 0 1px 2px #333;
+	height: 2px;
+}
+
 main > article {
 	overflow: hidden;
-	margin-left: 5%;
 }
 
 main > article a {
@@ -100,7 +118,7 @@ article > header .info {
 	font-size: smaller;
 }
 
-article > header .info:first-child {
+article > header time.info {
 	margin-left: 0;
 }
 
