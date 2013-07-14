@@ -1,9 +1,0 @@
----
-layout: post
-title: Test Post!
-category: blogging
----
-Testing that this thing works.
-
-Hopefully there'll be more interesting content later.
-

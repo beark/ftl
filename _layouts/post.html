@@ -3,16 +3,6 @@ layout: default
 ---
 <article>
 
-        <header>
-		<div class="info-container">
-		    <h3>{{ page.title }}</h3>
-		    <time class="info" datetime="{{page.date|date:"%F"}}">⌚ {{page.date|date:"%Y-%m-%d"}}</time>
-		    <span class="category info">☑ {{ page.categories | category_links }}</span>
-		    <span class="author info">✍ {% if page.author %}{{page.author}}{% else %}{{site.author}}{% endif%}</span>
-		</div>
-		<hr></hr>
-        </header>
-
         <div class="entry">{{ content }}</div>
 
 </article>
