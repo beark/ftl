@@ -169,56 +169,6 @@ namespace ftl {
 	 */
 	constexpr fMap fmap{};
 
-	/**
-	 * Distribute function inside a context across entire context.
-	 *
-	 * A practical example would be if you had a list of functions from
-	 * A to R, then \c distributing that list would give you a function from
-	 * A to a list of Rs.
-	 *
-	 * \ingroup functor
-	 */
-	/*
-	 * TODO: Implement the Representable concept and make distribute work
-	 * with any Representable.
-	 */
-	template<
-			template<typename...> class F,
-			typename A,
-			typename R,
-			typename...Ts,
-			typename = typename std::enable_if<
-				functor<F<A,Ts...>>::instance>::type>
-	function<F<R,Ts...>,A> distribute(F<function<R,A>,Ts...> f) {
-		return [f](A a) {
-			functor<F<A,Ts...>>::map(
-				[f,a](function<R,A>) {
-					return f(a);
-				},
-				f);
-		};
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup functor
-	 */
-	template<
-			template<typename> class F,
-			typename A,
-			typename R,
-			typename = typename std::enable_if<
-				functor<F<A>>::instance>::type>
-	function<F<R>,A> distribute(F<function<R,A>> f) {
-		return [f](A a) {
-			functor<F<A>>::map(
-				[f,a](function<R,A>) {
-					return f(a);
-				},
-				f);
-		};
-	}
 }
 
 #endif
