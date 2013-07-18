@@ -2,9 +2,10 @@ name: FTL - The Functional Template Library
 description: News about FTL and random thoughts about functional programming in general.
 author: bear
 category_dir: /categories
-auto: true
 permalink: pretty
 pygments: true
 baseurl: http://libftl.org
 future: false
+paginate: 10
+paginate_path: "blog/page:num"
 

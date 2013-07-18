@@ -3,7 +3,7 @@ layout: page
 ---
 Welcome to the home of FTL, the Functional Template Library. First, a short introduction in case you found yourself here without knowledge of what FTL is (besides faster than light, obviously):
 
-bq. FTL is a drop-in, header-only library for C++11. It provides little in the department of features, but lots in the department of abstraction. Specifically, its all about abstractions rooted in Haskell and functional programming.
+bq. FTL is a drop-in, header-only library for C++11. It provides little in the department of features, but lots in the department of abstraction. Specifically, it's all about abstractions rooted in Haskell and functional programming.
 
 For some examples, you can check out the "Github":https://github.com/beark/ftl page, and for more formal API documentation, you can check out the "API reference":/api.
 

@@ -1,6 +1,7 @@
 body {
 	margin: 0;
 	background-color: #CCC;
+	font-family: Times New Roman, Times, serif;
 }
 
 ul {
@@ -40,11 +41,13 @@ div.main > header {
 
 div.main > header a {
 	color: #fafafa;
+	text-shadow: 0 0 2px #333;
 	font-weight: bold;
 }
 
 div.main > header a:hover {
-	text-shadow: 0 0 12px white;
+	animation: header-hover-link 0.5s;
+	text-shadow: 0 0 6px white;
 }
 
 div.main > header > h1 {
@@ -101,7 +104,8 @@ main > article a {
 }
 
 main > article a:hover {
-	text-shadow: 0 0 12px #56A0D3;
+	animation: article-hover-link 0.25s;
+	color: white;
 }
 
 article > header {
@@ -123,7 +127,7 @@ article > header h2 {
 }
 
 article > header a {
-	color: #222;
+	color: #56A0D3;
 }
 
 header .info-container {
@@ -157,5 +161,23 @@ article ul {
 
 article ul > li {
 	margin: 1em 0;
+}
+
+@keyframes header-hover-link {
+	from {
+		text-shadow: inherit;
+	}
+	to {
+		text-shadow: 0 0 6px white;
+	}
+}
+
+@keyframes article-hover-link {
+	from {
+		color: #56A0D3;
+	}
+	to {
+		color: white;
+	}
 }
 
