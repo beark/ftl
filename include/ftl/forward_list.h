@@ -312,8 +312,8 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct foldable<std::forward_list<T,A>> :
-			fold_default<std::forward_list<T,A>>,
-			foldMap_default<std::forward_list<T,A>> {
+			deriving_fold<std::forward_list<T,A>>,
+			deriving_foldMap<std::forward_list<T,A>> {
 
 		template<
 				typename F,

@@ -362,8 +362,8 @@ namespace ftl {
 
 	// Forward declarations
 	template<typename> struct foldable;
-	template<typename> struct foldMap_default;
-	template<typename> struct fold_default;
+	template<typename> struct deriving_fold;
+	template<typename> struct deriving_foldMap;
 
 	/**
 	 * Foldable instance for eitherT.
@@ -372,7 +372,7 @@ namespace ftl {
 	 */
 	template<typename L, typename M>
 	struct foldable<eitherT<L,M>>
-	: foldMap_default<eitherT<L,M>>, fold_default<eitherT<L,M>> {
+	: deriving_foldMap<eitherT<L,M>>, deriving_fold<eitherT<L,M>> {
 
 		using T = concept_parameter<M>;
 		using Met = typename eitherT<L,M>::Met;

@@ -334,8 +334,8 @@ namespace ftl {
 
 	// Forward declarations
 	template<typename> struct foldable;
-	template<typename> struct foldMap_default;
-	template<typename> struct fold_default;
+	template<typename> struct deriving_fold;
+	template<typename> struct deriving_foldMap;
 
 	/**
 	 * Foldable instance for maybeT.
@@ -347,7 +347,7 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct foldable<maybeT<M>>
-	: fold_default<maybeT<M>>, foldMap_default<maybeT<M>> {
+	: deriving_fold<maybeT<M>>, deriving_foldMap<maybeT<M>> {
 
 		using T = concept_parameter<M>;
 		using Mmt = typename maybeT<M>::Mmt;

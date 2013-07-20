@@ -593,7 +593,7 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct foldable<maybe<T>>
-	: foldMap_default<maybe<T>>, fold_default<maybe<T>> {
+	: deriving_foldMap<maybe<T>>, deriving_fold<maybe<T>> {
 
 		template<
 				typename Fn,

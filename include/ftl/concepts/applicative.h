@@ -288,7 +288,7 @@ namespace ftl {
 	 */
 	template<typename F>
 	struct monoidA {
-#ifdef SILLY_WORKAROUND
+#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Get an instance of the failure state.
 		 */

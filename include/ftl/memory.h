@@ -153,7 +153,7 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct foldable<std::shared_ptr<T>>
-	: foldMap_default<std::shared_ptr<T>>, fold_default<std::shared_ptr<T>> {
+	: deriving_foldMap<std::shared_ptr<T>>, deriving_fold<std::shared_ptr<T>> {
 		template<
 				typename Fn,
 				typename U,

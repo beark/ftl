@@ -171,7 +171,8 @@ namespace ftl {
 	 * \ingroup list
 	 */
 	template<typename T, template<typename> class A>
-	struct monad<std::list<T,A<T>>> {
+	struct monad<std::list<T,A<T>>>
+	: deriving_bind<std::list<T,A<T>>> {
 
 		/**
 		 * Produces a singleton list.
@@ -249,6 +250,33 @@ namespace ftl {
 			return std::list<T,A<T>>{std::move(l)};
 		}
 
+		/**
+		 * Joins nested lists by way of concatenation.
+		 *
+		 * The resulting list contains every element of every list contained
+		 * in the original list. Relative order is preserved (from the
+		 * perspective of depth first iteration).
+		 */
+		static std::list<T> join(const std::list<std::list<T>>& l) {
+			std::list<T> rl;
+			for(const auto& ll : l) {
+				for(const auto& e : ll) {
+					rl.push_back(e);
+				}
+			}
+		}
+
+		/// \overload
+		static std::list<T> join(std::list<std::list<T>>&& l) {
+			std::list<T> rl;
+			for(auto& ll : l) {
+				rl.splice(rl.end(), std::move(ll));
+			}
+
+			return rl;
+		}
+
+#ifdef DOCUMENTATION_GENERATOR
 		/// Equivalent of flip(concatMap)
 		template<
 				typename F,
@@ -265,6 +293,7 @@ namespace ftl {
 		static std::list<U,A<U>> bind(std::list<T,A<T>>&& l, F&& f) {
 			return concatMap(std::forward<F>(f), std::move(l));
 		}
+#endif
 
 		static constexpr bool instance = true;
 	};
@@ -279,7 +308,7 @@ namespace ftl {
 			typename A
 	>
 	struct foldable<std::list<T,A>>
-	: fold_default<std::list<T,A>>, foldMap_default<std::list<T,A>> {
+	: deriving_fold<std::list<T,A>>, deriving_foldMap<std::list<T,A>> {
 
 		template<
 				typename Fn,

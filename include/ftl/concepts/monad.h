@@ -23,6 +23,7 @@
 #ifndef FTL_MONAD_H
 #define FTL_MONAD_H
 
+#include "../prelude.h"
 #include "applicative.h"
 
 namespace ftl {
@@ -99,13 +100,19 @@ namespace ftl {
 // Below ifdef section is to make sure the compiler disregards these
 // definitions, while allowing a doc generator to find them and generate the
 // proper documentation for the monad concept.
-#ifdef SILLY_WORKAROUND
+#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * The type `M` is a monad on.
 		 *
 		 * For example, in the case of `maybe<int>`, `T = int`.
 		 */
 		using T = concept_parameter<M>;
+
+		/**
+		 * Convenient means of re parametrising M
+		 */
+		template<typename U>
+		using M_ = typename re_parametrise<M,U>::type;
 
 		/**
 		 * Encapsulate a "pure" value.
@@ -123,10 +130,9 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type,
-				typename Mu = typename re_parametrise<M,U>::type
+				typename U = typename decayed_result<F(T)>::type
 		>
-		static Mu map(F&& f, const M& m);
+		static M_<U> map(F&& f, const M& m);
 
 		/**
 		 * Bind a value and execute a computation in M on it.
@@ -142,19 +148,146 @@ namespace ftl {
 		 * Instances are free to provide `bind` using move semantics on `M`,
 		 * either in addition to `const` reference version, or instead of.
 		 *
-		 * \tparam F must satisfy \ref fn`<M<U>(T)>` where `M` refers to the
-		 *           templated type parametrised by `T`.
+		 * \tparam F must satisfy \ref fn`<M_<U>(T)>`
 		 */
 		template<
 				typename F,
-				typename Mu = typename decayed_result<F(T)>::type,
-				typename = typename std::enable_if<std::is_same<
-					typename re_parametrise<Mu,T>::type,
-					M
-				>::value>::type
+				typename U = concept_parameter<
+					typename decayed_result<F(T)>::type>
+				>
 		>
-		static Mu bind(const M& m, F&& f);
+		static M_<U> bind(const M& m, F&& f);
+
+
+		/**
+		 * Joins (or "flattens") a nested instance of `M`.
+		 *
+		 * This function is easy to gain an intuition for; it corresponds to
+		 * e.g. making a list of lists into a plain old list by simply
+		 * concatenating all the inner lists into a single long one.
+		 */
+		static M join(const M_<M>& m);
 #endif
+	};
+
+	/**
+	 * Inheritable implementation of `monad<M>::join`.
+	 *
+	 * Monad implementations (as in, the template specialisations of monad<M>)
+	 * may inherit this struct to get a default implementation of `join`, in
+	 * terms of `bind`.
+	 *
+	 * \tparam M the template specialisation that is to derive `join`.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct monad<Identity<T>> : deriving_join<Identity<T>> {
+	 *       // Implementations of bind, map, and pure
+	 *   };
+	 *
+	 * \ingroup monad
+	 */
+	template<typename M>
+	struct deriving_join {
+		using T = concept_parameter<M>;
+		
+		template<typename U>
+		using M_ = typename re_parametrise<M,U>::type;
+
+		static M_<T> join(const M_<M_<T>>& m) {
+			return m >>= id;
+		}
+
+		static M_<T> join(M_<M_<T>>&& m) {
+			return std::move(m) >>= id;
+		}
+	};
+
+	/**
+	 * Inheritable implementation of `monad<M>::map`.
+	 *
+	 * Implementations of `monad<M>` may inherit this struct to have a default
+	 * implementation of `map` included. The default might not be the most
+	 * performant version possible of `map`.
+	 *
+	 * \tparam M the monad specialisation that is to derive `map`
+	 *
+	 * \note Requires that the inheriting monad specialisation implements `bind`
+	 *       and `pure`.
+	 *
+	 * \ingroup monad
+	 */
+	template<typename M>
+	struct deriving_map {
+		using T = concept_parameter<M>;
+		
+		template<typename U>
+		using M_ = typename re_parametrise<M,U>::type;
+
+		template<typename F, typename U = typename decayed_result<F(T)>::type>
+		static M_<U> map(F f, const M_<T>& m) {
+			return m >>= [f](const T& t){ return monad<M_<U>>::pure(f(t)); };
+		}
+
+		template<typename F, typename U = typename decayed_result<F(T)>::type>
+		static M_<U> map(F f, M_<T>&& m) {
+			return std::move(m)
+				>>= [f](T&& t){ return monad<M_<U>>::pure(f(std::move(t))); };
+		}
+	};
+
+	/**
+	 * Inheritable implementation of `monad::bind`.
+	 *
+	 * Monad specialisations (not the types that are monads themselves,
+	 * their specialisations of the monad<M> struct) may inherit this struct
+	 * to get a default implementatin of `bind`, in terms of `join` and `map`.
+	 *
+	 * \tparam M The same type monad<M> is being specialised for.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct monad<my_type<T>> : deriving_bind<my_type<T>> {
+	 *       // Implementation of join and map
+	 *   };
+	 * \endcode
+	 *
+	 * \note To use this `deriving` implementation, there _must_ be an
+	 *       actual implementation of `monad::join` and `monad::map`, you
+	 *       cannot rely on `deriving` for either.
+	 */
+	template<typename M>
+	struct deriving_bind {
+		using T = concept_parameter<M>;
+
+		template<typename U>
+		using M_ = typename re_parametrise<M,U>::type;
+
+		template<
+				typename F,
+				typename U = concept_parameter<
+					typename decayed_result<F(T)>::type
+				>
+		>
+		static M_<U> bind(const M_<T>& m, F&& f) {
+			return monad<M_<U>>::join(
+				monad<M_<T>>::map(std::forward<F>(f), m)
+			);
+		}
+
+		template<
+				typename F,
+				typename U = concept_parameter<
+					typename decayed_result<F(T)>::type
+				>
+		>
+		static M_<U> bind(M_<T>&& m, F&& f) {
+			return monad<M_<U>>::join(
+				monad<M_<T>>::map(std::forward<F>(f), std::move(m))
+			);
+		}
 	};
 
 	/**
@@ -234,17 +367,16 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mu,
-			typename Mu_ = plain_type<Mu>,
 			typename = typename std::enable_if<monad<Mt>::instance>::type,
 			typename T = concept_parameter<Mt>,
 			typename U = concept_parameter<Mu>,
 			typename = typename std::enable_if<
-				std::is_same<typename re_parametrise<Mu_,T>::type, Mt>::value
+				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
 			>::type
 	>
 	Mt operator<< (const Mt& m1, Mu m2) {
 		return monad<Mt>::bind(m1, [m2](T t) {
-			return monad<Mu_>::bind(m2, [t](const U&) {
+			return monad<Mu>::bind(m2, [t](const U&) {
 				return monad<Mt>::pure(t);
 			});
 		});
@@ -253,17 +385,16 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mu,
-			typename Mu_ = plain_type<Mu>,
 			typename = typename std::enable_if<monad<Mt>::instance>::type,
 			typename T = concept_parameter<Mt>,
 			typename U = concept_parameter<Mu>,
 			typename = typename std::enable_if<
-				std::is_same<typename re_parametrise<Mu_,T>::type, Mt>::value
+				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
 			>::type
 	>
 	Mt operator<< (Mt&& m1, Mu m2) {
 		return monad<Mt>::bind(m1, [m2](T t) {
-			return monad<Mu_>::bind(m2, [t](const U&) {
+			return monad<Mu>::bind(m2, [t](const U&) {
 				return monad<Mt>::pure(t);
 			});
 		});

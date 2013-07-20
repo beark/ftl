@@ -73,7 +73,7 @@ namespace ftl {
 
 // Just as in monad, we don't want the compiler to find these, but the API
 // reference generator should.
-#ifdef SILLY_WORKAROUND
+#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Fold a structure containing a monoidal type.
 		 *
@@ -143,15 +143,17 @@ namespace ftl {
 	};
 
 	/**
-	 * Default implementation of foldable::foldMap.
+	 * Inheritable implementation of foldable::foldMap.
 	 *
 	 * Foldable instances implementing foldable::foldl can simply inherit from
 	 * this struct to get foldable::foldMap for "free".
 	 *
+	 * \tparam F the foldable for which to implement `foldMap`.
+	 *
 	 * \ingroup foldable
 	 */
 	template<typename F>
-	struct foldMap_default {
+	struct deriving_foldMap {
 		template<
 				typename Fn,
 				typename T = concept_parameter<F>,
@@ -171,15 +173,31 @@ namespace ftl {
 	};
 
 	/**
-	 * Default implementation of foldable::fold.
+	 * Inheritable implementation of foldable::fold.
 	 *
-	 * Foldable instances implementing foldable::foldMap can simply inherit
-	 * fromt this struct to get foldable::fold for "free".
+	 * Foldable specialisations implementing foldable::foldMap can inherit from
+	 * this struct to get `foldable::fold` for "free".
+	 *
+	 * It is entirely possible for a foldable implementation to use both 
+	 * `deriving_foldMap<F>` and `deriving_fold`, even in reverse order.
+	 *
+	 * \tparam F the foldable instance (not implementation) for which `fold`
+	 *           should apply.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct foldable<myListType<T>>
+	 *   : deriving_foldMap<myListType<T>>, deriving_fold<myListType<T>> {
+	 *       
+	 *       // Implementations of foldl and foldr
+	 *   };
+	 * \endcode
 	 *
 	 * \ingroup foldable
 	 */
 	template<typename F>
-	struct fold_default {
+	struct deriving_fold {
 		template<
 				typename M = concept_parameter<F>,
 				typename = typename std::enable_if<monoid<M>::instance>::type

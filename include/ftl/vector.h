@@ -276,7 +276,7 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct foldable<std::vector<T,A>>
-	: fold_default<std::vector<T,A>>, foldMap_default<std::vector<T,A>> {
+	: deriving_fold<std::vector<T,A>>, deriving_foldMap<std::vector<T,A>> {
 
 		template<
 				typename Fn,
