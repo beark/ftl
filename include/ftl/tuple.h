@@ -106,7 +106,7 @@ namespace ftl {
 		template<
 			typename F,
 			typename A,
-			typename B = typename decayed_result<F(A)>::type,
+			typename B = result_of<F(A)>,
 			typename...Ts,
 			size_t...S>
 		std::tuple<B,Ts...> apply_on_first(
@@ -127,7 +127,7 @@ namespace ftl {
 		template<
 			typename F,
 			typename A,
-			typename B = typename decayed_result<F(A)>::type,
+			typename B = result_of<F(A)>,
 			typename...Ts>
 		std::tuple<B,Ts...> applicative_implementation(
 				const std::tuple<F,Ts...>& t1,
@@ -224,10 +224,7 @@ namespace ftl {
 	template<typename T, typename...Ts>
 	struct functor<std::tuple<T,Ts...>> {
 		/// Apply `f` to first element in the tuple
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
 
 			std::tuple<U,Ts...> ret;
@@ -236,10 +233,7 @@ namespace ftl {
 			return ret;
 		}
 
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static std::tuple<U,Ts...> map(F&& f, std::tuple<T,Ts...>&& t) {
 
 			std::tuple<U,Ts...> ret;
@@ -270,18 +264,12 @@ namespace ftl {
 			return std::make_tuple(std::move(a), monoid<Ts>::id()...);
 		}
 
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
 			return functor<std::tuple<T,Ts...>>::map(std::forward<F>(f), t);
 		}
 
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static std::tuple<U,Ts...> map(F&& f, std::tuple<T,Ts...>&& t) {
 			return functor<std::tuple<T,Ts...>>::map(
 					std::forward<F>(f),
@@ -289,10 +277,7 @@ namespace ftl {
 			);
 		}
 
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static std::tuple<U,Ts...> apply(
 				const std::tuple<F,Ts...>& tfn,
 				const std::tuple<T,Ts...>& t) {

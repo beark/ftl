@@ -152,7 +152,8 @@ namespace ftl {
 	 * \ingroup eitherT
 	 */
 	template<typename L, typename M>
-	struct monad<eitherT<L,M>> {
+	struct monad<eitherT<L,M>>
+	: deriving_join<eitherT<L,M>>, deriving_apply<eitherT<L,M>> {
 		using T = typename eitherT<L,M>::T;
 
 		template<typename U>
@@ -189,10 +190,7 @@ namespace ftl {
 		 *           parameter of `M` and `U` is any type that can be contained
 		 *           in an `M` _and_ in an `either`.
 		 */
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static eT<U> map(F f, const eT<T>& e) {
 			return eT<U>{
 				[f](const either<L,T>& e) { return f % e; } % *e
@@ -200,10 +198,7 @@ namespace ftl {
 		}
 
 		/// \overload
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static eT<U> map(F f, eT<T>&& e) {
 			return eT<U>{
 				[f](either<L,T>&& e) {return f % std::move(e);} % std::move(*e)
@@ -215,24 +210,17 @@ namespace ftl {
 		 *
 		 * Uses `M`'s bind operation on top of `either`'s. 
 		 */
-		template<
-				typename F,
-				typename U =
-					concept_parameter<typename decayed_result<F(T)>::type>
-		>
+		template<typename F, typename U = concept_parameter<result_of<F(T)>>>
 		static eT<U> bind(const eT<T>& e, F&& f) {
-			using monad_t = typename decayed_result<F(T)>::type;
+			using monad_t = result_of<F(T)>;
 
 			return bind_helper<monad_t>::bind(e, std::forward<F>(f));
 		}
 
 		/// \overload
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type::T
-		>
+		template<typename F, typename U = typename result_of<F(T)>::T>
 		static eT<U> bind(eT<T>&& e, F&& f) {
-			using monad_t = typename decayed_result<F(T)>::type;
+			using monad_t = result_of<F(T)>;
 
 			return bind_helper<monad_t>::bind(std::move(e), std::forward<F>(f));
 		}
@@ -381,10 +369,7 @@ namespace ftl {
 				typename F,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<F(U,T)>::type
-					>::value
+					std::is_same<U, result_of<F(U,T)>>::value
 				>::type
 		>
 		static U foldl(F f, U z, const eitherT<L,M>& me) {
@@ -405,10 +390,7 @@ namespace ftl {
 				typename F,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<F(T,U)>::type
-					>::value
+					std::is_same<U, result_of<F(T,U)>>::value
 				>::type
 		>
 		static U foldr(F f, U z, const eitherT<L,M>& me) {

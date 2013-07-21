@@ -506,7 +506,8 @@ namespace ftl {
 	 * \ingroup maybe
 	 */
 	template<typename T>
-	struct monad<maybe<T>> {
+	struct monad<maybe<T>>
+	: deriving_apply<maybe<T>>, deriving_join<maybe<T>> {
 
 		static constexpr maybe<T> pure(T&& t)
 		noexcept(std::is_nothrow_copy_constructible<T>::value) {
@@ -516,10 +517,7 @@ namespace ftl {
 		/**
 		 * Apply `f` if `m` is a value.
 		 */
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static maybe<U> map(const F& f, const maybe<T>& m) {
 			return m ? value(f(*m)) : maybe<U>();
 		}
@@ -527,10 +525,7 @@ namespace ftl {
 		/**
 		 * \overload
 		 */
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static maybe<U> map(const F& f, maybe<T>&& m) {
 			return m ? value(f(std::move(*m))) : maybe<U>();
 		}
@@ -542,7 +537,7 @@ namespace ftl {
 		 */
 		template<
 			typename F,
-			typename U = typename decayed_result<F(T)>::type::value_type>
+			typename U = typename result_of<F(T)>::value_type>
 		static maybe<U> bind(const maybe<T>& m, const F& f) {
 			return m ? f(*m) : maybe<U>();
 		}
@@ -550,7 +545,7 @@ namespace ftl {
 		/// \overload
 		template<
 			typename F,
-			typename U = typename decayed_result<F(T)>::type::value_type>
+			typename U = typename result_of<F(T)>::value_type>
 		static maybe<U> bind(maybe<T>&& m, const F& f) {
 			return m ? f(std::move(*m)) : maybe<U>();
 		}
@@ -599,10 +594,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<Fn(U,T)>::type
-					>::value
+					std::is_same<U, result_of<Fn(U,T)>>::value
 				>::type
 		>
 		static U foldl(Fn&& fn, U&& z, const maybe<T>& m) {
@@ -617,10 +609,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<Fn(T,U)>::type
-					>::value
+					std::is_same<U, result_of<Fn(T,U)>>::value
 				>::type
 		>
 		static U foldr(Fn&& fn, U&& z, const maybe<T>& m) {

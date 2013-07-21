@@ -140,7 +140,8 @@ namespace ftl {
 	 * \ingroup maybeT
 	 */
 	template<typename M>
-	struct monad<maybeT<M>> {
+	struct monad<maybeT<M>>
+	: deriving_join<maybeT<M>>, deriving_apply<maybeT<M>> {
 		/// Shorthand for the concept parameter
 		using T = typename maybeT<M>::T;
 
@@ -159,7 +160,7 @@ namespace ftl {
 		/// Composition of `M`'s and maybe's map
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type
+				typename U = result_of<F(T)>
 		>
 		static mT<U> map(F f, const mT<T>& m) {
 			return mT<U>{
@@ -169,7 +170,7 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type
+				typename U = result_of<F(T)>
 		>
 		static mT<U> map(F f, mT<T>&& m) {
 			return mT<U>{
@@ -188,12 +189,11 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U =
-					concept_parameter<typename decayed_result<F(T)>::type>
+				typename U = concept_parameter<result_of<F(T)>>
 		>
 		static mT<U> bind(const mT<T>& m, F&& f) {
 
-			using monad_t = typename decayed_result<F(T)>::type;
+			using monad_t = result_of<F(T)>;
 
 			return bind_helper<monad_t>::bind(m, std::forward<F>(f));
 		}
@@ -203,12 +203,11 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U =
-					concept_parameter<typename decayed_result<F(T)>::type>
+				typename U = concept_parameter<result_of<F(T)>>
 		>
 		static mT<U> bind(mT<T>&& m, F&& f) {
 
-			using monad_t = typename decayed_result<F(T)>::type;
+			using monad_t = result_of<F(T)>;
 
 			return bind_helper<monad_t>::bind(std::move(m), std::forward<F>(f));
 		}
@@ -356,10 +355,7 @@ namespace ftl {
 				typename F,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<F(T,U)>::type
-					>::value
+					std::is_same<U, result_of<F(T,U)>>::value
 				>::type
 		>
 		static U foldl(F f, U z, const maybeT<M>& mT) {
@@ -379,10 +375,7 @@ namespace ftl {
 				typename F,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<F(T,U)>::type
-					>::value
+					std::is_same<U, result_of<F(T,U)>>::value
 				>::type
 		>
 		static U foldr(F f, U z, const maybeT<M>& mT) {

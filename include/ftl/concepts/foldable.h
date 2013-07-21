@@ -107,10 +107,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<Fn(T,U)>::type
-					>::value
+					std::is_same<U, result_of<Fn(T,U)>>::value
 				>::type
 		>
 		static U foldr(Fn&& fn, U&& z, const F& f);
@@ -128,10 +125,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<Fn(U,T)>::type
-					>::value
+					std::is_same<U, result_of<Fn(U,T)>>::value
 				>::type
 		>
 		static U foldl(Fn&& fn, U&& z, const F& f);
@@ -157,7 +151,7 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename T = concept_parameter<F>,
-				typename M = typename decayed_result<Fn(T)>::type,
+				typename M = result_of<Fn(T)>,
 				typename = typename std::enable_if<monoid<M>::instance>::type
 		>
 		static M foldMap(Fn fn, const F& f) {
@@ -250,10 +244,7 @@ namespace ftl {
 			typename T = concept_parameter<F>,
 			typename = typename std::enable_if<foldable<F>::instance>::type,
 			typename = typename std::enable_if<
-				std::is_same<
-					plain_type<U>,
-					typename decayed_result<Fn(T,U)>::type
-				>::value
+				std::is_same<plain_type<U>, result_of<Fn(T,U)>>::value
 			>::type
 	>
 	U foldr(Fn&& fn, U&& z, const F& f) {
@@ -272,10 +263,7 @@ namespace ftl {
 			typename T = concept_parameter<F>,
 			typename = typename std::enable_if<foldable<F>::instance>::type,
 			typename = typename std::enable_if<
-				std::is_same<
-					plain_type<U>,
-					typename decayed_result<Fn(U,T)>::type
-				>::value
+				std::is_same<plain_type<U>, result_of<Fn(U,T)>>::value
 			>::type
 	>
 	U foldl(Fn&& fn, U&& z, const F& f) {

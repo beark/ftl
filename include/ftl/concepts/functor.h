@@ -100,7 +100,7 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename T = concept_parameter<F>,
-				typename U = typename decayed_result<Fn(T)>::type,
+				typename U = result_of<Fn(T)>,
 				typename Fu = typename re_parametrise<F,U>::type>
 		static Fu map(Fn&& fn, const F& f) {
 			return applicative<F>::map(
@@ -110,7 +110,7 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename T = concept_parameter<F>,
-				typename U = typename decayed_result<Fn(T)>::type,
+				typename U = result_of<Fn(T)>,
 				typename Fu = typename re_parametrise<F,U>::type>
 		static Fu map(Fn&& fn, F&& f) {
 			return applicative<F>::map(

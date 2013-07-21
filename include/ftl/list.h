@@ -75,7 +75,7 @@ namespace ftl {
 			typename F,
 			typename T,
 			template<typename> class A,
-			typename U = typename decayed_result<F(T)>::type::value_type
+			typename U = typename result_of<F(T)>::value_type
 	>
 	std::list<U,A<U>> concatMap(F&& f, const std::list<T,A<T>>& l) {
 
@@ -93,7 +93,7 @@ namespace ftl {
 			typename F,
 			typename T,
 			template<typename> class A,
-			typename U = typename decayed_result<F(T)>::type::value_type
+			typename U = typename result_of<F(T)>::value_type
 	>
 	std::list<U,A<U>> concatMap(F&& f, std::list<T,A<T>>&& l) {
 
@@ -172,7 +172,7 @@ namespace ftl {
 	 */
 	template<typename T, template<typename> class A>
 	struct monad<std::list<T,A<T>>>
-	: deriving_bind<std::list<T,A<T>>> {
+	: deriving_bind<std::list<T,A<T>>>, deriving_apply<std::list<T,A<T>>> {
 
 		/**
 		 * Produces a singleton list.
@@ -199,10 +199,7 @@ namespace ftl {
 		 * The result of each call to f is collected and returned as an element
 		 * in the list returned by the call to map.
 		 */
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static std::list<U,A<U>> map(F&& f, const std::list<T,A<T>>& l) {
 			std::list<U,A<U>> ret;
 			for(const auto& e : l) {
@@ -214,7 +211,7 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type,
+				typename U = result_of<F(T)>,
 				typename = typename std::enable_if<
 					!std::is_same<T,U>::value
 				>::type
@@ -237,7 +234,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type,
+				typename U = result_of<F(T)>,
 				typename = typename std::enable_if<
 					std::is_same<T,U>::value
 				>::type
@@ -280,7 +277,7 @@ namespace ftl {
 		/// Equivalent of flip(concatMap)
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type::value_type
+				typename U = typename result_of<F(T)>::value_type
 		>
 		static std::list<U,A<U>> bind(const std::list<T,A<T>>& l, F&& f) {
 			return concatMap(std::forward<F>(f), l);
@@ -288,7 +285,7 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type::value_type
+				typename U = typename result_of<F(T)>::value_type
 		>
 		static std::list<U,A<U>> bind(std::list<T,A<T>>&& l, F&& f) {
 			return concatMap(std::forward<F>(f), std::move(l));
@@ -314,10 +311,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<Fn(U,T)>::type
-					>::value
+					std::is_same<U, result_of<Fn(U,T)>>::value
 				>::type
 		>
 		static U foldl(Fn&& fn, U z, const std::list<T,A>& l) {
@@ -332,10 +326,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<Fn(T,U)>::type
-					>::value
+					std::is_same<U, result_of<Fn(T,U)>>::value
 				>::type
 		>
 		static U foldr(Fn&& fn, U z, const std::list<T,A>& l) {

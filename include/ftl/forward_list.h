@@ -75,7 +75,7 @@ namespace ftl {
 			typename F,
 			typename T,
 			template<typename> class A,
-			typename U = typename decayed_result<F(T)>::type::value_type>
+			typename U = typename result_of<F(T)>::value_type>
 	std::forward_list<U,A<U>> concatMap(
 			F&& f,
 			const std::forward_list<T,A<T>>& l) {
@@ -104,7 +104,7 @@ namespace ftl {
 			typename F,
 			typename T,
 			template<typename> class A,
-			typename U = typename decayed_result<F(T)>::type::value_type>
+			typename U = typename result_of<F(T)>::value_type>
 	std::forward_list<U,A<U>> concatMap(
 			F&& f,
 			std::forward_list<T,A<T>>&& l) {
@@ -193,7 +193,9 @@ namespace ftl {
 	 * \ingroup fwdlist
 	 */
 	template<typename T, template<typename> class A>
-	struct monad<std::forward_list<T,A<T>>> {
+	struct monad<std::forward_list<T,A<T>>>
+	: deriving_join<std::forward_list<T,A<T>>>
+	, deriving_apply<std::forward_list<T,A<T>>> {
 
 		static std::forward_list<T,A<T>> pure(T&& t) {
 			std::forward_list<T> l;
@@ -201,10 +203,7 @@ namespace ftl {
 			return l;
 		}
 
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static std::forward_list<U,A<U>> map(
 				const F& f,
 				const std::forward_list<T,A<T>>& l) {
@@ -220,7 +219,7 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type,
+				typename U = result_of<F(T)>,
 				typename =
 					typename std::enable_if<!std::is_same<T,U>::value>::type
 
@@ -242,10 +241,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename = typename std::enable_if<
-					std::is_same<
-						T,
-						typename decayed_result<F(T)>::type
-					>::value
+					std::is_same<T, result_of<F(T)>>::value
 				>::type>
 		static std::forward_list<T,A<T>> map(
 				const F& f,
@@ -259,10 +255,7 @@ namespace ftl {
 			return rl;
 		}
 
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type::value_type
-		>
+		template<typename F, typename U = typename result_of<F(T)>::value_type>
 		static std::forward_list<U,A<U>> bind(
 				const std::forward_list<T,A<T>>& l,
 				F&& f) {
@@ -270,10 +263,7 @@ namespace ftl {
 			return concatMap(std::forward<F>(f), l);
 		}
 
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type::value_type
-		>
+		template<typename F, typename U = typename result_of<F(T)>::value_type>
 		static std::forward_list<U,A<U>> bind(
 				std::forward_list<T,A<T>>&& l,
 				F&& f) {
@@ -319,10 +309,7 @@ namespace ftl {
 				typename F,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<F(U,T)>::type
-					>::value
+					std::is_same<U, result_of<F(U,T)>>::value
 				>::type
 		>
 		static U foldl(F&& f, U z, const std::forward_list<T,A>& l) {
@@ -337,10 +324,7 @@ namespace ftl {
 				typename F,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<F(T,U)>::type
-					>::value
+					std::is_same<U, result_of<F(T,U)>>::value
 				>::type
 		>
 		static U foldr(F&& f, U&& z, const std::forward_list<T,A>& l) {

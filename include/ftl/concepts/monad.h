@@ -130,7 +130,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type
+				typename U = result_of<F(T)>
 		>
 		static M_<U> map(F&& f, const M& m);
 
@@ -152,9 +152,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = concept_parameter<
-					typename decayed_result<F(T)>::type>
-				>
+				typename U = concept_parameter<result_of<F(T)>>
 		>
 		static M_<U> bind(const M& m, F&& f);
 
@@ -225,12 +223,12 @@ namespace ftl {
 		template<typename U>
 		using M_ = typename re_parametrise<M,U>::type;
 
-		template<typename F, typename U = typename decayed_result<F(T)>::type>
+		template<typename F, typename U = result_of<F(T)>>
 		static M_<U> map(F f, const M_<T>& m) {
 			return m >>= [f](const T& t){ return monad<M_<U>>::pure(f(t)); };
 		}
 
-		template<typename F, typename U = typename decayed_result<F(T)>::type>
+		template<typename F, typename U = result_of<F(T)>>
 		static M_<U> map(F f, M_<T>&& m) {
 			return std::move(m)
 				>>= [f](T&& t){ return monad<M_<U>>::pure(f(std::move(t))); };
@@ -257,6 +255,8 @@ namespace ftl {
 	 * \note To use this `deriving` implementation, there _must_ be an
 	 *       actual implementation of `monad::join` and `monad::map`, you
 	 *       cannot rely on `deriving` for either.
+	 *
+	 * \ingroup monad
 	 */
 	template<typename M>
 	struct deriving_bind {
@@ -267,9 +267,7 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename U = concept_parameter<
-					typename decayed_result<F(T)>::type
-				>
+				typename U = concept_parameter<result_of<F(T)>>
 		>
 		static M_<U> bind(const M_<T>& m, F&& f) {
 			return monad<M_<U>>::join(
@@ -279,15 +277,55 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename U = concept_parameter<
-					typename decayed_result<F(T)>::type
-				>
+				typename U = concept_parameter<result_of<F(T)>>
 		>
 		static M_<U> bind(M_<T>&& m, F&& f) {
 			return monad<M_<U>>::join(
 				monad<M_<T>>::map(std::forward<F>(f), std::move(m))
 			);
 		}
+	};
+
+	/**
+	 * Inheritable implementation of `monad::apply`.
+	 *
+	 * This inheritable `apply` implementation is given in terms of `bind` and
+	 * `pure`. Thus, `bind` cannot itself be derived when deriving from this
+	 * struct.
+	 *
+	 * \tparam M The same type monad<M> is being specialised for.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct monad<my_type<T>> : deriving_apply<my_type<T>> {
+	 *       // Implementation of pure and bind
+	 *   };
+	 * \endcode
+	 *
+	 * \ingroup monad
+	 */
+	template<typename M>
+	struct deriving_apply {
+		using T = concept_parameter<M>;
+
+		template<typename U>
+		using M_ = typename re_parametrise<M,U>::type;
+
+		template<
+				typename Mf,
+				typename Mf_ = plain_type<Mf>,
+				typename F = concept_parameter<Mf_>,
+				typename U = result_of<F(T)>
+		>
+		static M_<U> apply(Mf&& f, M m) {
+			return std::forward<Mf>(f) >>= [m] (F fn) {
+				return m >>= [fn] (const T& t) {
+					return monad<M_<U>>::pure(fn(t));
+				};
+			};
+		}
+
 	};
 
 	/**
@@ -414,7 +452,7 @@ namespace ftl {
 			typename F,
 			typename T = concept_parameter<Mt>,
 			typename = typename std::enable_if<monad<Mt>::instance>::type,
-			typename U = typename decayed_result<F(T)>::type,
+			typename U = result_of<F(T)>,
 			typename Mu = typename re_parametrise<Mt,U>::type
 	>
 	Mu liftM(F f, const Mt& m) {
@@ -438,30 +476,6 @@ namespace ftl {
 		};
 	}
 	*/
-
-	/**
-	 * Apply a function in M to a value in M.
-	 *
-	 * This is actually exactly equivalent to applicative<M>::apply.
-	 *
-	 * \ingroup monad
-	 */
-	template<
-			typename Mt,
-			typename Mf,
-			typename Mf_ = plain_type<Mf>,
-			typename T = concept_parameter<Mt>,
-			typename F = concept_parameter<Mf_>,
-			typename U = typename decayed_result<F(T)>::type,
-			typename Mu = typename re_parametrise<Mt,U>::type
-	>
-	Mu ap(Mf&& f, Mt m) {
-		return std::forward<Mf>(f) >>= [m] (F fn) {
-			return m >>= [fn] (const T& t) {
-				return monad<Mu>::pure(fn(t));
-			};
-		};
-	}
 
 	/**
 	 * Convenience function object.

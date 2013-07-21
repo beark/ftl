@@ -50,6 +50,28 @@ namespace ftl {
 	 * - \ref monoid
 	 */
 
+	// Because futures cannot be copied, only moved, we need to specialise
+	// apply to make applicative's apply/operator* work.
+
+	// TODO: When lambdas can capture by move, this won't be necessary
+	namespace _dtl {
+		template<typename A, typename B>
+		struct inner_ap {
+			using result_type = B;
+
+			explicit inner_ap(std::future<A>&& f) noexcept
+			: _f(std::move(f)) {}
+
+			std::future<B> operator() (function<B,A> fn) {
+				return std::move(_f) >>= [fn](A&& a) {
+					return monad<std::future<B>>::pure(fn(std::forward<A>(a)));
+				};
+			}
+
+			std::future<A> _f;
+		};
+	}
+
 	/**
 	 * Monad instance for std::future.
 	 *
@@ -61,7 +83,8 @@ namespace ftl {
 	 * \ingroup future
 	 */
 	template<typename T>
-	struct monad<std::future<T>> {
+	struct monad<std::future<T>>
+	: deriving_join<std::future<T>> {
 
 		/**
 		 * Creates a future that returns `t`.
@@ -84,10 +107,7 @@ namespace ftl {
 		 * \li we call `get` on the result of `map`
 		 * \li `fa` finishes waiting from the resulting call to its `get`
 		 */
-		template<
-				typename F,
-				typename U = typename std::result_of<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static std::future<U> map(F f, std::future<T>&& fa) {
 			return std::async(
 				std::launch::deferred,
@@ -99,6 +119,14 @@ namespace ftl {
 			);
 		}
 
+		template<
+			typename F,
+			typename U = result_of<F(T)>>
+		static std::future<U> apply(std::future<F>&& f, std::future<T>&& m) {
+			return std::move(f) >>= _dtl::inner_ap<T,U>(std::move(m));
+		}
+
+
 		/**
 		 * Binds a future value to another future computation.
 		 *
@@ -108,8 +136,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = typename inner_type<
-					typename std::result_of<F(T)>::type>::type
+				typename U = concept_parameter<result_of<F(T)>>
 		>
 		static std::future<U> bind(std::future<T>&& fa, F&& f) {
 			return std::async(
@@ -126,37 +153,6 @@ namespace ftl {
 		static constexpr bool instance = true;
 
 	};
-
-	// Because futures cannot be copied, only moved, we need to specialise
-	// ap to make applicative's apply/operator* work.
-
-	// TODO: When lambdas can capture by move, this won't be necessary
-	namespace _dtl {
-		template<typename A, typename B>
-		struct inner_ap {
-			using result_type = B;
-
-			explicit inner_ap(std::future<A>&& f) noexcept
-			: _f(std::move(f)) {}
-
-			std::future<B> operator() (function<B,A> fn) {
-				return std::move(_f) >>= [fn](A&& a) {
-					return monad<std::future<B>>::pure(fn(std::forward<A>(a)));
-				};
-			}
-
-			std::future<A> _f;
-		};
-	}
-
-	/// Specialised for futures, because they cannot be copied.
-	template<
-		typename F,
-		typename A,
-		typename B = typename std::result_of<F(A)>::type>
-	std::future<B> ap(std::future<F>&& f, std::future<A>&& m) {
-		return std::move(f) >>= _dtl::inner_ap<A,B>(std::move(m));
-	}
 
 	/**
 	 * Monoid instance of std::future.

@@ -173,7 +173,7 @@ namespace ftl {
 	template<
 			typename F,
 			typename...Args,
-			typename T = typename decayed_result<F(Args...)>::type
+			typename T = result_of<F(Args...)>
 	>
 	lazy<T> defer(F f, Args&&...args) {
 		// TODO: C++14: _move_ tuple of args into lambda
@@ -265,7 +265,8 @@ namespace ftl {
 	 * \ingroup lazy
 	 */
 	template<typename T>
-	struct monad<lazy<T>> {
+	struct monad<lazy<T>>
+   	: deriving_join<lazy<T>>, deriving_apply<lazy<T>> {
 		/**
 		 * Create a computation that computes `t`
 		 *
@@ -287,10 +288,7 @@ namespace ftl {
 		 * copmutation (though technically, `l` could be forced by another,
 		 * independant computation ahead of that).
 		 */
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static lazy<U> map(F f, lazy<T> l) {
 			return lazy<U>{function<U>{[f,l]() { return f(*l); }}};
 		}
@@ -308,8 +306,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U =
-					concept_parameter<typename decayed_result<F(T)>::type>
+				typename U = concept_parameter<result_of<F(T)>>
 		>
 		static lazy<U> bind(lazy<T> l, F f) {
 			return lazy<U>{[f,l]() {

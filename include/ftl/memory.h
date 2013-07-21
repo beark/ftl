@@ -114,16 +114,14 @@ namespace ftl {
 	 * \ingroup memory
 	 */
 	template<typename T>
-	struct monad<std::shared_ptr<T>> {
+	struct monad<std::shared_ptr<T>>
+	: deriving_join<std::shared_ptr<T>>, deriving_apply<std::shared_ptr<T>> {
 
 		static std::shared_ptr<T> pure(T&& a) {
 			return std::make_shared<T>(std::forward<T>(a));
 		}
 
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static std::shared_ptr<U> map(F f, std::shared_ptr<T> p) {
 			if(p)
 				return std::make_shared<U>(f(*p));
@@ -134,7 +132,7 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type::element_type
+				typename U = typename result_of<F(T)>::element_type
 		>
 		static std::shared_ptr<U> bind(std::shared_ptr<T> a, F f) {
 			if(a)
@@ -158,11 +156,8 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<Fn(U,T)>::type
-						>::value
-					>::type
+					std::is_same<U, result_of<Fn(U,T)>>::value
+				>::type
 		>
 		static U foldl(Fn&& fn, U&& z, std::shared_ptr<T> p) {
 			if(p) {
@@ -176,10 +171,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<Fn(T,U)>::type
-						>::value
+					std::is_same<U, result_of<Fn(T,U)>>::value
 					>::type
 				>
 		static U foldr(Fn&& fn, U&& z, std::shared_ptr<T> p) {

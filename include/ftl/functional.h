@@ -75,7 +75,8 @@ namespace ftl {
 	 * \ingroup functional
 	 */
 	template<typename R, typename P, typename...Ps>
-	struct monad<function<R,P,Ps...>> {
+	struct monad<function<R,P,Ps...>>
+	: deriving_join<function<R,P,Ps...>>, deriving_apply<function<R,P,Ps...>> {
 
 		/// Creates a function that returns `a`, regardless of its parameters.
 		static function<R,P,Ps...> pure(R a) {
@@ -166,7 +167,9 @@ namespace ftl {
 	 * Exactly equivalent of `monad<ftl::function>`.
 	 */
 	template<typename R, typename P, typename...Ps>
-	struct monad<std::function<R(P,Ps...)>> {
+	struct monad<std::function<R(P,Ps...)>>
+	: deriving_join<std::function<R(P,Ps...)>>
+	, deriving_apply<std::function<R(P,Ps...)>> {
 		static std::function<R(P,Ps...)> pure(R r) {
 			return std::function<R(P,Ps...)> {
 				[r](P,Ps...) { return r; }

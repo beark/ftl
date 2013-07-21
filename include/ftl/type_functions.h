@@ -187,6 +187,16 @@ namespace ftl {
 	template<typename T>
 	using plain_type = typename std::decay<T>::type;
 
+	namespace _dtl {
+		template<typename>
+		struct decayed_result;
+
+		template<typename F, typename...Ps>
+		struct decayed_result<F(Ps...)> {
+			using type = plain_type<typename std::result_of<F(Ps...)>::type>;
+		};
+	}
+
 	/**
 	 * Get the basic, "undecorated" return type of a function.
 	 *
@@ -204,13 +214,8 @@ namespace ftl {
 	 *
 	 * \ingroup typelevel
 	 */
-	template<typename>
-	struct decayed_result;
-
-	template<typename F, typename...Ps>
-	struct decayed_result<F(Ps...)> {
-		using type = plain_type<typename std::result_of<F(Ps...)>::type>;
-	};
+	template<typename F>
+	using result_of = typename _dtl::decayed_result<F>::type;
 
 	/**
 	 * Meta type used to store a variadic type sequence.

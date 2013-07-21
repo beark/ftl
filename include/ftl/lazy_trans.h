@@ -126,7 +126,8 @@ namespace ftl {
 	 * \ingroup lazyT
 	 */
 	template<typename M>
-	struct monad<lazyT<M>> {
+	struct monad<lazyT<M>>
+	: deriving_join<lazyT<M>>, deriving_apply<lazyT<M>> {
 		/// Concept parameter of the particular instance
 		using T = typename lazyT<M>::T;
 
@@ -152,10 +153,7 @@ namespace ftl {
 		 *
 		 * Nests `lazy`'s map inside `M`'s.
 		 */
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static lT<U> map(F f, const lT<T>& l) {
 			return lT<U>{
 				[f](const lazy<T>& l){ return f % l; } % *l
@@ -163,10 +161,7 @@ namespace ftl {
 		}
 
 		/// \overload
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static lT<U> map(F f, lT<T>&& l) {
 			return lT<U>{
 				// Cannot move contents of lazy; should be immutable
@@ -177,23 +172,19 @@ namespace ftl {
 		/**
 		 * Sequence two lazyT computations.
 		 */
-		template<
-				typename F,
-				typename U =
-					concept_parameter<typename decayed_result<F(T)>::type>
-		>
+		template<typename F, typename U = concept_parameter<result_of<F(T)>>>
 		static lT<U> bind(const lT<T>& l, F&& f) {
-			using monad_t = typename decayed_result<F(T)>::type;
+			using monad_t = result_of<F(T)>;
 			return bind_helper<monad_t>::bind(l, std::forward<F>(f));
 		}
 
 		template<
 				typename F,
 				typename U =
-					concept_parameter<typename decayed_result<F(T)>::type>
+					concept_parameter<result_of<F(T)>>
 		>
 		static lT<U> bind(lT<T>&& l, F&& f) {
-			using monad_t = typename decayed_result<F(T)>::type;
+			using monad_t = result_of<F(T)>;
 			return bind_helper<monad_t>::bind(std::move(l), std::forward<F>(f));
 		}
 

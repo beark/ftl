@@ -75,7 +75,7 @@ namespace ftl {
 			typename F,
 			typename T,
 			template<typename> class A,
-			typename U = typename decayed_result<F(T)>::type::value_type
+			typename U = typename result_of<F(T)>::value_type
 	>
 	std::vector<U,A<U>> concatMap(F f, const std::vector<T,A<T>>& v) {
 
@@ -103,7 +103,7 @@ namespace ftl {
 			typename F,
 			typename T,
 			template<typename> class A,
-			typename U = typename decayed_result<F(T)>::type::value_type
+			typename U = typename result_of<F(T)>::value_type
 	>
 	std::vector<U,A<U>> concatMap(F f, std::vector<T,A<T>>&& v) {
 
@@ -178,7 +178,8 @@ namespace ftl {
 	 * \ingroup vector
 	 */
 	template<typename T, template<typename> class A>
-	struct monad<std::vector<T,A<T>>> {
+	struct monad<std::vector<T,A<T>>>
+	: deriving_join<std::vector<T,A<T>>>, deriving_apply<std::vector<T,A<T>>> {
 
 		/// Creates a one element vector
 		static std::vector<T,A<T>> pure(const T& t) {
@@ -194,10 +195,7 @@ namespace ftl {
 		}
 
 		/// Applies f to each element
-		template<
-				typename F,
-				typename U = typename decayed_result<F(T)>::type
-		>
+		template<typename F, typename U = result_of<F(T)>>
 		static std::vector<U,A<U>> map(F&& f, const std::vector<T,A<T>>& v) {
 			std::vector<U,A<U>> ret;
 			ret.reserve(v.size());
@@ -211,7 +209,7 @@ namespace ftl {
 		/// Rvalue version of map
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type,
+				typename U = result_of<F(T)>,
 				typename =
 					typename std::enable_if<!std::is_same<T,U>::value>::type
 		>
@@ -234,7 +232,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type,
+				typename U = result_of<F(T)>,
 				typename =
 					typename std::enable_if<std::is_same<T,U>::value>::type
 		>
@@ -251,7 +249,7 @@ namespace ftl {
 		/// Equivalent of flip(concatMap)
 		template<
 			typename F,
-			typename U = typename decayed_result<F(T)>::type::value_type
+			typename U = typename result_of<F(T)>::value_type
 		>
 		static std::vector<U,A<U>> bind(const std::vector<T,A<T>>& v, F&& f) {
 			return concatMap(std::forward<F>(f), v);
@@ -260,7 +258,7 @@ namespace ftl {
 		/// Rvalue reference version of bind
 		template<
 			typename F,
-			typename U = typename decayed_result<F(T)>::type::value_type
+			typename U = typename result_of<F(T)>::value_type
 		>
 		static std::vector<U,A<U>> bind(std::vector<T,A<T>>&& v, F&& f) {
 			return concatMap(std::forward<F>(f), std::move(v));
@@ -282,11 +280,8 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<Fn(U,T)>::type
-						>::value
-					>::type
+					std::is_same<U, result_of<Fn(U,T)>>::value
+				>::type
 		>
 		static U foldl(Fn&& fn, U z, const std::vector<T,A>& v) {
 			for(auto& e : v) {
@@ -300,11 +295,8 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<
-						U,
-						typename decayed_result<Fn(T,U)>::type
-						>::value
-					>::type
+					std::is_same<U, result_of<Fn(T,U)>>::value
+				>::type
 		>
 		static U foldr(Fn&& fn, U z, const std::vector<T,A>& v) {
 			for(auto it = v.rbegin(); it != v.rend(); ++it) {

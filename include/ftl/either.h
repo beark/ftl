@@ -402,7 +402,8 @@ namespace ftl {
 	 * \ingroup either
 	 */
 	template<typename L, typename T>
-	struct monad<either<L,T>> {
+	struct monad<either<L,T>>
+	: deriving_join<either<L,T>>, deriving_apply<either<L,T>> {
 
 		static either<L,T> pure(const T& t) {
 			return either<L,T>(right_tag_t(), t);
@@ -421,7 +422,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type
+				typename U = result_of<F(T)>
 		>
 		static either<L,U> map(const F& f, const either<L,T>& e) {
 			if(e)
@@ -433,7 +434,7 @@ namespace ftl {
 		/// \overload
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type
+				typename U = result_of<F(T)>
 		>
 		static either<L,U> map(const F& f, either<L,T>&& e) {
 			if(e)
@@ -455,7 +456,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type::right_type
+				typename U = typename result_of<F(T)>::right_type
 		>
 		static either<L,U> bind(const either<L,T>& e, F&& f) {
 			if(e)
@@ -467,7 +468,7 @@ namespace ftl {
 		/// \overload
 		template<
 				typename F,
-				typename U = typename decayed_result<F(T)>::type::right_type
+				typename U = typename result_of<F(T)>::right_type
 		>
 		static either<L,U> bind(either<L,T>&& e, F&& f) {
 			if(e)

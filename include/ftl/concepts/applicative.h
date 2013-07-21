@@ -118,7 +118,7 @@ namespace ftl {
 		 */
 		template<
 				typename Fn,
-				typename U = typename decayed_result<Fn(T)>::type,
+				typename U = result_of<Fn(T)>,
 				typename Fu = typename re_parametrise<F,U>::type>
 		static Fu map(Fn&& fn, const F& f) {
 			return monad<F>::map(std::forward<Fn>(fn), f);
@@ -126,7 +126,7 @@ namespace ftl {
 
 		template<
 				typename Fn,
-				typename U = typename decayed_result<Fn(T)>::type,
+				typename U = result_of<Fn(T)>,
 				typename Fu = typename re_parametrise<F,U>::type>
 		static Fu map(Fn&& fn, F&& f) {
 			return monad<F>::map(std::forward<Fn>(fn), std::move(f));
@@ -149,14 +149,14 @@ namespace ftl {
 			typename Ff,
 			typename Ff_ = plain_type<Ff>,
 			typename Fn = concept_parameter<Ff_>,
-			typename U = typename decayed_result<Fn(T)>::type,
+			typename U = result_of<Fn(T)>,
 			typename Fu = typename re_parametrise<F,U>::type,
 			typename = typename std::enable_if<std::is_same<
 				typename re_parametrise<Ff_,T>::type, F
 			>::value>::type
 		>
 		static Fu apply(Ff&& fn, const F& f) {
-			return ap(std::forward<Ff>(fn), f);
+			return monad<F>::apply(std::forward<Ff>(fn), f);
 		}
 
 		/// \overload
@@ -164,14 +164,14 @@ namespace ftl {
 			typename Ff,
 			typename Ff_ = plain_type<Ff>,
 			typename Fn = concept_parameter<Ff_>,
-			typename U = typename decayed_result<Fn(T)>::type,
+			typename U = result_of<Fn(T)>,
 			typename Fu = typename re_parametrise<F,U>::type,
 			typename = typename std::enable_if<std::is_same<
 				typename re_parametrise<Ff_,T>::type, F
 			>::value>::type
 		>
 		static Fu apply(Ff&& fn, F&& f) {
-			return ap(std::forward<Ff>(fn), std::move(f));
+			return monad<F>::apply(std::forward<Ff>(fn), std::move(f));
 		}
 
 		/**
