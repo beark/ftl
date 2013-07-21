@@ -194,11 +194,11 @@ namespace ftl {
 		using M_ = typename re_parametrise<M,U>::type;
 
 		static M_<T> join(const M_<M_<T>>& m) {
-			return m >>= id;
+			return monad<M>::bind(m, id);
 		}
 
 		static M_<T> join(M_<M_<T>>&& m) {
-			return std::move(m) >>= id;
+			return monad<M>::bind(std::move(m), id);
 		}
 	};
 
@@ -225,13 +225,18 @@ namespace ftl {
 
 		template<typename F, typename U = result_of<F(T)>>
 		static M_<U> map(F f, const M_<T>& m) {
-			return m >>= [f](const T& t){ return monad<M_<U>>::pure(f(t)); };
+			return monad<M>::bind(
+				m,
+				[f](const T& t){ return monad<M_<U>>::pure(f(t)); }
+			);
 		}
 
 		template<typename F, typename U = result_of<F(T)>>
 		static M_<U> map(F f, M_<T>&& m) {
-			return std::move(m)
-				>>= [f](T&& t){ return monad<M_<U>>::pure(f(std::move(t))); };
+			return monad<M>::bind(
+				std::move(m),
+				[f](T&& t){ return monad<M_<U>>::pure(f(std::move(t))); }
+			);
 		}
 	};
 
@@ -319,11 +324,15 @@ namespace ftl {
 				typename U = result_of<F(T)>
 		>
 		static M_<U> apply(Mf&& f, M m) {
-			return std::forward<Mf>(f) >>= [m] (F fn) {
-				return m >>= [fn] (const T& t) {
-					return monad<M_<U>>::pure(fn(t));
-				};
-			};
+			return monad<Mf_>::bind(
+				std::forward<Mf>(f),
+				[m] (F fn) {
+					return monad<M>::bind(
+						m,
+						[fn] (const T& t) { return monad<M_<U>>::pure(fn(t)); }
+					);
+				}
+			);
 		}
 
 	};
