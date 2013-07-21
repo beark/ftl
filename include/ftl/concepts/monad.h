@@ -119,6 +119,8 @@ namespace ftl {
 		 *
 		 * Given a plain value, encapsulate it in the monad M.
 		 *
+		 * \note All monad instances must define `pure`, it can not be derived.
+		 *
 		 * \see applicative::pure
 		 */
 		static M pure(const T&);
@@ -126,13 +128,28 @@ namespace ftl {
 		/**
 		 * Map a function to a contextualised value.
 		 *
-		 * \see functor::map
+		 * \see functor::map, deriving_map
 		 */
 		template<
 				typename F,
 				typename U = result_of<F(T)>
 		>
 		static M_<U> map(F&& f, const M& m);
+
+		/**
+		 * Applies an encapsulated function to an encapsulated value.
+		 *
+		 * \see applicative::apply
+		 */
+		template<
+				typename Mf,
+				typename F = concept_parameter<Mf>,
+				typename U = result_of<F(T)>,
+				typename = typename std::enable_if<
+					std::is_same<M_<F>,Mf>::value
+				>::type
+		>
+		static M_<U> apply(const Mf& fn, const M& m);
 
 		/**
 		 * Bind a value and execute a computation in M on it.
@@ -183,6 +200,7 @@ namespace ftl {
 	 *   struct monad<Identity<T>> : deriving_join<Identity<T>> {
 	 *       // Implementations of bind, map, and pure
 	 *   };
+	 * \endcode
 	 *
 	 * \ingroup monad
 	 */
