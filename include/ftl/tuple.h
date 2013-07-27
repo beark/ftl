@@ -219,6 +219,8 @@ namespace ftl {
 	 * functors, but only applicative ones if the remaining types are all
 	 * monoids.
 	 *
+	 * \see <a href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html">applicative&lt;std::tuple&lt;T,Ts...&gt;&gt;</a>
+	 *
 	 * \ingroup tuple
 	 */
 	template<typename T, typename...Ts>
@@ -256,14 +258,24 @@ namespace ftl {
 	template<typename T, typename...Ts>
 	struct applicative<std::tuple<T,Ts...>> {
 
+		/**
+		 * Creates a tuple with `a` as first element.
+		 *
+		 * All the other fields are initialised with their respective
+		 * `monoid::id()` results.
+		 */
 		static std::tuple<T,Ts...> pure(const T& a) {
 			return std::make_tuple(a, monoid<Ts>::id()...);
 		}
 
+		/// \overload
 		static std::tuple<T,Ts...> pure(T&& a) {
 			return std::make_tuple(std::move(a), monoid<Ts>::id()...);
 		}
 
+		/**
+		 * Forwards to functor<std::tuple<T,Ts...>>::map.
+		 */
 		template<typename F, typename U = result_of<F(T)>>
 		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
 			return functor<std::tuple<T,Ts...>>::map(std::forward<F>(f), t);
@@ -277,6 +289,11 @@ namespace ftl {
 			);
 		}
 
+		/**
+		 * Applies an embedded function in the first field.
+		 *
+		 * All remaining fields are element-wise `monoid::append`ed together.
+		 */
 		template<typename F, typename U = result_of<F(T)>>
 		static std::tuple<U,Ts...> apply(
 				const std::tuple<F,Ts...>& tfn,

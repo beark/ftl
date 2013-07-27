@@ -59,8 +59,6 @@ namespace ftl {
 	/**
 	 * \page concepts Concepts
 	 *
-	 * Less concrete concepts that are nevertheless referenced in FTL.
-	 *
 	 * \subpage applicativepg
 	 * \subpage assignable
 	 * \subpage container
@@ -68,6 +66,7 @@ namespace ftl {
 	 * \subpage copycons
 	 * \subpage defcons
 	 * \subpage deref
+	 * \subpage empty
 	 * \subpage eq
 	 * \subpage foldablepg
 	 * \subpage fullycons
@@ -94,18 +93,30 @@ namespace ftl {
 	 * \page defcons DefaultConstructible
 	 *
 	 * Any type that has a default constructor.
+	 *
+	 * This includes types that have an implicit default constructor (by either
+	 * not declaring any of the standard constructors, or declaring it as
+	 * `default`).
 	 */
 
 	/**
 	 * \page copycons CopyConstructible
 	 *
 	 * Any type that has a copy constructor.
+	 *
+	 * This includes types that have an implicit copy constructor (by either not
+	 * declaring any of the standard constructors, or declaring it as
+	 * `default`).
 	 */
 
 	/**
 	 * \page movecons MoveConstructible
 	 *
 	 * Any type that has a move constructor.
+	 *
+	 * This includes types that have an implicit move constructor (by either not
+	 * declaring any of the standard constructors, or declaring it as
+	 * `default`).
 	 */
 
 	/**
@@ -129,13 +140,30 @@ namespace ftl {
 	 * Types that are dereferenceable.
 	 *
 	 * A type is dereferenceable if it has pointer-like semantics. That is, at
-	 * minimum, it must define `operator bool`, `operator*`, and `operator->`.
+	 * minimum, it must define `operator*` (the unary version), and
+	 * `operator->`.
 	 *
 	 * The behaviour of these should be as expected, in the context of the type
-	 * in question. `operator bool` should, for instance, be usable to check if
-	 * a particular value of the type is _valid_, as in, it's in a usable state
-	 * where dereferencing it with the other operators will not throw or cause
-	 * undefined behaviour.
+	 * in question. I.e., `operator->` should allow access to methods of some
+	 * wrapped type (if there are several, which one it applies to should be
+	 * well defined and documented).
+	 */
+
+	/**
+	 * \page empty EmptyState
+	 *
+	 * Types that may have an invalid or "empty" state.
+	 *
+	 * In practice, anything that has an implicit or explicit `operator bool`
+	 * defined. This includes the primitive types `bool`, `T*`, etc. in
+	 * addition to types that actually define such an operator.
+	 *
+	 * The main purpose of naming a type an instance of this concept is to
+	 * inform users of the type that there exists an easy way to check for
+	 * the empty state:
+	 * \code
+	 *   if(someValue)
+	 * \endcode
 	 */
 
 	/**
@@ -209,8 +237,9 @@ namespace ftl {
 	 *   void foo() {
 	 *       // t will be the decayed type of whatever F returns when called
 	 *       // with an int
-	 *       typename decayed_result<F(int)>::type t;
+	 *       ftl::result_of<F(int)> t;
 	 *   }
+	 * \endcode
 	 *
 	 * \ingroup typelevel
 	 */
@@ -342,6 +371,7 @@ namespace ftl {
 	 * \code
 	 *   // ts will be of type type_seq<char,bool>
 	 *   typename take_init<char,bool,int>::type ts;
+	 * \endcode
 	 *
 	 * \ingroup typelevel
 	 */

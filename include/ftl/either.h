@@ -72,25 +72,26 @@ namespace ftl {
 	/**
 	 * \brief Data type modelling a "one of" type.
 	 *
-	 * Put simply, an instance of either<L,R> can store a value of \em
+	 * Put simply, an instance of `either<L,R>` can store a value of
 	 * either type L, or type R, but not both at the same time.
 	 *
 	 * Either fulfills the following concepts if, and only if,
-	 * \em both of its sub-types also do:
+	 * _both_ of its sub-types also do:
 	 *  
-	 * \li \ref movecons
-	 * \li \ref assignable
-	 * \li \ref eq
+	 * - \ref movecons
+	 * - \ref assignable
+	 * - \ref eq
 	 *
 	 * Either fulfills the following concepts regardless of its sub-types:
 	 *
-	 * \li \ref copycons
-	 * \li \ref deref
-	 * \li \ref functor (in R)
-	 * \li \ref applicative (in R)
-	 * \li \ref monad (in R)
+	 * - \ref copycons
+	 * - \ref deref
+	 * - \ref empty (when containing an `L`)
+	 * - \ref functor (in R)
+	 * - \ref applicative (in R)
+	 * - \ref monad (in R)
 	 *
-	 * \note Either is \em not \ref defcons.
+	 * \note Either is _not_ \ref defcons.
 	 *
 	 * \tparam L The "left" type, must satisfy \ref copycons
 	 * \tparam R The "right" type , must satisfy \ref copycons
@@ -157,13 +158,13 @@ namespace ftl {
 		}
 
 		/// Construct a right type value
-		explicit constexpr either(right_tag_t, const R& right)
+		constexpr either(right_tag_t, const R& right)
 		noexcept(std::is_nothrow_copy_constructible<R>::value)
 		: r(right), tag(_dtl::RIGHT) {
 		}
 
 		/// Move a right value
-		explicit constexpr either(right_tag_t, R&& right)
+		constexpr either(right_tag_t, R&& right)
 		noexcept(std::is_nothrow_move_constructible<R>::value)
 		: r(std::move(right)), tag(_dtl::RIGHT) {
 		}
@@ -253,7 +254,7 @@ namespace ftl {
 		/**
 		 * Concise way of accessing member of right values.
 		 *
-		 * \throws std::logic_error if called one a left type.
+		 * \throws std::logic_error if called on a left type.
 		 */
 		R* operator-> () {
 			if(tag == _dtl::RIGHT)

@@ -53,6 +53,9 @@ namespace ftl {
 	 * by `monoid<instance>::append` or by `ftl::operator^`. This is due to the
 	 * limited selection of overloadable operators in C++.
 	 *
+	 * For the actual interface instances need to implement, refer to the
+	 * documentation of  `ftl::monoid`.
+	 *
 	 * \see \ref monoid (module)
 	 */
 

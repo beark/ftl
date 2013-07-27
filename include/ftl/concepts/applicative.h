@@ -48,7 +48,7 @@ namespace ftl {
 	 * Finally, an applicative instance must satisfy the following laws:
 	 * - **Identity law**
 	 *   \code
-	 *     pure(id<T>) * v   <=> v
+	 *     pure(id) * v   <=> v
 	 *   \endcode
 	 *
 	 * - **Homomorphism law**
@@ -62,7 +62,7 @@ namespace ftl {
 	/**
 	 * \defgroup applicative Applicative Functor
 	 *
-	 * \brief \ref applicativepg and \ref monoidapg concepts and utilities.
+	 * \ref applicativepg and \ref monoidapg concepts and utilities.
 	 *
 	 * \code
 	 *   #include <ftl/applicative.h>
@@ -254,7 +254,19 @@ namespace ftl {
 	/**
 	 * Compile time instance of aApply.
 	 *
-	 * For added convenience.
+	 * Makes it syntactically cheap to use `applicative::apply` in higher-
+	 * order functions and such.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename F, typename A, typename B>
+	 *   auto foo(const A& a, const B& b) -> ftl::result_of<F(A,B)>;
+	 *
+	 *   AnApplicative<ftl::function<U,T>> ff = ...;
+	 *   AnApplicative<T> ft = ...;
+	 *   
+	 *   foo(aapply, ff, ft);
+	 * \endcode
 	 *
 	 * \ingroup applicative
 	 */
@@ -269,6 +281,9 @@ namespace ftl {
 	 * encompass the notion of "failure" and are also monoids under some
 	 * binary operation that can result in such a failure state. In monoid
 	 * terms, the failure state is the same as the identity element.
+	 *
+	 * The `ftl::monoidA` interface documentation contains a more concrete
+	 * and programmatic definition of what an instance must implement.
 	 *
 	 * \see \ref applicative (module)
 	 */

@@ -33,8 +33,7 @@ namespace ftl {
 	 * Anything that can be ordered in some strict sense.
 	 *
 	 * In essence, any type that defines the operators `<`, `==`, and `>`.
-	 * Technically, the Orderable concept also requires \ref eq, but there is
-	 * nothing in FTL that enforces this.
+	 * All instances of Orderable also fulfill the requirements of \ref eq.
 	 *
 	 * \see \ref ord (module)
 	 */
@@ -163,10 +162,8 @@ namespace ftl {
 	 * In essence, instances of Orderable can be ordered in some strict sense.
 	 *
 	 * For a type to become an instance of Orderable, it must either implement
-	 * all of the operators `<`, `==`, and `>`, or it must specialise this
-	 * struct. Both of these work equally well.
-	 *
-	 * A type that is orderable must also implement \ref eq.
+	 * all of the operators `<`, `==`, `!=`, and `>`, or it must specialise this
+	 * struct. Either will work equally well.
 	 *
 	 * \ingroup ord
 	 */
@@ -226,7 +223,6 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \ingroup ord
-	 * \ingroup monoid
 	 */
 	template<>
 	struct monoid<ord> {
@@ -252,6 +248,14 @@ namespace ftl {
 	 *         to each object and then compare the two results using their
 	 *         Orderable instance.
 	 *
+	 * Example:
+	 * \code
+	 *     list<string> l{"aaaa", "a", "aaa", "aa"};
+	 *
+	 *     sort(l.begin(), l.end(), lessThan(comparing(&string::size)));
+	 * \endcode
+	 * Resulting list: `{"a", "aa", "aaa", "aaaa"}`
+	 *
 	 * \ingroup ord
 	 */
 	template<typename A, typename R>
@@ -274,11 +278,10 @@ namespace ftl {
 	 * Example:
 	 * \code
 	 *   list<maybe<string>> l{value("abc"), value("de"), value("f")};
-	 *   sort(l.begin(), l.end(),
-	 *           lessThan(comparing([] (const maybe<string>& m) -> size_t {
-	 *       if(m) return m->size();
-	 *       return 0;
-	 *   })));
+	 *
+	 *   sort(l.begin(), l.end(), lessThan(comparing(
+	 *       [] (const maybe<string>& m) -> size_t { return m ? m->size() : 0; }
+	 *   )));
 	 * \endcode
 	 * The above would sort `l` in ascending order of string length. Any element
 	 * that is `nothing` would be considered to be of length `0`.

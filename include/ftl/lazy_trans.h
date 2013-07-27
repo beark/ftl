@@ -30,6 +30,8 @@ namespace ftl {
 	/**
 	 * \defgroup lazyT Lazy Transformer
 	 *
+	 * The lazyT transformer and its concept instances.
+	 *
 	 * \code
 	 *   #include <ftl/lazy_trans.h>
 	 * \endcode
@@ -80,7 +82,7 @@ namespace ftl {
 		/**
 		 * Inplace constructor
 		 *
-		 * Forwards `args` to the underlying types constructor.
+		 * Forwards `args` to the underlying type's constructor.
 		 */
 		template<typename...Args>
 		lazyT(inplace_tag, Args&&...args)
@@ -128,12 +130,14 @@ namespace ftl {
 	template<typename M>
 	struct monad<lazyT<M>>
 	: deriving_join<lazyT<M>>, deriving_apply<lazyT<M>> {
-		/// Concept parameter of the particular instance
+		/// Concept parameter of the particular instance.
 		using T = typename lazyT<M>::T;
 
+		/// Type alias to simplify signatures involving the base monad.
 		template<typename U>
 		using M_ = typename re_parametrise<M,U>::type;
 
+		/// Type alias to simplify signatures involving the lazy transformer.
 		template<typename U>
 		using lT = lazyT<M_<U>>;
 
@@ -171,6 +175,22 @@ namespace ftl {
 
 		/**
 		 * Sequence two lazyT computations.
+		 *
+		 * Includes automatic lifting of `f`s that return the untransformed
+		 * type, i.e., `M_<U>`.
+		 *
+		 * Example:
+		 * \code
+		 *   lazyT<maybe<int>> foo(int);
+		 *   maybe<int> bar(int);
+		 *   
+		 *   lazyT<maybe<int>> lmi = ...;
+		 *
+		 *   // Both of these work (using the >>= operator for bind), the
+		 *   // second one by utilising the automatic lifting.
+		 *   auto r1 = lmi >>= foo;
+		 *   auto r2 = lmi >>= bar;
+		 * \endcode
 		 */
 		template<typename F, typename U = concept_parameter<result_of<F(T)>>>
 		static lT<U> bind(const lT<T>& l, F&& f) {

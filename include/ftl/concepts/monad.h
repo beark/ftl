@@ -64,6 +64,9 @@ namespace ftl {
 	 *     (m >>= f) >>= g) <=> m >>= ([f](X x){return f(x);} >>= g)
 	 *   \endcode
 	 *
+	 * To be considered an instance of Monad, the interface `ftl::monad` must
+	 * be specialised for the type in question.
+	 *
 	 * \see \ref monad (module)
 	 */
 

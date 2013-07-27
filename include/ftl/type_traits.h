@@ -25,7 +25,9 @@
 
 namespace ftl {
 	/**
-	 * \defgroup typetraits Collection of useful type traits.
+	 * \defgroup typetraits Type Traits
+	 *
+	 * Collection of useful type traits.
 	 *
 	 * The main difference between this module and \ref typelevel is that
 	 * this module is concerned with finding out particular properties of types,
@@ -77,7 +79,7 @@ namespace ftl {
 		/**
 		 * Compile time value to compare to.
 		 *
-		 * Is `true` is there exists an `operator==(T,T)`, regardless of
+		 * Is `true` if there exists an `operator==(T,T)`, regardless of
 		 * return type. Otherwise `false`.
 		 */
 		static constexpr bool value = 

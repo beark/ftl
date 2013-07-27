@@ -29,7 +29,9 @@
 
 namespace ftl {
 	/**
-	 * \defgroup lazy The lazy data type and its concept instances.
+	 * \defgroup lazy Lazy
+	 *
+	 * The lazy data type and its concept instances.
 	 *
 	 * \code
 	 *   #include <ftl/lazy.h>
@@ -44,6 +46,8 @@ namespace ftl {
 	 * Enumeration of the states a lazy computation can be in.
 	 *
 	 * Mainly used in combination with ftl::lazy::valueStatus().
+	 *
+	 * \ingroup lazy
 	 */
 	enum class value_status {
 		/// The computation still has not been performed
@@ -77,6 +81,7 @@ namespace ftl {
 	 * - \ref assignable (note that assigning to a `lazy` does not change or
 	 *        force the underlying computation, it merely changes _what_
 	 *        computation that particular `lazy` encapsulates.
+	 * - \ref deref to `T` (_forces_ evaluation).
 	 * - \ref functor
 	 * - \ref applicative
 	 * - \ref monad
@@ -244,7 +249,7 @@ namespace ftl {
 		return *lhs > *rhs;
 	}
 
-	/**
+	/*
 	 * TODO: Evaluate how wise the following would be
 	template<typename T>
 	struct oderable<lazy<T>> {

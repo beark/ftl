@@ -38,6 +38,9 @@ namespace ftl {
 	 * "linearly". I.e., it is impossible to use a fold to build an isomorphic
 	 * representation of a tree.
 	 *
+	 * For a concrete definition of what an instance must fulfill, see the
+	 * `ftl::foldable` interface.
+	 *
 	 * \see \ref foldable (module)
 	 */
 

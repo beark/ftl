@@ -64,8 +64,8 @@ namespace ftl {
 	/**
 	 * Convenience instance value of `nothing_t`.
 	 *
-	 * Useful when one wants to be more explicit that just using the implicit
-	 * bool cast of `maybe`.
+	 * Useful when one wants to be more explicit than just using the bool cast
+	 * of `maybe`.
 	 *
 	 * Example:
 	 * \code
@@ -93,17 +93,19 @@ namespace ftl {
 	 * \li \ref fullycons
 	 * \li \ref assignable
 	 * \li \ref deref
+	 * \li \ref empty (the empty state is, of course, when the maybe is
+	 *                `nothing`)
 	 * \li \ref eq, if, and only if, `A` is EqComparable
-	 * \li \ref orderable, if, and only if, `A` is Orderable
-	 * \li \ref functor (in `A`)
-	 * \li \ref applicative (in `A`)
-	 * \li \ref monad (in `A`)
-	 * \li \ref monoid, if, and only if, `A` is a Monoid
+	 * \li \ref orderable, if, and only if, `T` is Orderable
+	 * \li \ref functor (in `T`)
+	 * \li \ref applicative (in `T`)
+	 * \li \ref monad (in `T`)
+	 * \li \ref monoid, if, and only if, `T` is a Monoid
 	 * \li \ref foldable
 	 *
 	 * \ingroup maybe
 	 */
-	template<typename A>
+	template<typename T>
 	class maybe {
 	public:
 		/**
@@ -112,7 +114,7 @@ namespace ftl {
 		 * Allows compatibility with plethora of templated functions/structures
 		 * that require an object have a value_type member.
 		 */
-		using value_type = A;
+		using value_type = T;
 
 		/**
 		 * Default c-tor, equivalent to \c nothing.
@@ -134,10 +136,10 @@ namespace ftl {
 
 		/// Move c-tor
 		maybe(maybe&& m)
-		noexcept(std::is_nothrow_move_constructible<A>::value)
+		noexcept(std::is_nothrow_move_constructible<T>::value)
 		: isValid(m.isValid) {
 			if(isValid) {
-				new (&val) value_type(std::move(reinterpret_cast<A&>(m.val)));
+				new (&val) value_type(std::move(reinterpret_cast<T&>(m.val)));
 				m.isValid = false;
 			}
 		}
@@ -146,14 +148,14 @@ namespace ftl {
 		 * Construct a value by copy.
 		 */
 		explicit maybe(const value_type& v)
-		noexcept(std::is_nothrow_copy_constructible<A>::value)
+		noexcept(std::is_nothrow_copy_constructible<T>::value)
 		: isValid(true) {
 			 new (&val) value_type(v);
 		}
 
 		/// Construct a value by move.
 		explicit maybe(value_type&& v)
-		noexcept(std::is_nothrow_move_constructible<A>::value)
+		noexcept(std::is_nothrow_move_constructible<T>::value)
 		: isValid(true) {
 			new (&val) value_type(std::move(v));
 		}
@@ -162,17 +164,17 @@ namespace ftl {
 		 * In-place value construction constructor.
 		 *
 		 * Constructs a value in the internal storage, forwarding the parameters
-		 * to `A`'s constructor.
+		 * to `T`'s constructor.
 		 */
 		template<typename...Ts>
-		maybe(inplace_tag, Ts&&...ts) noexcept(std::is_nothrow_constructible<A,Ts...>::value)
+		maybe(inplace_tag, Ts&&...ts) noexcept(std::is_nothrow_constructible<T,Ts...>::value)
 		: isValid(true) {
 			new (&val) value_type(std::forward<Ts>(ts)...);
 		}
 
 		// TODO: Enable the noexcept specifier once is_nothrow_destructible is
 		// available (gcc-4.8).
-		~maybe() /*noexcept(std::is_nothrow_destructible<A>::value)*/ {
+		~maybe() /*noexcept(std::is_nothrow_destructible<T>::value)*/ {
 			self_destruct();
 		}
 
@@ -194,8 +196,8 @@ namespace ftl {
 		maybe& operator= (const maybe& m)
 		/* TODO: Enable noexcept specifier once is_nothrow_destructible is
 		 * available.
-		noexcept(  std::is_nothrow_copy_constructible<A>::value
-				&& std::is_nothrow_destructible<A>::value) */ {
+		noexcept(  std::is_nothrow_copy_constructible<T>::value
+				&& std::is_nothrow_destructible<T>::value) */ {
 			// Check for self-assignment
 			if(this == &m)
 				return *this;
@@ -204,7 +206,7 @@ namespace ftl {
 
 			isValid = m.isValid;
 			if(isValid) {
-				new (&val) value_type(reinterpret_cast<const A&>(m.val));
+				new (&val) value_type(reinterpret_cast<const T&>(m.val));
 			}
 
 			return *this;
@@ -214,8 +216,8 @@ namespace ftl {
 		maybe& operator= (maybe&& m)
 		/* TODO: Enable noexcept specifier once is_nothrow_destructible is
 		 * available.
-		noexcept(  std::is_nothrow_copy_constructible<A>::value
-				&& std::is_nothrow_destructible<A>::value) */ {
+		noexcept(  std::is_nothrow_copy_constructible<T>::value
+				&& std::is_nothrow_destructible<T>::value) */ {
 			// Check for self-assignment
 			if(this == &m)
 				return *this;
@@ -225,7 +227,7 @@ namespace ftl {
 			isValid = m.isValid;
 			if(isValid) {
 				new (&val) value_type(
-						std::move(reinterpret_cast<A&>(m.val)));
+						std::move(reinterpret_cast<T&>(m.val)));
 				m.isValid = false;
 			}
 
@@ -243,7 +245,7 @@ namespace ftl {
 		 *   }
 		 * \endcode
 		 */
-		constexpr operator bool() const noexcept {
+		explicit constexpr operator bool() const noexcept {
 			return isValue();
 		}
 
@@ -256,7 +258,7 @@ namespace ftl {
 			if(!isValid)
 				throw std::logic_error("Attempting to read the value of Nothing.");
 
-			return reinterpret_cast<A&>(val);
+			return reinterpret_cast<T&>(val);
 		}
 
 		/// \overload
@@ -264,7 +266,7 @@ namespace ftl {
 			if(!isValid)
 				throw std::logic_error("Attempting to read the value of Nothing.");
 
-			return reinterpret_cast<const A&>(val);
+			return reinterpret_cast<const T&>(val);
 		}
 
 		/**
@@ -276,7 +278,7 @@ namespace ftl {
 			if(!isValid)
 				throw std::logic_error("Attempting to read the value of Nothing.");
 
-			return reinterpret_cast<A*>(&val);
+			return reinterpret_cast<T*>(&val);
 		}
 
 		/// \overload
@@ -284,7 +286,7 @@ namespace ftl {
 			if(!isValid)
 				throw std::logic_error("Attempting to read the value of Nothing.");
 
-			return reinterpret_cast<const A*>(&val);
+			return reinterpret_cast<const T*>(&val);
 		}
 
 		/**
@@ -294,21 +296,21 @@ namespace ftl {
 		 * relying on maybe's default constructor. The end result is exactly
 		 * equivalent.
 		 */
-		static constexpr maybe<A> nothing() noexcept {
+		static constexpr maybe<T> nothing() noexcept {
 			return maybe();
 		}
 
 	private:
 		void self_destruct() {
 			if(isValid) {
-				reinterpret_cast<A&>(val).~A();
+				reinterpret_cast<T&>(val).~T();
 				isValid = false;
 			}
 		}
 
 		typename std::aligned_storage<
-			sizeof(A),
-			std::alignment_of<A>::value>::type val;
+			sizeof(T),
+			std::alignment_of<T>::value>::type val;
 
 		bool isValid = false;
 	};

@@ -51,12 +51,15 @@ namespace ftl {
 	 * of the mathematical definition from which this concept is derived):
 	 * - **Preservation of identity**
 	 *   \code
-	 *     map(id<T>, t)          <=> t
+	 *     map(id, t)          <=> t
 	 *   \endcode
-	 * - **Preservatin of composition**
+	 * - **Preservation of composition**
 	 *   \code
 	 *     map(compose(f, g), t)  <=> compose(curry(map)(f), curry(map)(g))(t)
 	 *   \endcode
+	 *
+	 * For a detailed description of what exactly an instance needs to
+	 * implement, see the ftl::functor interface.
 	 *
 	 * \see \ref functor (module)
 	 */
