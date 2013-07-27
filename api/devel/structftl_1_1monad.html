@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -100,27 +100,39 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Concrete definition of the monad concept.  
  <a href="structftl_1_1monad.html#details">More...</a></p>
 
-<p><code>#include &lt;ftl/monad.h&gt;</code></p>
+<p><code>#include &lt;ftl/concepts/monad.h&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a1b089491c092b9a557698d104e3df106"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html#a1b089491c092b9a557698d104e3df106">T</a> = <a class="el" href="group__typelevel.html#ga9b2fe7cfd4033787fa2f9c07e7f34839">concept_parameter</a>&lt; M &gt;</td></tr>
+<tr class="memitem:a1b089491c092b9a557698d104e3df106"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html#a1b089491c092b9a557698d104e3df106">T</a> = <a class="el" href="group__typelevel.html#ga3d10d966c41c9018bc34c6c51b4e994f">concept_parameter</a>&lt; M &gt;</td></tr>
 <tr class="memdesc:a1b089491c092b9a557698d104e3df106"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type <code>M</code> is a monad on.  <a href="#a1b089491c092b9a557698d104e3df106">More...</a><br/></td></tr>
 <tr class="separator:a1b089491c092b9a557698d104e3df106"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16489eb59b8ada82a1a8b0aa0df653b4"><td class="memTemplParams" colspan="2"><a class="anchor" id="a16489eb59b8ada82a1a8b0aa0df653b4"></a>
+template&lt;typename U &gt; </td></tr>
+<tr class="memitem:a16489eb59b8ada82a1a8b0aa0df653b4"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html#a16489eb59b8ada82a1a8b0aa0df653b4">M_</a> = typename <a class="el" href="structftl_1_1re__parametrise.html">re_parametrise</a>&lt; M, U &gt;::type</td></tr>
+<tr class="memdesc:a16489eb59b8ada82a1a8b0aa0df653b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenient means of re parametrising M. <br/></td></tr>
+<tr class="separator:a16489eb59b8ada82a1a8b0aa0df653b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:acc337ad5bb79d4f4f764598aa31a2d75"><td class="memItemLeft" align="right" valign="top">static M&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html#acc337ad5bb79d4f4f764598aa31a2d75">pure</a> (const <a class="el" href="structftl_1_1monad.html#a1b089491c092b9a557698d104e3df106">T</a> &amp;)</td></tr>
 <tr class="memdesc:acc337ad5bb79d4f4f764598aa31a2d75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encapsulate a "pure" value.  <a href="#acc337ad5bb79d4f4f764598aa31a2d75">More...</a><br/></td></tr>
 <tr class="separator:acc337ad5bb79d4f4f764598aa31a2d75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0441232b8bd660fb9aadebe7d52e10dd"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type, typename Mu  = typename re_parametrise&lt;M,U&gt;::type&gt; </td></tr>
-<tr class="memitem:a0441232b8bd660fb9aadebe7d52e10dd"><td class="memTemplItemLeft" align="right" valign="top">static Mu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html#a0441232b8bd660fb9aadebe7d52e10dd">map</a> (F &amp;&amp;f, const M &amp;m)</td></tr>
-<tr class="memdesc:a0441232b8bd660fb9aadebe7d52e10dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map a function to a contextualised value.  <a href="#a0441232b8bd660fb9aadebe7d52e10dd">More...</a><br/></td></tr>
-<tr class="separator:a0441232b8bd660fb9aadebe7d52e10dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a163bcc66e4bd7c947bf37a3f83310078"><td class="memTemplParams" colspan="2">template&lt;typename F , typename Mu  = typename decayed_result&lt;F(T)&gt;::type, typename  = typename std::enable_if&lt;std::is_same&lt;					typename re_parametrise&lt;Mu,T&gt;::type,					M				&gt;::value&gt;::type&gt; </td></tr>
-<tr class="memitem:a163bcc66e4bd7c947bf37a3f83310078"><td class="memTemplItemLeft" align="right" valign="top">static Mu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078">bind</a> (const M &amp;m, F &amp;&amp;f)</td></tr>
-<tr class="memdesc:a163bcc66e4bd7c947bf37a3f83310078"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind a value and execute a computation in M on it.  <a href="#a163bcc66e4bd7c947bf37a3f83310078">More...</a><br/></td></tr>
-<tr class="separator:a163bcc66e4bd7c947bf37a3f83310078"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab019ea91046a37e49baaeeba836e831e"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </td></tr>
+<tr class="memitem:ab019ea91046a37e49baaeeba836e831e"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="structftl_1_1monad.html#a16489eb59b8ada82a1a8b0aa0df653b4">M_</a>&lt; U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html#ab019ea91046a37e49baaeeba836e831e">map</a> (F &amp;&amp;f, const M &amp;m)</td></tr>
+<tr class="memdesc:ab019ea91046a37e49baaeeba836e831e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map a function to a contextualised value.  <a href="#ab019ea91046a37e49baaeeba836e831e">More...</a><br/></td></tr>
+<tr class="separator:ab019ea91046a37e49baaeeba836e831e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55d9dc66d3ca1a73fa8dd42d427b7e15"><td class="memTemplParams" colspan="2">template&lt;typename Mf , typename F  = concept_parameter&lt;Mf&gt;, typename U  = result_of&lt;F(T)&gt;, typename  = typename std::enable_if&lt;					std::is_same&lt;M_&lt;F&gt;,Mf&gt;::value				&gt;::type&gt; </td></tr>
+<tr class="memitem:a55d9dc66d3ca1a73fa8dd42d427b7e15"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="structftl_1_1monad.html#a16489eb59b8ada82a1a8b0aa0df653b4">M_</a>&lt; U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html#a55d9dc66d3ca1a73fa8dd42d427b7e15">apply</a> (const Mf &amp;fn, const M &amp;m)</td></tr>
+<tr class="memdesc:a55d9dc66d3ca1a73fa8dd42d427b7e15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies an encapsulated function to an encapsulated value.  <a href="#a55d9dc66d3ca1a73fa8dd42d427b7e15">More...</a><br/></td></tr>
+<tr class="separator:a55d9dc66d3ca1a73fa8dd42d427b7e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeaeca77ea0895c2a9fc72f33f5156347"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = concept_parameter&lt;result_of&lt;F(T)&gt;&gt;&gt; </td></tr>
+<tr class="memitem:aeaeca77ea0895c2a9fc72f33f5156347"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="structftl_1_1monad.html#a16489eb59b8ada82a1a8b0aa0df653b4">M_</a>&lt; U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html#aeaeca77ea0895c2a9fc72f33f5156347">bind</a> (const M &amp;m, F &amp;&amp;f)</td></tr>
+<tr class="memdesc:aeaeca77ea0895c2a9fc72f33f5156347"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind a value and execute a computation in M on it.  <a href="#aeaeca77ea0895c2a9fc72f33f5156347">More...</a><br/></td></tr>
+<tr class="separator:aeaeca77ea0895c2a9fc72f33f5156347"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f2d0feff47a94baf72931ae6270e3a3"><td class="memItemLeft" align="right" valign="top">static M&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html#a1f2d0feff47a94baf72931ae6270e3a3">join</a> (const <a class="el" href="structftl_1_1monad.html#a16489eb59b8ada82a1a8b0aa0df653b4">M_</a>&lt; M &gt; &amp;m)</td></tr>
+<tr class="memdesc:a1f2d0feff47a94baf72931ae6270e3a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Joins (or "flattens") a nested instance of <code>M</code>.  <a href="#a1f2d0feff47a94baf72931ae6270e3a3">More...</a><br/></td></tr>
+<tr class="separator:a1f2d0feff47a94baf72931ae6270e3a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -141,7 +153,7 @@ interface ftl::monad&lt; M &gt;</h3>
 template&lt;typename M &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; M &gt;::<a class="el" href="structftl_1_1monad.html#a1b089491c092b9a557698d104e3df106">T</a> =  <a class="el" href="group__typelevel.html#ga9b2fe7cfd4033787fa2f9c07e7f34839">concept_parameter</a>&lt;M&gt;</td>
+          <td class="memname">using <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; M &gt;::<a class="el" href="structftl_1_1monad.html#a1b089491c092b9a557698d104e3df106">T</a> =  <a class="el" href="group__typelevel.html#ga3d10d966c41c9018bc34c6c51b4e994f">concept_parameter</a>&lt;M&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -178,23 +190,24 @@ template&lt;typename M &gt; </div>
 
 <p>Encapsulate a "pure" value. </p>
 <p>Given a plain value, encapsulate it in the monad M.</p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="structftl_1_1applicative.html#a0154bb314c06e66c822f7341d284ef5f" title="Encapsulate a pure value in the applicative functor.">applicative::pure</a> </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>All monad instances must define <code>pure</code>, it can not be derived.</dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="structftl_1_1applicative.html#aa799f90c2b5e6936bc361cb2b96012b4" title="Encapsulate a pure value in the applicative functor.">applicative::pure</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a0441232b8bd660fb9aadebe7d52e10dd"></a>
+<a class="anchor" id="ab019ea91046a37e49baaeeba836e831e"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename M &gt; </div>
 <div class="memtemplate">
-template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type, typename Mu  = typename re_parametrise&lt;M,U&gt;::type&gt; </div>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static Mu <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; M &gt;::map </td>
+          <td class="memname">static <a class="el" href="structftl_1_1monad.html#a16489eb59b8ada82a1a8b0aa0df653b4">M_</a>&lt;U&gt; <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; M &gt;::map </td>
           <td>(</td>
           <td class="paramtype">F &amp;&amp;&#160;</td>
           <td class="paramname"><em>f</em>, </td>
@@ -219,23 +232,64 @@ template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type
 </div><div class="memdoc">
 
 <p>Map a function to a contextualised value. </p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="structftl_1_1functor.html#a8bea58a9814e5ab2a3b9ab019d68055b" title="Maps a function to the contained value(s).">functor::map</a> </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="structftl_1_1functor.html#a8bea58a9814e5ab2a3b9ab019d68055b" title="Maps a function to the contained value(s).">functor::map</a>, <a class="el" href="structftl_1_1deriving__map.html" title="Inheritable implementation of monad&lt;M&gt;::map.">deriving_map</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a163bcc66e4bd7c947bf37a3f83310078"></a>
+<a class="anchor" id="a55d9dc66d3ca1a73fa8dd42d427b7e15"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename M &gt; </div>
 <div class="memtemplate">
-template&lt;typename F , typename Mu  = typename decayed_result&lt;F(T)&gt;::type, typename  = typename std::enable_if&lt;std::is_same&lt;					typename re_parametrise&lt;Mu,T&gt;::type,					M				&gt;::value&gt;::type&gt; </div>
+template&lt;typename Mf , typename F  = concept_parameter&lt;Mf&gt;, typename U  = result_of&lt;F(T)&gt;, typename  = typename std::enable_if&lt;					std::is_same&lt;M_&lt;F&gt;,Mf&gt;::value				&gt;::type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static Mu <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; M &gt;::bind </td>
+          <td class="memname">static <a class="el" href="structftl_1_1monad.html#a16489eb59b8ada82a1a8b0aa0df653b4">M_</a>&lt;U&gt; <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; M &gt;::apply </td>
+          <td>(</td>
+          <td class="paramtype">const Mf &amp;&#160;</td>
+          <td class="paramname"><em>fn</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const M &amp;&#160;</td>
+          <td class="paramname"><em>m</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Applies an encapsulated function to an encapsulated value. </p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="structftl_1_1applicative.html#ae8261989c486235592c22dfc1705b132" title="Contextualised function application.">applicative::apply</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aeaeca77ea0895c2a9fc72f33f5156347"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename M &gt; </div>
+<div class="memtemplate">
+template&lt;typename F , typename U  = concept_parameter&lt;result_of&lt;F(T)&gt;&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structftl_1_1monad.html#a16489eb59b8ada82a1a8b0aa0df653b4">M_</a>&lt;U&gt; <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; M &gt;::bind </td>
           <td>(</td>
           <td class="paramtype">const M &amp;&#160;</td>
           <td class="paramname"><em>m</em>, </td>
@@ -264,10 +318,39 @@ template&lt;typename F , typename Mu  = typename decayed_result&lt;F(T)&gt;::typ
 <p>Instances are free to provide <code>bind</code> using move semantics on <code>M</code>, either in addition to <code>const</code> reference version, or instead of.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">F</td><td>must satisfy <a class="el" href="fn.html">Function</a><code>&lt;M&lt;U&gt;(T)&gt;</code> where <code>M</code> refers to the templated type parametrised by <code>T</code>. </td></tr>
+    <tr><td class="paramname">F</td><td>must satisfy <a class="el" href="fn.html">Function</a><code>&lt;M_&lt;U&gt;(T)&gt;</code> </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="a1f2d0feff47a94baf72931ae6270e3a3"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename M &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static M <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; M &gt;::join </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structftl_1_1monad.html#a16489eb59b8ada82a1a8b0aa0df653b4">M_</a>&lt; M &gt; &amp;&#160;</td>
+          <td class="paramname"><em>m</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Joins (or "flattens") a nested instance of <code>M</code>. </p>
+<p>This function is easy to gain an intuition for; it corresponds to e.g. making a list of lists into a plain old list by simply concatenating all the inner lists into a single long one. </p>
 
 </div>
 </div>
@@ -300,7 +383,7 @@ template&lt;typename M &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

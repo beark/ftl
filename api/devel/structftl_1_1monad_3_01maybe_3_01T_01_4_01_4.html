@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -103,14 +103,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aa5db01a44066a51d51dbf330dea7ef40"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa5db01a44066a51d51dbf330dea7ef40"></a>
-template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type&gt; </td></tr>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </td></tr>
 <tr class="memitem:aa5db01a44066a51d51dbf330dea7ef40"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html#aa5db01a44066a51d51dbf330dea7ef40">map</a> (const F &amp;f, const <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; T &gt; &amp;m)</td></tr>
 <tr class="memdesc:aa5db01a44066a51d51dbf330dea7ef40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply <code>f</code> if <code>m</code> is a value. <br/></td></tr>
 <tr class="separator:aa5db01a44066a51d51dbf330dea7ef40"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2bc96a6eaf8bf25a8e711827a937c85f"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type::value_type&gt; </td></tr>
-<tr class="memitem:a2bc96a6eaf8bf25a8e711827a937c85f"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html#a2bc96a6eaf8bf25a8e711827a937c85f">bind</a> (const <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; T &gt; &amp;m, F f)</td></tr>
-<tr class="memdesc:a2bc96a6eaf8bf25a8e711827a937c85f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies a function to unwrapped maybe value.  <a href="#a2bc96a6eaf8bf25a8e711827a937c85f">More...</a><br/></td></tr>
-<tr class="separator:a2bc96a6eaf8bf25a8e711827a937c85f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae61dd754878d456b116fac900853fb4"><td class="memTemplParams" colspan="2"><a class="anchor" id="aae61dd754878d456b116fac900853fb4"></a>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </td></tr>
+<tr class="memitem:aae61dd754878d456b116fac900853fb4"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html#aae61dd754878d456b116fac900853fb4">map</a> (const F &amp;f, <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; T &gt; &amp;&amp;m)</td></tr>
+<tr class="memdesc:aae61dd754878d456b116fac900853fb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:aae61dd754878d456b116fac900853fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a231a9dca7e98e6c82e00bb3b0ac8639b"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = typename result_of&lt;F(T)&gt;::value_type&gt; </td></tr>
+<tr class="memitem:a231a9dca7e98e6c82e00bb3b0ac8639b"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html#a231a9dca7e98e6c82e00bb3b0ac8639b">bind</a> (const <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; T &gt; &amp;m, const F &amp;f)</td></tr>
+<tr class="memdesc:a231a9dca7e98e6c82e00bb3b0ac8639b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies a function to unwrapped maybe value.  <a href="#a231a9dca7e98e6c82e00bb3b0ac8639b">More...</a><br/></td></tr>
+<tr class="separator:a231a9dca7e98e6c82e00bb3b0ac8639b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90308e23514fc7d8e4b25488f3ba2016"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = typename result_of&lt;F(T)&gt;::value_type&gt; </td></tr>
+<tr class="memitem:a90308e23514fc7d8e4b25488f3ba2016"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html#a90308e23514fc7d8e4b25488f3ba2016">bind</a> (<a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; T &gt; &amp;&amp;m, const F &amp;f)</td></tr>
+<tr class="separator:a90308e23514fc7d8e4b25488f3ba2016"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename T&gt;<br/>
@@ -119,13 +127,13 @@ struct ftl::monad&lt; maybe&lt; T &gt; &gt;</h3>
 <p>Implementation of monad for maybe. </p>
 <dl class="section note"><dt>Note</dt><dd>This automatically gives maybe default applicative and functor instances. </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a2bc96a6eaf8bf25a8e711827a937c85f"></a>
+<a class="anchor" id="a231a9dca7e98e6c82e00bb3b0ac8639b"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename T &gt; </div>
 <div class="memtemplate">
-template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type::value_type&gt; </div>
+template&lt;typename F , typename U  = typename result_of&lt;F(T)&gt;::value_type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -139,7 +147,7 @@ template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">F&#160;</td>
+          <td class="paramtype">const F &amp;&#160;</td>
           <td class="paramname"><em>f</em>&#160;</td>
         </tr>
         <tr>
@@ -165,10 +173,49 @@ template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type
 
 </div>
 </div>
+<a class="anchor" id="a90308e23514fc7d8e4b25488f3ba2016"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<div class="memtemplate">
+template&lt;typename F , typename U  = typename result_of&lt;F(T)&gt;::value_type&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt;U&gt; <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; <a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; T &gt; &gt;::bind </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classftl_1_1maybe.html">maybe</a>&lt; T &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const F &amp;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

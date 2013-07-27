@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -88,6 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">ftl::applicative&lt; std::tuple&lt; T, Ts...&gt; &gt; Struct Template Reference<div class="ingroups"><a class="el" href="group__tuple.html">Tuple</a></div></div>  </div>
@@ -98,16 +99,132 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <a href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#details">More...</a></p>
 
 <p><code>#include &lt;ftl/tuple.h&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a209d0a44546825f005eb8b41c5a0a7f9"><td class="memItemLeft" align="right" valign="top">static std::tuple&lt; T, Ts...&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#a209d0a44546825f005eb8b41c5a0a7f9">pure</a> (const T &amp;a)</td></tr>
+<tr class="memdesc:a209d0a44546825f005eb8b41c5a0a7f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a tuple with <code>a</code> as first element.  <a href="#a209d0a44546825f005eb8b41c5a0a7f9">More...</a><br/></td></tr>
+<tr class="separator:a209d0a44546825f005eb8b41c5a0a7f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ff7cdb731d645b9aa3c5bbdfeca86ba"><td class="memItemLeft" align="right" valign="top">static std::tuple&lt; T, Ts...&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#a4ff7cdb731d645b9aa3c5bbdfeca86ba">pure</a> (T &amp;&amp;a)</td></tr>
+<tr class="separator:a4ff7cdb731d645b9aa3c5bbdfeca86ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad73cd5bc85b75b0f8381b6bb28783ec7"><td class="memTemplParams" colspan="2"><a class="anchor" id="ad73cd5bc85b75b0f8381b6bb28783ec7"></a>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </td></tr>
+<tr class="memitem:ad73cd5bc85b75b0f8381b6bb28783ec7"><td class="memTemplItemLeft" align="right" valign="top">static std::tuple&lt; U, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#ad73cd5bc85b75b0f8381b6bb28783ec7">map</a> (F &amp;&amp;f, const std::tuple&lt; T, Ts...&gt; &amp;t)</td></tr>
+<tr class="memdesc:ad73cd5bc85b75b0f8381b6bb28783ec7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Forwards to functor&lt;std::tuple&lt;T,Ts...&gt;&gt;::map. <br/></td></tr>
+<tr class="separator:ad73cd5bc85b75b0f8381b6bb28783ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dee060969677da0e52bad8c907daaea"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </td></tr>
+<tr class="memitem:a3dee060969677da0e52bad8c907daaea"><td class="memTemplItemLeft" align="right" valign="top">static std::tuple&lt; U, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#a3dee060969677da0e52bad8c907daaea">apply</a> (const std::tuple&lt; F, Ts...&gt; &amp;tfn, const std::tuple&lt; T, Ts...&gt; &amp;t)</td></tr>
+<tr class="memdesc:a3dee060969677da0e52bad8c907daaea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies an embedded function in the first field.  <a href="#a3dee060969677da0e52bad8c907daaea">More...</a><br/></td></tr>
+<tr class="separator:a3dee060969677da0e52bad8c907daaea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename T, typename... Ts&gt;<br/>
 struct ftl::applicative&lt; std::tuple&lt; T, Ts...&gt; &gt;</h3>
 
 <p>Applicative instance for tuples. </p>
 <p>Note that this requires a monoid instance for every type in the tuple except the first one. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a209d0a44546825f005eb8b41c5a0a7f9"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename... Ts&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::tuple&lt;T,Ts...&gt; <a class="el" href="structftl_1_1applicative.html">ftl::applicative</a>&lt; std::tuple&lt; T, Ts...&gt; &gt;::pure </td>
+          <td>(</td>
+          <td class="paramtype">const T &amp;&#160;</td>
+          <td class="paramname"><em>a</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a tuple with <code>a</code> as first element. </p>
+<p>All the other fields are initialised with their respective <code><a class="el" href="structftl_1_1monoid.html#aa82bed05de22bf0124dfa9dfcd15991a" title="Get the identity element for a given monoid.">monoid::id()</a></code> results. </p>
+
+</div>
+</div>
+<a class="anchor" id="a4ff7cdb731d645b9aa3c5bbdfeca86ba"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename... Ts&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::tuple&lt;T,Ts...&gt; <a class="el" href="structftl_1_1applicative.html">ftl::applicative</a>&lt; std::tuple&lt; T, Ts...&gt; &gt;::pure </td>
+          <td>(</td>
+          <td class="paramtype">T &amp;&amp;&#160;</td>
+          <td class="paramname"><em>a</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+
+</div>
+</div>
+<a class="anchor" id="a3dee060969677da0e52bad8c907daaea"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename... Ts&gt; </div>
+<div class="memtemplate">
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::tuple&lt;U,Ts...&gt; <a class="el" href="structftl_1_1applicative.html">ftl::applicative</a>&lt; std::tuple&lt; T, Ts...&gt; &gt;::apply </td>
+          <td>(</td>
+          <td class="paramtype">const std::tuple&lt; F, Ts...&gt; &amp;&#160;</td>
+          <td class="paramname"><em>tfn</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::tuple&lt; T, Ts...&gt; &amp;&#160;</td>
+          <td class="paramname"><em>t</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Applies an embedded function in the first field. </p>
+<p>All remaining fields are element-wise <code><a class="el" href="structftl_1_1monoid.html#a51ffabd70a2c769b70306a7be91f53c7" title="The monoid operation itself.">monoid::append</a></code>ed together. </p>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -98,22 +98,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Concrete interface of monoidal alternatives concept.  
  <a href="structftl_1_1monoidA.html#details">More...</a></p>
 
-<p><code>#include &lt;ftl/applicative.h&gt;</code></p>
+<p><code>#include &lt;ftl/concepts/applicative.h&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ab2056c170b5e5c7c36ef2b9ba8cccfc7"><td class="memTemplParams" colspan="2"><a class="anchor" id="ab2056c170b5e5c7c36ef2b9ba8cccfc7"></a>
-template&lt;typename... Ts&gt; </td></tr>
-<tr class="memitem:ab2056c170b5e5c7c36ef2b9ba8cccfc7"><td class="memTemplItemLeft" align="right" valign="top">static F&lt; Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monoidA.html#ab2056c170b5e5c7c36ef2b9ba8cccfc7">fail</a> ()</td></tr>
-<tr class="memdesc:ab2056c170b5e5c7c36ef2b9ba8cccfc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an instance of the failure state. <br/></td></tr>
-<tr class="separator:ab2056c170b5e5c7c36ef2b9ba8cccfc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9b7ad514fd2a6d1f851d25d711e2e22"><td class="memTemplParams" colspan="2">template&lt;typename... Ts&gt; </td></tr>
-<tr class="memitem:ab9b7ad514fd2a6d1f851d25d711e2e22"><td class="memTemplItemLeft" align="right" valign="top">static F&lt; Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monoidA.html#ab9b7ad514fd2a6d1f851d25d711e2e22">orDo</a> (const F&lt; Ts...&gt; &amp;f1, const F&lt; Ts...&gt; &amp;f2)</td></tr>
-<tr class="memdesc:ab9b7ad514fd2a6d1f851d25d711e2e22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sequence two applicative computations that can fail.  <a href="#ab9b7ad514fd2a6d1f851d25d711e2e22">More...</a><br/></td></tr>
-<tr class="separator:ab9b7ad514fd2a6d1f851d25d711e2e22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a482df775497ced4a672615c84a1a1006"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a482df775497ced4a672615c84a1a1006"></a>
+static F&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoidA.html#a482df775497ced4a672615c84a1a1006">fail</a> ()</td></tr>
+<tr class="memdesc:a482df775497ced4a672615c84a1a1006"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an instance of the failure state. <br/></td></tr>
+<tr class="separator:a482df775497ced4a672615c84a1a1006"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf842e67110d9858f8e7e835c0d2d513"><td class="memItemLeft" align="right" valign="top">static F&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoidA.html#acf842e67110d9858f8e7e835c0d2d513">orDo</a> (const F &amp;f1, const F &amp;f2)</td></tr>
+<tr class="memdesc:acf842e67110d9858f8e7e835c0d2d513"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sequence two applicative computations that can fail.  <a href="#acf842e67110d9858f8e7e835c0d2d513">More...</a><br/></td></tr>
+<tr class="separator:acf842e67110d9858f8e7e835c0d2d513"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;template&lt; typename...&gt; class F&gt;<br/>
+<div class="textblock"><h3>template&lt;typename F&gt;<br/>
 interface ftl::monoidA&lt; F &gt;</h3>
 
 <p>Concrete interface of monoidal alternatives concept. </p>
@@ -125,27 +123,25 @@ interface ftl::monoidA&lt; F &gt;</h3>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Due to the constraint on <code>F</code> that it is already an applicative functor, the monoid operation may be <em>effectful</em>, unlike in the <a class="el" href="group__monoid.html">Monoid</a> concept. </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="ab9b7ad514fd2a6d1f851d25d711e2e22"></a>
+<a class="anchor" id="acf842e67110d9858f8e7e835c0d2d513"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;template&lt; typename...&gt; class F&gt; </div>
-<div class="memtemplate">
-template&lt;typename... Ts&gt; </div>
+template&lt;typename F &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static F&lt;Ts...&gt; <a class="el" href="structftl_1_1monoidA.html">ftl::monoidA</a>&lt; F &gt;::orDo </td>
+          <td class="memname">static F <a class="el" href="structftl_1_1monoidA.html">ftl::monoidA</a>&lt; F &gt;::orDo </td>
           <td>(</td>
-          <td class="paramtype">const F&lt; Ts...&gt; &amp;&#160;</td>
+          <td class="paramtype">const F &amp;&#160;</td>
           <td class="paramname"><em>f1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const F&lt; Ts...&gt; &amp;&#160;</td>
+          <td class="paramtype">const F &amp;&#160;</td>
           <td class="paramname"><em>f2</em>&#160;</td>
         </tr>
         <tr>
@@ -169,7 +165,7 @@ template&lt;typename... Ts&gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

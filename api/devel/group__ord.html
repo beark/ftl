@@ -65,7 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -100,10 +100,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga59d369cf86710bf6ac69abfd1673bb4f"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:ga59d369cf86710bf6ac69abfd1673bb4f"><td class="memTemplItemLeft" align="right" valign="top">ord&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__ord.html#ga59d369cf86710bf6ac69abfd1673bb4f">ftl::compare</a> (const T &amp;a, const T &amp;b)</td></tr>
-<tr class="memdesc:ga59d369cf86710bf6ac69abfd1673bb4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function to more easily compare things.  <a href="#ga59d369cf86710bf6ac69abfd1673bb4f">More...</a><br/></td></tr>
-<tr class="separator:ga59d369cf86710bf6ac69abfd1673bb4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab142fc5a93e1ddbeb5ecc1e45419af39"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gab142fc5a93e1ddbeb5ecc1e45419af39"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__ord.html#gab142fc5a93e1ddbeb5ecc1e45419af39">ftl::compare</a> (const T &amp;a, const T &amp;b) -&gt; decltype(orderable&lt; T &gt;::compare(a, b))</td></tr>
+<tr class="memdesc:gab142fc5a93e1ddbeb5ecc1e45419af39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function to more easily compare things.  <a href="#gab142fc5a93e1ddbeb5ecc1e45419af39">More...</a><br/></td></tr>
+<tr class="separator:gab142fc5a93e1ddbeb5ecc1e45419af39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4fbfc72e8f16fdf2c5ec411a1745cc3f"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga4fbfc72e8f16fdf2c5ec411a1745cc3f"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ga4fbfc72e8f16fdf2c5ec411a1745cc3f"><td class="memTemplItemLeft" align="right" valign="top">function&lt; ord, const T <br class="typebreak"/>
@@ -115,11 +115,11 @@ template&lt;typename T &gt; </td></tr>
 &amp;, const A &amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__ord.html#ga9788b6f4bc73189a374e02b9f7615b01">ftl::comparing</a> (R(A::*method)() const)</td></tr>
 <tr class="memdesc:ga9788b6f4bc73189a374e02b9f7615b01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function to compare objects by getter.  <a href="#ga9788b6f4bc73189a374e02b9f7615b01">More...</a><br/></td></tr>
 <tr class="separator:ga9788b6f4bc73189a374e02b9f7615b01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga638428e57a4e88d92947bda722e69d83"><td class="memTemplParams" colspan="2">template&lt;typename A , typename B &gt; </td></tr>
-<tr class="memitem:ga638428e57a4e88d92947bda722e69d83"><td class="memTemplItemLeft" align="right" valign="top">function&lt; ord, const A <br class="typebreak"/>
-&amp;, const A &amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__ord.html#ga638428e57a4e88d92947bda722e69d83">ftl::comparing</a> (function&lt; B, A &gt; cmp)</td></tr>
-<tr class="memdesc:ga638428e57a4e88d92947bda722e69d83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function to compare objects by "converter".  <a href="#ga638428e57a4e88d92947bda722e69d83">More...</a><br/></td></tr>
-<tr class="separator:ga638428e57a4e88d92947bda722e69d83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae36dd321b9c45ab184af505a0b4cf2e6"><td class="memTemplParams" colspan="2">template&lt;typename A , typename B &gt; </td></tr>
+<tr class="memitem:gae36dd321b9c45ab184af505a0b4cf2e6"><td class="memTemplItemLeft" align="right" valign="top">function&lt; ord, const A <br class="typebreak"/>
+&amp;, const A &amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__ord.html#gae36dd321b9c45ab184af505a0b4cf2e6">ftl::comparing</a> (function&lt; B, A &gt; f)</td></tr>
+<tr class="memdesc:gae36dd321b9c45ab184af505a0b4cf2e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function to compare objects by "converter".  <a href="#gae36dd321b9c45ab184af505a0b4cf2e6">More...</a><br/></td></tr>
+<tr class="separator:gae36dd321b9c45ab184af505a0b4cf2e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4ed1e8cac1f7f3dfae4a3c46d32f371b"><td class="memTemplParams" colspan="2">template&lt;typename A &gt; </td></tr>
 <tr class="memitem:ga4ed1e8cac1f7f3dfae4a3c46d32f371b"><td class="memTemplItemLeft" align="right" valign="top">function&lt; bool, const A <br class="typebreak"/>
 &amp;, const A &amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__ord.html#ga4ed1e8cac1f7f3dfae4a3c46d32f371b">ftl::lessThan</a> (function&lt; ord, const A &amp;, const A &amp; &gt; cmp)</td></tr>
@@ -145,14 +145,14 @@ template&lt;typename T &gt; </td></tr>
 </ul>
 </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ga59d369cf86710bf6ac69abfd1673bb4f"></a>
+<a class="anchor" id="gab142fc5a93e1ddbeb5ecc1e45419af39"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">ord ftl::compare </td>
+          <td class="memname">auto ftl::compare </td>
           <td>(</td>
           <td class="paramtype">const T &amp;&#160;</td>
           <td class="paramname"><em>a</em>, </td>
@@ -166,7 +166,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> -&gt; decltype(orderable&lt;T&gt;::compare(a, b)) </td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -205,11 +205,16 @@ template&lt;typename A , typename R &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Function that compares two objects by first applying method to each object and then compare the two results using their Orderable instance. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Function that compares two objects by first applying method to each object and then compare the two results using their Orderable instance.</dd></dl>
+<p>Example: </p>
+<div class="fragment"><div class="line">list&lt;string&gt; l{<span class="stringliteral">&quot;aaaa&quot;</span>, <span class="stringliteral">&quot;a&quot;</span>, <span class="stringliteral">&quot;aaa&quot;</span>, <span class="stringliteral">&quot;aa&quot;</span>};</div>
+<div class="line"></div>
+<div class="line">sort(l.begin(), l.end(), <a class="code" href="group__ord.html#ga4ed1e8cac1f7f3dfae4a3c46d32f371b" title="Convenience function to ease integration with stdlib&#39;s sort.">lessThan</a>(<a class="code" href="group__ord.html#ga9788b6f4bc73189a374e02b9f7615b01" title="Convenience function to compare objects by getter.">comparing</a>(&amp;string::size)));</div>
+</div><!-- fragment --><p> Resulting list: <code>{"a", "aa", "aaa", "aaaa"}</code> </p>
 
 </div>
 </div>
-<a class="anchor" id="ga638428e57a4e88d92947bda722e69d83"></a>
+<a class="anchor" id="gae36dd321b9c45ab184af505a0b4cf2e6"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -219,7 +224,7 @@ template&lt;typename A , typename B &gt; </div>
           <td class="memname">function&lt;ord,const A&amp;,const A&amp;&gt; ftl::comparing </td>
           <td>(</td>
           <td class="paramtype">function&lt; B, A &gt;&#160;</td>
-          <td class="paramname"><em>cmp</em></td><td>)</td>
+          <td class="paramname"><em>f</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -234,12 +239,11 @@ template&lt;typename A , typename B &gt; </div>
 </dl>
 <p>The use case for this convenience function is similar to the comparing function that works with getter methods, but in this case the comparison is made after a free function has been aplied to the original values.</p>
 <p>Example: </p>
-<div class="fragment"><div class="line">list&lt;maybe&lt;string&gt;&gt; l{<a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;abc&quot;</span>), <a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;de&quot;</span>), <a class="code" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;f&quot;</span>)};</div>
-<div class="line">sort(l.begin(), l.end(),</div>
-<div class="line">        <a class="code" href="group__ord.html#ga4ed1e8cac1f7f3dfae4a3c46d32f371b" title="Convenience function to ease integration with stdlib&#39;s sort.">lessThan</a>(<a class="code" href="group__ord.html#ga9788b6f4bc73189a374e02b9f7615b01" title="Convenience function to compare objects by getter.">comparing</a>([] (<span class="keyword">const</span> maybe&lt;string&gt;&amp; m) -&gt; <span class="keywordtype">size_t</span> {</div>
-<div class="line">    <span class="keywordflow">if</span>(m) <span class="keywordflow">return</span> m-&gt;size();</div>
-<div class="line">    <span class="keywordflow">return</span> 0;</div>
-<div class="line">})));</div>
+<div class="fragment"><div class="line">list&lt;maybe&lt;string&gt;&gt; l{<a class="code" href="group__maybe.html#gaa5204d8f561ca3ad7024987ed4b82475" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;abc&quot;</span>), <a class="code" href="group__maybe.html#gaa5204d8f561ca3ad7024987ed4b82475" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;de&quot;</span>), <a class="code" href="group__maybe.html#gaa5204d8f561ca3ad7024987ed4b82475" title="Convenience function to create maybe:s.">value</a>(<span class="stringliteral">&quot;f&quot;</span>)};</div>
+<div class="line"></div>
+<div class="line">sort(l.begin(), l.end(), <a class="code" href="group__ord.html#ga4ed1e8cac1f7f3dfae4a3c46d32f371b" title="Convenience function to ease integration with stdlib&#39;s sort.">lessThan</a>(<a class="code" href="group__ord.html#ga9788b6f4bc73189a374e02b9f7615b01" title="Convenience function to compare objects by getter.">comparing</a>(</div>
+<div class="line">    [] (<span class="keyword">const</span> maybe&lt;string&gt;&amp; m) -&gt; <span class="keywordtype">size_t</span> { <span class="keywordflow">return</span> m ? m-&gt;size() : 0; }</div>
+<div class="line">)));</div>
 </div><!-- fragment --><p> The above would sort <code>l</code> in ascending order of string length. Any element that is <code>nothing</code> would be considered to be of length <code>0</code>. </p>
 
 </div>
@@ -328,7 +332,7 @@ template&lt;typename A &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

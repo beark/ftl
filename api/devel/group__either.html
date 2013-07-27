@@ -65,7 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -97,8 +97,11 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html">ftl::either&lt; L, R &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data type modelling a "one of" type.  <a href="classftl_1_1either.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01either_3_01T_00_01R_01_4_01_4.html">ftl::monad&lt; either&lt; T, R &gt; &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monad implementation for either.  <a href="structftl_1_1monad_3_01either_3_01T_00_01R_01_4_01_4.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1re__parametrise_3_01either_3_01L_00_01R_01_4_00_01R2_01_4.html">ftl::re_parametrise&lt; either&lt; L, R &gt;, R2 &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Either-specialised <a class="el" href="structftl_1_1re__parametrise.html" title="Changes the concept parameter type of some template type.">re_parametrise</a>.  <a href="structftl_1_1re__parametrise_3_01either_3_01L_00_01R_01_4_00_01R2_01_4.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01either_3_01L_00_01T_01_4_01_4.html">ftl::monad&lt; either&lt; L, T &gt; &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monad implementation for either.  <a href="structftl_1_1monad_3_01either_3_01L_00_01T_01_4_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -107,10 +110,10 @@ Functions</h2></td></tr>
 <tr class="memitem:gaf90ba9d2e6a1d7e7aaca65dcd1839011"><td class="memTemplItemLeft" align="right" valign="top">constexpr either&lt; L, R &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__either.html#gaf90ba9d2e6a1d7e7aaca65dcd1839011">ftl::make_left</a> (_L &amp;&amp;l) noexcept(std::is_nothrow_constructible&lt; either&lt; L, R &gt;, L &gt;::value)</td></tr>
 <tr class="memdesc:gaf90ba9d2e6a1d7e7aaca65dcd1839011"><td class="mdescLeft">&#160;</td><td class="mdescRight">Smart constructor of left values.  <a href="#gaf90ba9d2e6a1d7e7aaca65dcd1839011">More...</a><br/></td></tr>
 <tr class="separator:gaf90ba9d2e6a1d7e7aaca65dcd1839011"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac7907be4e0dd490f19ae938596a67d63"><td class="memTemplParams" colspan="2">template&lt;typename L , typename _R , typename R  = typename std::decay&lt;_R&gt;::type&gt; </td></tr>
-<tr class="memitem:gac7907be4e0dd490f19ae938596a67d63"><td class="memTemplItemLeft" align="right" valign="top">constexpr either&lt; L, R &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__either.html#gac7907be4e0dd490f19ae938596a67d63">ftl::make_right</a> (_R &amp;&amp;r) noexcept(std::is_nothrow_constructible&lt; either&lt; L, R &gt;, R &gt;::value)</td></tr>
-<tr class="memdesc:gac7907be4e0dd490f19ae938596a67d63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Smart constructor of right values.  <a href="#gac7907be4e0dd490f19ae938596a67d63">More...</a><br/></td></tr>
-<tr class="separator:gac7907be4e0dd490f19ae938596a67d63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacd8dfd461b1afe0382532291a051abfe"><td class="memTemplParams" colspan="2">template&lt;typename L , typename _R , typename R  = plain_type&lt;_R&gt;&gt; </td></tr>
+<tr class="memitem:gacd8dfd461b1afe0382532291a051abfe"><td class="memTemplItemLeft" align="right" valign="top">constexpr either&lt; L, R &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__either.html#gacd8dfd461b1afe0382532291a051abfe">ftl::make_right</a> (_R &amp;&amp;r) noexcept(std::is_nothrow_constructible&lt; either&lt; L, R &gt;, _R &gt;::value)</td></tr>
+<tr class="memdesc:gacd8dfd461b1afe0382532291a051abfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Smart constructor of right values.  <a href="#gacd8dfd461b1afe0382532291a051abfe">More...</a><br/></td></tr>
+<tr class="separator:gacd8dfd461b1afe0382532291a051abfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>The either data type and associated concept instances. </p>
@@ -152,11 +155,11 @@ template&lt;typename R , typename _L , typename L  = typename std::decay&lt;_L&g
 </div><!-- fragment --> 
 </div>
 </div>
-<a class="anchor" id="gac7907be4e0dd490f19ae938596a67d63"></a>
+<a class="anchor" id="gacd8dfd461b1afe0382532291a051abfe"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename L , typename _R , typename R  = typename std::decay&lt;_R&gt;::type&gt; </div>
+template&lt;typename L , typename _R , typename R  = plain_type&lt;_R&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -186,7 +189,7 @@ template&lt;typename L , typename _R , typename R  = typename std::decay&lt;_R&g
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

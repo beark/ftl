@@ -65,7 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -77,7 +77,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">Applicative Functor</div>  </div>
 </div><!--header-->
@@ -88,6 +89,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1aPure.html">ftl::aPure&lt; F &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function object.  <a href="structftl_1_1aPure.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1aApply.html">ftl::aApply</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function object.  <a href="structftl_1_1aApply.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative.html">ftl::applicative&lt; F &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Struct that must be specialised to implement the applicative concept.  <a href="structftl_1_1applicative.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -97,30 +104,36 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gac5b41f8adf454df426c558903f5f9c81"><td class="memTemplParams" colspan="2">template&lt;typename F , typename Fn , typename F_  = plain_type&lt;F&gt;, typename  = typename std::enable_if&lt;applicative&lt;F_&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:gac5b41f8adf454df426c558903f5f9c81"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gac5b41f8adf454df426c558903f5f9c81">ftl::operator*</a> (Fn &amp;&amp;u, F &amp;&amp;v) -&gt; decltype(applicative&lt; F_ &gt;::apply(std::forward&lt; Fn &gt;(u), std::forward&lt; F_ &gt;(v)))</td></tr>
-<tr class="memdesc:gac5b41f8adf454df426c558903f5f9c81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator to ease applicative style programming.  <a href="#gac5b41f8adf454df426c558903f5f9c81">More...</a><br/></td></tr>
-<tr class="separator:gac5b41f8adf454df426c558903f5f9c81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad840e7ce200860a53c6a05570912d2d7"><td class="memTemplParams" colspan="2"><a class="anchor" id="gad840e7ce200860a53c6a05570912d2d7"></a>
-template&lt;template&lt; typename...&gt; class F, typename  = typename std::enable_if&lt;monoidA&lt;F&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gad840e7ce200860a53c6a05570912d2d7"><td class="memTemplItemLeft" align="right" valign="top">F&lt; Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gad840e7ce200860a53c6a05570912d2d7">ftl::operator|</a> (const F&lt; Ts...&gt; &amp;f1, const F&lt; Ts...&gt; &amp;f2)</td></tr>
-<tr class="memdesc:gad840e7ce200860a53c6a05570912d2d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1monoidA.html#ab9b7ad514fd2a6d1f851d25d711e2e22" title="Sequence two applicative computations that can fail.">monoidA::orDo</a>. <br/></td></tr>
-<tr class="separator:gad840e7ce200860a53c6a05570912d2d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab6de9298265df22a0684e2bbebf57b51"><td class="memTemplParams" colspan="2"><a class="anchor" id="gab6de9298265df22a0684e2bbebf57b51"></a>
-template&lt;template&lt; typename...&gt; class F, typename  = typename std::enable_if&lt;monoidA&lt;F&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gab6de9298265df22a0684e2bbebf57b51"><td class="memTemplItemLeft" align="right" valign="top">F&lt; Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gab6de9298265df22a0684e2bbebf57b51">ftl::operator|</a> (F&lt; Ts...&gt; &amp;&amp;f1, const F&lt; Ts...&gt; &amp;f2)</td></tr>
-<tr class="memdesc:gab6de9298265df22a0684e2bbebf57b51"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:gab6de9298265df22a0684e2bbebf57b51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8df401112e8061aa63cdbeb2073c8d44"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga8df401112e8061aa63cdbeb2073c8d44"></a>
-template&lt;template&lt; typename...&gt; class F, typename  = typename std::enable_if&lt;monoidA&lt;F&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:ga8df401112e8061aa63cdbeb2073c8d44"><td class="memTemplItemLeft" align="right" valign="top">F&lt; Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#ga8df401112e8061aa63cdbeb2073c8d44">ftl::operator|</a> (const F&lt; Ts...&gt; &amp;f1, F&lt; Ts...&gt; &amp;&amp;f2)</td></tr>
-<tr class="memdesc:ga8df401112e8061aa63cdbeb2073c8d44"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga8df401112e8061aa63cdbeb2073c8d44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gacd748991e3d656fd22b68bd7b31323f5"><td class="memTemplParams" colspan="2"><a class="anchor" id="gacd748991e3d656fd22b68bd7b31323f5"></a>
-template&lt;template&lt; typename...&gt; class F, typename  = typename std::enable_if&lt;monoidA&lt;F&gt;::instance&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:gacd748991e3d656fd22b68bd7b31323f5"><td class="memTemplItemLeft" align="right" valign="top">F&lt; Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gacd748991e3d656fd22b68bd7b31323f5">ftl::operator|</a> (F&lt; Ts...&gt; &amp;&amp;f1, F&lt; Ts...&gt; &amp;&amp;f2)</td></tr>
-<tr class="memdesc:gacd748991e3d656fd22b68bd7b31323f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:gacd748991e3d656fd22b68bd7b31323f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf0ec601efb3baa54806bfa6af3574d75"><td class="memTemplParams" colspan="2">template&lt;typename F , typename Fn , typename F_  = plain_type&lt;F&gt;, typename  = typename std::enable_if&lt;applicative&lt;F_&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:gaf0ec601efb3baa54806bfa6af3574d75"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gaf0ec601efb3baa54806bfa6af3574d75">ftl::operator*</a> (Fn &amp;&amp;u, F &amp;&amp;v) -&gt; decltype(applicative&lt; F_ &gt;::apply(std::forward&lt; Fn &gt;(u), std::forward&lt; F &gt;(v)))</td></tr>
+<tr class="memdesc:gaf0ec601efb3baa54806bfa6af3574d75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator to ease applicative style programming.  <a href="#gaf0ec601efb3baa54806bfa6af3574d75">More...</a><br/></td></tr>
+<tr class="separator:gaf0ec601efb3baa54806bfa6af3574d75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8f2f2b49a3c74c2aa127c6ce04eef958"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga8f2f2b49a3c74c2aa127c6ce04eef958"></a>
+template&lt;typename F , typename  = typename std::enable_if&lt;monoidA&lt;F&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:ga8f2f2b49a3c74c2aa127c6ce04eef958"><td class="memTemplItemLeft" align="right" valign="top">F&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#ga8f2f2b49a3c74c2aa127c6ce04eef958">ftl::operator|</a> (const F &amp;f1, const F &amp;f2)</td></tr>
+<tr class="memdesc:ga8f2f2b49a3c74c2aa127c6ce04eef958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1monoidA.html#acf842e67110d9858f8e7e835c0d2d513" title="Sequence two applicative computations that can fail.">monoidA::orDo</a>. <br/></td></tr>
+<tr class="separator:ga8f2f2b49a3c74c2aa127c6ce04eef958"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae5472ff2704fdbd7369f922188b0753a"><td class="memTemplParams" colspan="2"><a class="anchor" id="gae5472ff2704fdbd7369f922188b0753a"></a>
+template&lt;typename F , typename  = typename std::enable_if&lt;monoidA&lt;F&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:gae5472ff2704fdbd7369f922188b0753a"><td class="memTemplItemLeft" align="right" valign="top">F&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gae5472ff2704fdbd7369f922188b0753a">ftl::operator|</a> (F &amp;&amp;f1, const F &amp;f2)</td></tr>
+<tr class="memdesc:gae5472ff2704fdbd7369f922188b0753a"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:gae5472ff2704fdbd7369f922188b0753a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaae23611c9df3154cb5095b1fe6981a45"><td class="memTemplParams" colspan="2"><a class="anchor" id="gaae23611c9df3154cb5095b1fe6981a45"></a>
+template&lt;typename F , typename  = typename std::enable_if&lt;monoidA&lt;F&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:gaae23611c9df3154cb5095b1fe6981a45"><td class="memTemplItemLeft" align="right" valign="top">F&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gaae23611c9df3154cb5095b1fe6981a45">ftl::operator|</a> (const F &amp;f1, F &amp;&amp;f2)</td></tr>
+<tr class="memdesc:gaae23611c9df3154cb5095b1fe6981a45"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:gaae23611c9df3154cb5095b1fe6981a45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac60d244528bffa096629d53039b5ed57"><td class="memTemplParams" colspan="2"><a class="anchor" id="gac60d244528bffa096629d53039b5ed57"></a>
+template&lt;typename F , typename  = typename std::enable_if&lt;monoidA&lt;F&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:gac60d244528bffa096629d53039b5ed57"><td class="memTemplItemLeft" align="right" valign="top">F&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__applicative.html#gac60d244528bffa096629d53039b5ed57">ftl::operator|</a> (F &amp;&amp;f1, F &amp;&amp;f2)</td></tr>
+<tr class="memdesc:gac60d244528bffa096629d53039b5ed57"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:gac60d244528bffa096629d53039b5ed57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:gace09b85988c92d73243af3b7a8d67f5a"><td class="memItemLeft" align="right" valign="top">constexpr aApply&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__applicative.html#gace09b85988c92d73243af3b7a8d67f5a">ftl::aapply</a> {}</td></tr>
+<tr class="memdesc:gace09b85988c92d73243af3b7a8d67f5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compile time instance of <a class="el" href="structftl_1_1aApply.html" title="Convenience function object.">aApply</a>.  <a href="#gace09b85988c92d73243af3b7a8d67f5a">More...</a><br/></td></tr>
+<tr class="separator:gace09b85988c92d73243af3b7a8d67f5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p><a class="el" href="applicativepg.html">Applicative Functor</a> and <a class="el" href="monoidapg.html">Monoidal Alternatives</a> concepts and utilities. </p>
@@ -130,7 +143,7 @@ template&lt;template&lt; typename...&gt; class F, typename  = typename std::enab
 </ul>
 </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="gac5b41f8adf454df426c558903f5f9c81"></a>
+<a class="anchor" id="gaf0ec601efb3baa54806bfa6af3574d75"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -152,21 +165,45 @@ template&lt;typename F , typename Fn , typename F_  = plain_type&lt;F&gt;, typen
           <td></td>
           <td>)</td>
           <td></td><td> -&gt; decltype(applicative&lt;F_&gt;::apply(
-				std::forward&lt;Fn&gt;(u),std::forward&lt;F_&gt;(v))) </td>
+				std::forward&lt;Fn&gt;(u),std::forward&lt;F&gt;(v))) </td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Convenience operator to ease applicative style programming. </p>
-<div class="fragment"><div class="line">a * b &lt;=&gt; <a class="code" href="structftl_1_1applicative.html#ac360c626517fd6eb3bdb817834864114" title="Contextualised function application.">applicative&lt;F&gt;::apply</a>(a, b)</div>
+<div class="fragment"><div class="line">a * b &lt;=&gt; <a class="code" href="structftl_1_1applicative.html#ae8261989c486235592c22dfc1705b132" title="Contextualised function application.">applicative&lt;F&gt;::apply</a>(a, b)</div>
 </div><!-- fragment --><p> Where <code>a</code> and <code>b</code> are complete types of <code>F</code> and <code>F</code> is an applicative functor. </p>
 
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="gace09b85988c92d73243af3b7a8d67f5a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr aApply ftl::aapply {}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Compile time instance of <a class="el" href="structftl_1_1aApply.html" title="Convenience function object.">aApply</a>. </p>
+<p>Makes it syntactically cheap to use <code><a class="el" href="structftl_1_1applicative.html#ae8261989c486235592c22dfc1705b132" title="Contextualised function application.">applicative::apply</a></code> in higher- order functions and such.</p>
+<p>Example: </p>
+<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> F, <span class="keyword">typename</span> A, <span class="keyword">typename</span> B&gt;</div>
+<div class="line"><span class="keyword">auto</span> foo(<span class="keyword">const</span> A&amp; a, <span class="keyword">const</span> B&amp; b) -&gt; <a class="code" href="group__typelevel.html#ga1395087c0d9f5de7a15e0a5bf154fac2" title="Get the basic, &quot;undecorated&quot; return type of a function.">ftl::result_of&lt;F(A,B)&gt;</a>;</div>
+<div class="line"></div>
+<div class="line">AnApplicative&lt;ftl::function&lt;U,T&gt;&gt; ff = ...;</div>
+<div class="line">AnApplicative&lt;T&gt; ft = ...;</div>
+<div class="line"></div>
+<div class="line">foo(<a class="code" href="group__applicative.html#gace09b85988c92d73243af3b7a8d67f5a" title="Compile time instance of aApply.">aapply</a>, ff, ft);</div>
+</div><!-- fragment --> 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

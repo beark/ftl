@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -88,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="structftl_1_1functor_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">ftl::functor&lt; std::tuple&lt; T, Ts...&gt; &gt; Struct Template Reference<div class="ingroups"><a class="el" href="group__tuple.html">Tuple</a></div></div>  </div>
@@ -100,24 +100,25 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;ftl/tuple.h&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:abeb4a87b8d8a4d569fa3f2420d41fd27"><td class="memTemplParams" colspan="2"><a class="anchor" id="abeb4a87b8d8a4d569fa3f2420d41fd27"></a>
-template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type, typename... Ts&gt; </td></tr>
-<tr class="memitem:abeb4a87b8d8a4d569fa3f2420d41fd27"><td class="memTemplItemLeft" align="right" valign="top">std::tuple&lt; U, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1functor_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#abeb4a87b8d8a4d569fa3f2420d41fd27">map</a> (F &amp;&amp;f, const std::tuple&lt; T, Ts...&gt; &amp;t)</td></tr>
-<tr class="memdesc:abeb4a87b8d8a4d569fa3f2420d41fd27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply <code>f</code> to first element in the tuple. <br/></td></tr>
-<tr class="separator:abeb4a87b8d8a4d569fa3f2420d41fd27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a40453f4de3c1e5f062f262f7f1a2fa22"><td class="memTemplParams" colspan="2"><a class="anchor" id="a40453f4de3c1e5f062f262f7f1a2fa22"></a>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </td></tr>
+<tr class="memitem:a40453f4de3c1e5f062f262f7f1a2fa22"><td class="memTemplItemLeft" align="right" valign="top">static std::tuple&lt; U, Ts...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1functor_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#a40453f4de3c1e5f062f262f7f1a2fa22">map</a> (F &amp;&amp;f, const std::tuple&lt; T, Ts...&gt; &amp;t)</td></tr>
+<tr class="memdesc:a40453f4de3c1e5f062f262f7f1a2fa22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply <code>f</code> to first element in the tuple. <br/></td></tr>
+<tr class="separator:a40453f4de3c1e5f062f262f7f1a2fa22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename T, typename... Ts&gt;<br/>
 struct ftl::functor&lt; std::tuple&lt; T, Ts...&gt; &gt;</h3>
 
 <p>Functor instance for tuples. </p>
-<p>Separate from the applicative instance because tuples are always functors, but only applicative ones if the remaining types are all monoids. </p>
+<p>Separate from the applicative instance because tuples are always functors, but only applicative ones if the remaining types are all monoids.</p>
+<dl class="section see"><dt>See Also</dt><dd><a href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html">applicative&lt;std::tuple&lt;T,Ts...&gt;&gt;</a> </dd></dl>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

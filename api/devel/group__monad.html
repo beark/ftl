@@ -65,7 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -77,7 +77,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">Monad</div>  </div>
 </div><!--header-->
@@ -88,41 +89,53 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1deriving__join.html">ftl::deriving_join&lt; M &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inheritable implementation of <code>monad&lt;M&gt;::join</code>.  <a href="structftl_1_1deriving__join.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1deriving__map.html">ftl::deriving_map&lt; M &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inheritable implementation of <code>monad&lt;M&gt;::map</code>.  <a href="structftl_1_1deriving__map.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1deriving__bind.html">ftl::deriving_bind&lt; M &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inheritable implementation of <code><a class="el" href="structftl_1_1monad.html#aeaeca77ea0895c2a9fc72f33f5156347" title="Bind a value and execute a computation in M on it.">monad::bind</a></code>.  <a href="structftl_1_1deriving__bind.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1deriving__apply.html">ftl::deriving_apply&lt; M &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inheritable implementation of <code><a class="el" href="structftl_1_1monad.html#a55d9dc66d3ca1a73fa8dd42d427b7e15" title="Applies an encapsulated function to an encapsulated value.">monad::apply</a></code>.  <a href="structftl_1_1deriving__apply.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1mBind.html">ftl::mBind</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function object.  <a href="structftl_1_1mBind.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad.html">ftl::monad&lt; M &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concrete definition of the monad concept.  <a href="structftl_1_1monad.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gae667046c98546e79b11c780174a0e048"><td class="memTemplParams" colspan="2">template&lt;typename M , typename F , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:gae667046c98546e79b11c780174a0e048"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gae667046c98546e79b11c780174a0e048">ftl::operator&gt;&gt;=</a> (const M &amp;m, F &amp;&amp;f) -&gt; decltype(monad&lt; M &gt;::bind(m, std::forward&lt; F &gt;(f)))</td></tr>
-<tr class="memdesc:gae667046c98546e79b11c780174a0e048"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078" title="Bind a value and execute a computation in M on it.">monad::bind</a>.  <a href="#gae667046c98546e79b11c780174a0e048">More...</a><br/></td></tr>
-<tr class="separator:gae667046c98546e79b11c780174a0e048"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga36ebacf434ea5b5986c76a1f9418b7bb"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga36ebacf434ea5b5986c76a1f9418b7bb"></a>
-template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typename  = typename std::enable_if&lt;monad&lt;M_&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:ga36ebacf434ea5b5986c76a1f9418b7bb"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga36ebacf434ea5b5986c76a1f9418b7bb">ftl::operator&gt;&gt;=</a> (M &amp;&amp;m, F &amp;&amp;f) -&gt; decltype(monad&lt; M_ &gt;::bind(std::move(m), std::forward&lt; F &gt;(f)))</td></tr>
-<tr class="memdesc:ga36ebacf434ea5b5986c76a1f9418b7bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga36ebacf434ea5b5986c76a1f9418b7bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad9856f87a004a485f1b99beb250c35f6"><td class="memTemplParams" colspan="2">template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:gad9856f87a004a485f1b99beb250c35f6"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gad9856f87a004a485f1b99beb250c35f6">ftl::operator&lt;&lt;=</a> (F &amp;&amp;f, M &amp;&amp;m) -&gt; decltype(monad&lt; M_ &gt;::bind(std::forward&lt; M_ &gt;(m), std::forward&lt; F &gt;(f)))</td></tr>
-<tr class="memdesc:gad9856f87a004a485f1b99beb250c35f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078" title="Bind a value and execute a computation in M on it.">monad::bind</a>.  <a href="#gad9856f87a004a485f1b99beb250c35f6">More...</a><br/></td></tr>
-<tr class="separator:gad9856f87a004a485f1b99beb250c35f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1dc8cdeb407f99ac95585600c77b3d1b"><td class="memTemplParams" colspan="2">template&lt;typename Mt , typename Mu , typename T  = concept_parameter&lt;Mt&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt&gt;::value			&gt;::type&gt; </td></tr>
-<tr class="memitem:ga1dc8cdeb407f99ac95585600c77b3d1b"><td class="memTemplItemLeft" align="right" valign="top">Mu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga1dc8cdeb407f99ac95585600c77b3d1b">ftl::operator&gt;&gt;</a> (const Mt &amp;m1, const Mu &amp;m2)</td></tr>
-<tr class="memdesc:ga1dc8cdeb407f99ac95585600c77b3d1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform two monadic computations, discard result of first.  <a href="#ga1dc8cdeb407f99ac95585600c77b3d1b">More...</a><br/></td></tr>
-<tr class="separator:ga1dc8cdeb407f99ac95585600c77b3d1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga94d8bce32649e6cae74b153e9fa5b34c"><td class="memTemplParams" colspan="2">template&lt;typename Mt_ , typename Mu , typename Mt  = plain_type&lt;Mt_&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename T  = concept_parameter&lt;Mt&gt;, typename U  = concept_parameter&lt;Mu&gt;, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt&gt;::value			&gt;::type&gt; </td></tr>
-<tr class="memitem:ga94d8bce32649e6cae74b153e9fa5b34c"><td class="memTemplItemLeft" align="right" valign="top">Mt&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga94d8bce32649e6cae74b153e9fa5b34c">ftl::operator&lt;&lt;</a> (Mt_ &amp;&amp;m1, Mu m2)</td></tr>
-<tr class="memdesc:ga94d8bce32649e6cae74b153e9fa5b34c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sequence two monadic computations, return the first.  <a href="#ga94d8bce32649e6cae74b153e9fa5b34c">More...</a><br/></td></tr>
-<tr class="separator:ga94d8bce32649e6cae74b153e9fa5b34c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga599111a0106c7c9a00d71dcbeababacd"><td class="memTemplParams" colspan="2">template&lt;typename Mt_ , typename F , typename Mt  = plain_type&lt;Mt_&gt;, typename T  = concept_parameter&lt;Mt&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename U  = typename decayed_result&lt;F(T)&gt;::type, typename Mu  = typename re_parametrise&lt;Mt,U&gt;::type&gt; </td></tr>
-<tr class="memitem:ga599111a0106c7c9a00d71dcbeababacd"><td class="memTemplItemLeft" align="right" valign="top">Mu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga599111a0106c7c9a00d71dcbeababacd">ftl::liftM</a> (F f, Mt_ &amp;&amp;m)</td></tr>
-<tr class="memdesc:ga599111a0106c7c9a00d71dcbeababacd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lifts a function into M.  <a href="#ga599111a0106c7c9a00d71dcbeababacd">More...</a><br/></td></tr>
-<tr class="separator:ga599111a0106c7c9a00d71dcbeababacd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga83379adbd329f997d47f12a687256573"><td class="memTemplParams" colspan="2">template&lt;typename Mt , typename Mf , typename T  = concept_parameter&lt;Mt&gt;, typename F  = concept_parameter&lt;Mf&gt;, typename U  = typename decayed_result&lt;F(T)&gt;::type, typename Mu  = typename re_parametrise&lt;Mt,U&gt;::type&gt; </td></tr>
-<tr class="memitem:ga83379adbd329f997d47f12a687256573"><td class="memTemplItemLeft" align="right" valign="top">Mu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga83379adbd329f997d47f12a687256573">ftl::ap</a> (const Mf &amp;f, Mt m)</td></tr>
-<tr class="memdesc:ga83379adbd329f997d47f12a687256573"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply a function in M to a value in M.  <a href="#ga83379adbd329f997d47f12a687256573">More...</a><br/></td></tr>
-<tr class="separator:ga83379adbd329f997d47f12a687256573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga635fb0423f67f8ee065fedc9fb7763e4"><td class="memTemplParams" colspan="2">template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typename  = typename std::enable_if&lt;monad&lt;M_&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:ga635fb0423f67f8ee065fedc9fb7763e4"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga635fb0423f67f8ee065fedc9fb7763e4">ftl::operator&gt;&gt;=</a> (M &amp;&amp;m, F &amp;&amp;f) -&gt; decltype(monad&lt; M_ &gt;::bind(std::forward&lt; M &gt;(m), std::forward&lt; F &gt;(f)))</td></tr>
+<tr class="memdesc:ga635fb0423f67f8ee065fedc9fb7763e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1monad.html#aeaeca77ea0895c2a9fc72f33f5156347" title="Bind a value and execute a computation in M on it.">monad::bind</a>.  <a href="#ga635fb0423f67f8ee065fedc9fb7763e4">More...</a><br/></td></tr>
+<tr class="separator:ga635fb0423f67f8ee065fedc9fb7763e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa5b7affb4bcd880f03be8e06b2df3dbb"><td class="memTemplParams" colspan="2">template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typename  = typename std::enable_if&lt;monad&lt;M_&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:gaa5b7affb4bcd880f03be8e06b2df3dbb"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gaa5b7affb4bcd880f03be8e06b2df3dbb">ftl::operator&lt;&lt;=</a> (F &amp;&amp;f, M &amp;&amp;m) -&gt; decltype(monad&lt; M_ &gt;::bind(std::forward&lt; M &gt;(m), std::forward&lt; F &gt;(f)))</td></tr>
+<tr class="memdesc:gaa5b7affb4bcd880f03be8e06b2df3dbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1monad.html#aeaeca77ea0895c2a9fc72f33f5156347" title="Bind a value and execute a computation in M on it.">monad::bind</a>.  <a href="#gaa5b7affb4bcd880f03be8e06b2df3dbb">More...</a><br/></td></tr>
+<tr class="separator:gaa5b7affb4bcd880f03be8e06b2df3dbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa69e01a4b56024be56f7be175e0cd5ed"><td class="memTemplParams" colspan="2">template&lt;typename Mt , typename Mu , typename Mt_  = plain_type&lt;Mt&gt;, typename T  = concept_parameter&lt;Mt_&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt_&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt_&gt;::value			&gt;::type&gt; </td></tr>
+<tr class="memitem:gaa69e01a4b56024be56f7be175e0cd5ed"><td class="memTemplItemLeft" align="right" valign="top">Mu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#gaa69e01a4b56024be56f7be175e0cd5ed">ftl::operator&gt;&gt;</a> (Mt &amp;&amp;m1, const Mu &amp;m2)</td></tr>
+<tr class="memdesc:gaa69e01a4b56024be56f7be175e0cd5ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform two monadic computations, discard result of first.  <a href="#gaa69e01a4b56024be56f7be175e0cd5ed">More...</a><br/></td></tr>
+<tr class="separator:gaa69e01a4b56024be56f7be175e0cd5ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4d8f608949a64546f8006329ea242451"><td class="memTemplParams" colspan="2">template&lt;typename Mt , typename Mu , typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename T  = concept_parameter&lt;Mt&gt;, typename U  = concept_parameter&lt;Mu&gt;, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt&gt;::value			&gt;::type&gt; </td></tr>
+<tr class="memitem:ga4d8f608949a64546f8006329ea242451"><td class="memTemplItemLeft" align="right" valign="top">Mt&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga4d8f608949a64546f8006329ea242451">ftl::operator&lt;&lt;</a> (const Mt &amp;m1, Mu m2)</td></tr>
+<tr class="memdesc:ga4d8f608949a64546f8006329ea242451"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sequence two monadic computations, return the first.  <a href="#ga4d8f608949a64546f8006329ea242451">More...</a><br/></td></tr>
+<tr class="separator:ga4d8f608949a64546f8006329ea242451"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga764862b1a3d6622bd8d98cd17e2417f8"><td class="memTemplParams" colspan="2">template&lt;typename Mt , typename F , typename T  = concept_parameter&lt;Mt&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename U  = result_of&lt;F(T)&gt;, typename Mu  = typename re_parametrise&lt;Mt,U&gt;::type&gt; </td></tr>
+<tr class="memitem:ga764862b1a3d6622bd8d98cd17e2417f8"><td class="memTemplItemLeft" align="right" valign="top">Mu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monad.html#ga764862b1a3d6622bd8d98cd17e2417f8">ftl::liftM</a> (F f, const Mt &amp;m)</td></tr>
+<tr class="memdesc:ga764862b1a3d6622bd8d98cd17e2417f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lifts a function into M.  <a href="#ga764862b1a3d6622bd8d98cd17e2417f8">More...</a><br/></td></tr>
+<tr class="separator:ga764862b1a3d6622bd8d98cd17e2417f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:gaf51d1d800fb103d84d9ff601ce8bd299"><td class="memItemLeft" align="right" valign="top">constexpr mBind&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__monad.html#gaf51d1d800fb103d84d9ff601ce8bd299">ftl::mbind</a> {}</td></tr>
+<tr class="memdesc:gaf51d1d800fb103d84d9ff601ce8bd299"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compile time instance of <a class="el" href="structftl_1_1mBind.html" title="Convenience function object.">mBind</a>.  <a href="#gaf51d1d800fb103d84d9ff601ce8bd299">More...</a><br/></td></tr>
+<tr class="separator:gaf51d1d800fb103d84d9ff601ce8bd299"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p><a class="el" href="monadpg.html">Monad</a> concept and related functions. </p>
@@ -132,16 +145,16 @@ template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typena
 </ul>
 </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="gae667046c98546e79b11c780174a0e048"></a>
+<a class="anchor" id="ga635fb0423f67f8ee065fedc9fb7763e4"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename M , typename F , typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </div>
+template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typename  = typename std::enable_if&lt;monad&lt;M_&gt;::instance&gt;::type&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto ftl::operator&gt;&gt;= </td>
           <td>(</td>
-          <td class="paramtype">const M &amp;&#160;</td>
+          <td class="paramtype">M &amp;&amp;&#160;</td>
           <td class="paramname"><em>m</em>, </td>
         </tr>
         <tr>
@@ -153,21 +166,21 @@ template&lt;typename M , typename F , typename  = typename std::enable_if&lt;mon
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td> -&gt; decltype(monad&lt;M&gt;::bind(m, std::forward&lt;F&gt;(f))) </td>
+          <td></td><td> -&gt; decltype(monad&lt;M_&gt;::bind(std::forward&lt;M&gt;(m), std::forward&lt;F&gt;(f))) </td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Convenience operator for <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078" title="Bind a value and execute a computation in M on it.">monad::bind</a>. </p>
+<p>Convenience operator for <a class="el" href="structftl_1_1monad.html#aeaeca77ea0895c2a9fc72f33f5156347" title="Bind a value and execute a computation in M on it.">monad::bind</a>. </p>
 <p>Basically makes monadic code a lot cleaner. </p>
 
 </div>
 </div>
-<a class="anchor" id="gad9856f87a004a485f1b99beb250c35f6"></a>
+<a class="anchor" id="gaa5b7affb4bcd880f03be8e06b2df3dbb"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typename  = typename std::enable_if&lt;monad&lt;M&gt;::instance&gt;::type&gt; </div>
+template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typename  = typename std::enable_if&lt;monad&lt;M_&gt;::instance&gt;::type&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto ftl::operator&lt;&lt;= </td>
@@ -184,26 +197,26 @@ template&lt;typename M , typename F , typename M_  = plain_type&lt;M&gt;, typena
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td> -&gt; decltype(monad&lt;M_&gt;::bind(std::forward&lt;M_&gt;(m), std::forward&lt;F&gt;(f))) </td>
+          <td></td><td> -&gt; decltype(monad&lt;M_&gt;::bind(std::forward&lt;M&gt;(m), std::forward&lt;F&gt;(f))) </td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Convenience operator for <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078" title="Bind a value and execute a computation in M on it.">monad::bind</a>. </p>
+<p>Convenience operator for <a class="el" href="structftl_1_1monad.html#aeaeca77ea0895c2a9fc72f33f5156347" title="Bind a value and execute a computation in M on it.">monad::bind</a>. </p>
 <p>Mirror of operator &gt;&gt;= </p>
 
 </div>
 </div>
-<a class="anchor" id="ga1dc8cdeb407f99ac95585600c77b3d1b"></a>
+<a class="anchor" id="gaa69e01a4b56024be56f7be175e0cd5ed"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Mt , typename Mu , typename T  = concept_parameter&lt;Mt&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt&gt;::value			&gt;::type&gt; </div>
+template&lt;typename Mt , typename Mu , typename Mt_  = plain_type&lt;Mt&gt;, typename T  = concept_parameter&lt;Mt_&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt_&gt;::instance&gt;::type, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt_&gt;::value			&gt;::type&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">Mu ftl::operator&gt;&gt; </td>
           <td>(</td>
-          <td class="paramtype">const Mt &amp;&#160;</td>
+          <td class="paramtype">Mt &amp;&amp;&#160;</td>
           <td class="paramname"><em>m1</em>, </td>
         </tr>
         <tr>
@@ -225,16 +238,16 @@ template&lt;typename Mt , typename Mu , typename T  = concept_parameter&lt;Mt&gt
 
 </div>
 </div>
-<a class="anchor" id="ga94d8bce32649e6cae74b153e9fa5b34c"></a>
+<a class="anchor" id="ga4d8f608949a64546f8006329ea242451"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Mt_ , typename Mu , typename Mt  = plain_type&lt;Mt_&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename T  = concept_parameter&lt;Mt&gt;, typename U  = concept_parameter&lt;Mu&gt;, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt&gt;::value			&gt;::type&gt; </div>
+template&lt;typename Mt , typename Mu , typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename T  = concept_parameter&lt;Mt&gt;, typename U  = concept_parameter&lt;Mu&gt;, typename  = typename std::enable_if&lt;				std::is_same&lt;typename re_parametrise&lt;Mu,T&gt;::type, Mt&gt;::value			&gt;::type&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">Mt ftl::operator&lt;&lt; </td>
           <td>(</td>
-          <td class="paramtype">Mt_ &amp;&amp;&#160;</td>
+          <td class="paramtype">const Mt &amp;&#160;</td>
           <td class="paramname"><em>m1</em>, </td>
         </tr>
         <tr>
@@ -257,11 +270,11 @@ template&lt;typename Mt_ , typename Mu , typename Mt  = plain_type&lt;Mt_&gt;, t
 
 </div>
 </div>
-<a class="anchor" id="ga599111a0106c7c9a00d71dcbeababacd"></a>
+<a class="anchor" id="ga764862b1a3d6622bd8d98cd17e2417f8"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Mt_ , typename F , typename Mt  = plain_type&lt;Mt_&gt;, typename T  = concept_parameter&lt;Mt&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename U  = typename decayed_result&lt;F(T)&gt;::type, typename Mu  = typename re_parametrise&lt;Mt,U&gt;::type&gt; </div>
+template&lt;typename Mt , typename F , typename T  = concept_parameter&lt;Mt&gt;, typename  = typename std::enable_if&lt;monad&lt;Mt&gt;::instance&gt;::type, typename U  = result_of&lt;F(T)&gt;, typename Mu  = typename re_parametrise&lt;Mt,U&gt;::type&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">Mu ftl::liftM </td>
@@ -272,7 +285,7 @@ template&lt;typename Mt_ , typename F , typename Mt  = plain_type&lt;Mt_&gt;, ty
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Mt_ &amp;&amp;&#160;</td>
+          <td class="paramtype">const Mt &amp;&#160;</td>
           <td class="paramname"><em>m</em>&#160;</td>
         </tr>
         <tr>
@@ -288,41 +301,26 @@ template&lt;typename Mt_ , typename F , typename Mt  = plain_type&lt;Mt_&gt;, ty
 
 </div>
 </div>
-<a class="anchor" id="ga83379adbd329f997d47f12a687256573"></a>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="gaf51d1d800fb103d84d9ff601ce8bd299"></a>
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;typename Mt , typename Mf , typename T  = concept_parameter&lt;Mt&gt;, typename F  = concept_parameter&lt;Mf&gt;, typename U  = typename decayed_result&lt;F(T)&gt;::type, typename Mu  = typename re_parametrise&lt;Mt,U&gt;::type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">Mu ftl::ap </td>
-          <td>(</td>
-          <td class="paramtype">const Mf &amp;&#160;</td>
-          <td class="paramname"><em>f</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Mt&#160;</td>
-          <td class="paramname"><em>m</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="memname">constexpr mBind ftl::mbind {}</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Apply a function in M to a value in M. </p>
-<p>This is actually exactly equivalent to <a class="el" href="structftl_1_1applicative.html#ac360c626517fd6eb3bdb817834864114" title="Contextualised function application.">applicative&lt;M&gt;::apply</a>. </p>
+<p>Compile time instance of <a class="el" href="structftl_1_1mBind.html" title="Convenience function object.">mBind</a>. </p>
+<p>Makes higher order passing of <a class="el" href="structftl_1_1monad.html#aeaeca77ea0895c2a9fc72f33f5156347" title="Bind a value and execute a computation in M on it.">monad&lt;T&gt;::bind</a> even more convenient. </p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

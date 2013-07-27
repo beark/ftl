@@ -65,7 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -76,7 +76,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">Prelude</div>  </div>
 </div><!--header-->
@@ -85,16 +87,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>A number of utility functions useful with higher order functions.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1identity.html">ftl::identity</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identity function object.  <a href="structftl_1_1identity.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaf45d5c020afaf3880a007196bd1999a8"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:gaf45d5c020afaf3880a007196bd1999a8"><td class="memTemplItemLeft" align="right" valign="top">const T &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__prelude.html#gaf45d5c020afaf3880a007196bd1999a8">ftl::id</a> (const T &amp;t)</td></tr>
-<tr class="memdesc:gaf45d5c020afaf3880a007196bd1999a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identity function.  <a href="#gaf45d5c020afaf3880a007196bd1999a8">More...</a><br/></td></tr>
-<tr class="separator:gaf45d5c020afaf3880a007196bd1999a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf46096187bc06452797aac32f8686b1d"><td class="memTemplParams" colspan="2">template&lt;typename R , typename P1 , typename P2 , typename... Ps&gt; </td></tr>
 <tr class="memitem:gaf46096187bc06452797aac32f8686b1d"><td class="memTemplItemLeft" align="right" valign="top">function&lt; R, P1, P2, Ps...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__prelude.html#gaf46096187bc06452797aac32f8686b1d">ftl::curry</a> (R(*f)(P1, P2, Ps...))</td></tr>
 <tr class="memdesc:gaf46096187bc06452797aac32f8686b1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Curries an n-ary function pointer.  <a href="#gaf46096187bc06452797aac32f8686b1d">More...</a><br/></td></tr>
 <tr class="separator:gaf46096187bc06452797aac32f8686b1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1cc062f2c17ffa182003f6451dfdae4f"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga1cc062f2c17ffa182003f6451dfdae4f"></a>
+template&lt;typename R , typename P1 , typename P2 , typename... Ps&gt; </td></tr>
+<tr class="memitem:ga1cc062f2c17ffa182003f6451dfdae4f"><td class="memTemplItemLeft" align="right" valign="top">function&lt; R, P1, P2, Ps...&gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__prelude.html#ga1cc062f2c17ffa182003f6451dfdae4f">ftl::curry</a> (const std::function&lt; R(P1, P2, Ps...)&gt; &amp;f)</td></tr>
+<tr class="memdesc:ga1cc062f2c17ffa182003f6451dfdae4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:ga1cc062f2c17ffa182003f6451dfdae4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac91fd71390af9ff105e02e9ff30e87e1"><td class="memTemplParams" colspan="2"><a class="anchor" id="gac91fd71390af9ff105e02e9ff30e87e1"></a>
 template&lt;typename R , typename T1 , typename T2 &gt; </td></tr>
 <tr class="memitem:gac91fd71390af9ff105e02e9ff30e87e1"><td class="memTemplItemLeft" align="right" valign="top">function&lt; R, T1, T2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__prelude.html#gac91fd71390af9ff105e02e9ff30e87e1">ftl::uncurry</a> (function&lt; function&lt; R, T2 &gt;, T1 &gt; f)</td></tr>
@@ -127,6 +136,12 @@ template&lt;typename R , typename A , typename B &gt; </td></tr>
 <tr class="memitem:ga262e76958ae85c42f0bdd2631deadeb5"><td class="memTemplItemLeft" align="right" valign="top">function&lt; function&lt; R, A &gt;, B &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__prelude.html#ga262e76958ae85c42f0bdd2631deadeb5">ftl::flip</a> (function&lt; function&lt; R, B &gt;, A &gt; f)</td></tr>
 <tr class="memdesc:ga262e76958ae85c42f0bdd2631deadeb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flip parameter order of a curried binary function. <br/></td></tr>
 <tr class="separator:ga262e76958ae85c42f0bdd2631deadeb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:gae0b06fcc8b38dd802352589bf3bec96d"><td class="memItemLeft" align="right" valign="top">constexpr identity&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__prelude.html#gae0b06fcc8b38dd802352589bf3bec96d">ftl::id</a> {}</td></tr>
+<tr class="memdesc:gae0b06fcc8b38dd802352589bf3bec96d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compile time instance of identity.  <a href="#gae0b06fcc8b38dd802352589bf3bec96d">More...</a><br/></td></tr>
+<tr class="separator:gae0b06fcc8b38dd802352589bf3bec96d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>A number of utility functions useful with higher order functions. </p>
@@ -136,27 +151,6 @@ template&lt;typename R , typename A , typename B &gt; </td></tr>
 </ul>
 </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="gaf45d5c020afaf3880a007196bd1999a8"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">const T&amp; ftl::id </td>
-          <td>(</td>
-          <td class="paramtype">const T &amp;&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Identity function. </p>
-<p>Returns whatever is given as parameter. This can be useful in combination with certain higher order functions. </p>
-
-</div>
-</div>
 <a class="anchor" id="gaf46096187bc06452797aac32f8686b1d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -272,10 +266,26 @@ template&lt;typename F , typename... Fs&gt; </div>
 
 </div>
 </div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="gae0b06fcc8b38dd802352589bf3bec96d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr identity ftl::id {}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Compile time instance of identity. </p>
+<p>Makes passing the identity function to higher order functions even more convenient. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -65,7 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -88,8 +88,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1type__seq.html">ftl::type_seq&lt; Ts &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Meta type used to store a variadic type sequence.  <a href="structftl_1_1type__seq.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1concat__type__seqs.html">ftl::concat_type_seqs&lt; L, R &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the basic, "undecorated" return type of a function.  <a href="structftl_1_1concat__type__seqs.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concatenates two type_seqs.  <a href="structftl_1_1concat__type__seqs.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1repeat.html">ftl::repeat&lt; T, N &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Repeat a type N times.  <a href="structftl_1_1repeat.html#details">More...</a><br/></td></tr>
@@ -100,8 +103,11 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1take__types.html">ftl::take_types&lt; N, T, Ts &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the first N elements in a type sequence.  <a href="structftl_1_1take__types.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1take__init.html">ftl::take_init&lt; Ts &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take all elements except the last one.  <a href="structftl_1_1take__init.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1drop__types.html">ftl::drop_types&lt; N, Ts &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take all elements except the last one.  <a href="structftl_1_1drop__types.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drops a number of types from a type sequence.  <a href="structftl_1_1drop__types.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1seq.html">ftl::seq&lt;&gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A number sequence.  <a href="structftl_1_1seq.html#details">More...</a><br/></td></tr>
@@ -124,15 +130,19 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:ga1395087c0d9f5de7a15e0a5bf154fac2"><td class="memTemplParams" colspan="2">template&lt;typename F &gt; </td></tr>
+<tr class="memitem:ga1395087c0d9f5de7a15e0a5bf154fac2"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__typelevel.html#ga1395087c0d9f5de7a15e0a5bf154fac2">ftl::result_of</a> = typename _dtl::decayed_result&lt; F &gt;::type</td></tr>
+<tr class="memdesc:ga1395087c0d9f5de7a15e0a5bf154fac2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the basic, "undecorated" return type of a function.  <a href="#ga1395087c0d9f5de7a15e0a5bf154fac2">More...</a><br/></td></tr>
+<tr class="separator:ga1395087c0d9f5de7a15e0a5bf154fac2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5d3bf2a7c887bde4b59f05cbc0a7098b"><td class="memTemplParams" colspan="2">template&lt;typename T , typename... Ts&gt; </td></tr>
 <tr class="memitem:ga5d3bf2a7c887bde4b59f05cbc0a7098b"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__typelevel.html#ga5d3bf2a7c887bde4b59f05cbc0a7098b">ftl::get_last</a> = get_nth&lt; sizeof...(Ts), T, Ts...&gt;</td></tr>
 <tr class="memdesc:ga5d3bf2a7c887bde4b59f05cbc0a7098b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the final element in a type sequence.  <a href="#ga5d3bf2a7c887bde4b59f05cbc0a7098b">More...</a><br/></td></tr>
 <tr class="separator:ga5d3bf2a7c887bde4b59f05cbc0a7098b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9b2fe7cfd4033787fa2f9c07e7f34839"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga9b2fe7cfd4033787fa2f9c07e7f34839"></a>
+<tr class="memitem:ga3d10d966c41c9018bc34c6c51b4e994f"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga3d10d966c41c9018bc34c6c51b4e994f"></a>
 template&lt;typename T &gt; </td></tr>
-<tr class="memitem:ga9b2fe7cfd4033787fa2f9c07e7f34839"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__typelevel.html#ga9b2fe7cfd4033787fa2f9c07e7f34839">ftl::concept_parameter</a> = typename parametric_type_traits&lt; T &gt;::concept_parameter</td></tr>
-<tr class="memdesc:ga9b2fe7cfd4033787fa2f9c07e7f34839"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenient way of getting the primary concept type of a parametric type. <br/></td></tr>
-<tr class="separator:ga9b2fe7cfd4033787fa2f9c07e7f34839"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3d10d966c41c9018bc34c6c51b4e994f"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__typelevel.html#ga3d10d966c41c9018bc34c6c51b4e994f">ftl::concept_parameter</a> = typename parametric_type_traits&lt; T &gt;::parameter_type</td></tr>
+<tr class="memdesc:ga3d10d966c41c9018bc34c6c51b4e994f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenient way of getting the primary concept type of a parametric type. <br/></td></tr>
+<tr class="separator:ga3d10d966c41c9018bc34c6c51b4e994f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>A collection of "functions" working at a type level. </p>
@@ -143,6 +153,30 @@ template&lt;typename T &gt; </td></tr>
 </ul>
 </dd></dl>
 <h2 class="groupheader">Typedef Documentation</h2>
+<a class="anchor" id="ga1395087c0d9f5de7a15e0a5bf154fac2"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename F &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="group__typelevel.html#ga1395087c0d9f5de7a15e0a5bf154fac2">ftl::result_of</a> = typedef typename _dtl::decayed_result&lt;F&gt;::type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the basic, "undecorated" return type of a function. </p>
+<p>This is really only a composition of std::decay and std::result_of, provided for convenience.</p>
+<p>Example: </p>
+<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> F&gt;</div>
+<div class="line"><span class="keywordtype">void</span> foo() {</div>
+<div class="line">    <span class="comment">// t will be the decayed type of whatever F returns when called</span></div>
+<div class="line">    <span class="comment">// with an int</span></div>
+<div class="line">    <a class="code" href="group__typelevel.html#ga1395087c0d9f5de7a15e0a5bf154fac2" title="Get the basic, &quot;undecorated&quot; return type of a function.">ftl::result_of&lt;F(int)&gt;</a> t;</div>
+<div class="line">}</div>
+</div><!-- fragment --> 
+</div>
+</div>
 <a class="anchor" id="ga5d3bf2a7c887bde4b59f05cbc0a7098b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -165,7 +199,7 @@ template&lt;typename T , typename... Ts&gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

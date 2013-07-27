@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -103,10 +103,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:abc9df8485e4ed89b7f715507879b3b7d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc9df8485e4ed89b7f715507879b3b7d"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#abc9df8485e4ed89b7f715507879b3b7d">value_type</a> = L</td></tr>
-<tr class="memdesc:abc9df8485e4ed89b7f715507879b3b7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type either implements various concepts on. <br/></td></tr>
-<tr class="separator:abc9df8485e4ed89b7f715507879b3b7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5434756648ed6f7fa1b5dd76a7e0039"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad5434756648ed6f7fa1b5dd76a7e0039"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#ad5434756648ed6f7fa1b5dd76a7e0039">left_type</a> = L</td></tr>
+<tr class="memdesc:ad5434756648ed6f7fa1b5dd76a7e0039"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenient access to Left type. <br/></td></tr>
+<tr class="separator:ad5434756648ed6f7fa1b5dd76a7e0039"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a082bbfbc808d8ee0c587118d41053772"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a082bbfbc808d8ee0c587118d41053772"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#a082bbfbc808d8ee0c587118d41053772">right_type</a> = R</td></tr>
+<tr class="memdesc:a082bbfbc808d8ee0c587118d41053772"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenient access to Right type. <br/></td></tr>
+<tr class="separator:a082bbfbc808d8ee0c587118d41053772"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -155,42 +159,43 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 <tr class="memitem:a240370004bd49760934c88368f0e5cfd"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#a240370004bd49760934c88368f0e5cfd">operator bool</a> () const noexcept</td></tr>
 <tr class="memdesc:a240370004bd49760934c88368f0e5cfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator when using either for error handling.  <a href="#a240370004bd49760934c88368f0e5cfd">More...</a><br/></td></tr>
 <tr class="separator:a240370004bd49760934c88368f0e5cfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6c7fe0182013c478123eb4137540c27"><td class="memItemLeft" align="right" valign="top">L &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#aa6c7fe0182013c478123eb4137540c27">operator*</a> ()</td></tr>
-<tr class="memdesc:aa6c7fe0182013c478123eb4137540c27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alternate, concise way of accessing left values.  <a href="#aa6c7fe0182013c478123eb4137540c27">More...</a><br/></td></tr>
-<tr class="separator:aa6c7fe0182013c478123eb4137540c27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40054fa07c0b594b0456c3c527b01f4b"><td class="memItemLeft" align="right" valign="top">const L &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#a40054fa07c0b594b0456c3c527b01f4b">operator*</a> () const </td></tr>
-<tr class="separator:a40054fa07c0b594b0456c3c527b01f4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf918d4a16ca08c697e68d4851530e9a"><td class="memItemLeft" align="right" valign="top">L *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#abf918d4a16ca08c697e68d4851530e9a">operator-&gt;</a> ()</td></tr>
-<tr class="memdesc:abf918d4a16ca08c697e68d4851530e9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concise way of accessing member of left values.  <a href="#abf918d4a16ca08c697e68d4851530e9a">More...</a><br/></td></tr>
-<tr class="separator:abf918d4a16ca08c697e68d4851530e9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02bef5a43f17cfebf941fd31df6519a0"><td class="memItemLeft" align="right" valign="top">const L *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#a02bef5a43f17cfebf941fd31df6519a0">operator-&gt;</a> () const </td></tr>
-<tr class="separator:a02bef5a43f17cfebf941fd31df6519a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d70ed9bd6b48819734ca521c8c7ff8c"><td class="memItemLeft" align="right" valign="top">R &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#a6d70ed9bd6b48819734ca521c8c7ff8c">operator*</a> ()</td></tr>
+<tr class="memdesc:a6d70ed9bd6b48819734ca521c8c7ff8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alternate, concise way of accessing right values.  <a href="#a6d70ed9bd6b48819734ca521c8c7ff8c">More...</a><br/></td></tr>
+<tr class="separator:a6d70ed9bd6b48819734ca521c8c7ff8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cd691d9c289e0fbd740deb83da2c035"><td class="memItemLeft" align="right" valign="top">const R &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#a4cd691d9c289e0fbd740deb83da2c035">operator*</a> () const </td></tr>
+<tr class="separator:a4cd691d9c289e0fbd740deb83da2c035"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07fd3b9229a37822433d9ccdf726a809"><td class="memItemLeft" align="right" valign="top">R *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#a07fd3b9229a37822433d9ccdf726a809">operator-&gt;</a> ()</td></tr>
+<tr class="memdesc:a07fd3b9229a37822433d9ccdf726a809"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concise way of accessing member of right values.  <a href="#a07fd3b9229a37822433d9ccdf726a809">More...</a><br/></td></tr>
+<tr class="separator:a07fd3b9229a37822433d9ccdf726a809"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7196fd13f525fde22481567283148e05"><td class="memItemLeft" align="right" valign="top">const R *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1either.html#a7196fd13f525fde22481567283148e05">operator-&gt;</a> () const </td></tr>
+<tr class="separator:a7196fd13f525fde22481567283148e05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename L, typename R&gt;<br/>
 class ftl::either&lt; L, R &gt;</h3>
 
 <p>Data type modelling a "one of" type. </p>
-<p>Put simply, an instance of either&lt;L,R&gt; can store a value of <em>either</em> type L, or type R, but not both at the same time.</p>
+<p>Put simply, an instance of <code>either&lt;L,R&gt;</code> can store a value of either type L, or type R, but not both at the same time.</p>
 <p>Either fulfills the following concepts if, and only if, <em>both</em> of its sub-types also do:</p>
 <ul>
-<li><a class="el" href="movecons.html">MoveConstructible</a> </li>
-<li><a class="el" href="assignable.html">Assignable</a> </li>
+<li><a class="el" href="movecons.html">MoveConstructible</a></li>
+<li><a class="el" href="assignable.html">Assignable</a></li>
 <li><a class="el" href="eq.html">EqualityComparable</a></li>
 </ul>
 <p>Either fulfills the following concepts regardless of its sub-types:</p>
 <ul>
-<li><a class="el" href="copycons.html">CopyConstructible</a> </li>
-<li><a class="el" href="deref.html">Dereferenceable</a> </li>
-<li><a class="el" href="group__functor.html">Functor</a> (in L) </li>
-<li><a class="el" href="group__applicative.html">Applicative Functor</a> (in L) </li>
-<li><a class="el" href="group__monad.html">Monad</a> (in L)</li>
+<li><a class="el" href="copycons.html">CopyConstructible</a></li>
+<li><a class="el" href="deref.html">Dereferenceable</a></li>
+<li><a class="el" href="empty.html">EmptyState</a> (when containing an <code>L</code>)</li>
+<li><a class="el" href="group__functor.html">Functor</a> (in R)</li>
+<li><a class="el" href="group__applicative.html">Applicative Functor</a> (in R)</li>
+<li><a class="el" href="group__monad.html">Monad</a> (in R)</li>
 </ul>
 <dl class="section note"><dt>Note</dt><dd>Either is <em>not</em> <a class="el" href="defcons.html">DefaultConstructible</a>.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">L</td><td>The "left" type, must satisfy <a class="el" href="copycons.html">CopyConstructible</a> </td></tr>
-    <tr><td class="paramname">R</td><td>The "right" type (sometimes used to signal an error), must satisfy <a class="el" href="copycons.html">CopyConstructible</a> </td></tr>
+    <tr><td class="paramname">R</td><td>The "right" type , must satisfy <a class="el" href="copycons.html">CopyConstructible</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -327,18 +332,18 @@ template&lt;typename L , typename R &gt; </div>
 </div><div class="memdoc">
 
 <p>Convenience operator when using either for error handling. </p>
-<dl class="section return"><dt>Returns</dt><dd>true if the instance is of <em>left</em> type. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the instance is of <em>right</em> type. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="aa6c7fe0182013c478123eb4137540c27"></a>
+<a class="anchor" id="a6d70ed9bd6b48819734ca521c8c7ff8c"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename L , typename R &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">L&amp; <a class="el" href="classftl_1_1either.html">ftl::either</a>&lt; L, R &gt;::operator* </td>
+          <td class="memname">R&amp; <a class="el" href="classftl_1_1either.html">ftl::either</a>&lt; L, R &gt;::operator* </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -346,24 +351,24 @@ template&lt;typename L , typename R &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Alternate, concise way of accessing left values. </p>
+<p>Alternate, concise way of accessing right values. </p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::logic_error</td><td>if called on a right type. </td></tr>
+    <tr><td class="paramname">std::logic_error</td><td>if called on a left type. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="a40054fa07c0b594b0456c3c527b01f4b"></a>
+<a class="anchor" id="a4cd691d9c289e0fbd740deb83da2c035"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename L , typename R &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">const L&amp; <a class="el" href="classftl_1_1either.html">ftl::either</a>&lt; L, R &gt;::operator* </td>
+          <td class="memname">const R&amp; <a class="el" href="classftl_1_1either.html">ftl::either</a>&lt; L, R &gt;::operator* </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -374,14 +379,14 @@ template&lt;typename L , typename R &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="abf918d4a16ca08c697e68d4851530e9a"></a>
+<a class="anchor" id="a07fd3b9229a37822433d9ccdf726a809"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename L , typename R &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">L* <a class="el" href="classftl_1_1either.html">ftl::either</a>&lt; L, R &gt;::operator-&gt; </td>
+          <td class="memname">R* <a class="el" href="classftl_1_1either.html">ftl::either</a>&lt; L, R &gt;::operator-&gt; </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -389,24 +394,24 @@ template&lt;typename L , typename R &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Concise way of accessing member of left values. </p>
+<p>Concise way of accessing member of right values. </p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::logic_error</td><td>if called one a right type. </td></tr>
+    <tr><td class="paramname">std::logic_error</td><td>if called on a left type. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="a02bef5a43f17cfebf941fd31df6519a0"></a>
+<a class="anchor" id="a7196fd13f525fde22481567283148e05"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename L , typename R &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">const L* <a class="el" href="classftl_1_1either.html">ftl::either</a>&lt; L, R &gt;::operator-&gt; </td>
+          <td class="memname">const R* <a class="el" href="classftl_1_1either.html">ftl::either</a>&lt; L, R &gt;::operator-&gt; </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -420,7 +425,7 @@ template&lt;typename L , typename R &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

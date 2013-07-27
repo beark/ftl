@@ -65,7 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -77,7 +77,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">Maybe</div>  </div>
 </div><!--header-->
@@ -88,6 +89,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1nothing__t.html">ftl::nothing_t</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type that can be used to compare any maybe to <code>nothing</code>.  <a href="structftl_1_1nothing__t.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classftl_1_1maybe.html">ftl::maybe&lt; T &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abstracts the concept of optional arguments and similar.  <a href="classftl_1_1maybe.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -97,8 +101,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html">ftl::monad&lt; maybe&lt; T &gt; &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of monad for maybe.  <a href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoidA_3_01maybe_01_4.html">ftl::monoidA&lt; maybe &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of <a class="el" href="structftl_1_1monoidA.html" title="Concrete interface of monoidal alternatives concept.">ftl::monoidA</a> concept.  <a href="structftl_1_1monoidA_3_01maybe_01_4.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoidA_3_01maybe_3_01T_01_4_01_4.html">ftl::monoidA&lt; maybe&lt; T &gt; &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of <a class="el" href="structftl_1_1monoidA.html" title="Concrete interface of monoidal alternatives concept.">ftl::monoidA</a> concept.  <a href="structftl_1_1monoidA_3_01maybe_3_01T_01_4_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1foldable_3_01maybe_3_01T_01_4_01_4.html">ftl::foldable&lt; maybe&lt; T &gt; &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Foldable instance for maybe.  <a href="structftl_1_1foldable_3_01maybe_3_01T_01_4_01_4.html#details">More...</a><br/></td></tr>
@@ -106,19 +110,38 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gafa1d05640c79d83fa80217f4a1784cd8"><td class="memTemplParams" colspan="2"><a class="anchor" id="gafa1d05640c79d83fa80217f4a1784cd8"></a>
-template&lt;typename A &gt; </td></tr>
-<tr class="memitem:gafa1d05640c79d83fa80217f4a1784cd8"><td class="memTemplItemLeft" align="right" valign="top">constexpr maybe&lt; A &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#gafa1d05640c79d83fa80217f4a1784cd8">ftl::value</a> (A &amp;&amp;a) noexcept(std::is_nothrow_constructible&lt; A, A &gt;::value)</td></tr>
-<tr class="memdesc:gafa1d05640c79d83fa80217f4a1784cd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function to create maybe:s. <br/></td></tr>
-<tr class="separator:gafa1d05640c79d83fa80217f4a1784cd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa5204d8f561ca3ad7024987ed4b82475"><td class="memTemplParams" colspan="2">template&lt;typename A &gt; </td></tr>
+<tr class="memitem:gaa5204d8f561ca3ad7024987ed4b82475"><td class="memTemplItemLeft" align="right" valign="top">constexpr maybe&lt; plain_type&lt; A &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#gaa5204d8f561ca3ad7024987ed4b82475">ftl::value</a> (A &amp;&amp;a) noexcept(std::is_nothrow_constructible&lt; plain_type&lt; A &gt;, A &gt;::value)</td></tr>
+<tr class="memdesc:gaa5204d8f561ca3ad7024987ed4b82475"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function to create maybe:s.  <a href="#gaa5204d8f561ca3ad7024987ed4b82475">More...</a><br/></td></tr>
+<tr class="separator:gaa5204d8f561ca3ad7024987ed4b82475"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4d7d3fd5c54a47c7ea162e52c9cf1ff2"><td class="memTemplParams" colspan="2">template&lt;typename A &gt; </td></tr>
 <tr class="memitem:ga4d7d3fd5c54a47c7ea162e52c9cf1ff2"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#ga4d7d3fd5c54a47c7ea162e52c9cf1ff2">ftl::operator==</a> (const maybe&lt; A &gt; &amp;m1, const maybe&lt; A &gt; &amp;m2)</td></tr>
 <tr class="memdesc:ga4d7d3fd5c54a47c7ea162e52c9cf1ff2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality comparison for maybe.  <a href="#ga4d7d3fd5c54a47c7ea162e52c9cf1ff2">More...</a><br/></td></tr>
 <tr class="separator:ga4d7d3fd5c54a47c7ea162e52c9cf1ff2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga17bfd63da060da86715f4bf0fbbd6da7"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga17bfd63da060da86715f4bf0fbbd6da7"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ga17bfd63da060da86715f4bf0fbbd6da7"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#ga17bfd63da060da86715f4bf0fbbd6da7">ftl::operator==</a> (const maybe&lt; T &gt; &amp;m, nothing_t) noexcept</td></tr>
+<tr class="memdesc:ga17bfd63da060da86715f4bf0fbbd6da7"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:ga17bfd63da060da86715f4bf0fbbd6da7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga87e7820bff61581ba25005ea0e1a5b83"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga87e7820bff61581ba25005ea0e1a5b83"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ga87e7820bff61581ba25005ea0e1a5b83"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#ga87e7820bff61581ba25005ea0e1a5b83">ftl::operator==</a> (nothing_t, const maybe&lt; T &gt; &amp;m) noexcept</td></tr>
+<tr class="memdesc:ga87e7820bff61581ba25005ea0e1a5b83"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:ga87e7820bff61581ba25005ea0e1a5b83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga47ecb98decda80ad90fc94c1facf8860"><td class="memTemplParams" colspan="2">template&lt;typename A &gt; </td></tr>
 <tr class="memitem:ga47ecb98decda80ad90fc94c1facf8860"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#ga47ecb98decda80ad90fc94c1facf8860">ftl::operator!=</a> (const maybe&lt; A &gt; &amp;m1, const maybe&lt; A &gt; &amp;m2)</td></tr>
 <tr class="memdesc:ga47ecb98decda80ad90fc94c1facf8860"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not equal to operator for maybe.  <a href="#ga47ecb98decda80ad90fc94c1facf8860">More...</a><br/></td></tr>
 <tr class="separator:ga47ecb98decda80ad90fc94c1facf8860"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaecd4c8c2a9cf823fde3e2e06089350f2"><td class="memTemplParams" colspan="2"><a class="anchor" id="gaecd4c8c2a9cf823fde3e2e06089350f2"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gaecd4c8c2a9cf823fde3e2e06089350f2"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#gaecd4c8c2a9cf823fde3e2e06089350f2">ftl::operator!=</a> (const maybe&lt; T &gt; &amp;m, nothing_t) noexcept</td></tr>
+<tr class="memdesc:gaecd4c8c2a9cf823fde3e2e06089350f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:gaecd4c8c2a9cf823fde3e2e06089350f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae027ce9b7c86ab97e476eb12a92e4c3b"><td class="memTemplParams" colspan="2"><a class="anchor" id="gae027ce9b7c86ab97e476eb12a92e4c3b"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gae027ce9b7c86ab97e476eb12a92e4c3b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#gae027ce9b7c86ab97e476eb12a92e4c3b">ftl::operator!=</a> (nothing_t, const maybe&lt; T &gt; &amp;m) noexcept</td></tr>
+<tr class="memdesc:gae027ce9b7c86ab97e476eb12a92e4c3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:gae027ce9b7c86ab97e476eb12a92e4c3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gadf369621402610b5afe13c5bef1d0604"><td class="memTemplParams" colspan="2">template&lt;typename A &gt; </td></tr>
 <tr class="memitem:gadf369621402610b5afe13c5bef1d0604"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#gadf369621402610b5afe13c5bef1d0604">ftl::operator&lt;</a> (const maybe&lt; A &gt; &amp;m1, const maybe&lt; A &gt; &amp;m2)</td></tr>
 <tr class="memdesc:gadf369621402610b5afe13c5bef1d0604"><td class="mdescLeft">&#160;</td><td class="mdescRight">Less than operator.  <a href="#gadf369621402610b5afe13c5bef1d0604">More...</a><br/></td></tr>
@@ -127,6 +150,12 @@ template&lt;typename A &gt; </td></tr>
 <tr class="memitem:gaaeaf6b95d5cec26a9eed48454136c655"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__maybe.html#gaaeaf6b95d5cec26a9eed48454136c655">ftl::operator&gt;</a> (const maybe&lt; A &gt; &amp;m1, const maybe&lt; A &gt; &amp;m2)</td></tr>
 <tr class="memdesc:gaaeaf6b95d5cec26a9eed48454136c655"><td class="mdescLeft">&#160;</td><td class="mdescRight">Greater than operator.  <a href="#gaaeaf6b95d5cec26a9eed48454136c655">More...</a><br/></td></tr>
 <tr class="separator:gaaeaf6b95d5cec26a9eed48454136c655"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ga823f7f4c282db0d2f9bd11326b41baea"><td class="memItemLeft" align="right" valign="top">constexpr nothing_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__maybe.html#ga823f7f4c282db0d2f9bd11326b41baea">ftl::nothing</a> {}</td></tr>
+<tr class="memdesc:ga823f7f4c282db0d2f9bd11326b41baea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience instance value of <code><a class="el" href="structftl_1_1nothing__t.html" title="Type that can be used to compare any maybe to nothing.">nothing_t</a></code>.  <a href="#ga823f7f4c282db0d2f9bd11326b41baea">More...</a><br/></td></tr>
+<tr class="separator:ga823f7f4c282db0d2f9bd11326b41baea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>The maybe data type and associated operations. </p>
@@ -134,12 +163,42 @@ template&lt;typename A &gt; </td></tr>
 </div><!-- fragment --><dl class="section user"><dt>Dependencies</dt><dd><ul>
 <li>&lt;stdexcept&gt;</li>
 <li>&lt;type_traits&gt;</li>
+<li><a class="el" href="group__prelude.html">Prelude</a></li>
 <li><a class="el" href="group__monoid.html">Monoid</a></li>
 <li><a class="el" href="group__monad.html">Monad</a></li>
 <li><a class="el" href="group__foldable.html">Foldable</a> </li>
 </ul>
 </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="gaa5204d8f561ca3ad7024987ed4b82475"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename A &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr maybe&lt; plain_type&lt; A &gt; &gt; ftl::value </td>
+          <td>(</td>
+          <td class="paramtype">A &amp;&amp;&#160;</td>
+          <td class="paramname"><em>a</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convenience function to create maybe:s. </p>
+<p>Creates a maybe, the exact type of which is automatically inferred from the parameter type. </p>
+
+</div>
+</div>
 <a class="anchor" id="ga4d7d3fd5c54a47c7ea162e52c9cf1ff2"></a>
 <div class="memitem">
 <div class="memproto">
@@ -264,10 +323,30 @@ template&lt;typename A &gt; </div>
 
 </div>
 </div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="ga823f7f4c282db0d2f9bd11326b41baea"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr nothing_t ftl::nothing {}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convenience instance value of <code><a class="el" href="structftl_1_1nothing__t.html" title="Type that can be used to compare any maybe to nothing.">nothing_t</a></code>. </p>
+<p>Useful when one wants to be more explicit than just using the bool cast of <code>maybe</code>.</p>
+<p>Example: </p>
+<div class="fragment"><div class="line"><a class="code" href="classftl_1_1maybe.html" title="Abstracts the concept of optional arguments and similar.">ftl::maybe&lt;T&gt;</a> m = ...;</div>
+<div class="line"><span class="keywordflow">if</span>(m != <a class="code" href="group__maybe.html#ga823f7f4c282db0d2f9bd11326b41baea" title="Convenience instance value of nothing_t.">ftl::nothing</a>)</div>
+<div class="line">    do_something();</div>
+</div><!-- fragment --> 
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

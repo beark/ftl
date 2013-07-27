@@ -65,7 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -77,7 +77,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">Functor</div>  </div>
 </div><!--header-->
@@ -88,31 +89,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1fMap.html">ftl::fMap</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function object.  <a href="structftl_1_1fMap.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1functor.html">ftl::functor&lt; F &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Struct that must be specialised to implement the functor concept.  <a href="structftl_1_1functor.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga395cb731489f99153920d8db3175ac13"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga395cb731489f99153920d8db3175ac13"></a>
-template&lt;typename F , typename Fn , typename  = typename std::enable_if&lt;functor&lt;F&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:ga395cb731489f99153920d8db3175ac13"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#ga395cb731489f99153920d8db3175ac13">ftl::operator%</a> (Fn &amp;&amp;fn, const F &amp;f) -&gt; decltype(functor&lt; F &gt;::map(std::forward&lt; Fn &gt;(fn), f))</td></tr>
-<tr class="memdesc:ga395cb731489f99153920d8db3175ac13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1functor.html#a8bea58a9814e5ab2a3b9ab019d68055b" title="Maps a function to the contained value(s).">functor::map</a>. <br/></td></tr>
-<tr class="separator:ga395cb731489f99153920d8db3175ac13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga21cb0d74ea4d2908bb6a297f47949c2c"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga21cb0d74ea4d2908bb6a297f47949c2c"></a>
+<tr class="memitem:gadcc3d178615fdbaedfb6303ecb52e85b"><td class="memTemplParams" colspan="2"><a class="anchor" id="gadcc3d178615fdbaedfb6303ecb52e85b"></a>
 template&lt;typename F , typename Fn , typename F_  = plain_type&lt;F&gt;, typename  = typename std::enable_if&lt;functor&lt;F_&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:ga21cb0d74ea4d2908bb6a297f47949c2c"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#ga21cb0d74ea4d2908bb6a297f47949c2c">ftl::operator%</a> (Fn &amp;&amp;fn, F &amp;&amp;f) -&gt; decltype(functor&lt; F_ &gt;::map(std::forward&lt; Fn &gt;(fn), std::move(f)))</td></tr>
-<tr class="memdesc:ga21cb0d74ea4d2908bb6a297f47949c2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga21cb0d74ea4d2908bb6a297f47949c2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga79ff5ff7c884b1bacc9abed9dd53aa40"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename...&gt; class F, typename A , typename R , typename... Ts, typename  = typename std::enable_if&lt;				functor&lt;F&lt;A,Ts...&gt;&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:ga79ff5ff7c884b1bacc9abed9dd53aa40"><td class="memTemplItemLeft" align="right" valign="top">function&lt; F&lt; R, Ts...&gt;, A &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#ga79ff5ff7c884b1bacc9abed9dd53aa40">ftl::distribute</a> (F&lt; function&lt; R, A &gt;, Ts...&gt; f)</td></tr>
-<tr class="memdesc:ga79ff5ff7c884b1bacc9abed9dd53aa40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distribute function inside a context across entire context.  <a href="#ga79ff5ff7c884b1bacc9abed9dd53aa40">More...</a><br/></td></tr>
-<tr class="separator:ga79ff5ff7c884b1bacc9abed9dd53aa40"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1680c6b58f2618d51534b0e124c2cbac"><td class="memTemplParams" colspan="2"><a class="anchor" id="ga1680c6b58f2618d51534b0e124c2cbac"></a>
-template&lt;template&lt; typename &gt; class F, typename A , typename R , typename  = typename std::enable_if&lt;				functor&lt;F&lt;A&gt;&gt;::instance&gt;::type&gt; </td></tr>
-<tr class="memitem:ga1680c6b58f2618d51534b0e124c2cbac"><td class="memTemplItemLeft" align="right" valign="top">function&lt; F&lt; R &gt;, A &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#ga1680c6b58f2618d51534b0e124c2cbac">ftl::distribute</a> (F&lt; function&lt; R, A &gt;&gt; f)</td></tr>
-<tr class="memdesc:ga1680c6b58f2618d51534b0e124c2cbac"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
-<tr class="separator:ga1680c6b58f2618d51534b0e124c2cbac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadcc3d178615fdbaedfb6303ecb52e85b"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__functor.html#gadcc3d178615fdbaedfb6303ecb52e85b">ftl::operator%</a> (Fn &amp;&amp;fn, F &amp;&amp;f) -&gt; decltype(functor&lt; F_ &gt;::map(std::forward&lt; Fn &gt;(fn), std::forward&lt; F &gt;(f)))</td></tr>
+<tr class="memdesc:gadcc3d178615fdbaedfb6303ecb52e85b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator for <a class="el" href="structftl_1_1functor.html#a8bea58a9814e5ab2a3b9ab019d68055b" title="Maps a function to the contained value(s).">functor::map</a>. <br/></td></tr>
+<tr class="separator:gadcc3d178615fdbaedfb6303ecb52e85b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:gaae00a3fd2e311a8d7ed20e3a21c49495"><td class="memItemLeft" align="right" valign="top">constexpr fMap&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__functor.html#gaae00a3fd2e311a8d7ed20e3a21c49495">ftl::fmap</a> {}</td></tr>
+<tr class="memdesc:gaae00a3fd2e311a8d7ed20e3a21c49495"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compile time instance of <a class="el" href="structftl_1_1fMap.html" title="Convenience function object.">fMap</a>.  <a href="#gaae00a3fd2e311a8d7ed20e3a21c49495">More...</a><br/></td></tr>
+<tr class="separator:gaae00a3fd2e311a8d7ed20e3a21c49495"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Module containg the <a class="el" href="functorpg.html">Functor</a> concept and related functions. </p>
@@ -122,32 +118,26 @@ template&lt;template&lt; typename &gt; class F, typename A , typename R , typena
 <li>&lt;ftl/function.h&gt; </li>
 </ul>
 </dd></dl>
-<h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ga79ff5ff7c884b1bacc9abed9dd53aa40"></a>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="gaae00a3fd2e311a8d7ed20e3a21c49495"></a>
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;template&lt; typename...&gt; class F, typename A , typename R , typename... Ts, typename  = typename std::enable_if&lt;				functor&lt;F&lt;A,Ts...&gt;&gt;::instance&gt;::type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">function&lt;F&lt;R,Ts...&gt;,A&gt; ftl::distribute </td>
-          <td>(</td>
-          <td class="paramtype">F&lt; function&lt; R, A &gt;, Ts...&gt;&#160;</td>
-          <td class="paramname"><em>f</em></td><td>)</td>
-          <td></td>
+          <td class="memname">constexpr fMap ftl::fmap {}</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Distribute function inside a context across entire context. </p>
-<p>A practical example would be if you had a list of functions from A to R, then <code>distributing</code> that list would give you a function from A to a list of Rs. </p>
+<p>Compile time instance of <a class="el" href="structftl_1_1fMap.html" title="Convenience function object.">fMap</a>. </p>
+<p>Makes it even more convenient to pass <a class="el" href="structftl_1_1functor.html#a8bea58a9814e5ab2a3b9ab019d68055b" title="Maps a function to the contained value(s).">functor&lt;T&gt;::map</a> as parameter to higher order functions. </p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

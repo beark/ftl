@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -100,27 +100,32 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Struct that must be specialised to implement the applicative concept.  
  <a href="structftl_1_1applicative.html#details">More...</a></p>
 
-<p><code>#include &lt;ftl/applicative.h&gt;</code></p>
+<p><code>#include &lt;ftl/concepts/applicative.h&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:adcd071bf33e3249a56199761b9f55696"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative.html#adcd071bf33e3249a56199761b9f55696">T</a> = <a class="el" href="group__typelevel.html#ga9b2fe7cfd4033787fa2f9c07e7f34839">concept_parameter</a>&lt; F &gt;</td></tr>
+<tr class="memitem:adcd071bf33e3249a56199761b9f55696"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative.html#adcd071bf33e3249a56199761b9f55696">T</a> = <a class="el" href="group__typelevel.html#ga3d10d966c41c9018bc34c6c51b4e994f">concept_parameter</a>&lt; F &gt;</td></tr>
 <tr class="memdesc:adcd071bf33e3249a56199761b9f55696"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type F is an applicative functor on.  <a href="#adcd071bf33e3249a56199761b9f55696">More...</a><br/></td></tr>
 <tr class="separator:adcd071bf33e3249a56199761b9f55696"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:aa799f90c2b5e6936bc361cb2b96012b4"><td class="memItemLeft" align="right" valign="top">static F&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative.html#aa799f90c2b5e6936bc361cb2b96012b4">pure</a> (const <a class="el" href="structftl_1_1applicative.html#adcd071bf33e3249a56199761b9f55696">T</a> &amp;x)</td></tr>
+<tr class="memdesc:aa799f90c2b5e6936bc361cb2b96012b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encapsulate a pure value in the applicative functor.  <a href="#aa799f90c2b5e6936bc361cb2b96012b4">More...</a><br/></td></tr>
+<tr class="separator:aa799f90c2b5e6936bc361cb2b96012b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0154bb314c06e66c822f7341d284ef5f"><td class="memItemLeft" align="right" valign="top">static F&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative.html#a0154bb314c06e66c822f7341d284ef5f">pure</a> (<a class="el" href="structftl_1_1applicative.html#adcd071bf33e3249a56199761b9f55696">T</a> &amp;&amp;x)</td></tr>
-<tr class="memdesc:a0154bb314c06e66c822f7341d284ef5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encapsulate a pure value in the applicative functor.  <a href="#a0154bb314c06e66c822f7341d284ef5f">More...</a><br/></td></tr>
 <tr class="separator:a0154bb314c06e66c822f7341d284ef5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8634a56ed34db5853eb2704eadc772d0"><td class="memTemplParams" colspan="2">template&lt;typename Fn , typename U  = typename decayed_result&lt;Fn(T)&gt;::type, typename Fu  = typename re_parametrise&lt;F,U&gt;::type&gt; </td></tr>
+<tr class="memitem:a8634a56ed34db5853eb2704eadc772d0"><td class="memTemplParams" colspan="2">template&lt;typename Fn , typename U  = result_of&lt;Fn(T)&gt;, typename Fu  = typename re_parametrise&lt;F,U&gt;::type&gt; </td></tr>
 <tr class="memitem:a8634a56ed34db5853eb2704eadc772d0"><td class="memTemplItemLeft" align="right" valign="top">static Fu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative.html#a8634a56ed34db5853eb2704eadc772d0">map</a> (Fn &amp;&amp;fn, const F &amp;f)</td></tr>
 <tr class="memdesc:a8634a56ed34db5853eb2704eadc772d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map a function to inner value of functor.  <a href="#a8634a56ed34db5853eb2704eadc772d0">More...</a><br/></td></tr>
 <tr class="separator:a8634a56ed34db5853eb2704eadc772d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac360c626517fd6eb3bdb817834864114"><td class="memTemplParams" colspan="2">template&lt;typename Ff_ , typename Ff  = plain_type&lt;Ff_&gt;, typename Fn  = concept_parameter&lt;Ff&gt;, typename U  = typename decayed_result&lt;Fn(T)&gt;::type, typename Fu  = typename re_parametrise&lt;F,U&gt;::type, typename  = typename std::enable_if&lt;std::is_same&lt;				typename re_parametrise&lt;Ff,T&gt;::type, F			&gt;::value&gt;::type&gt; </td></tr>
-<tr class="memitem:ac360c626517fd6eb3bdb817834864114"><td class="memTemplItemLeft" align="right" valign="top">static Fu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative.html#ac360c626517fd6eb3bdb817834864114">apply</a> (Ff_ &amp;&amp;fn, F &amp;&amp;f)</td></tr>
-<tr class="memdesc:ac360c626517fd6eb3bdb817834864114"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contextualised function application.  <a href="#ac360c626517fd6eb3bdb817834864114">More...</a><br/></td></tr>
-<tr class="separator:ac360c626517fd6eb3bdb817834864114"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8261989c486235592c22dfc1705b132"><td class="memTemplParams" colspan="2">template&lt;typename Ff , typename Ff_  = plain_type&lt;Ff&gt;, typename Fn  = concept_parameter&lt;Ff_&gt;, typename U  = result_of&lt;Fn(T)&gt;, typename Fu  = typename re_parametrise&lt;F,U&gt;::type, typename  = typename std::enable_if&lt;std::is_same&lt;				typename re_parametrise&lt;Ff_,T&gt;::type, F			&gt;::value&gt;::type&gt; </td></tr>
+<tr class="memitem:ae8261989c486235592c22dfc1705b132"><td class="memTemplItemLeft" align="right" valign="top">static Fu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative.html#ae8261989c486235592c22dfc1705b132">apply</a> (Ff &amp;&amp;fn, const F &amp;f)</td></tr>
+<tr class="memdesc:ae8261989c486235592c22dfc1705b132"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contextualised function application.  <a href="#ae8261989c486235592c22dfc1705b132">More...</a><br/></td></tr>
+<tr class="separator:ae8261989c486235592c22dfc1705b132"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2064c88fb7313a2e6d7cf40ce3b46c8"><td class="memTemplParams" colspan="2">template&lt;typename Ff , typename Ff_  = plain_type&lt;Ff&gt;, typename Fn  = concept_parameter&lt;Ff_&gt;, typename U  = result_of&lt;Fn(T)&gt;, typename Fu  = typename re_parametrise&lt;F,U&gt;::type, typename  = typename std::enable_if&lt;std::is_same&lt;				typename re_parametrise&lt;Ff_,T&gt;::type, F			&gt;::value&gt;::type&gt; </td></tr>
+<tr class="memitem:ac2064c88fb7313a2e6d7cf40ce3b46c8"><td class="memTemplItemLeft" align="right" valign="top">static Fu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1applicative.html#ac2064c88fb7313a2e6d7cf40ce3b46c8">apply</a> (Ff &amp;&amp;fn, F &amp;&amp;f)</td></tr>
+<tr class="separator:ac2064c88fb7313a2e6d7cf40ce3b46c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -141,7 +146,7 @@ interface ftl::applicative&lt; F &gt;</h3>
 template&lt;typename F &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structftl_1_1applicative.html">ftl::applicative</a>&lt; F &gt;::<a class="el" href="structftl_1_1applicative.html#adcd071bf33e3249a56199761b9f55696">T</a> =  <a class="el" href="group__typelevel.html#ga9b2fe7cfd4033787fa2f9c07e7f34839">concept_parameter</a>&lt;F&gt;</td>
+          <td class="memname">using <a class="el" href="structftl_1_1applicative.html">ftl::applicative</a>&lt; F &gt;::<a class="el" href="structftl_1_1applicative.html#adcd071bf33e3249a56199761b9f55696">T</a> =  <a class="el" href="group__typelevel.html#ga3d10d966c41c9018bc34c6c51b4e994f">concept_parameter</a>&lt;F&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -152,6 +157,38 @@ template&lt;typename F &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="aa799f90c2b5e6936bc361cb2b96012b4"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename F &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static F <a class="el" href="structftl_1_1applicative.html">ftl::applicative</a>&lt; F &gt;::pure </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structftl_1_1applicative.html#adcd071bf33e3249a56199761b9f55696">T</a> &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Encapsulate a pure value in the applicative functor. </p>
+<p>Defaults to <a class="el" href="structftl_1_1monad.html#acc337ad5bb79d4f4f764598aa31a2d75" title="Encapsulate a &quot;pure&quot; value.">monad&lt;F&gt;::pure</a>, because any monad is also an applicative functor.</p>
+<dl class="section note"><dt>Note</dt><dd>Default implementation only works if <code>F</code> has a monad instance defined.</dd>
+<dd>
+If implementing applicative directly (instead of implicitly by way of monad), then <code>pure</code> may be overloaded or replaced with a <code>const</code> reference version, or even a pass by value version. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a0154bb314c06e66c822f7341d284ef5f"></a>
 <div class="memitem">
 <div class="memproto">
@@ -175,12 +212,7 @@ template&lt;typename F &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Encapsulate a pure value in the applicative functor. </p>
-<p>Defaults to <a class="el" href="structftl_1_1monad.html#acc337ad5bb79d4f4f764598aa31a2d75" title="Encapsulate a &quot;pure&quot; value.">monad&lt;F&gt;::pure</a>, because any monad is also an applicative functor.</p>
-<dl class="section note"><dt>Note</dt><dd>Default implementation only works if <code>F</code> has a monad instance defined.</dd>
-<dd>
-If implementing applicative directly (instead of implicitly by way of monad), then <code>pure</code> may be overloaded or replaced with a <code>const</code> reference version, or even a pass by value version. </dd></dl>
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
 
 </div>
 </div>
@@ -190,7 +222,7 @@ If implementing applicative directly (instead of implicitly by way of monad), th
 <div class="memtemplate">
 template&lt;typename F &gt; </div>
 <div class="memtemplate">
-template&lt;typename Fn , typename U  = typename decayed_result&lt;Fn(T)&gt;::type, typename Fu  = typename re_parametrise&lt;F,U&gt;::type&gt; </div>
+template&lt;typename Fn , typename U  = result_of&lt;Fn(T)&gt;, typename Fu  = typename re_parametrise&lt;F,U&gt;::type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -225,13 +257,13 @@ template&lt;typename Fn , typename U  = typename decayed_result&lt;Fn(T)&gt;::ty
 
 </div>
 </div>
-<a class="anchor" id="ac360c626517fd6eb3bdb817834864114"></a>
+<a class="anchor" id="ae8261989c486235592c22dfc1705b132"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename F &gt; </div>
 <div class="memtemplate">
-template&lt;typename Ff_ , typename Ff  = plain_type&lt;Ff_&gt;, typename Fn  = concept_parameter&lt;Ff&gt;, typename U  = typename decayed_result&lt;Fn(T)&gt;::type, typename Fu  = typename re_parametrise&lt;F,U&gt;::type, typename  = typename std::enable_if&lt;std::is_same&lt;				typename re_parametrise&lt;Ff,T&gt;::type, F			&gt;::value&gt;::type&gt; </div>
+template&lt;typename Ff , typename Ff_  = plain_type&lt;Ff&gt;, typename Fn  = concept_parameter&lt;Ff_&gt;, typename U  = result_of&lt;Fn(T)&gt;, typename Fu  = typename re_parametrise&lt;F,U&gt;::type, typename  = typename std::enable_if&lt;std::is_same&lt;				typename re_parametrise&lt;Ff_,T&gt;::type, F			&gt;::value&gt;::type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -239,7 +271,56 @@ template&lt;typename Ff_ , typename Ff  = plain_type&lt;Ff_&gt;, typename Fn  = 
         <tr>
           <td class="memname">static Fu <a class="el" href="structftl_1_1applicative.html">ftl::applicative</a>&lt; F &gt;::apply </td>
           <td>(</td>
-          <td class="paramtype">Ff_ &amp;&amp;&#160;</td>
+          <td class="paramtype">Ff &amp;&amp;&#160;</td>
+          <td class="paramname"><em>fn</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const F &amp;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Contextualised function application. </p>
+<p>Applies the wrapped/contextualised function <code>fn</code> to the similarly wrapped value <code>f</code>.</p>
+<p>Default implementation is to use monad's <code>ap()</code>.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Ff</td><td>must satisfy <code>std::is_same&lt;typename <a class="el" href="structftl_1_1re__parametrise.html" title="Changes the concept parameter type of some template type.">re_parametrise</a>&lt;Ff,T&gt;::type, F&gt;::value</code></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Default implementation only works if F is already a monad. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac2064c88fb7313a2e6d7cf40ce3b46c8"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename F &gt; </div>
+<div class="memtemplate">
+template&lt;typename Ff , typename Ff_  = plain_type&lt;Ff&gt;, typename Fn  = concept_parameter&lt;Ff_&gt;, typename U  = result_of&lt;Fn(T)&gt;, typename Fu  = typename re_parametrise&lt;F,U&gt;::type, typename  = typename std::enable_if&lt;std::is_same&lt;				typename re_parametrise&lt;Ff_,T&gt;::type, F			&gt;::value&gt;::type&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static Fu <a class="el" href="structftl_1_1applicative.html">ftl::applicative</a>&lt; F &gt;::apply </td>
+          <td>(</td>
+          <td class="paramtype">Ff &amp;&amp;&#160;</td>
           <td class="paramname"><em>fn</em>, </td>
         </tr>
         <tr>
@@ -260,17 +341,7 @@ template&lt;typename Ff_ , typename Ff  = plain_type&lt;Ff_&gt;, typename Fn  = 
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Contextualised function application. </p>
-<p>Applies the wrapped/contextualised function <code>fn</code> to the similarly wrapped value <code>f</code>.</p>
-<p>Default implementation is to use monad's <code><a class="el" href="group__monad.html#ga83379adbd329f997d47f12a687256573" title="Apply a function in M to a value in M.">ap()</a></code>.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Ff</td><td>must satisfy <code>std::is_same&lt;typename <a class="el" href="structftl_1_1re__parametrise.html" title="Changes the concept parameter type of some template type.">re_parametrise</a>&lt;Ff,T&gt;::type, F&gt;::value</code></td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>Default implementation only works if F is already a monad. </dd></dl>
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
 
 </div>
 </div>
@@ -303,7 +374,7 @@ template&lt;typename F &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

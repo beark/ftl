@@ -65,7 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -88,9 +88,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoid_3_01std_1_1function_3_01M_07Ps_8_8_8_08_4_01_4.html">ftl::monoid&lt; std::function&lt; M(Ps...)&gt; &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monoid instance for std::functions returning monoids.  <a href="structftl_1_1monoid_3_01std_1_1function_3_01M_07Ps_8_8_8_08_4_01_4.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1sum__monoid.html">ftl::sum_monoid&lt; N &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of monoid for numbers, interpreted as sums.  <a href="structftl_1_1sum__monoid.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -103,8 +100,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1all.html">ftl::all</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper for booleans to get a monoid implementation.  <a href="structftl_1_1all.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoid_3_01ord_01_4.html">ftl::monoid&lt; ord &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monoid instance for ord.  <a href="structftl_1_1monoid_3_01ord_01_4.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoid_3_01std_1_1function_3_01M_07Ps_8_8_8_08_4_01_4.html">ftl::monoid&lt; std::function&lt; M(Ps...)&gt; &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monoid instance for std::functions returning monoids.  <a href="structftl_1_1monoid_3_01std_1_1function_3_01M_07Ps_8_8_8_08_4_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monoid.html">ftl::monoid&lt; M &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concrete monoid interface.  <a href="structftl_1_1monoid.html#details">More...</a><br/></td></tr>
@@ -116,6 +113,11 @@ Functions</h2></td></tr>
 <tr class="memitem:gacb392d4270de828d3c52854639da09a2"><td class="memTemplItemLeft" align="right" valign="top">M&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monoid.html#gacb392d4270de828d3c52854639da09a2">ftl::operator^</a> (const M &amp;m1, const M &amp;m2)</td></tr>
 <tr class="memdesc:gacb392d4270de828d3c52854639da09a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience operator to ease use of append.  <a href="#gacb392d4270de828d3c52854639da09a2">More...</a><br/></td></tr>
 <tr class="separator:gacb392d4270de828d3c52854639da09a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa11fbcbdac0fcec2abf7d5ba3c179b27"><td class="memTemplParams" colspan="2"><a class="anchor" id="gaa11fbcbdac0fcec2abf7d5ba3c179b27"></a>
+template&lt;typename M , typename  = typename std::enable_if&lt;monoid&lt;M&gt;::instance&gt;::type&gt; </td></tr>
+<tr class="memitem:gaa11fbcbdac0fcec2abf7d5ba3c179b27"><td class="memTemplItemLeft" align="right" valign="top">M&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monoid.html#gaa11fbcbdac0fcec2abf7d5ba3c179b27">ftl::operator^</a> (M &amp;&amp;m1, M &amp;&amp;m2)</td></tr>
+<tr class="memdesc:gaa11fbcbdac0fcec2abf7d5ba3c179b27"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br/></td></tr>
+<tr class="separator:gaa11fbcbdac0fcec2abf7d5ba3c179b27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad0776bac2bed3184280e901bd31c670c"><td class="memTemplParams" colspan="2"><a class="anchor" id="gad0776bac2bed3184280e901bd31c670c"></a>
 template&lt;typename N &gt; </td></tr>
 <tr class="memitem:gad0776bac2bed3184280e901bd31c670c"><td class="memTemplItemLeft" align="right" valign="top">constexpr sum_monoid&lt; N &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__monoid.html#gad0776bac2bed3184280e901bd31c670c">ftl::sum</a> (N num) noexcept(std::is_nothrow_constructible&lt; sum_monoid&lt; N &gt;, N &gt;::value)</td></tr>
@@ -169,7 +171,7 @@ template&lt;typename M , typename  = typename std::enable_if&lt;monoid&lt;M&gt;:
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -1,6 +1,8 @@
 var searchData=
 [
   ['re_5fparametrise',['re_parametrise',['../structftl_1_1re__parametrise.html',1,'ftl']]],
+  ['re_5fparametrise_3c_20either_3c_20l_2c_20r_20_3e_2c_20r2_20_3e',['re_parametrise&lt; either&lt; L, R &gt;, R2 &gt;',['../structftl_1_1re__parametrise_3_01either_3_01L_00_01R_01_4_00_01R2_01_4.html',1,'ftl']]],
+  ['re_5fparametrise_3c_20maybet_3c_20m_20_3e_2c_20u_20_3e',['re_parametrise&lt; maybeT&lt; M &gt;, U &gt;',['../structftl_1_1re__parametrise_3_01maybeT_3_01M_01_4_00_01U_01_4.html',1,'ftl']]],
   ['re_5fparametrise_3c_20std_3a_3aforward_5flist_3c_20t_2c_20a_3c_20t_20_3e_20_3e_2c_20u_20_3e',['re_parametrise&lt; std::forward_list&lt; T, A&lt; T &gt; &gt;, U &gt;',['../structftl_1_1re__parametrise_3_01std_1_1forward__list_3_01T_00_01A_3_01T_01_4_01_4_00_01U_01_4.html',1,'ftl']]],
   ['re_5fparametrise_3c_20std_3a_3alist_3c_20t_2c_20a_3c_20t_20_3e_20_3e_2c_20u_20_3e',['re_parametrise&lt; std::list&lt; T, A&lt; T &gt; &gt;, U &gt;',['../structftl_1_1re__parametrise_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_00_01U_01_4.html',1,'ftl']]],
   ['re_5fparametrise_3c_20std_3a_3avector_3c_20t_2c_20a_3c_20t_20_3e_20_3e_2c_20u_20_3e',['re_parametrise&lt; std::vector&lt; T, A&lt; T &gt; &gt;, U &gt;',['../structftl_1_1re__parametrise_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_00_01U_01_4.html',1,'ftl']]],

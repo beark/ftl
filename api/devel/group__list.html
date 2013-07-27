@@ -65,7 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -109,10 +109,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga7a6fdd5ef4f6f9b380edff05b42e44ec"><td class="memTemplParams" colspan="2">template&lt;typename F , typename T , template&lt; typename &gt; class A, typename U  = typename decayed_result&lt;F(T)&gt;::type::value_type&gt; </td></tr>
-<tr class="memitem:ga7a6fdd5ef4f6f9b380edff05b42e44ec"><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; U, A&lt; U &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__list.html#ga7a6fdd5ef4f6f9b380edff05b42e44ec">ftl::concatMap</a> (F f, const std::list&lt; T, A&lt; T &gt;&gt; &amp;l)</td></tr>
-<tr class="memdesc:ga7a6fdd5ef4f6f9b380edff05b42e44ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps and concatenates in one step.  <a href="#ga7a6fdd5ef4f6f9b380edff05b42e44ec">More...</a><br/></td></tr>
-<tr class="separator:ga7a6fdd5ef4f6f9b380edff05b42e44ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae53ffac9b7b490be196787cb1e0ae4fd"><td class="memTemplParams" colspan="2">template&lt;typename F , typename T , template&lt; typename &gt; class A, typename U  = typename result_of&lt;F(T)&gt;::value_type&gt; </td></tr>
+<tr class="memitem:gae53ffac9b7b490be196787cb1e0ae4fd"><td class="memTemplItemLeft" align="right" valign="top">std::list&lt; U, A&lt; U &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__list.html#gae53ffac9b7b490be196787cb1e0ae4fd">ftl::concatMap</a> (F &amp;&amp;f, const std::list&lt; T, A&lt; T &gt;&gt; &amp;l)</td></tr>
+<tr class="memdesc:gae53ffac9b7b490be196787cb1e0ae4fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps and concatenates in one step.  <a href="#gae53ffac9b7b490be196787cb1e0ae4fd">More...</a><br/></td></tr>
+<tr class="separator:gae53ffac9b7b490be196787cb1e0ae4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Concept implementations and utility functions for std::list. </p>
@@ -133,16 +133,16 @@ Functions</h2></td></tr>
 </ul>
 </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ga7a6fdd5ef4f6f9b380edff05b42e44ec"></a>
+<a class="anchor" id="gae53ffac9b7b490be196787cb1e0ae4fd"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename F , typename T , template&lt; typename &gt; class A, typename U  = typename decayed_result&lt;F(T)&gt;::type::value_type&gt; </div>
+template&lt;typename F , typename T , template&lt; typename &gt; class A, typename U  = typename result_of&lt;F(T)&gt;::value_type&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">std::list&lt;U,A&lt;U&gt; &gt; ftl::concatMap </td>
           <td>(</td>
-          <td class="paramtype">F&#160;</td>
+          <td class="paramtype">F &amp;&amp;&#160;</td>
           <td class="paramname"><em>f</em>, </td>
         </tr>
         <tr>
@@ -172,7 +172,7 @@ template&lt;typename F , typename T , template&lt; typename &gt; class A, typena
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -84,12 +84,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="#index_e"><span>e</span></a></li>
       <li><a href="#index_f"><span>f</span></a></li>
       <li><a href="#index_i"><span>i</span></a></li>
+      <li><a href="#index_j"><span>j</span></a></li>
       <li><a href="#index_l"><span>l</span></a></li>
       <li><a href="#index_m"><span>m</span></a></li>
       <li><a href="#index_n"><span>n</span></a></li>
       <li><a href="#index_o"><span>o</span></a></li>
       <li><a href="#index_p"><span>p</span></a></li>
       <li><a href="#index_r"><span>r</span></a></li>
+      <li><a href="#index_s"><span>s</span></a></li>
     </ul>
   </div>
 </div><!-- top -->
@@ -98,7 +100,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -118,24 +120,32 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="structftl_1_1any.html#a8ae36297e6e7201ca5e3c2363f56bd6e">ftl::any</a>
 </li>
 <li>append()
-: <a class="el" href="structftl_1_1monoid.html#a51ffabd70a2c769b70306a7be91f53c7">ftl::monoid&lt; M &gt;</a>
-, <a class="el" href="structftl_1_1monoid_3_01std_1_1shared__ptr_3_01T_01_4_01_4.html#a370531951cb9622f167d3c4097eae2e4">ftl::monoid&lt; std::shared_ptr&lt; T &gt; &gt;</a>
+: <a class="el" href="structftl_1_1monoid_3_01function_3_01M_00_01Ps_8_8_8_4_01_4.html#ab630bfbf78ec430a3860b724f7a15f87">ftl::monoid&lt; function&lt; M, Ps...&gt; &gt;</a>
 , <a class="el" href="structftl_1_1monoid_3_01std_1_1future_3_01T_01_4_01_4.html#a56775ee071ac404974b87988ef3bb2f8">ftl::monoid&lt; std::future&lt; T &gt; &gt;</a>
-, <a class="el" href="structftl_1_1monoid_3_01function_3_01M_00_01Ps_8_8_8_4_01_4.html#ab630bfbf78ec430a3860b724f7a15f87">ftl::monoid&lt; function&lt; M, Ps...&gt; &gt;</a>
+, <a class="el" href="structftl_1_1monoid.html#a51ffabd70a2c769b70306a7be91f53c7">ftl::monoid&lt; M &gt;</a>
+, <a class="el" href="structftl_1_1monoid_3_01std_1_1shared__ptr_3_01T_01_4_01_4.html#a370531951cb9622f167d3c4097eae2e4">ftl::monoid&lt; std::shared_ptr&lt; T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monoid_3_01lazy_3_01T_01_4_01_4.html#a4641401b2cb81e0cda984393c8122cd1">ftl::monoid&lt; lazy&lt; T &gt; &gt;</a>
 </li>
 <li>apply()
-: <a class="el" href="structftl_1_1applicative.html#ac360c626517fd6eb3bdb817834864114">ftl::applicative&lt; F &gt;</a>
+: <a class="el" href="structftl_1_1monad.html#a55d9dc66d3ca1a73fa8dd42d427b7e15">ftl::monad&lt; M &gt;</a>
+, <a class="el" href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#a3dee060969677da0e52bad8c907daaea">ftl::applicative&lt; std::tuple&lt; T, Ts...&gt; &gt;</a>
+, <a class="el" href="structftl_1_1applicative.html#ae8261989c486235592c22dfc1705b132">ftl::applicative&lt; F &gt;</a>
 </li>
 </ul>
 
 
 <h3><a class="anchor" id="index_b"></a>- b -</h3><ul>
 <li>bind()
-: <a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#aba9e80ccf828745674d7a2479c292a64">ftl::monad&lt; std::future&lt; T &gt; &gt;</a>
-, <a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a5ef2ac937e4c43f14798d6276fcf430b">ftl::monad&lt; std::vector&lt; T, A&lt; T &gt; &gt; &gt;</a>
-, <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078">ftl::monad&lt; M &gt;</a>
-, <a class="el" href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html#a2bc96a6eaf8bf25a8e711827a937c85f">ftl::monad&lt; maybe&lt; T &gt; &gt;</a>
+: <a class="el" href="structftl_1_1monad.html#aeaeca77ea0895c2a9fc72f33f5156347">ftl::monad&lt; M &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#aa9fd6e426335af43759173cae44f70ed">ftl::monad&lt; std::vector&lt; T, A&lt; T &gt; &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01maybeT_3_01M_01_4_01_4.html#a98d1290ecd15467ec93e714dbaf625a5">ftl::monad&lt; maybeT&lt; M &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html#a90308e23514fc7d8e4b25488f3ba2016">ftl::monad&lt; maybe&lt; T &gt; &gt;</a>
 , <a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a4d2da4163e27e425e4edf4329ffe3339">ftl::monad&lt; std::list&lt; T, A&lt; T &gt; &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01lazyT_3_01M_01_4_01_4.html#a391851afffa11b5cb782c99fb77d8080">ftl::monad&lt; lazyT&lt; M &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01lazy_3_01T_01_4_01_4.html#ace3b4f34ff29d7f484684c83847e5eb3">ftl::monad&lt; lazy&lt; T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#aba9e80ccf828745674d7a2479c292a64">ftl::monad&lt; std::future&lt; T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01eitherT_3_01L_00_01M_01_4_01_4.html#a34404d81e6d511466f8fb511035d2efd">ftl::monad&lt; eitherT&lt; L, M &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01either_3_01L_00_01T_01_4_01_4.html#a3da90a5d08b5ed02f18f8b907a5224e4">ftl::monad&lt; either&lt; L, T &gt; &gt;</a>
 </li>
 </ul>
 
@@ -151,12 +161,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>either()
 : <a class="el" href="classftl_1_1either.html#a3855238b1f3d8d71e7ba928fbaa7dd7c">ftl::either&lt; L, R &gt;</a>
 </li>
+<li>eitherT()
+: <a class="el" href="classftl_1_1eitherT.html#a9153a989cd6abb2d0d86f8b653d79244">ftl::eitherT&lt; L, M &gt;</a>
+</li>
 </ul>
 
 
 <h3><a class="anchor" id="index_f"></a>- f -</h3><ul>
 <li>fail()
-: <a class="el" href="structftl_1_1monoidA.html#ab2056c170b5e5c7c36ef2b9ba8cccfc7">ftl::monoidA&lt; F &gt;</a>
+: <a class="el" href="structftl_1_1monoidA.html#a482df775497ced4a672615c84a1a1006">ftl::monoidA&lt; F &gt;</a>
+, <a class="el" href="structftl_1_1monoidA_3_01eitherT_3_01L_00_01M_01_4_01_4.html#a710d99ed7541410ab5a273dc3aea5821">ftl::monoidA&lt; eitherT&lt; L, M &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monoidA_3_01maybeT_3_01M_01_4_01_4.html#a2c024e99d71698bce11513ab71b39003">ftl::monoidA&lt; maybeT&lt; M &gt; &gt;</a>
 </li>
 <li>fold()
 : <a class="el" href="structftl_1_1foldable.html#a33277b06b9c8e6a50cd40407eb3b764e">ftl::foldable&lt; F &gt;</a>
@@ -178,10 +193,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <h3><a class="anchor" id="index_i"></a>- i -</h3><ul>
 <li>id()
-: <a class="el" href="structftl_1_1monoid_3_01function_3_01M_00_01Ps_8_8_8_4_01_4.html#a4df21ad9c2210d5de4c3a29792f06ef1">ftl::monoid&lt; function&lt; M, Ps...&gt; &gt;</a>
-, <a class="el" href="structftl_1_1monoid_3_01std_1_1future_3_01T_01_4_01_4.html#a60984f551a27f169ce5e314931379dd3">ftl::monoid&lt; std::future&lt; T &gt; &gt;</a>
-, <a class="el" href="structftl_1_1monoid.html#aa82bed05de22bf0124dfa9dfcd15991a">ftl::monoid&lt; M &gt;</a>
+: <a class="el" href="structftl_1_1monoid.html#aa82bed05de22bf0124dfa9dfcd15991a">ftl::monoid&lt; M &gt;</a>
+, <a class="el" href="structftl_1_1monoid_3_01function_3_01M_00_01Ps_8_8_8_4_01_4.html#a4df21ad9c2210d5de4c3a29792f06ef1">ftl::monoid&lt; function&lt; M, Ps...&gt; &gt;</a>
+, <a class="el" href="structftl_1_1monoid_3_01lazy_3_01T_01_4_01_4.html#a453e93d83d7ffcbabce31865ee0e1139">ftl::monoid&lt; lazy&lt; T &gt; &gt;</a>
 , <a class="el" href="structftl_1_1monoid_3_01std_1_1shared__ptr_3_01T_01_4_01_4.html#afcc31c13f168ca4493d9f00e7e723275">ftl::monoid&lt; std::shared_ptr&lt; T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monoid_3_01std_1_1future_3_01T_01_4_01_4.html#a60984f551a27f169ce5e314931379dd3">ftl::monoid&lt; std::future&lt; T &gt; &gt;</a>
 </li>
 <li>isLeft()
 : <a class="el" href="classftl_1_1either.html#a29cdab6faf72f02ba692aab241e594db">ftl::either&lt; L, R &gt;</a>
@@ -198,9 +214,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </ul>
 
 
+<h3><a class="anchor" id="index_j"></a>- j -</h3><ul>
+<li>join()
+: <a class="el" href="structftl_1_1monad.html#a1f2d0feff47a94baf72931ae6270e3a3">ftl::monad&lt; M &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a79ab4bac9dc2a197d0309d456bbf3ba8">ftl::monad&lt; std::list&lt; T, A&lt; T &gt; &gt; &gt;</a>
+</li>
+</ul>
+
+
 <h3><a class="anchor" id="index_l"></a>- l -</h3><ul>
+<li>lazy()
+: <a class="el" href="classftl_1_1lazy.html#a28ca324ac5ccb81b60123c548575f995">ftl::lazy&lt; T &gt;</a>
+</li>
+<li>lazyT()
+: <a class="el" href="classftl_1_1lazyT.html#a126d5bc8cc5e850925ab997727be8c4a">ftl::lazyT&lt; M &gt;</a>
+</li>
 <li>left()
-: <a class="el" href="classftl_1_1either.html#ae44bacf8321d7d9b9dce3a561147834a">ftl::either&lt; L, R &gt;</a>
+: <a class="el" href="classftl_1_1either.html#a9ab1f9ec481dcd5f3c1ab8fc5371d877">ftl::either&lt; L, R &gt;</a>
 </li>
 </ul>
 
@@ -208,70 +238,92 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h3><a class="anchor" id="index_m"></a>- m -</h3><ul>
 <li>map()
 : <a class="el" href="structftl_1_1applicative.html#a8634a56ed34db5853eb2704eadc772d0">ftl::applicative&lt; F &gt;</a>
-, <a class="el" href="structftl_1_1applicative_3_01function_3_01R_00_01P_00_01Ps_8_8_8_4_01_4.html#a5bc41a3f7af149e38165f3b4828d403b">ftl::applicative&lt; function&lt; R, P, Ps...&gt; &gt;</a>
-, <a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#adbbc8972511b1a3a0c194d0a5a1bbad1">ftl::monad&lt; std::future&lt; T &gt; &gt;</a>
-, <a class="el" href="structftl_1_1monad.html#a0441232b8bd660fb9aadebe7d52e10dd">ftl::monad&lt; M &gt;</a>
-, <a class="el" href="structftl_1_1functor_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#abeb4a87b8d8a4d569fa3f2420d41fd27">ftl::functor&lt; std::tuple&lt; T, Ts...&gt; &gt;</a>
-, <a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a6e158a89b7800282db7a9ad15292d6e6">ftl::monad&lt; std::list&lt; T, A&lt; T &gt; &gt; &gt;</a>
-, <a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#ae4e78a94428db552bf8bdcf5bb956230">ftl::monad&lt; std::vector&lt; T, A&lt; T &gt; &gt; &gt;</a>
 , <a class="el" href="structftl_1_1functor.html#a8bea58a9814e5ab2a3b9ab019d68055b">ftl::functor&lt; F &gt;</a>
-, <a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a2dce30238b895e0a4dffdf06f409a6a6">ftl::monad&lt; std::list&lt; T, A&lt; T &gt; &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01either_3_01L_00_01T_01_4_01_4.html#ab267d9773c9761dd09723b57529e9f57">ftl::monad&lt; either&lt; L, T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01function_3_01R_00_01P_00_01Ps_8_8_8_4_01_4.html#a7b47c5e40f2d534791dcd1650cc29a9c">ftl::monad&lt; function&lt; R, P, Ps...&gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html#aae61dd754878d456b116fac900853fb4">ftl::monad&lt; maybe&lt; T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01maybeT_3_01M_01_4_01_4.html#a637681e239b25227e3a9435a45a59247">ftl::monad&lt; maybeT&lt; M &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#adbbc8972511b1a3a0c194d0a5a1bbad1">ftl::monad&lt; std::future&lt; T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1functor_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#a40453f4de3c1e5f062f262f7f1a2fa22">ftl::functor&lt; std::tuple&lt; T, Ts...&gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#aaa48bf07bfc311a953377f10a7934722">ftl::monad&lt; std::vector&lt; T, A&lt; T &gt; &gt; &gt;</a>
+, <a class="el" href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#ad73cd5bc85b75b0f8381b6bb28783ec7">ftl::applicative&lt; std::tuple&lt; T, Ts...&gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01either_3_01L_00_01T_01_4_01_4.html#aef80a0270f077ff029716ef304630e8b">ftl::monad&lt; either&lt; L, T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01lazy_3_01T_01_4_01_4.html#ace971aeb407087aac659b20d1f51dfef">ftl::monad&lt; lazy&lt; T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01lazyT_3_01M_01_4_01_4.html#a4a103aeea1c246abf53f78952e66592e">ftl::monad&lt; lazyT&lt; M &gt; &gt;</a>
 , <a class="el" href="structftl_1_1monad_3_01maybe_3_01T_01_4_01_4.html#aa5db01a44066a51d51dbf330dea7ef40">ftl::monad&lt; maybe&lt; T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a2dce30238b895e0a4dffdf06f409a6a6">ftl::monad&lt; std::list&lt; T, A&lt; T &gt; &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01lazyT_3_01M_01_4_01_4.html#a8480235835ab9cb9896af118ef15a27e">ftl::monad&lt; lazyT&lt; M &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad.html#ab019ea91046a37e49baaeeba836e831e">ftl::monad&lt; M &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01eitherT_3_01L_00_01M_01_4_01_4.html#ae37a3fb34c9b62f67c00982cb0f7bc66">ftl::monad&lt; eitherT&lt; L, M &gt; &gt;</a>
 </li>
 <li>maybe()
-: <a class="el" href="classftl_1_1maybe.html#a33e68dcd170f1266593557ebae027ae0">ftl::maybe&lt; T &gt;</a>
+: <a class="el" href="classftl_1_1maybe.html#a8e54fc608c3e9a93e291951caae51246">ftl::maybe&lt; T &gt;</a>
+</li>
+<li>maybeT()
+: <a class="el" href="classftl_1_1maybeT.html#a05d3bb62671e8f1c41218fbbcdf96680">ftl::maybeT&lt; M &gt;</a>
 </li>
 </ul>
 
 
 <h3><a class="anchor" id="index_n"></a>- n -</h3><ul>
 <li>nothing()
-: <a class="el" href="classftl_1_1maybe.html#a49b701c1d6d5ebe2896f05165da1fcce">ftl::maybe&lt; T &gt;</a>
+: <a class="el" href="classftl_1_1maybe.html#a21a03fa23d5524d07f9d3ef3676391d3">ftl::maybe&lt; T &gt;</a>
 </li>
 </ul>
 
 
 <h3><a class="anchor" id="index_o"></a>- o -</h3><ul>
 <li>operator bool()
-: <a class="el" href="classftl_1_1either.html#a240370004bd49760934c88368f0e5cfd">ftl::either&lt; L, R &gt;</a>
-, <a class="el" href="classftl_1_1function.html#a915313a376929527db62b2313d882231">ftl::function&lt; typename, &gt;</a>
-, <a class="el" href="structftl_1_1any.html#a37ef614df3a5e361dc5c88978190a47f">ftl::any</a>
+: <a class="el" href="structftl_1_1any.html#a37ef614df3a5e361dc5c88978190a47f">ftl::any</a>
 , <a class="el" href="structftl_1_1all.html#a79f3af79e8279317cbd7f5b7900043b9">ftl::all</a>
+, <a class="el" href="classftl_1_1function.html#a915313a376929527db62b2313d882231">ftl::function&lt; typename, &gt;</a>
 , <a class="el" href="classftl_1_1maybe.html#a3a05b3485a646776f6e6fcf4d484d6fe">ftl::maybe&lt; T &gt;</a>
+, <a class="el" href="classftl_1_1either.html#a240370004bd49760934c88368f0e5cfd">ftl::either&lt; L, R &gt;</a>
 </li>
 <li>operator()()
 : <a class="el" href="classftl_1_1function.html#af0a53a22bce5d5888f19f567fd8d5cc3">ftl::function&lt; typename, &gt;</a>
 </li>
 <li>operator*()
-: <a class="el" href="classftl_1_1either.html#a40054fa07c0b594b0456c3c527b01f4b">ftl::either&lt; L, R &gt;</a>
+: <a class="el" href="classftl_1_1either.html#a4cd691d9c289e0fbd740deb83da2c035">ftl::either&lt; L, R &gt;</a>
+, <a class="el" href="classftl_1_1eitherT.html#a05f08d303bc66d88afbdb284b8a7d41f">ftl::eitherT&lt; L, M &gt;</a>
+, <a class="el" href="classftl_1_1lazy.html#afb5006dcba80f3f8bafc34d865fe55de">ftl::lazy&lt; T &gt;</a>
 , <a class="el" href="classftl_1_1maybe.html#ab1d1c47a55c11fce7fbac657ce9e9fda">ftl::maybe&lt; T &gt;</a>
-, <a class="el" href="classftl_1_1either.html#aa6c7fe0182013c478123eb4137540c27">ftl::either&lt; L, R &gt;</a>
+, <a class="el" href="classftl_1_1either.html#a6d70ed9bd6b48819734ca521c8c7ff8c">ftl::either&lt; L, R &gt;</a>
 </li>
 <li>operator-&gt;()
 : <a class="el" href="classftl_1_1maybe.html#a6a241efc4c4aaf8153848791c6514101">ftl::maybe&lt; T &gt;</a>
-, <a class="el" href="classftl_1_1either.html#abf918d4a16ca08c697e68d4851530e9a">ftl::either&lt; L, R &gt;</a>
+, <a class="el" href="classftl_1_1eitherT.html#a464100de046569de3d9e8342eac0221d">ftl::eitherT&lt; L, M &gt;</a>
+, <a class="el" href="classftl_1_1lazy.html#ad161fc4081b1505669c2236beb6e5fd9">ftl::lazy&lt; T &gt;</a>
 , <a class="el" href="classftl_1_1maybe.html#a7081d0ceca27587c787c8f9590095ad5">ftl::maybe&lt; T &gt;</a>
+, <a class="el" href="classftl_1_1either.html#a07fd3b9229a37822433d9ccdf726a809">ftl::either&lt; L, R &gt;</a>
 </li>
 <li>operator=()
-: <a class="el" href="classftl_1_1maybe.html#af767790a648d2de9aa6d1d6f9aefac02">ftl::maybe&lt; T &gt;</a>
+: <a class="el" href="classftl_1_1maybe.html#a6cc56dd2d083ddbc89975f410d05e260">ftl::maybe&lt; T &gt;</a>
 </li>
 <li>ord()
-: <a class="el" href="classftl_1_1ord.html#afb6faa7e3ce1c69a7ab57c76778a110a">ftl::ord</a>
+: <a class="el" href="classftl_1_1ord.html#aafffdca6358571038d9010403180c842">ftl::ord</a>
 </li>
 <li>orDo()
-: <a class="el" href="structftl_1_1monoidA.html#ab9b7ad514fd2a6d1f851d25d711e2e22">ftl::monoidA&lt; F &gt;</a>
+: <a class="el" href="structftl_1_1monoidA_3_01eitherT_3_01L_00_01M_01_4_01_4.html#a32c6e35cfda4ba5fa1d1234e06993ad6">ftl::monoidA&lt; eitherT&lt; L, M &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monoidA_3_01maybeT_3_01M_01_4_01_4.html#af4e9466eeb9b50235ae4d487052cf10d">ftl::monoidA&lt; maybeT&lt; M &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monoidA.html#acf842e67110d9858f8e7e835c0d2d513">ftl::monoidA&lt; F &gt;</a>
 </li>
 </ul>
 
 
 <h3><a class="anchor" id="index_p"></a>- p -</h3><ul>
 <li>pure()
-: <a class="el" href="structftl_1_1applicative.html#a0154bb314c06e66c822f7341d284ef5f">ftl::applicative&lt; F &gt;</a>
-, <a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#ad5e7bfdf00fd6fb8b326d033e9eb81a4">ftl::monad&lt; std::vector&lt; T, A&lt; T &gt; &gt; &gt;</a>
-, <a class="el" href="structftl_1_1monad.html#acc337ad5bb79d4f4f764598aa31a2d75">ftl::monad&lt; M &gt;</a>
+: <a class="el" href="structftl_1_1applicative.html#aa799f90c2b5e6936bc361cb2b96012b4">ftl::applicative&lt; F &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a8a594dc43c0fa94d2bc5716b1022cbff">ftl::monad&lt; std::vector&lt; T, A&lt; T &gt; &gt; &gt;</a>
+, <a class="el" href="structftl_1_1applicative_3_01std_1_1tuple_3_01T_00_01Ts_8_8_8_4_01_4.html#a4ff7cdb731d645b9aa3c5bbdfeca86ba">ftl::applicative&lt; std::tuple&lt; T, Ts...&gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01maybeT_3_01M_01_4_01_4.html#a37763c042f26240fdbb676f9ff6318ee">ftl::monad&lt; maybeT&lt; M &gt; &gt;</a>
 , <a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a60525f235e7f45714a8d5fa8711b2e34">ftl::monad&lt; std::list&lt; T, A&lt; T &gt; &gt; &gt;</a>
-, <a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#acc661c7d3cdfb5b5e865681aaf21e491">ftl::monad&lt; std::future&lt; T &gt; &gt;</a>
-, <a class="el" href="structftl_1_1applicative_3_01function_3_01R_00_01P_00_01Ps_8_8_8_4_01_4.html#a11fffb9594f3dd1616d77798ab4f1d88">ftl::applicative&lt; function&lt; R, P, Ps...&gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01lazyT_3_01M_01_4_01_4.html#a52f76d5cdb42b8d264d83cac290ad06f">ftl::monad&lt; lazyT&lt; M &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01lazy_3_01T_01_4_01_4.html#ae7833d4bdcfd08c9bd7f423bdf967d4b">ftl::monad&lt; lazy&lt; T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#a851c0d4fb922bcf3455ad37f58ec5cfb">ftl::monad&lt; std::future&lt; T &gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad_3_01function_3_01R_00_01P_00_01Ps_8_8_8_4_01_4.html#ad288e86df9dcbcf244618a6db0857eff">ftl::monad&lt; function&lt; R, P, Ps...&gt; &gt;</a>
+, <a class="el" href="structftl_1_1monad.html#acc337ad5bb79d4f4f764598aa31a2d75">ftl::monad&lt; M &gt;</a>
+, <a class="el" href="structftl_1_1applicative.html#a0154bb314c06e66c822f7341d284ef5f">ftl::applicative&lt; F &gt;</a>
 </li>
 </ul>
 
@@ -281,10 +333,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classftl_1_1either.html#aab05292ac6bf8188e268e72d3cd7d7d0">ftl::either&lt; L, R &gt;</a>
 </li>
 </ul>
+
+
+<h3><a class="anchor" id="index_s"></a>- s -</h3><ul>
+<li>status()
+: <a class="el" href="classftl_1_1lazy.html#afcb2fc844186ab6d475785da36aefe7f">ftl::lazy&lt; T &gt;</a>
+</li>
+</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -102,24 +102,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ad5e7bfdf00fd6fb8b326d033e9eb81a4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad5e7bfdf00fd6fb8b326d033e9eb81a4"></a>
-static std::vector&lt; T, A&lt; T &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#ad5e7bfdf00fd6fb8b326d033e9eb81a4">pure</a> (T &amp;&amp;t)</td></tr>
-<tr class="memdesc:ad5e7bfdf00fd6fb8b326d033e9eb81a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a one element vector. <br/></td></tr>
-<tr class="separator:ad5e7bfdf00fd6fb8b326d033e9eb81a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a594dc43c0fa94d2bc5716b1022cbff"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8a594dc43c0fa94d2bc5716b1022cbff"></a>
+static std::vector&lt; T, A&lt; T &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a8a594dc43c0fa94d2bc5716b1022cbff">pure</a> (const T &amp;t)</td></tr>
+<tr class="memdesc:a8a594dc43c0fa94d2bc5716b1022cbff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a one element vector. <br/></td></tr>
+<tr class="separator:a8a594dc43c0fa94d2bc5716b1022cbff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4e78a94428db552bf8bdcf5bb956230"><td class="memTemplParams" colspan="2"><a class="anchor" id="ae4e78a94428db552bf8bdcf5bb956230"></a>
-template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type&gt; </td></tr>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </td></tr>
 <tr class="memitem:ae4e78a94428db552bf8bdcf5bb956230"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; U, A&lt; U &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#ae4e78a94428db552bf8bdcf5bb956230">map</a> (F &amp;&amp;f, const std::vector&lt; T, A&lt; T &gt;&gt; &amp;v)</td></tr>
 <tr class="memdesc:ae4e78a94428db552bf8bdcf5bb956230"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies f to each element. <br/></td></tr>
 <tr class="separator:ae4e78a94428db552bf8bdcf5bb956230"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa48bf07bfc311a953377f10a7934722"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type, typename  = typename std::enable_if&lt;std::is_same&lt;T,U&gt;::value&gt;::type&gt; </td></tr>
+<tr class="memitem:ac25afdb40bd3c5d23848c880a4782625"><td class="memTemplParams" colspan="2"><a class="anchor" id="ac25afdb40bd3c5d23848c880a4782625"></a>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;, typename  = typename std::enable_if&lt;!std::is_same&lt;T,U&gt;::value&gt;::type&gt; </td></tr>
+<tr class="memitem:ac25afdb40bd3c5d23848c880a4782625"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; U, A&lt; U &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#ac25afdb40bd3c5d23848c880a4782625">map</a> (F &amp;&amp;f, std::vector&lt; T, A&lt; T &gt;&gt; &amp;&amp;v)</td></tr>
+<tr class="memdesc:ac25afdb40bd3c5d23848c880a4782625"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rvalue version of map. <br/></td></tr>
+<tr class="separator:ac25afdb40bd3c5d23848c880a4782625"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa48bf07bfc311a953377f10a7934722"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = result_of&lt;F(T)&gt;, typename  = typename std::enable_if&lt;std::is_same&lt;T,U&gt;::value&gt;::type&gt; </td></tr>
 <tr class="memitem:aaa48bf07bfc311a953377f10a7934722"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; T, A&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#aaa48bf07bfc311a953377f10a7934722">map</a> (F &amp;&amp;f, std::vector&lt; T, A&lt; T &gt;&gt; &amp;&amp;v)</td></tr>
 <tr class="memdesc:aaa48bf07bfc311a953377f10a7934722"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move optimised version enabled when <code>f</code> does not change domain.  <a href="#aaa48bf07bfc311a953377f10a7934722">More...</a><br/></td></tr>
 <tr class="separator:aaa48bf07bfc311a953377f10a7934722"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ef2ac937e4c43f14798d6276fcf430b"><td class="memTemplParams" colspan="2"><a class="anchor" id="a5ef2ac937e4c43f14798d6276fcf430b"></a>
-template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type::value_type&gt; </td></tr>
+template&lt;typename F , typename U  = typename result_of&lt;F(T)&gt;::value_type&gt; </td></tr>
 <tr class="memitem:a5ef2ac937e4c43f14798d6276fcf430b"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; U, A&lt; U &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a5ef2ac937e4c43f14798d6276fcf430b">bind</a> (const std::vector&lt; T, A&lt; T &gt;&gt; &amp;v, F &amp;&amp;f)</td></tr>
 <tr class="memdesc:a5ef2ac937e4c43f14798d6276fcf430b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equivalent of flip(concatMap) <br/></td></tr>
 <tr class="separator:a5ef2ac937e4c43f14798d6276fcf430b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9fd6e426335af43759173cae44f70ed"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa9fd6e426335af43759173cae44f70ed"></a>
+template&lt;typename F , typename U  = typename result_of&lt;F(T)&gt;::value_type&gt; </td></tr>
+<tr class="memitem:aa9fd6e426335af43759173cae44f70ed"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; U, A&lt; U &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1vector_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#aa9fd6e426335af43759173cae44f70ed">bind</a> (std::vector&lt; T, A&lt; T &gt;&gt; &amp;&amp;v, F &amp;&amp;f)</td></tr>
+<tr class="memdesc:aa9fd6e426335af43759173cae44f70ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rvalue reference version of bind. <br/></td></tr>
+<tr class="separator:aa9fd6e426335af43759173cae44f70ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename T, template&lt; typename &gt; class A&gt;<br/>
@@ -133,7 +143,7 @@ struct ftl::monad&lt; std::vector&lt; T, A&lt; T &gt; &gt; &gt;</h3>
 <div class="memtemplate">
 template&lt;typename T , template&lt; typename &gt; class A&gt; </div>
 <div class="memtemplate">
-template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type, typename  = typename std::enable_if&lt;std::is_same&lt;T,U&gt;::value&gt;::type&gt; </div>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;, typename  = typename std::enable_if&lt;std::is_same&lt;T,U&gt;::value&gt;::type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -171,7 +181,7 @@ template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

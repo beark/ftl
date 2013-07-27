@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -99,11 +99,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Struct that must be specialised to implement the functor concept.  
  <a href="structftl_1_1functor.html#details">More...</a></p>
 
-<p><code>#include &lt;ftl/functor.h&gt;</code></p>
+<p><code>#include &lt;ftl/concepts/functor.h&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a8bea58a9814e5ab2a3b9ab019d68055b"><td class="memTemplParams" colspan="2">template&lt;typename Fn , typename T  = concept_parameter&lt;F&gt;, typename U  = typename decayed_result&lt;Fn(T)&gt;::type, typename Fu  = typename re_parametrise&lt;F,U&gt;::type&gt; </td></tr>
+<tr class="memitem:a8bea58a9814e5ab2a3b9ab019d68055b"><td class="memTemplParams" colspan="2">template&lt;typename Fn , typename T  = concept_parameter&lt;F&gt;, typename U  = result_of&lt;Fn(T)&gt;, typename Fu  = typename re_parametrise&lt;F,U&gt;::type&gt; </td></tr>
 <tr class="memitem:a8bea58a9814e5ab2a3b9ab019d68055b"><td class="memTemplItemLeft" align="right" valign="top">static Fu&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1functor.html#a8bea58a9814e5ab2a3b9ab019d68055b">map</a> (Fn &amp;&amp;fn, const F &amp;f)</td></tr>
 <tr class="memdesc:a8bea58a9814e5ab2a3b9ab019d68055b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps a function to the contained value(s).  <a href="#a8bea58a9814e5ab2a3b9ab019d68055b">More...</a><br/></td></tr>
 <tr class="separator:a8bea58a9814e5ab2a3b9ab019d68055b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -127,7 +127,7 @@ interface ftl::functor&lt; F &gt;</h3>
 <div class="memtemplate">
 template&lt;typename F &gt; </div>
 <div class="memtemplate">
-template&lt;typename Fn , typename T  = concept_parameter&lt;F&gt;, typename U  = typename decayed_result&lt;Fn(T)&gt;::type, typename Fu  = typename re_parametrise&lt;F,U&gt;::type&gt; </div>
+template&lt;typename Fn , typename T  = concept_parameter&lt;F&gt;, typename U  = result_of&lt;Fn(T)&gt;, typename Fu  = typename re_parametrise&lt;F,U&gt;::type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -196,7 +196,7 @@ template&lt;typename F &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

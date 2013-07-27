@@ -64,7 +64,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -88,16 +88,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Ie, <code>int</code> is a plain type, <code>vector&lt;int&gt;</code> is an <code>int</code> "trapped" in the context of <code>vector</code>, and the mapping should apply the function "inside" that context. The most obvious way of doing so would be to apply the mapped function to every element in the vector.</p>
 <p>All instances of Functor should follow the laws below (which are part of the mathematical definition from which this concept is derived):</p>
 <ul>
-<li><b>Preservation of identity</b> <div class="fragment"><div class="line">map(id&lt;T&gt;, t)          &lt;=&gt; t</div>
+<li><b>Preservation of identity</b> <div class="fragment"><div class="line">map(<span class="keywordtype">id</span>, t)          &lt;=&gt; t</div>
 </div><!-- fragment --></li>
-<li><b>Preservatin of composition</b> <div class="fragment"><div class="line">map(<a class="code" href="group__prelude.html#ga531e16797e150f533f60b497acfc5e62" title="Function composition first base case.">compose</a>(f, g), t)  &lt;=&gt; <a class="code" href="group__prelude.html#ga531e16797e150f533f60b497acfc5e62" title="Function composition first base case.">compose</a>(<a class="code" href="group__prelude.html#gaf46096187bc06452797aac32f8686b1d" title="Curries an n-ary function pointer.">curry</a>(map)(f), <a class="code" href="group__prelude.html#gaf46096187bc06452797aac32f8686b1d" title="Curries an n-ary function pointer.">curry</a>(map)(g))(t)</div>
+<li><b>Preservation of composition</b> <div class="fragment"><div class="line">map(<a class="code" href="group__prelude.html#ga531e16797e150f533f60b497acfc5e62" title="Function composition first base case.">compose</a>(f, g), t)  &lt;=&gt; <a class="code" href="group__prelude.html#ga531e16797e150f533f60b497acfc5e62" title="Function composition first base case.">compose</a>(<a class="code" href="group__prelude.html#gaf46096187bc06452797aac32f8686b1d" title="Curries an n-ary function pointer.">curry</a>(map)(f), <a class="code" href="group__prelude.html#gaf46096187bc06452797aac32f8686b1d" title="Curries an n-ary function pointer.">curry</a>(map)(g))(t)</div>
 </div><!-- fragment --></li>
 </ul>
+<p>For a detailed description of what exactly an instance needs to implement, see the <a class="el" href="structftl_1_1functor.html" title="Struct that must be specialised to implement the functor concept.">ftl::functor</a> interface.</p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="group__functor.html">Functor</a> (module) </dd></dl>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

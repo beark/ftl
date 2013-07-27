@@ -64,7 +64,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -86,7 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock"><p>Abstraction of sequenceable computations in some context.</p>
 <p>Monads are essentially just a functor with some additional structure. Specifically, types that are monads have the added functionality (on top of what applicative adds) of sequencing computations in the context of the monad.</p>
 <p>While this is technically already possible in C++, the abstraction is useful none the less, because monads also have the power to implicitly pass state or other useful context information forward, without the user having to bother with it.</p>
-<p>The easiest example of the above is probably the maybe monad, where the user does not need to manually check for nothingness except at the very end of a sequence of computations&mdash;because maybe's implementation of <a class="el" href="structftl_1_1monad.html#a163bcc66e4bd7c947bf37a3f83310078" title="Bind a value and execute a computation in M on it.">monad&lt;M&gt;::bind</a> does that for them.</p>
+<p>The easiest example of the above is probably the maybe monad, where the user does not need to manually check for nothingness except at the very end of a sequence of computations&mdash;because maybe's implementation of <a class="el" href="structftl_1_1monad.html#aeaeca77ea0895c2a9fc72f33f5156347" title="Bind a value and execute a computation in M on it.">monad&lt;M&gt;::bind</a> does that for them.</p>
 <p>As with many of the other concepts in FTL, monads have a set of associated laws that instances must follow (though technically, there is nothing enforcing them):</p>
 <ul>
 <li><b>Left identity law</b> <div class="fragment"><div class="line">pure(x) &gt;&gt;= f    &lt;=&gt; f(x)</div>
@@ -96,11 +96,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><b>Law of associativity</b> <div class="fragment"><div class="line">(m &gt;&gt;= f) &gt;&gt;= g) &lt;=&gt; m &gt;&gt;= ([f](X x){<span class="keywordflow">return</span> f(x);} &gt;&gt;= g)</div>
 </div><!-- fragment --></li>
 </ul>
+<p>To be considered an instance of Monad, the interface <code><a class="el" href="structftl_1_1monad.html" title="Concrete definition of the monad concept.">ftl::monad</a></code> must be specialised for the type in question.</p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="group__monad.html">Monad</a> (module) </dd></dl>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

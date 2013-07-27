@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -102,19 +102,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a1645bae7cc24d133f08f4993c293413c"><td class="memItemLeft" align="right" valign="top">static std::list&lt; T, A&lt; T &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a1645bae7cc24d133f08f4993c293413c">pure</a> (const T &amp;a)</td></tr>
+<tr class="memdesc:a1645bae7cc24d133f08f4993c293413c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Produces a singleton list.  <a href="#a1645bae7cc24d133f08f4993c293413c">More...</a><br/></td></tr>
+<tr class="separator:a1645bae7cc24d133f08f4993c293413c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60525f235e7f45714a8d5fa8711b2e34"><td class="memItemLeft" align="right" valign="top">static std::list&lt; T, A&lt; T &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a60525f235e7f45714a8d5fa8711b2e34">pure</a> (T &amp;&amp;a)</td></tr>
-<tr class="memdesc:a60525f235e7f45714a8d5fa8711b2e34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Produces a singleton list.  <a href="#a60525f235e7f45714a8d5fa8711b2e34">More...</a><br/></td></tr>
 <tr class="separator:a60525f235e7f45714a8d5fa8711b2e34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e158a89b7800282db7a9ad15292d6e6"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type&gt; </td></tr>
+<tr class="memitem:a6e158a89b7800282db7a9ad15292d6e6"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </td></tr>
 <tr class="memitem:a6e158a89b7800282db7a9ad15292d6e6"><td class="memTemplItemLeft" align="right" valign="top">static std::list&lt; U, A&lt; U &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a6e158a89b7800282db7a9ad15292d6e6">map</a> (F &amp;&amp;f, const std::list&lt; T, A&lt; T &gt;&gt; &amp;l)</td></tr>
 <tr class="memdesc:a6e158a89b7800282db7a9ad15292d6e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies f to each element.  <a href="#a6e158a89b7800282db7a9ad15292d6e6">More...</a><br/></td></tr>
 <tr class="separator:a6e158a89b7800282db7a9ad15292d6e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2dce30238b895e0a4dffdf06f409a6a6"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type, typename  = typename std::enable_if&lt;					std::is_same&lt;T,U&gt;::value				&gt;::type&gt; </td></tr>
+<tr class="memitem:a2dce30238b895e0a4dffdf06f409a6a6"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = result_of&lt;F(T)&gt;, typename  = typename std::enable_if&lt;					std::is_same&lt;T,U&gt;::value				&gt;::type&gt; </td></tr>
 <tr class="memitem:a2dce30238b895e0a4dffdf06f409a6a6"><td class="memTemplItemLeft" align="right" valign="top">static std::list&lt; T, A&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a2dce30238b895e0a4dffdf06f409a6a6">map</a> (F &amp;&amp;f, std::list&lt; T, A&lt; T &gt;&gt; &amp;&amp;l)</td></tr>
 <tr class="memdesc:a2dce30238b895e0a4dffdf06f409a6a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move optimised version enabled when <code>f</code> does not change domain.  <a href="#a2dce30238b895e0a4dffdf06f409a6a6">More...</a><br/></td></tr>
 <tr class="separator:a2dce30238b895e0a4dffdf06f409a6a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9055d309b3b321fafa99187c217468f4"><td class="memItemLeft" align="right" valign="top">static std::list&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a9055d309b3b321fafa99187c217468f4">join</a> (const std::list&lt; std::list&lt; T &gt;&gt; &amp;l)</td></tr>
+<tr class="memdesc:a9055d309b3b321fafa99187c217468f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Joins nested lists by way of concatenation.  <a href="#a9055d309b3b321fafa99187c217468f4">More...</a><br/></td></tr>
+<tr class="separator:a9055d309b3b321fafa99187c217468f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79ab4bac9dc2a197d0309d456bbf3ba8"><td class="memItemLeft" align="right" valign="top">static std::list&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a79ab4bac9dc2a197d0309d456bbf3ba8">join</a> (std::list&lt; std::list&lt; T &gt;&gt; &amp;&amp;l)</td></tr>
+<tr class="separator:a79ab4bac9dc2a197d0309d456bbf3ba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d2da4163e27e425e4edf4329ffe3339"><td class="memTemplParams" colspan="2"><a class="anchor" id="a4d2da4163e27e425e4edf4329ffe3339"></a>
-template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type::value_type&gt; </td></tr>
+template&lt;typename F , typename U  = typename result_of&lt;F(T)&gt;::value_type&gt; </td></tr>
 <tr class="memitem:a4d2da4163e27e425e4edf4329ffe3339"><td class="memTemplItemLeft" align="right" valign="top">static std::list&lt; U, A&lt; U &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1list_3_01T_00_01A_3_01T_01_4_01_4_01_4.html#a4d2da4163e27e425e4edf4329ffe3339">bind</a> (const std::list&lt; T, A&lt; T &gt;&gt; &amp;l, F &amp;&amp;f)</td></tr>
 <tr class="memdesc:a4d2da4163e27e425e4edf4329ffe3339"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equivalent of flip(concatMap) <br/></td></tr>
 <tr class="separator:a4d2da4163e27e425e4edf4329ffe3339"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -126,6 +133,35 @@ struct ftl::monad&lt; std::list&lt; T, A&lt; T &gt; &gt; &gt;</h3>
 <p>Monad implementation for std::list. </p>
 <p>Note that this instance is only valid for std::lists using an allocator of the form <code>template&lt;typename&gt; class Allocator</code>, where the template parameter to the allocator is the elment type of the list. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a1645bae7cc24d133f08f4993c293413c"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , template&lt; typename &gt; class A&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::list&lt;T,A&lt;T&gt; &gt; <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; std::list&lt; T, A&lt; T &gt; &gt; &gt;::pure </td>
+          <td>(</td>
+          <td class="paramtype">const T &amp;&#160;</td>
+          <td class="paramname"><em>a</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Produces a singleton list. </p>
+<p>That is, pure generates a one element list, where that single element is <code>a</code>. </p>
+
+</div>
+</div>
 <a class="anchor" id="a60525f235e7f45714a8d5fa8711b2e34"></a>
 <div class="memitem">
 <div class="memproto">
@@ -149,9 +185,7 @@ template&lt;typename T , template&lt; typename &gt; class A&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Produces a singleton list. </p>
-<p>That is, pure generates a one element list, where that single element is <code>a</code>. </p>
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
 
 </div>
 </div>
@@ -161,7 +195,7 @@ template&lt;typename T , template&lt; typename &gt; class A&gt; </div>
 <div class="memtemplate">
 template&lt;typename T , template&lt; typename &gt; class A&gt; </div>
 <div class="memtemplate">
-template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type&gt; </div>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -202,7 +236,7 @@ template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type
 <div class="memtemplate">
 template&lt;typename T , template&lt; typename &gt; class A&gt; </div>
 <div class="memtemplate">
-template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type, typename  = typename std::enable_if&lt;					std::is_same&lt;T,U&gt;::value				&gt;::type&gt; </div>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;, typename  = typename std::enable_if&lt;					std::is_same&lt;T,U&gt;::value				&gt;::type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -237,10 +271,66 @@ template&lt;typename F , typename U  = typename decayed_result&lt;F(T)&gt;::type
 
 </div>
 </div>
+<a class="anchor" id="a9055d309b3b321fafa99187c217468f4"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , template&lt; typename &gt; class A&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::list&lt;T&gt; <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; std::list&lt; T, A&lt; T &gt; &gt; &gt;::join </td>
+          <td>(</td>
+          <td class="paramtype">const std::list&lt; std::list&lt; T &gt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>l</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Joins nested lists by way of concatenation. </p>
+<p>The resulting list contains every element of every list contained in the original list. Relative order is preserved (from the perspective of depth first iteration). </p>
+
+</div>
+</div>
+<a class="anchor" id="a79ab4bac9dc2a197d0309d456bbf3ba8"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , template&lt; typename &gt; class A&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::list&lt;T&gt; <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; std::list&lt; T, A&lt; T &gt; &gt; &gt;::join </td>
+          <td>(</td>
+          <td class="paramtype">std::list&lt; std::list&lt; T &gt;&gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>l</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

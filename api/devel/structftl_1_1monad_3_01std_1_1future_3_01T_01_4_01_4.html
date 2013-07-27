@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -102,15 +102,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:acc661c7d3cdfb5b5e865681aaf21e491"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acc661c7d3cdfb5b5e865681aaf21e491"></a>
-static std::future&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#acc661c7d3cdfb5b5e865681aaf21e491">pure</a> (T &amp;&amp;t)</td></tr>
-<tr class="memdesc:acc661c7d3cdfb5b5e865681aaf21e491"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a future that returns <code>t</code>. <br/></td></tr>
-<tr class="separator:acc661c7d3cdfb5b5e865681aaf21e491"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adbbc8972511b1a3a0c194d0a5a1bbad1"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = typename std::result_of&lt;F(T)&gt;::type&gt; </td></tr>
+<tr class="memitem:a851c0d4fb922bcf3455ad37f58ec5cfb"><td class="memItemLeft" align="right" valign="top">static std::future&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#a851c0d4fb922bcf3455ad37f58ec5cfb">pure</a> (T t)</td></tr>
+<tr class="memdesc:a851c0d4fb922bcf3455ad37f58ec5cfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a future that returns <code>t</code>.  <a href="#a851c0d4fb922bcf3455ad37f58ec5cfb">More...</a><br/></td></tr>
+<tr class="separator:a851c0d4fb922bcf3455ad37f58ec5cfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbbc8972511b1a3a0c194d0a5a1bbad1"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </td></tr>
 <tr class="memitem:adbbc8972511b1a3a0c194d0a5a1bbad1"><td class="memTemplItemLeft" align="right" valign="top">static std::future&lt; U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#adbbc8972511b1a3a0c194d0a5a1bbad1">map</a> (F f, std::future&lt; T &gt; &amp;&amp;fa)</td></tr>
 <tr class="memdesc:adbbc8972511b1a3a0c194d0a5a1bbad1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply a function sometime in the future.  <a href="#adbbc8972511b1a3a0c194d0a5a1bbad1">More...</a><br/></td></tr>
 <tr class="separator:adbbc8972511b1a3a0c194d0a5a1bbad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba9e80ccf828745674d7a2479c292a64"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = typename inner_type&lt;					typename std::result_of&lt;F(T)&gt;::type&gt;::type&gt; </td></tr>
+<tr class="memitem:aba9e80ccf828745674d7a2479c292a64"><td class="memTemplParams" colspan="2">template&lt;typename F , typename U  = concept_parameter&lt;result_of&lt;F(T)&gt;&gt;&gt; </td></tr>
 <tr class="memitem:aba9e80ccf828745674d7a2479c292a64"><td class="memTemplItemLeft" align="right" valign="top">static std::future&lt; U &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structftl_1_1monad_3_01std_1_1future_3_01T_01_4_01_4.html#aba9e80ccf828745674d7a2479c292a64">bind</a> (std::future&lt; T &gt; &amp;&amp;fa, F &amp;&amp;f)</td></tr>
 <tr class="memdesc:aba9e80ccf828745674d7a2479c292a64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Binds a future value to another future computation.  <a href="#aba9e80ccf828745674d7a2479c292a64">More...</a><br/></td></tr>
 <tr class="separator:aba9e80ccf828745674d7a2479c292a64"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,13 +121,42 @@ struct ftl::monad&lt; std::future&lt; T &gt; &gt;</h3>
 <p>Monad instance for std::future. </p>
 <p>This is a pretty powerful instance. It lets us perform all sorts of computations on future values, without actually waiting for them. Only when we explicitly <em>need</em> the value will it be computed (when we call <code>get</code> on the final future). </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a851c0d4fb922bcf3455ad37f58ec5cfb"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::future&lt;T&gt; <a class="el" href="structftl_1_1monad.html">ftl::monad</a>&lt; std::future&lt; T &gt; &gt;::pure </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>t</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a future that returns <code>t</code>. </p>
+<p>Note that <code>t</code> is copied in all cases. This is because it's generally a bad idea to pass references to an async call. </p>
+
+</div>
+</div>
 <a class="anchor" id="adbbc8972511b1a3a0c194d0a5a1bbad1"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename T &gt; </div>
 <div class="memtemplate">
-template&lt;typename F , typename U  = typename std::result_of&lt;F(T)&gt;::type&gt; </div>
+template&lt;typename F , typename U  = result_of&lt;F(T)&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -173,7 +201,7 @@ template&lt;typename F , typename U  = typename std::result_of&lt;F(T)&gt;::type
 <div class="memtemplate">
 template&lt;typename T &gt; </div>
 <div class="memtemplate">
-template&lt;typename F , typename U  = typename inner_type&lt;					typename std::result_of&lt;F(T)&gt;::type&gt;::type&gt; </div>
+template&lt;typename F , typename U  = concept_parameter&lt;result_of&lt;F(T)&gt;&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -211,7 +239,7 @@ template&lt;typename F , typename U  = typename inner_type&lt;					typename std:
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

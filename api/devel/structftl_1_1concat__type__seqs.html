@@ -72,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,7 +92,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Get the basic, "undecorated" return type of a function.  
+<p>Concatenates two type_seqs.  
  <a href="structftl_1_1concat__type__seqs.html#details">More...</a></p>
 
 <p><code>#include &lt;ftl/type_functions.h&gt;</code></p>
@@ -100,33 +100,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock"><h3>template&lt;typename L, typename R&gt;<br/>
 struct ftl::concat_type_seqs&lt; L, R &gt;</h3>
 
-<p>Get the basic, "undecorated" return type of a function. </p>
-<p>This is really only a composition of std::decay and std::result_of, provided for convenience.</p>
+<p>Concatenates two type_seqs. </p>
 <p>Example: </p>
-<div class="fragment"><div class="line">     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> F&gt;</div>
-<div class="line">     <span class="keywordtype">void</span> foo() {</div>
-<div class="line">         <span class="comment">// t will be the decayed type of whatever F returns when called</span></div>
-<div class="line">         <span class="comment">// with an int</span></div>
-<div class="line">         <span class="keyword">typename</span> decayed_result&lt;F(int)&gt;::type t;</div>
-<div class="line">     }</div>
-<div class="line">  </div>
-<div class="line">   \ingroup typelevel</div>
-<div class="line"> */</div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
-<div class="line"><span class="keyword">struct </span>decayed_result;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> F, <span class="keyword">typename</span>...Ps&gt;</div>
-<div class="line"><span class="keyword">struct </span>decayed_result&lt;F(Ps...)&gt; {</div>
-<div class="line">    <span class="keyword">using</span> type = plain_type&lt;<span class="keyword">typename</span> std::result_of&lt;F(Ps...)&gt;::type&gt;;</div>
-<div class="line">};</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>...Ts&gt;</div>
-<div class="line"><span class="keyword">struct </span>type_seq {};</div>
-<div class="line"></div>
+<div class="fragment"><div class="line"><span class="comment">// ts has type type_seq&lt;char,int,bool,float&gt;</span></div>
+<div class="line"><span class="keyword">typename</span> concat_type_seqs&lt;</div>
+<div class="line">    type_seq&lt;char,int&gt;,</div>
+<div class="line">    type_seq&lt;bool,float&gt;</div>
+<div class="line">&gt;::type ts;</div>
 </div><!-- fragment --> </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun May 26 2013 00:21:12 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jul 27 2013 19:49:02 for FTL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>
