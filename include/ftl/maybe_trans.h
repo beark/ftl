@@ -233,7 +233,7 @@ namespace ftl {
 				return mT<U>{
 					*m >>= [f](const maybe<T>& m) {
 						if(m)
-							return f(*m);
+							return aPure<maybe<U>>() % f(*m);
 						else
 							return monad<M_<maybe<U>>>::pure(maybe<U>{});
 					}
@@ -253,7 +253,7 @@ namespace ftl {
 				return mT<U>{
 					std::move(*m) >>= [f](maybe<T>&& m) {
 						if(m)
-							return f(std::move(*m));
+							return aPure<maybe<U>>() % f(std::move(*m));
 						else
 							return monad<M_<maybe<U>>>::pure(maybe<U>{});
 					}
