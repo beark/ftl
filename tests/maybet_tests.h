@@ -55,7 +55,7 @@ test_set maybet_tests{
 				mf f{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
 				auto g = [](int x){ return float(x)/4.f; } % f;
 
-				return (*g)(3) == ftl::maybe<int>{};
+				return (*g)(3) == ftl::maybe<float>{};
 			})
 		),
 		std::make_tuple(
@@ -151,7 +151,7 @@ test_set maybet_tests{
 						[x](int y){ return ftl::value(float(x+y)/4.f); }
 					};
 				};
-				return (*g)(2) == 1.f;
+				return (*g)(2) == ftl::value(1.f);
 			})
 		),
 		std::make_tuple(
@@ -218,7 +218,7 @@ test_set maybet_tests{
 						[x](int y){ return float(x+y)/4.f; }
 					};
 				};
-				return (*g)(2) == 1.f;
+				return (*g)(2) == ftl::value(1.f);
 			})
 		),
 		std::make_tuple(

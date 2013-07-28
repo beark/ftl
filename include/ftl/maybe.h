@@ -127,10 +127,10 @@ namespace ftl {
 
 		/// Copy c-tor
 		maybe(const maybe& m)
-		noexcept(std::is_nothrow_copy_constructible<A>::value)
+		noexcept(std::is_nothrow_copy_constructible<T>::value)
 	    : isValid(m.isValid) {
 			if(isValid) {
-				new (&val) value_type(reinterpret_cast<const A&>(m.val));
+				new (&val) value_type(reinterpret_cast<const T&>(m.val));
 			}
 		}
 
