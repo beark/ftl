@@ -36,6 +36,7 @@
 #include "fwdlist_tests.h"
 #include "tuple_tests.h"
 #include "memory_tests.h"
+#include "string_tests.h"
 
 bool run_test_set(test_set& ts, std::ostream& os) {
 	os << "Running test set '" << std::get<0>(ts) << "'...";
@@ -86,6 +87,7 @@ int main(int, char**) {
 	flawless &= run_test_set(fwdlist_tests, std::cout);
 	flawless &= run_test_set(tuple_tests, std::cout);
 	flawless &= run_test_set(memory_tests, std::cout);
+	flawless &= run_test_set(string_tests, std::cout);
 
 	if(!flawless)
 		return -1;
