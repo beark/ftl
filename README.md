@@ -68,7 +68,7 @@ And of course the equivalent plain version:
     }
 ```
 
-If `algorithm` had happened to already be wrapped in an `ftl::function`, then the FTL-version would have been even shorter, because the `curry` call could have been elided. `ftl::function` supports both conventional calls and curried calls out of the box. That is, if `f` is an `ftl::function<int,int,int,int>`, it could be called in any of the following ways `f(1,2,3)`, `f(1)(2,3)`, `f(1)(2)(3)`.
+If `algorithm` had happened to already be wrapped in an `ftl::function`, then the FTL-version would have been even shorter, because the `curry` call could have been elided. `ftl::function` supports both conventional calls and curried calls out of the box. That is, if `f` is an `ftl::function<int,int,int,int>`, it could be called in any of the following ways `f(1,2,3)`, `f(1)(2,3)`, `f(1)(2)(3)`. Naturally, it would be possible to store the intermediate results of each of the partial applications above, should you want.
 
 ### Transformers
 No, not as in Optimus Prime! As in a monad transformer: a type transformer that takes one monad as parameter and "magically" adds functionality to it in the form of one of many other monads. For example, let's say you want to add the functionality of the `maybe` monad to the list monad. You'd have to create a new type that combines the powers, then write all of those crazy monad instances and whatnot, right? Wrong!
