@@ -553,8 +553,10 @@ namespace ftl {
 	 *
 	 * \ingroup typelevel
 	 */
-	template<typename, typename>
-	struct re_parametrise;
+	template<typename T, typename>
+	struct re_parametrise {
+		using type = T;
+	};
 
 	template<template<typename> class Tt, typename T, typename U>
 	struct re_parametrise<Tt<T>,U> {
