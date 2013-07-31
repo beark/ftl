@@ -1,0 +1,112 @@
+/*
+ * Copyright (c) 2013 Björn Aili
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ *
+ * 1. The origin of this software must not be misrepresented; you must not
+ * claim that you wrote the original software. If you use this software
+ * in a product, an acknowledgment in the product documentation would be
+ * appreciated but is not required.
+ *
+ * 2. Altered source versions must be plainly marked as such, and must not be
+ * misrepresented as being the original software.
+ *
+ * 3. This notice may not be removed or altered from any source
+ * distribution.
+ */
+#ifndef FTL_SET_TESTS_H
+#define FTL_SET_TESTS_H
+
+#include <ftl/set.h>
+#include "base.h"
+#include <iostream>
+
+namespace std {
+	template<typename...Ts>
+	struct less<ftl::function<Ts...>> {
+		bool operator()(
+				const ftl::function<Ts...>& a,
+				const ftl::function<Ts...>& b) const {
+			auto cmp = less<ftl::function<Ts...>*>();
+
+			std::cout << "wtf\n";
+			return cmp(&a, &b);
+		}
+	};
+}
+
+test_set set_tests{
+	std::string("set"),
+	{
+		std::make_tuple(
+			std::string("functor::map[&&]"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto f = [](int x){ return x+1; };
+				auto s = f % std::set<int>{1,2,3};
+
+				return s == std::set<int>{2,3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto f = [](int x){ return x+1; };
+				auto s1 = std::set<int>{1,2,3};
+				auto s = f % s1;
+
+				return s == std::set<int>{2,3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("applicative::pure"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto s = ftl::applicative<std::set<int>>::pure(1);
+
+				return s == std::set<int>{1};
+			})
+		),
+		std::make_tuple(
+			std::string("monad::bind"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator>>=;
+
+				auto s = std::set<int>{0,1,2};
+				auto s2 = s >>= [](int x){ return std::set<int>{x,2*x}; };
+
+				return s2 == std::set<int>{0,1,2,4};
+			})
+		),
+		std::make_tuple(
+			std::string("monad::join"),
+			std::function<bool()>([]() -> bool {
+
+				auto s = std::set<std::set<int>>{
+					std::set<int>{1,2,3},
+					std::set<int>{3,4,5}
+				};
+
+				auto s2 = ftl::monad<std::set<int>>::join(s);
+
+				return s2 == std::set<int>{1,2,3,4,5};
+			})
+		)
+	}
+};
+
+#endif
+
+
+
+
