@@ -139,6 +139,30 @@ namespace ftl {
 	template<
 		typename M,
 		typename = typename std::enable_if<monoid<M>::instance>::type>
+	M operator^ (const M& m1, M&& m2) {
+		return monoid<M>::append(m1, std::move(m2));
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup monoid
+	 */
+	template<
+		typename M,
+		typename = typename std::enable_if<monoid<M>::instance>::type>
+	M operator^ (M&& m1, const M& m2) {
+		return monoid<M>::append(std::move(m1), m2);
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup monoid
+	 */
+	template<
+		typename M,
+		typename = typename std::enable_if<monoid<M>::instance>::type>
 	M operator^ (M&& m1, M&& m2) {
 		return monoid<M>::append(std::move(m1), std::move(m2));
 	}
