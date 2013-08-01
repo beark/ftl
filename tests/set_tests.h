@@ -45,7 +45,29 @@ test_set set_tests{
 	std::string("set"),
 	{
 		std::make_tuple(
-			std::string("functor::map[&&]"),
+			std::string("monoid:id"),
+			std::function<bool()>([]() -> bool {
+
+				return ftl::monoid<std::set<int>>::id()
+					== std::set<int>{};
+			})
+		),
+		std::make_tuple(
+			std::string("monoid:append"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator^;
+				using std::set;
+
+				auto s1 = set<int>{1,2};
+				auto s2 = set<int>{2,3,4};
+				auto s3 = set<int>{3,4,5,6,7};
+
+				auto s = std::move(s2) ^ std::move(s3) ^ s1;
+				return s == set<int>{1,2,3,4,5,6,7};
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map[a->a,&&]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 
@@ -56,7 +78,7 @@ test_set set_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("functor::map"),
+			std::string("functor::map[a->a,&]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 

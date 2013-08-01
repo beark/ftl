@@ -65,6 +65,72 @@ namespace ftl {
 	};
 
 	/**
+	 * Implementation of the \ref monoidpg concept.
+	 *
+	 * Behvariour of the monoid operations are equivalent to:
+	 * \code
+	 *   id() == set{}
+	 *   append(a, b) == set{a}.insert(b.begin(), b.end())
+	 * \endcode
+	 *
+	 * In cases where e.g. one of the sets is a temporary, `append`
+	 * might actually mutate one of the sets instead of making a copy.
+	 */
+	template<typename T, typename Cmp, typename A>
+	struct monoid<std::set<T,Cmp,A>> {
+
+		static std::set<T,Cmp,A> id()
+		noexcept(std::is_nothrow_default_constructible<std::set<T,Cmp,A>>::value) {
+			return std::set<T,Cmp,A>{};
+		}
+
+		static std::set<T,Cmp,A> append(
+				const std::set<T,Cmp,A>& s1,
+				const std::set<T,Cmp,A>& s2) {
+
+			std::set<T,Cmp,A> rs{s1};
+			rs.insert(s2.begin(), s2.end());
+
+			return rs;
+		}
+
+		static std::set<T,Cmp,A> append(
+				std::set<T,Cmp,A>&& s1,
+				const std::set<T,Cmp,A>& s2) {
+
+			s1.insert(s2.begin(), s2.end());
+			return s1;
+		}
+
+		static std::set<T,Cmp,A> append(
+				const std::set<T,Cmp,A>& s1,
+				std::set<T,Cmp,A>&& s2) {
+
+			s2.insert(s1.begin(), s1.end());
+			return s2;
+		}
+
+		static std::set<T,Cmp,A> append(
+				std::set<T,Cmp,A>&& s1,
+				std::set<T,Cmp,A>&& s2) {
+
+			if(s1.size() > s2.size()) {
+				s1.insert(s2.begin(), s2.end());
+
+				return s1;
+			}
+
+			else {
+				s2.insert(s1.begin(), s1.end());
+
+				return s2;
+			}
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
 	 * \ref monadpg implementation for std::set with parametrised comparator.
 	 *
 	 * Generally behaves as the other collections. The main difference being,
@@ -72,11 +138,7 @@ namespace ftl {
 	 *
 	 * \ingroup set
 	 */
-	template<
-			typename T,
-			typename Cmp,
-			typename A
-	>
+	template<typename T, typename Cmp, typename A>
 	struct monad<std::set<T,Cmp,A>>
 	: deriving_bind<std::set<T,Cmp,A>>
 	, deriving_apply<std::set<T,Cmp,A>> {
