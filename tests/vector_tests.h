@@ -111,7 +111,30 @@ test_set vector_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("functor::map"),
+			std::string("functor::map[a->b,&"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto f = [](int x){ return float(x)+1.f; };
+				auto v = std::vector<int>{1,2,3};
+				auto v2 = f % v;
+
+				return v2 == std::vector<float>{2.f,3.f,4.f};
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map[a->b,&&"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto f = [](int x){ return float(x)+1.f; };
+				auto v = f % std::vector<int>{1,2,3};
+
+				return v == std::vector<float>{2.f,3.f,4.f};
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map[a->a,&&"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 

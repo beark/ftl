@@ -59,9 +59,13 @@ namespace ftl {
 	 *
 	 * \ingroup list
 	 */
-	template<typename T, typename U, template<typename> class A>
-	struct re_parametrise<std::vector<T,A<T>>,U> {
-		using type = std::vector<U,A<U>>;
+	template<typename T, typename U, typename A>
+	struct re_parametrise<std::vector<T,A>,U> {
+	private:
+		using Au = typename re_parametrise<A,U>::type;
+
+	public:
+		using type = std::vector<U,Au>;
 	};
 
 	/**
@@ -74,12 +78,13 @@ namespace ftl {
 	template<
 			typename F,
 			typename T,
-			template<typename> class A,
-			typename U = typename result_of<F(T)>::value_type
+			typename A,
+			typename U = typename result_of<F(T)>::value_type,
+			typename Au = typename re_parametrise<A,U>::type
 	>
-	std::vector<U,A<U>> concatMap(F f, const std::vector<T,A<T>>& v) {
+	std::vector<U,Au> concatMap(F f, const std::vector<T,A>& v) {
 
-		std::vector<U,A<U>> result;
+		std::vector<U,Au> result;
 		result.reserve(v.size() * 2);
 		auto nested = f % v;
 
@@ -102,14 +107,15 @@ namespace ftl {
 	template<
 			typename F,
 			typename T,
-			template<typename> class A,
-			typename U = typename result_of<F(T)>::value_type
+			typename A,
+			typename U = typename result_of<F(T)>::value_type,
+			typename Au = typename re_parametrise<A,U>::type
 	>
-	std::vector<U,A<U>> concatMap(F f, std::vector<T,A<T>>&& v) {
+	std::vector<U,Au> concatMap(F f, std::vector<T,A>&& v) {
 
 		auto nested = f % std::move(v);
 
-		std::vector<U,A<U>> result;
+		std::vector<U,Au> result;
 		result.reserve(nested.size() * 2);
 
 		for(auto& el : nested) {
@@ -177,27 +183,31 @@ namespace ftl {
 	 *
 	 * \ingroup vector
 	 */
-	template<typename T, template<typename> class A>
-	struct monad<std::vector<T,A<T>>>
-	: deriving_join<std::vector<T,A<T>>>, deriving_apply<std::vector<T,A<T>>> {
+	template<typename T, typename A>
+	struct monad<std::vector<T,A>>
+	: deriving_join<std::vector<T,A>>, deriving_apply<std::vector<T,A>> {
+
+		/// Alias to make type signatures cleaner
+		template<typename U>
+		using vector = typename re_parametrise<std::vector<T,A>,U>::type;
 
 		/// Creates a one element vector
-		static std::vector<T,A<T>> pure(const T& t) {
-			std::vector<T,A<T>> v{};
+		static vector<T> pure(const T& t) {
+			vector<T> v{};
 			v.push_back(t);
 			return v;
 		}
 
-		static std::vector<T,A<T>> pure(T&& t) {
-			std::vector<T,A<T>> v{};
+		static vector<T> pure(T&& t) {
+			vector<T> v{};
 			v.emplace_back(std::move(t));
 			return v;
 		}
 
 		/// Applies f to each element
 		template<typename F, typename U = result_of<F(T)>>
-		static std::vector<U,A<U>> map(F&& f, const std::vector<T,A<T>>& v) {
-			std::vector<U,A<U>> ret;
+		static vector<U> map(F&& f, const vector<T>& v) {
+			vector<U> ret;
 			ret.reserve(v.size());
 			for(const auto& e : v) {
 				ret.push_back(f(e));
@@ -213,8 +223,8 @@ namespace ftl {
 				typename =
 					typename std::enable_if<!std::is_same<T,U>::value>::type
 		>
-		static std::vector<U,A<U>> map(F&& f, std::vector<T,A<T>>&& v) {
-			std::vector<U,A<U>> ret;
+		static vector<U> map(F&& f, vector<T>&& v) {
+			vector<U> ret;
 			ret.reserve(v.size());
 			for(auto& e : v) {
 				ret.push_back(f(std::move(e)));
@@ -236,14 +246,12 @@ namespace ftl {
 				typename =
 					typename std::enable_if<std::is_same<T,U>::value>::type
 		>
-		static std::vector<T,A<T>> map(F&& f, std::vector<T,A<T>>&& v) {
+		static vector<T> map(F&& f, vector<T>&& v) {
 			for(auto& e : v) {
 				e = f(e);
 			}
 
-			// Move into new (temporary) container, so reference does not go
-			// and die
-			return std::vector<T,A<T>>(std::move(v));
+			return v;
 		}
 
 		/// Equivalent of flip(concatMap)
@@ -251,7 +259,7 @@ namespace ftl {
 			typename F,
 			typename U = typename result_of<F(T)>::value_type
 		>
-		static std::vector<U,A<U>> bind(const std::vector<T,A<T>>& v, F&& f) {
+		static vector<U> bind(const vector<T>& v, F&& f) {
 			return concatMap(std::forward<F>(f), v);
 		}
 
@@ -260,7 +268,7 @@ namespace ftl {
 			typename F,
 			typename U = typename result_of<F(T)>::value_type
 		>
-		static std::vector<U,A<U>> bind(std::vector<T,A<T>>&& v, F&& f) {
+		static vector<U> bind(vector<T>&& v, F&& f) {
 			return concatMap(std::forward<F>(f), std::move(v));
 		}
 
