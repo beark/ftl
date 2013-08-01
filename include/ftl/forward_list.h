@@ -59,9 +59,13 @@ namespace ftl {
 	 *
 	 * \ingroup list
 	 */
-	template<typename T, typename U, template<typename> class A>
-	struct re_parametrise<std::forward_list<T,A<T>>,U> {
-		using type = std::forward_list<U,A<U>>;
+	template<typename T, typename U, typename A>
+	struct re_parametrise<std::forward_list<T,A>,U> {
+	private:
+		using Au = typename re_parametrise<A,U>::type;
+
+	public:
+		using type = std::forward_list<U,Au>;
 	};
 
 	/**
@@ -74,13 +78,15 @@ namespace ftl {
 	template<
 			typename F,
 			typename T,
-			template<typename> class A,
-			typename U = typename result_of<F(T)>::value_type>
-	std::forward_list<U,A<U>> concatMap(
+			typename A,
+			typename U = typename result_of<F(T)>::value_type,
+			typename Au = typename re_parametrise<A,U>::type
+	>
+	std::forward_list<U,Au> concatMap(
 			F&& f,
-			const std::forward_list<T,A<T>>& l) {
+			const std::forward_list<T,A>& l) {
 
-		std::forward_list<U,A<U>> result;
+		std::forward_list<U,Au> result;
 		auto nested = std::forward<F>(f) % l;
 
 		auto it = result.before_begin();
@@ -103,15 +109,17 @@ namespace ftl {
 	template<
 			typename F,
 			typename T,
-			template<typename> class A,
-			typename U = typename result_of<F(T)>::value_type>
-	std::forward_list<U,A<U>> concatMap(
+			typename A,
+			typename U = typename result_of<F(T)>::value_type,
+			typename Au = typename re_parametrise<A,U>::type
+	>
+	std::forward_list<U,Au> concatMap(
 			F&& f,
-			std::forward_list<T,A<T>>&& l) {
+			std::forward_list<T,A>&& l) {
 
 		auto nested = std::forward<F>(f) % std::move(l);
 
-		std::forward_list<U,A<U>> result;
+		std::forward_list<U,Au> result;
 
 		auto it = result.before_begin();
 		for(auto& el : nested) {
@@ -192,23 +200,45 @@ namespace ftl {
 	 *
 	 * \ingroup fwdlist
 	 */
-	template<typename T, template<typename> class A>
-	struct monad<std::forward_list<T,A<T>>>
-	: deriving_join<std::forward_list<T,A<T>>>
-	, deriving_apply<std::forward_list<T,A<T>>> {
+	template<typename T, typename A>
+	struct monad<std::forward_list<T,A>>
+	: deriving_join<std::forward_list<T,A>>
+	, deriving_apply<std::forward_list<T,A>> {
 
-		static std::forward_list<T,A<T>> pure(T&& t) {
-			std::forward_list<T> l;
-			l.emplace_front(std::forward<T>(t));
+		/// Alias to make type signatures more easily read.
+		template<typename U>
+		using forward_list
+			= typename re_parametrise<std::forward_list<T,A>,U>::type;
+
+		/**
+		 * Embed a `T` in a forward list.
+		 *
+		 * Simply creates a singleton list, containing `t`.
+		 */
+		static forward_list<T> pure(const T& t) {
+			forward_list<T> l;
+			l.emplace_front(t);
 			return l;
 		}
 
-		template<typename F, typename U = result_of<F(T)>>
-		static std::forward_list<U,A<U>> map(
-				const F& f,
-				const std::forward_list<T,A<T>>& l) {
 
-			std::forward_list<U,A<U>> rl;
+		/// \overload
+		static forward_list<T> pure(T&& t) {
+			forward_list<T> l;
+			l.emplace_front(std::move(t));
+			return l;
+		}
+
+		/**
+		 * Maps the given function over all elements in the list.
+		 *
+		 * Similar to std::transform, except `l` is not mutated and `f` is
+		 * allowed to change domain.
+		 */
+		template<typename F, typename U = result_of<F(T)>>
+		static forward_list<U> map(F&& f, const forward_list<T>& l) {
+
+			forward_list<U> rl;
 			auto it = rl.before_begin();
 			for(const auto& e : l) {
 				it = rl.insert_after(it, f(e));
@@ -217,6 +247,7 @@ namespace ftl {
 			return rl;
 		}
 
+		/// \overload
 		template<
 				typename F,
 				typename U = result_of<F(T)>,
@@ -224,11 +255,9 @@ namespace ftl {
 					typename std::enable_if<!std::is_same<T,U>::value>::type
 
 		>
-		static std::forward_list<U,A<U>> map(
-				const F& f,
-				std::forward_list<T,A<T>>&& l) {
+		static forward_list<U> map(F&& f, forward_list<T>&& l) {
 
-			std::forward_list<U,A<U>> rl;
+			forward_list<U> rl;
 			auto it = rl.before_begin();
 			for(auto& e : l) {
 				it = rl.insert_after(it, f(std::move(e)));
@@ -237,15 +266,17 @@ namespace ftl {
 			return rl;
 		}
 
-		// No copy version available when F is an endofuntion, and l is a temp
+		/**
+		 * A no-copies map.
+		 *
+		 * Kicks in if `f` does not change domain and `l` is a temporary.
+		 */
 		template<
 				typename F,
 				typename = typename std::enable_if<
 					std::is_same<T, result_of<F(T)>>::value
 				>::type>
-		static std::forward_list<T,A<T>> map(
-				const F& f,
-				std::forward_list<T,A<T>>&& l) {
+		static forward_list<T> map(F&& f, forward_list<T>&& l) {
 
 			auto rl = std::move(l);
 			for(auto& e : rl) {
@@ -255,18 +286,20 @@ namespace ftl {
 			return rl;
 		}
 
+		/**
+		 * Monadic bind operation.
+		 *
+		 * Equivalent of `flip(concatMap)`.
+		 */
 		template<typename F, typename U = typename result_of<F(T)>::value_type>
-		static std::forward_list<U,A<U>> bind(
-				const std::forward_list<T,A<T>>& l,
-				F&& f) {
+		static forward_list<U> bind(const forward_list<T>& l, F&& f) {
 
 			return concatMap(std::forward<F>(f), l);
 		}
 
+		/// \overload
 		template<typename F, typename U = typename result_of<F(T)>::value_type>
-		static std::forward_list<U,A<U>> bind(
-				std::forward_list<T,A<T>>&& l,
-				F&& f) {
+		static forward_list<U> bind(forward_list<T>&& l, F&& f) {
 
 			return concatMap(std::forward<F>(f), std::move(l));
 		}

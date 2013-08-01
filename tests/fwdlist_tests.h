@@ -111,7 +111,30 @@ test_set fwdlist_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("functor::map"),
+			std::string("functor::map[a->b,&]"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto f = [](int x){ return float(x)+1.f; };
+				auto l = std::forward_list<int>{1,2,3};
+				auto l2 = f % l;
+
+				return l2 == std::forward_list<float>{2.f,3.f,4.f};
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map[a->b,&&]"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto f = [](int x){ return float(x)+1.f; };
+				auto l = f % std::forward_list<int>{1,2,3};
+
+				return l == std::forward_list<float>{2.f,3.f,4.f};
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map[a->a,&&]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 
