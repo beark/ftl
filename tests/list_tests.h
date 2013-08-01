@@ -111,7 +111,30 @@ test_set list_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("functor::map"),
+			std::string("functor::map[a->b,&]"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto f = [](int x){ return float(x)+.5f; };
+				auto l = std::list<int>{1,2,3};
+				auto l2 = f % l;
+
+				return l2 == std::list<float>{1.5f, 2.5f, 3.5f};
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map[a->b,&&]"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto f = [](int x){ return float(x)+.5f; };
+				auto l = f % std::list<int>{1,2,3};
+
+				return l == std::list<float>{1.5f, 2.5f, 3.5f};
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map[a->a,&&]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 

@@ -59,9 +59,13 @@ namespace ftl {
 	 *
 	 * \ingroup list
 	 */
-	template<typename T, typename U, template<typename> class A>
-	struct re_parametrise<std::list<T,A<T>>,U> {
-		using type = std::list<U,A<U>>;
+	template<typename T, typename U, typename A>
+	struct re_parametrise<std::list<T,A>,U> {
+	private:
+		using Au = typename re_parametrise<A,U>::type;
+
+	public:
+		using type = std::list<U,Au>;
 	};
 
 	/**
@@ -74,12 +78,13 @@ namespace ftl {
 	template<
 			typename F,
 			typename T,
-			template<typename> class A,
-			typename U = typename result_of<F(T)>::value_type
+			typename A,
+			typename U = typename result_of<F(T)>::value_type,
+			typename Au = typename re_parametrise<A,U>::type
 	>
-	std::list<U,A<U>> concatMap(F&& f, const std::list<T,A<T>>& l) {
+	std::list<U,Au> concatMap(F&& f, const std::list<T,A>& l) {
 
-		std::list<U,A<U>> result;
+		std::list<U,Au> result;
 		auto nested = std::forward<F>(f) % l;
 
 		for(auto& el : nested) {
@@ -92,12 +97,13 @@ namespace ftl {
 	template<
 			typename F,
 			typename T,
-			template<typename> class A,
-			typename U = typename result_of<F(T)>::value_type
+			typename A,
+			typename U = typename result_of<F(T)>::value_type,
+			typename Au = typename re_parametrise<A,U>::type
 	>
-	std::list<U,A<U>> concatMap(F&& f, std::list<T,A<T>>&& l) {
+	std::list<U,Au> concatMap(F&& f, std::list<T,A>&& l) {
 
-		std::list<U,A<U>> result;
+		std::list<U,Au> result;
 		auto nested = std::forward<F>(f) % std::move(l);
 
 		for(auto& el : nested)
@@ -134,14 +140,14 @@ namespace ftl {
 				std::list<Ts...>&& l1,
 				const std::list<Ts...>& l2) {
 			l1.insert(l1.end(), l2.begin(), l2.end());
-			return std::move(l1);
+			return l1;
 		}
 
 		static std::list<Ts...> append(
 				const std::list<Ts...>& l1,
 				std::list<Ts...>&& l2) {
 			l2.insert(l2.begin(), l1.begin(), l1.end());
-			return std::move(l2);
+			return l2;
 		}
 
 		static std::list<Ts...> append(
@@ -170,9 +176,13 @@ namespace ftl {
 	 *
 	 * \ingroup list
 	 */
-	template<typename T, template<typename> class A>
-	struct monad<std::list<T,A<T>>>
-	: deriving_bind<std::list<T,A<T>>>, deriving_apply<std::list<T,A<T>>> {
+	template<typename T, typename A>
+	struct monad<std::list<T,A>>
+	: deriving_bind<std::list<T,A>>, deriving_apply<std::list<T,A>> {
+
+		/// Alias to make type signatures cleaner
+		template<typename U>
+		using list = typename re_parametrise<std::list<T,A>,U>::type;
 
 		/**
 		 * Produces a singleton list.
@@ -180,15 +190,15 @@ namespace ftl {
 		 * That is, pure generates a one element list, where that single element
 		 * is `a`.
 		 */
-		static std::list<T,A<T>> pure(const T& a) {
-			std::list<T,A<T>> l{};
+		static list<T> pure(const T& a) {
+			list<T> l{};
 			l.emplace_back(a);
 			return l;
 		}
 
 		/// \overload
-		static std::list<T,A<T>> pure(T&& a) {
-			std::list<T,A<T>> l{};
+		static list<T> pure(T&& a) {
+			list<T> l{};
 			l.emplace_back(std::move(a));
 			return l;
 		}
@@ -200,8 +210,8 @@ namespace ftl {
 		 * in the list returned by the call to map.
 		 */
 		template<typename F, typename U = result_of<F(T)>>
-		static std::list<U,A<U>> map(F&& f, const std::list<T,A<T>>& l) {
-			std::list<U,A<U>> ret;
+		static list<U> map(F&& f, const list<T>& l) {
+			list<U> ret;
 			for(const auto& e : l) {
 				ret.push_back(f(e));
 			}
@@ -216,8 +226,8 @@ namespace ftl {
 					!std::is_same<T,U>::value
 				>::type
 		>
-		static std::list<U,A<U>> map(F&& f, std::list<T,A<T>>&& l) {
-			std::list<U,A<U>> ret;
+		static list<U> map(F&& f, list<T>&& l) {
+			list<U> ret;
 			for(auto& e : l) {
 				ret.push_back(f(std::move(e)));
 			}
@@ -239,12 +249,12 @@ namespace ftl {
 					std::is_same<T,U>::value
 				>::type
 		>
-		static std::list<T,A<T>> map(F&& f, std::list<T,A<T>>&& l) {
+		static list<T> map(F&& f, list<T>&& l) {
 			for(auto& e : l) {
 				e = f(e);
 			}
 
-			return std::list<T,A<T>>{std::move(l)};
+			return l;
 		}
 
 		/**
@@ -254,8 +264,8 @@ namespace ftl {
 		 * in the original list. Relative order is preserved (from the
 		 * perspective of depth first iteration).
 		 */
-		static std::list<T> join(const std::list<std::list<T>>& l) {
-			std::list<T> rl;
+		static list<T> join(const list<list<T>>& l) {
+			list<T> rl;
 			for(const auto& ll : l) {
 				for(const auto& e : ll) {
 					rl.push_back(e);
@@ -264,8 +274,8 @@ namespace ftl {
 		}
 
 		/// \overload
-		static std::list<T> join(std::list<std::list<T>>&& l) {
-			std::list<T> rl;
+		static list<T> join(list<list<T>>&& l) {
+			list<T> rl;
 			for(auto& ll : l) {
 				rl.splice(rl.end(), std::move(ll));
 			}
@@ -279,17 +289,13 @@ namespace ftl {
 				typename F,
 				typename U = typename result_of<F(T)>::value_type
 		>
-		static std::list<U,A<U>> bind(const std::list<T,A<T>>& l, F&& f) {
-			return concatMap(std::forward<F>(f), l);
-		}
+		static list<U> bind(const list<T>& l, F&& f);
 
 		template<
 				typename F,
 				typename U = typename result_of<F(T)>::value_type
 		>
-		static std::list<U,A<U>> bind(std::list<T,A<T>>&& l, F&& f) {
-			return concatMap(std::forward<F>(f), std::move(l));
-		}
+		static list<U> bind(list<T>&& l, F&& f);
 #endif
 
 		static constexpr bool instance = true;
