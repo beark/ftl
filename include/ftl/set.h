@@ -38,7 +38,8 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * This module adds the following concept instances to `std::set`:
-	 * - \ref foldable
+	 * - \ref monoidpg
+	 * - \ref foldablepg
 	 * - \ref functorpg
 	 * - \ref applicativepg
 	 * - \ref monadpg
@@ -75,6 +76,8 @@ namespace ftl {
 	 *
 	 * In cases where e.g. one of the sets is a temporary, `append`
 	 * might actually mutate one of the sets instead of making a copy.
+	 *
+	 * \ingroup set
 	 */
 	template<typename T, typename Cmp, typename A>
 	struct monoid<std::set<T,Cmp,A>> {
@@ -219,6 +222,48 @@ namespace ftl {
 		>
 		static set<U> bind(const set<T>& s, F&& f);
 #endif
+
+		static constexpr bool instance = true;
+	};
+
+	/**
+	 * Foldable instance for std::set.
+	 *
+	 * \ingroup set
+	 */
+	template<typename T, typename C, typename A>
+	struct foldable<std::set<T,C,A>>
+	: deriving_fold<std::set<T,C,A>>, deriving_foldMap<std::set<T,C,A>> {
+
+		template<
+				typename F,
+				typename U,
+				typename = typename std::enable_if<
+					std::is_same<U, result_of<F(U,T)>>::value
+				>::type
+		>
+		static U foldl(F&& f, U z, const std::set<T,C,A>& s) {
+			for(auto& e : s) {
+				z = f(z, e);
+			}
+
+			return z;
+		}
+
+		template<
+				typename F,
+				typename U,
+				typename = typename std::enable_if<
+					std::is_same<U, result_of<F(T,U)>>::value
+				>::type
+		>
+		static U foldr(F&& f, U z, const std::set<T,C,A>& s) {
+			for(auto it = s.rbegin(); it != s.rend(); ++it) {
+				z = f(*it, z);
+			}
+
+			return z;
+		}
 
 		static constexpr bool instance = true;
 	};
