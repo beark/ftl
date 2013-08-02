@@ -123,6 +123,39 @@ test_set set_tests{
 
 				return s2 == std::set<int>{1,2,3,4,5};
 			})
+		),
+		std::make_tuple(
+			std::string("foldable::foldl"),
+			std::function<bool()>([]() -> bool {
+
+				auto s = std::set<int>{2,3,4};
+
+				auto f = [](float x, int y){ return x + float(y); };
+
+				return ftl::foldl(f, 0.5f, s) == .5f + 2.f + 3.f + 4.f;
+			})
+		),
+		std::make_tuple(
+			std::string("foldable::foldr"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::set<float> s{4.f,5.f,2.f};
+				auto f = [](float x, float y){ return x/y; };
+
+
+				return foldr(f, 16.f, s) == .15625f;
+			})
+		),
+		std::make_tuple(
+			std::string("foldable::fold"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::set<prod_monoid<int>> l{prod(2),prod(3),prod(4)};
+
+				return fold(l) == 24;
+			})
 		)
 	}
 };
