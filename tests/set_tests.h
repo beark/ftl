@@ -27,20 +27,6 @@
 #include "base.h"
 #include <iostream>
 
-namespace std {
-	template<typename...Ts>
-	struct less<ftl::function<Ts...>> {
-		bool operator()(
-				const ftl::function<Ts...>& a,
-				const ftl::function<Ts...>& b) const {
-			auto cmp = less<ftl::function<Ts...>*>();
-
-			std::cout << "wtf\n";
-			return cmp(&a, &b);
-		}
-	};
-}
-
 test_set set_tests{
 	std::string("set"),
 	{
