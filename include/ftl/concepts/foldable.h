@@ -50,7 +50,7 @@ namespace ftl {
 	 * Interface and utilities relating to the \ref foldablepg concept.
 	 *
 	 * \code
-	 *   #include <ftl/foldable.h>
+	 *   #include <ftl/concepts/foldable.h>
 	 * \endcode
 	 *
 	 * \par Dependencies

@@ -70,7 +70,7 @@ namespace ftl {
 	 * Module containg the \ref functorpg concept and related functions.
 	 *
 	 * \code
-	 *   #include <ftl/functor.h>
+	 *   #include <ftl/concepts/functor.h>
 	 * \endcode
 	 *
 	 * \par Dependencies

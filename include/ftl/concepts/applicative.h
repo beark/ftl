@@ -65,7 +65,7 @@ namespace ftl {
 	 * \ref applicativepg and \ref monoidapg concepts and utilities.
 	 *
 	 * \code
-	 *   #include <ftl/applicative.h>
+	 *   #include <ftl/concepts/applicative.h>
 	 * \endcode
 	 *
 	 * \par Dependencies

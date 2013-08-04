@@ -306,10 +306,7 @@ namespace ftl {
 	 *
 	 * \ingroup list
 	 */
-	template<
-			typename T,
-			typename A
-	>
+	template<typename T, typename A>
 	struct foldable<std::list<T,A>>
 	: deriving_fold<std::list<T,A>>, deriving_foldMap<std::list<T,A>> {
 

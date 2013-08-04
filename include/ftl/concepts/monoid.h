@@ -65,7 +65,7 @@ namespace ftl {
 	 * Functions and interfaces relating to the \ref monoidpg concept.
 	 *
 	 * \code
-	 *   #include <ftl/monoid.h>
+	 *   #include <ftl/concepts/monoid.h>
 	 * \endcode
 	 *
 	 * \par Dependencies

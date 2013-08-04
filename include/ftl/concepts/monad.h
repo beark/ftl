@@ -76,7 +76,7 @@ namespace ftl {
 	 * \ref monadpg concept and related functions.
 	 *
 	 * \code
-	 *   #include <ftl/monad.h>
+	 *   #include <ftl/concepts/monad.h>
 	 * \endcode
 	 *
 	 * \par Dependencies
