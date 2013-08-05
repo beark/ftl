@@ -82,7 +82,7 @@ namespace ftl {
 		 *
 		 * \tparam T must be a \ref monoid
 		 */
-		template<typename = typename std::enable_if<monoid<T>::instance>::type>
+		template<typename = typename std::enable_if<Monoid<T>()>::type>
 		static T fold(const F& f);
 
 		/**
@@ -93,7 +93,7 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename M = typename std::result_of<Fn(T)>::type,
-				typename = typename std::enable_if<monoid<M>::instance>::type
+				typename = typename std::enable_if<Monoid<M>()>::type
 		>
 		static M foldMap(Fn&& fn, const F& f);
 
@@ -140,6 +140,16 @@ namespace ftl {
 	};
 
 	/**
+	 * Concepts lite-compatible check for foldable instances.
+	 *
+	 * \ingroup foldable
+	 */
+	template<typename F>
+	constexpr bool Foldable() noexcept {
+		return foldable<F>::instance;
+	}
+
+	/**
 	 * Inheritable implementation of foldable::foldMap.
 	 *
 	 * Foldable instances implementing foldable::foldl can simply inherit from
@@ -155,7 +165,7 @@ namespace ftl {
 				typename Fn,
 				typename T = concept_parameter<F>,
 				typename M = result_of<Fn(T)>,
-				typename = typename std::enable_if<monoid<M>::instance>::type
+				typename = typename std::enable_if<Monoid<M>()>::type
 		>
 		static M foldMap(Fn fn, const F& f) {
 			return foldable<F>::foldl(
@@ -197,7 +207,7 @@ namespace ftl {
 	struct deriving_fold {
 		template<
 				typename M = concept_parameter<F>,
-				typename = typename std::enable_if<monoid<M>::instance>::type
+				typename = typename std::enable_if<Monoid<M>()>::type
 		>
 		static M fold(const F& f) {
 			return foldable<F>::foldMap(id, f);
@@ -212,8 +222,8 @@ namespace ftl {
 	template<
 			typename F,
 			typename M = concept_parameter<F>,
-			typename = typename std::enable_if<foldable<F>::instance>::type,
-			typename = typename std::enable_if<monoid<M>::instance>::type
+			typename = typename std::enable_if<Foldable<F>()>::type,
+			typename = typename std::enable_if<Monoid<M>()>::type
 	>
 	M fold(const F& f) {
 		return foldable<F>::fold(f);
@@ -228,7 +238,7 @@ namespace ftl {
 			typename F,
 			typename T = concept_parameter<F>,
 			typename Fn,
-			typename = typename std::enable_if<foldable<F>::instance>::type
+			typename = typename std::enable_if<Foldable<F>()>::type
 	>
 	auto foldMap(Fn&& fn, const F& f)
 	-> decltype(foldable<F>::foldMap(std::forward<Fn>(fn), f)) {
@@ -245,7 +255,7 @@ namespace ftl {
 			typename Fn,
 			typename U,
 			typename T = concept_parameter<F>,
-			typename = typename std::enable_if<foldable<F>::instance>::type,
+			typename = typename std::enable_if<Foldable<F>()>::type,
 			typename = typename std::enable_if<
 				std::is_same<plain_type<U>, result_of<Fn(T,U)>>::value
 			>::type
@@ -264,7 +274,7 @@ namespace ftl {
 			typename Fn,
 			typename U,
 			typename T = concept_parameter<F>,
-			typename = typename std::enable_if<foldable<F>::instance>::type,
+			typename = typename std::enable_if<Foldable<F>()>::type,
 			typename = typename std::enable_if<
 				std::is_same<plain_type<U>, result_of<Fn(U,T)>>::value
 			>::type

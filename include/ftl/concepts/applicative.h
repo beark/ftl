@@ -183,6 +183,16 @@ namespace ftl {
 	};
 
 	/**
+	 * Concepts lite-compatible check for applicative instances.
+	 *
+	 * \ingroup applicative
+	 */
+	template<typename F>
+	constexpr bool Applicative() noexcept {
+		return applicative<F>::instance;
+	}
+
+	/**
 	 * Convenience operator to ease applicative style programming.
 	 *
 	 * \code
@@ -197,7 +207,7 @@ namespace ftl {
 			typename F,
 			typename Fn,
 			typename F_ = plain_type<F>,
-			typename = typename std::enable_if<applicative<F_>::instance>::type
+			typename = typename std::enable_if<Applicative<F_>()>::type
 	>
 	auto operator* (Fn&& u, F&& v)
 	-> decltype(applicative<F_>::apply(
@@ -324,13 +334,23 @@ namespace ftl {
 	};
 
 	/**
+	 * Concepts lite-compatible check for monoidA instances.
+	 *
+	 * \ingroup applicative
+	 */
+	template<typename Alt>
+	constexpr bool MonoidAlt() {
+		return monoidA<Alt>::instance;
+	}
+
+	/**
 	 * Convenience operator for monoidA::orDo
 	 *
 	 * \ingroup applicative
 	 */
 	template<
 			typename F,
-			typename = typename std::enable_if<monoidA<F>::instance>::type
+			typename = typename std::enable_if<MonoidAlt<F>()>::type
 	>
 	F operator| (const F& f1, const F& f2) {
 		return monoidA<F>::orDo(f1, f2);
@@ -343,7 +363,7 @@ namespace ftl {
 	 */
 	template<
 			typename F,
-			typename = typename std::enable_if<monoidA<F>::instance>::type
+			typename = typename std::enable_if<MonoidAlt<F>()>::type
 	>
 	F operator| (F&& f1, const F& f2) {
 		return monoidA<F>::orDo(std::move(f1), f2);
@@ -356,7 +376,7 @@ namespace ftl {
 	 */
 	template<
 			typename F,
-			typename = typename std::enable_if<monoidA<F>::instance>::type
+			typename = typename std::enable_if<MonoidAlt<F>()>::type
 	>
 	F operator| (const F& f1, F&& f2) {
 		return monoidA<F>::orDo(f1, std::move(f2));
@@ -369,7 +389,7 @@ namespace ftl {
 	 */
 	template<
 			typename F,
-			typename = typename std::enable_if<monoidA<F>::instance>::type
+			typename = typename std::enable_if<MonoidAlt<F>()>::type
 	>
 	F operator| (F&& f1, F&& f2) {
 		return monoidA<F>::orDo(std::move(f1), std::move(f2));
@@ -395,7 +415,7 @@ namespace ftl {
 	template<
 			typename F,
 			typename A = concept_parameter<F>,
-			typename = typename std::enable_if<monoidA<F>::instance>::type
+			typename = typename std::enable_if<MonoidAlt<F>()>::type
 	>
 	typename re_parametrise<F,maybe<A>>::type optional(const F& f) {
 		using Fm = typename re_parametrise<F,maybe<A>>::type;

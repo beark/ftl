@@ -189,6 +189,16 @@ namespace ftl {
 	};
 
 	/**
+	 * Concepts lite-compatible check for monad instances.
+	 *
+	 * \ingroup monad
+	 */
+	template<typename M>
+	constexpr bool Monad() noexcept {
+		return monad<M>::instance;
+	}
+
+	/**
 	 * Inheritable implementation of `monad<M>::join`.
 	 *
 	 * Monad implementations (as in, the template specialisations of monad<M>)
@@ -369,7 +379,7 @@ namespace ftl {
 			typename M,
 			typename F,
 			typename M_ = plain_type<M>,
-			typename = typename std::enable_if<monad<M_>::instance>::type
+			typename = typename std::enable_if<Monad<M_>()>::type
 	>
 	auto operator>>= (M&& m, F&& f)
 	-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
@@ -387,7 +397,7 @@ namespace ftl {
 			typename M,
 			typename F,
 			typename M_ = plain_type<M>,
-			typename = typename std::enable_if<monad<M_>::instance>::type
+			typename = typename std::enable_if<Monad<M_>()>::type
 	>
 	auto operator<<= (F&& f, M&& m)
 	-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
@@ -409,7 +419,7 @@ namespace ftl {
 			typename Mu,
 			typename Mt_ = plain_type<Mt>,
 			typename T = concept_parameter<Mt_>,
-			typename = typename std::enable_if<monad<Mt_>::instance>::type,
+			typename = typename std::enable_if<Monad<Mt_>()>::type,
 			typename = typename std::enable_if<
 				std::is_same<typename re_parametrise<Mu,T>::type, Mt_>::value
 			>::type
@@ -435,7 +445,7 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mu,
-			typename = typename std::enable_if<monad<Mt>::instance>::type,
+			typename = typename std::enable_if<Monad<Mt>()>::type,
 			typename T = concept_parameter<Mt>,
 			typename U = concept_parameter<Mu>,
 			typename = typename std::enable_if<
@@ -453,7 +463,7 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mu,
-			typename = typename std::enable_if<monad<Mt>::instance>::type,
+			typename = typename std::enable_if<Monad<Mt>()>::type,
 			typename T = concept_parameter<Mt>,
 			typename U = concept_parameter<Mu>,
 			typename = typename std::enable_if<
@@ -481,7 +491,7 @@ namespace ftl {
 			typename Mt,
 			typename F,
 			typename T = concept_parameter<Mt>,
-			typename = typename std::enable_if<monad<Mt>::instance>::type,
+			typename = typename std::enable_if<Monad<Mt>()>::type,
 			typename U = result_of<F(T)>,
 			typename Mu = typename re_parametrise<Mt,U>::type
 	>
@@ -490,22 +500,6 @@ namespace ftl {
 			return monad<Mu>::pure(f(t));
 		};
 	}
-
-	/*
-	template<
-			typename Mt,
-			typename F,
-			typename T = concept_parameter<Mt>,
-			typename = typename std::enable_if<monad<Mt>::instance>::type,
-			typename U = typename decayed_result<F(T)>::type,
-			typename Mu = typename re_parametrise<Mt,U>::type
-	>
-	Mu liftM(F f, Mt&& m) {
-		return std::move(m) >>= [f] (T&& t) {
-			return monad<Mu>::pure(f(std::move(t)));
-		};
-	}
-	*/
 
 	/**
 	 * Convenience function object.

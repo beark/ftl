@@ -189,6 +189,16 @@ namespace ftl {
 	};
 
 	/**
+	 * Concepts lite-compatible check for orderable instances.
+	 *
+	 * \ingroup ord
+	 */
+	template<typename T>
+	constexpr bool Ord() noexcept {
+		return orderable<T>::instance();
+	}
+
+	/**
 	 * Convenience function to more easily compare things.
 	 *
 	 * Simply invokes \c orderable<T>::compare.

@@ -25,7 +25,6 @@
 
 #include <ftl/set.h>
 #include "base.h"
-#include <iostream>
 
 test_set set_tests{
 	std::string("set"),

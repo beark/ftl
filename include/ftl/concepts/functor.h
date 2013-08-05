@@ -131,6 +131,16 @@ namespace ftl {
 	};
 
 	/**
+	 * Concepts lite-compatible check for functor instances.
+	 *
+	 * \ingroup functor
+	 */
+	template<typename F>
+	constexpr bool Functor() noexcept {
+		return functor<F>::instance;
+	}
+
+	/**
 	 * Convenience operator for functor::map.
 	 *
 	 * \ingroup functor
@@ -139,7 +149,7 @@ namespace ftl {
 		typename F,
 		typename Fn,
 		typename F_ = plain_type<F>,
-		typename = typename std::enable_if<functor<F_>::instance>::type>
+		typename = typename std::enable_if<Functor<F_>()>::type>
 	auto operator% (Fn&& fn, F&& f)
 	-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f))) {
 		return functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f));
