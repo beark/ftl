@@ -23,49 +23,38 @@
 #ifndef FTL_ORD_H
 #define FTL_ORD_H
 
-#include "type_traits.h"
+#include "concepts/orderable.h"
 #include "concepts/monoid.h"
 
 namespace ftl {
 	/**
-	 * \page orderablepg Orderable
-	 *
-	 * Anything that can be ordered in some strict sense.
-	 *
-	 * In essence, any type that defines the operators `<`, `==`, and `>`.
-	 * All instances of Orderable also fulfill the requirements of \ref eq.
-	 *
-	 * \see \ref ord (module)
-	 */
-
-	/**
 	 * \defgroup ord Ord
 	 *
-	 * \ref orderablepg concept, `ord` data type, concept instances, and related.
+	 * The `ord` data type, concept instances, and related utilities.
 	 *
 	 * \code
 	 *   #include <ftl/ord.h>
 	 * \endcode
 	 *
 	 * The `ord` data type represents an ordering, in the form of "less than",
-	 * "equal", or "greater than". The Orderable concept relies on this data
-	 * type to order values.
+	 * "equal", or "greater than".
 	 *
 	 * \par Dependencies
+	 * - \ref orderable
 	 * - \ref monoid
 	 */
 
 	/**
-	 * Encapsulation of the concept of an ordering.
+	 * Data type representing an ordering relationship.
 	 *
 	 * In essence, an ordering can be either 'less than' (Lt), 'equal' (Eq), or
 	 * 'greater than' (Gt).
 	 *
 	 * \par Concepts implemented by ord
-	 * \li \ref fullycons
-	 * \li \ref assignable
-	 * \li \ref orderable
-	 * \li \ref monoid
+	 * - \ref fullycons
+	 * - \ref assignable
+	 * - \ref orderable
+	 * - \ref monoid
 	 *
 	 * \ingroup ord
 	 */
@@ -90,7 +79,7 @@ namespace ftl {
 			Lt = 0, Eq, Gt
 		};
 
-		/// Default to Eq.
+		/// Defaults to Eq.
 		constexpr ord() noexcept {}
 
 		/**
@@ -155,64 +144,34 @@ namespace ftl {
 	};
 
 	/**
-	 * \interface orderable
-	 *
-	 * Concrete definition of \ref orderablepg concept.
-	 *
-	 * In essence, instances of Orderable can be ordered in some strict sense.
-	 *
-	 * For a type to become an instance of Orderable, it must either implement
-	 * all of the operators `<`, `==`, `!=`, and `>`, or it must specialise this
-	 * struct. Either will work equally well.
+	 * Comparison function for \ref orderablepg objects.
 	 *
 	 * \ingroup ord
 	 */
-	template<typename T>
-	struct orderable {
-		/**
-		 * Compares two orderables of the same type.
-		 *
-		 * The default implementation should very rarely need to be overided.
-		 *
-		 * \return ord::Lt if lhs < rhs, ord::Eq if they're equal, and
-		 *         otherwise ord::Gt.
-		 */
-		static ord compare(const T& lhs, const T& rhs) {
-			return lhs < rhs ? ord::Lt : (lhs == rhs ? ord::Eq : ord::Gt);
-		}
-
-		static constexpr bool instance =
-			has_eq<T>::value
-			&& has_neq<T>::value
-			&& has_lt<T>::value
-			&& has_gt<T>::value;
-	};
-
-	/**
-	 * Concepts lite-compatible check for orderable instances.
-	 *
-	 * \ingroup ord
-	 */
-	template<typename T>
-	constexpr bool Ord() noexcept {
-		return orderable<T>::instance();
-	}
-
-	/**
-	 * Convenience function to more easily compare things.
-	 *
-	 * Simply invokes \c orderable<T>::compare.
-	 *
-	 * \ingroup ord
-	 */
-	template<typename T>
-	auto compare(const T& a, const T& b)
-	-> decltype(orderable<T>::compare(a, b)) {
-		return orderable<T>::compare(a, b);
+	template<
+			typename Ord,
+			typename = typename std::enable_if<Orderable<Ord>()>::type
+	>
+	ord compare(const Ord& lhs, const Ord& rhs) {
+		return lhs < rhs ? ord::Lt : (lhs == rhs ? ord::Eq : ord::Gt);
 	}
 
 	/**
 	 * Convenience function to get a comparator for a certain type.
+	 *
+	 * This can be a very useful function for compositional purposes. I.e.,
+	 * it is possible to compose a comparator using the composite \ref monoidpg
+	 * instance of `ftl::function` and `ftl::ord`.
+	 *
+	 * Example:
+	 * \code
+	 *   using ftl::asc;
+	 *   using ftl::getComparator;
+	 *   using ftl::operator^;
+	 *
+	 *   std::sort(collection.begin(), collection.end(),
+	 *   	asc(comparing(&SomeType::Property) ^ getComparator<SomeType>()));
+	 * \endcode
 	 *
 	 * \ingroup ord
 	 */
@@ -250,7 +209,7 @@ namespace ftl {
 	/**
 	 * Convenience function to compare objects by getter.
 	 *
-	 * \tparam R Must satisfy orderable.
+	 * \tparam R Must satisfy \ref orderablepg.
 	 *
 	 * \param method Getter method to do comparison by.
 	 *
@@ -262,24 +221,27 @@ namespace ftl {
 	 * \code
 	 *     list<string> l{"aaaa", "a", "aaa", "aa"};
 	 *
-	 *     sort(l.begin(), l.end(), lessThan(comparing(&string::size)));
+	 *     sort(l.begin(), l.end(), asc(comparing(&string::size)));
 	 * \endcode
 	 * Resulting list: `{"a", "aa", "aaa", "aaaa"}`
 	 *
 	 * \ingroup ord
 	 */
-	template<typename A, typename R>
+	template<
+			typename A,
+			typename R,
+			typename = typename std::enable_if<Orderable<R>()>::type>
 	function<ord,const A&,const A&> comparing(R (A::*method)() const) {
 		return [=] (const A& a, const A& b) {
-			return orderable<R>::compare((a.*method)(), (b.*method)());
+			return compare((a.*method)(), (b.*method)());
 		};
 	}
 
 	/**
 	 * Convenience function to compare objects by "converter".
 	 *
-	 * \tparam F Must satisfy \ref fn<orderable(A)>, or in other words, must
-	 *           return something that is orderable.
+	 * \tparam F Must satisfy \ref fn`<`\ref orderablepg`(A)>`, or in other
+	 *           words, must return something that is orderable.
 	 *
 	 * The use case for this convenience function is similar to the comparing
 	 * function that works with getter methods, but in this case the comparison
@@ -289,7 +251,7 @@ namespace ftl {
 	 * \code
 	 *   list<maybe<string>> l{value("abc"), value("de"), value("f")};
 	 *
-	 *   sort(l.begin(), l.end(), lessThan(comparing(
+	 *   sort(l.begin(), l.end(), asc(comparing(
 	 *       [] (const maybe<string>& m) -> size_t { return m ? m->size() : 0; }
 	 *   )));
 	 * \endcode
@@ -298,11 +260,13 @@ namespace ftl {
 	 *
 	 * \ingroup ord
 	 */
-	template<typename A, typename B>
+	template<
+			typename A,
+			typename B,
+			typename = typename std::enable_if<Orderable<B>()>::type>
 	function<ord,const A&,const A&> comparing(function<B,A> f) {
 		return [=] (const A& a, const A& b) {
-			return orderable<typename std::decay<B>::type>::compare(
-					f(a), f(b));
+			return compare(f(a), f(b));
 		};
 	}
 
@@ -317,7 +281,7 @@ namespace ftl {
 	 * \ingroup ord
 	 */
 	template<typename A>
-	function<bool,const A&,const A&> lessThan(
+	function<bool,const A&,const A&> asc(
 			function<ord,const A&,const A&> cmp) {
 		return [=] (const A& a, const A& b) {
 			return cmp(a, b) == ord::Lt;
@@ -335,12 +299,13 @@ namespace ftl {
 	 * \ingroup ord
 	 */
 	template<typename A>
-	function<bool,const A&,const A&> greaterThan(
+	function<bool,const A&,const A&> desc(
 			function<ord,const A&,const A&> cmp) {
 		return [=] (const A& a, const A& b) {
 			return cmp(a, b) == ord::Gt;
 		};
 	}
+
 	/**
 	 * Convenience function to ease integration with stdlib's sort.
 	 *

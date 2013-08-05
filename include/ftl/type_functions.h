@@ -167,14 +167,6 @@ namespace ftl {
 	 */
 
 	/**
-	 * \page eq EqualityComparable
-	 *
-	 * Any type that can be compared for equality.
-	 *
-	 * More formally, there must exist an `operator==` and an `operator!=`.
-	 */
-
-	/**
 	 * \page copyassignable CopyAssignable
 	 *
 	 * Types that can be copy assigned to.
