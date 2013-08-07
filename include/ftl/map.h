@@ -49,10 +49,9 @@ namespace ftl {
 	/**
 	 * Re parameterisation specialisation of std::map.
 	 *
-	 * Applies the parametrisation recursively to the compare function and
-	 * allocator types, meaning that if either of the two requires special
-	 * consideration, a user can simply specialise `re_parametrise` in an
-	 * appropriate manner.
+	 * Applies the parametrisation recursively to the allocator type,
+	 * meaning that if it requires special consideration, a user can simply
+	 * specialise `re_parametrise` in an appropriate manner.
 	 *
 	 * \note When parameterising the allocator `A`, it's given
 	 *       `std::pair<const K,U>` as type parameter. If this is not the
@@ -66,11 +65,10 @@ namespace ftl {
 	template<typename K, typename T, typename C, typename A, typename U>
 	struct re_parametrise<std::map<K,T,C,A>,U> {
 	private:
-		using Cu = typename re_parametrise<C,U>::type;
 		using Au = typename re_parametrise<A,std::pair<const K,U>>::type;
 
 	public:
-		using type = std::map<K,U,Cu,Au>;
+		using type = std::map<K,U,C,Au>;
 	};
 
 	template<typename K, typename V, typename...Ts>
@@ -103,7 +101,32 @@ namespace ftl {
 			return rm;
 		}
 
-		/// No-copy overload for endofunctions on temporary maps.
+		/**
+		 * R-value overload.
+		 *
+		 * Moves keys and values from `m`.
+		 */
+		template<
+				typename F,
+				typename U = result_of<F(T)>,
+				typename = typename std::enable_if<
+					!std::is_same<T,U>::value
+				>::type
+		>
+		static Map<U> map(F&& f, Map<T>&& m) {
+			umap<U> rm;
+			for(auto& kv : m) {
+				rm.emplace(std::move(kv.first), f(std::move(kv.second)));
+			}
+
+			return rm;
+		}
+
+		/**
+		 * No-copy overload for endofunctions on temporary maps.
+		 *
+		 * \note Requires a \ref moveassignable `T`.
+		 */
 		template<
 				typename F,
 				typename = typename std::enable_if<
@@ -112,7 +135,7 @@ namespace ftl {
 		>
 		static Map<T> map(F&& f, Map<T>&& m) {
 			for(auto& kv : m) {
-				m[kv.first] = f(kv.second);
+				m[kv.first] = f(std::move(kv.second));
 			}
 
 			return m;
