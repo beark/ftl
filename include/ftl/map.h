@@ -114,7 +114,7 @@ namespace ftl {
 				>::type
 		>
 		static Map<U> map(F&& f, Map<T>&& m) {
-			umap<U> rm;
+			Map<U> rm;
 			for(auto& kv : m) {
 				rm.emplace(std::move(kv.first), f(std::move(kv.second)));
 			}
