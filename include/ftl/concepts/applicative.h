@@ -146,27 +146,21 @@ namespace ftl {
 		 *
 		 * \note Default implementation only works if `F` is already a monad.
 		 */
-		template<typename Fn, typename U = result_of<Fn(T)>>
-		static F<U> apply(const F<Fn>& fn, const F<T>& f) {
-			return monad<F_>::apply(fn, f);
+		template<
+				typename Ff,
+				typename Fn = concept_parameter<plain_type<Ff>>,
+				typename U = result_of<Fn(T)>>
+		static F<U> apply(Ff&& fn, const F<T>& f) {
+			return monad<F_>::apply(std::forward<Ff>(fn), f);
 		}
 
 		/// \overload
-		template<typename Fn, typename U = result_of<Fn(T)>>
-		static F<U> apply(F<Fn>&& fn, const F<T>& f) {
-			return monad<F_>::apply(std::move(fn), f);
-		}
-
-		/// \overload
-		template<typename Fn, typename U = result_of<Fn(T)>>
-		static F<U> apply(const F<Fn>& fn, F<T>&& f) {
-			return monad<F_>::apply(fn, std::move(f));
-		}
-
-		/// \overload
-		template<typename Fn, typename U = result_of<Fn(T)>>
-		static F<U> apply(F<Fn>&& fn, F<T>&& f) {
-			return monad<F_>::apply(std::move(fn), std::move(f));
+		template<
+				typename Ff,
+				typename Fn = concept_parameter<plain_type<Ff>>,
+				typename U = result_of<Fn(T)>>
+		static F<U> apply(Ff&& fn, F<T>&& f) {
+			return monad<F_>::apply(std::forward<Ff>(fn), std::move(f));
 		}
 
 		/**
@@ -174,7 +168,7 @@ namespace ftl {
 		 *
 		 * Implementors that aren't also Monads \em must override this default.
 		 */
-		static constexpr bool instance = monad<F>::instance;
+		static constexpr bool instance = monad<F_>::instance;
 	};
 
 	/**
@@ -213,7 +207,10 @@ namespace ftl {
 			typename F,
 			typename Fn,
 			typename F_ = plain_type<F>,
-			typename = typename std::enable_if<Applicative<F_>()>::type
+			typename = typename std::enable_if<Applicative<F_>()>::type,
+			typename = typename std::enable_if<
+				is_same_template<plain_type<Fn>,F_>::value
+			>::type
 	>
 	auto operator* (Fn&& u, F&& v)
 	-> decltype(applicative<F_>::apply(

@@ -94,7 +94,7 @@ namespace ftl {
 	template<typename F_>
 	struct functor {
 		/// Convenient access to the type `F_` is parametrised on.
-		using T = concept_parameter<F>;
+		using T = concept_parameter<F_>;
 
 		/**
 		 * Clean way of referring to differently parametrised `F`s.
@@ -125,7 +125,7 @@ namespace ftl {
 		 * Because all applicative functors are functors, `F` is an instance
 		 * of functor if it is an instance of applicative.
 		 */
-		static constexpr bool instance = applicative<F>::instance;
+		static constexpr bool instance = applicative<F_>::instance;
 	};
 
 	/**
