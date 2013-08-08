@@ -81,57 +81,66 @@ namespace ftl {
 	/**
 	 * \interface functor
 	 *
-	 * \brief Struct that must be specialised to implement the functor concept.
+	 * Struct that must be specialised to implement the functor concept.
 	 *
 	 * When specialising, it is important to remember that the described
-	 * interface here is _minimal_, and an instance is encouraged to include
+	 * interface here is the _default_, and an instance is encouraged to include
 	 * additional overloads of the functions for optimization reasons and
 	 * similar. For types that cannot be copied, for instance, it makes sense
 	 * that all of the functor interface functions accept an rvalue reference.
 	 *
 	 * \ingroup functor
 	 */
-	template<typename F>
+	template<typename F_>
 	struct functor {
+		/// Convenient access to the type `F_` is parametrised on.
+		using T = concept_parameter<F>;
+
+		/**
+		 * Clean way of referring to differently parametrised `F`s.
+		 */
+		template<typename U>
+		using F = typename re_parametrise<F_,U>::type;
+
 		/**
 		 * Maps a function to the contained value(s).
 		 *
-		 * \tparam Fn must satisfy \ref fn<U(T)>, where `T` is the type `F` is
-		 *            parametrised on, and `U` is a type the unparametrised
-		 *            `F` _can_ encapsulate.
+		 * Default implementation is to invoke `applicative<F>::map`.
 		 */
-		template<
-				typename Fn,
-				typename T = concept_parameter<F>,
-				typename U = result_of<Fn(T)>,
-				typename Fu = typename re_parametrise<F,U>::type>
-		static Fu map(Fn&& fn, const F& f) {
-			return applicative<F>::map(
+		template<typename Fn, typename U = result_of<Fn(T)>>
+		static F<U> map(Fn&& fn, const F<T>& f) {
+			return applicative<F_>::map(
 					std::forward<Fn>(fn), f);
 		}
 
-		template<
-				typename Fn,
-				typename T = concept_parameter<F>,
-				typename U = result_of<Fn(T)>,
-				typename Fu = typename re_parametrise<F,U>::type>
-		static Fu map(Fn&& fn, F&& f) {
-			return applicative<F>::map(
-					std::forward<Fn>(fn),
-					std::move(f));
+		/// \overload
+		template<typename Fn, typename U = result_of<Fn(T)>>
+		static F<U> map(Fn&& fn, F<T>&& f) {
+			return applicative<F_>::map(std::forward<Fn>(fn), std::move(f));
 		}
 
 		/**
 		 * Compile time check whether a type is a functor.
 		 *
-		 * Because all applicative functors are functors, \c F is an instance
+		 * Because all applicative functors are functors, `F` is an instance
 		 * of functor if it is an instance of applicative.
 		 */
 		static constexpr bool instance = applicative<F>::instance;
 	};
 
 	/**
-	 * Concepts lite-compatible check for functor instances.
+	 * Concepts lite-compatible predicate for functor instances.
+	 *
+	 * Can be used already for similar purposes by way of SFINAE.
+	 *
+	 * Example usage:
+	 * \code
+	 *   template<
+	 *       typename F,
+	 *       typename = typename std::enable_if<Functor<F>()>::type
+	 *   >
+	 *   void myFunc(const F& f);
+	 * \endcode
 	 *
 	 * \ingroup functor
 	 */
@@ -141,7 +150,29 @@ namespace ftl {
 	}
 
 	/**
-	 * Convenience operator for functor::map.
+	 * Convenience operator for `functor::map`.
+	 *
+	 * This operator perfectly forwards the parameters, so it works regardless
+	 * of r-valueness.
+	 *
+	 * Example usage:
+	 * \code
+	 *   MyFunctor<SomeType> foo(
+	 *       const MyFunctor<OtherType>& f,
+	 *       ftl::function<SomeType,OtherType> fn) {
+	 *
+	 *       using ftl::operator%;
+	 *       return fn % f;
+	 *   }
+	 *
+	 *   // Equivalent operator-less version
+	 *   MyFunctor<SomeType> foo(
+	 *       const MyFunctor<OtherType>& f,
+	 *       ftl::function<SomeType,OtherType> fn) {
+	 *
+	 *       return functor<MyFunctor<OtherType>>::map(fn, f);
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup functor
 	 */
@@ -158,7 +189,7 @@ namespace ftl {
 	/**
 	 * Convenience function object.
 	 *
-	 * Provided to make it easier to pass functor::map as parameter to
+	 * Provided to make it easier to pass `functor::map` as parameter to
 	 * higher order functions, as one might otherwise have to wrap such calls
 	 * in a lambda to deal with the ambiguity in face of overloads.
 	 *
@@ -175,8 +206,24 @@ namespace ftl {
 	/**
 	 * Compile time instance of fMap.
 	 *
-	 * Makes it even more convenient to pass functor<T>::map as parameter to
+	 * Makes it even more convenient to pass `functor::map` as parameter to
 	 * higher order functions.
+	 *
+	 * Example usage:
+	 * \code
+	 *   template<
+	 *       typename F1, typename F2,
+	 *       typename T, typename U = result_of<F1(F2,T)>
+	 *   >
+	 *   U foo(const F1& f1, const F2& f2, const T& t) {
+	 *       return f1(f2, t);
+	 *   }
+	 *
+	 *   MyFunctor<SomeType> bar(MyFunctor<SomeType> myFunctor) {
+	 *       // Really a no-op, but demonstrates how convenient fmap can be
+	 *       return foo(fmap, id, myFunctor);
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup functor
 	 */

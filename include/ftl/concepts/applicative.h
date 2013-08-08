@@ -79,20 +79,26 @@ namespace ftl {
 	 *
 	 * \ingroup applicative
 	 */
-	template<typename F>
+	template<typename F_>
 	struct applicative {
 
 		/**
-		 * The type F is an applicative functor on.
+		 * Clean way of expressing `F` parametrised over different types.
+		 */
+		template<typename U>
+		using F = typename re_parametrise<F_,U>::type;
+
+		/**
+		 * The type this particular instance of `F` is parametrised on.
 		 *
 		 * For example, in the case of `maybe<int>`, `T = int`.
 		 */
-		using T = concept_parameter<F>;
+		using T = concept_parameter<F_>;
 
 		/**
 		 * Encapsulate a pure value in the applicative functor.
 		 *
-		 * Defaults to monad<F>::pure, because any monad is also an
+		 * Defaults to `monad<F>::pure`, because any monad is also an
 		 * applicative functor.
 		 *
 		 * \note Default implementation only works if `F` has a monad instance
@@ -102,34 +108,32 @@ namespace ftl {
 		 *       way of monad), then `pure` may be overloaded or replaced with a
 		 *       `const` reference version, or even a pass by value version.
 		 */
-		static F pure(const T& x) {
-			return monad<F>::pure(x);
+		static F<T> pure(const T& x) {
+			return monad<F_>::pure(x);
 		}
 
 		/// \overload
-		static F pure(T&& x) {
-			return monad<F>::pure(std::move(x));
+		static F<T> pure(T&& x) {
+			return monad<F_>::pure(std::move(x));
 		}
 
 		/**
 		 * Map a function to inner value of functor.
 		 *
+		 * Much like `pure`, defaults to the monad implementation, in order to
+		 * prevent need for duplicate code.
+		 *
 		 * \see functor<F>::map
 		 */
-		template<
-				typename Fn,
-				typename U = result_of<Fn(T)>,
-				typename Fu = typename re_parametrise<F,U>::type>
-		static Fu map(Fn&& fn, const F& f) {
-			return monad<F>::map(std::forward<Fn>(fn), f);
+		template<typename Fn, typename U = result_of<Fn(T)>>
+		static F<U> map(Fn&& fn, const F<T>& f) {
+			return monad<F_>::map(std::forward<Fn>(fn), f);
 		}
 
-		template<
-				typename Fn,
-				typename U = result_of<Fn(T)>,
-				typename Fu = typename re_parametrise<F,U>::type>
-		static Fu map(Fn&& fn, F&& f) {
-			return monad<F>::map(std::forward<Fn>(fn), std::move(f));
+		/// \overload
+		template<typename Fn, typename U = result_of<Fn(T)>>
+		static F<U> map(Fn&& fn, F<T>&& f) {
+			return monad<F_>::map(std::forward<Fn>(fn), std::move(f));
 		}
 
 		/**
@@ -138,40 +142,31 @@ namespace ftl {
 		 * Applies the wrapped/contextualised function `fn` to the similarly
 		 * wrapped value `f`.
 		 *
-		 * Default implementation is to use monad's \c ap().
+		 * Default implementation is to use the monad instance's version.
 		 *
-		 * \tparam Ff must satisfy
-		 *         `std::is_same<typename re_parametrise<Ff,T>::type, F>::value`
-		 *
-		 * \note Default implementation only works if F is already a monad.
+		 * \note Default implementation only works if `F` is already a monad.
 		 */
-		template<
-			typename Ff,
-			typename Ff_ = plain_type<Ff>,
-			typename Fn = concept_parameter<Ff_>,
-			typename U = result_of<Fn(T)>,
-			typename Fu = typename re_parametrise<F,U>::type,
-			typename = typename std::enable_if<std::is_same<
-				typename re_parametrise<Ff_,T>::type, F
-			>::value>::type
-		>
-		static Fu apply(Ff&& fn, const F& f) {
-			return monad<F>::apply(std::forward<Ff>(fn), f);
+		template<typename Fn, typename U = result_of<Fn(T)>>
+		static F<U> apply(const F<Fn>& fn, const F<T>& f) {
+			return monad<F_>::apply(fn, f);
 		}
 
 		/// \overload
-		template<
-			typename Ff,
-			typename Ff_ = plain_type<Ff>,
-			typename Fn = concept_parameter<Ff_>,
-			typename U = result_of<Fn(T)>,
-			typename Fu = typename re_parametrise<F,U>::type,
-			typename = typename std::enable_if<std::is_same<
-				typename re_parametrise<Ff_,T>::type, F
-			>::value>::type
-		>
-		static Fu apply(Ff&& fn, F&& f) {
-			return monad<F>::apply(std::forward<Ff>(fn), std::move(f));
+		template<typename Fn, typename U = result_of<Fn(T)>>
+		static F<U> apply(F<Fn>&& fn, const F<T>& f) {
+			return monad<F_>::apply(std::move(fn), f);
+		}
+
+		/// \overload
+		template<typename Fn, typename U = result_of<Fn(T)>>
+		static F<U> apply(const F<Fn>& fn, F<T>&& f) {
+			return monad<F_>::apply(fn, std::move(f));
+		}
+
+		/// \overload
+		template<typename Fn, typename U = result_of<Fn(T)>>
+		static F<U> apply(F<Fn>&& fn, F<T>&& f) {
+			return monad<F_>::apply(std::move(fn), std::move(f));
 		}
 
 		/**
@@ -183,7 +178,18 @@ namespace ftl {
 	};
 
 	/**
-	 * Concepts lite-compatible check for applicative instances.
+	 * Concepts lite-compatible predicate for applicative instances.
+	 *
+	 * Can of course be used for similar purposes by way of SFINAE already.
+	 *
+	 * Example:
+	 * \code
+	 *   template<
+	 *       typename F,
+	 *       typename = typename std::enable_if<Applicative<F>()>::type
+	 *   >
+	 *   myFunction(const F& f);
+	 * \endcode
 	 *
 	 * \ingroup applicative
 	 */

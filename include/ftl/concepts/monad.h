@@ -88,9 +88,25 @@ namespace ftl {
 	 *
 	 * Concrete definition of the monad concept.
 	 *
+	 * \par Writing A New Instance
+	 * To create a monad implementation for a user defines type, you need to
+	 * specialise the `struct` that defines this interface. In general, this
+	 * will look something akin to:
+	 *
+	 * \code
+	 *   template<typename T>
+	 *   struct monad<MyType<T>> {
+	 *       // Implementation goes here
+	 *   };
+	 * \endcode
+	 *
+	 * For details about the various monadic operations that should be part of
+	 * the implementation, simply refer to the rest of the documentation of this
+	 * interface.
+	 *
 	 * \ingroup monad
 	 */
-	template<typename M>
+	template<typename M_>
 	struct monad {
 
 		/**
@@ -104,77 +120,81 @@ namespace ftl {
 // definitions, while allowing a doc generator to find them and generate the
 // proper documentation for the monad concept.
 #ifdef DOCUMENTATION_GENERATOR
+
+		/**
+		 * Provides some sugar for referring to differently parametrised `M_`s.
+		 *
+		 * This results in much cleaner type signatures.
+		 */
+		template<typename U>
+		using M = typename re_parametrise<M_,U>::type;
+
 		/**
 		 * The type `M` is a monad on.
 		 *
-		 * For example, in the case of `maybe<int>`, `T = int`.
+		 * For example, in the case of `maybe<int>`, `T = int`. In the general
+		 * case, `T` depends on how (if at all) `M` specialises the
+		 * `parametric_traits` struct.
 		 */
-		using T = concept_parameter<M>;
-
-		/**
-		 * Convenient means of re parametrising M
-		 */
-		template<typename U>
-		using M_ = typename re_parametrise<M,U>::type;
+		using T = concept_parameter<M_>;
 
 		/**
 		 * Encapsulate a "pure" value.
 		 *
-		 * Given a plain value, encapsulate it in the monad M.
+		 * Given a plain value, encapsulate it in the monad `M`.
 		 *
 		 * \note All monad instances must define `pure`, it can not be derived.
 		 *
 		 * \see applicative::pure
 		 */
-		static M pure(const T&);
+		static M<T> pure(const T&);
 
 		/**
 		 * Map a function to a contextualised value.
 		 *
+		 * Depending on how you decide to view a monad, `map` could be
+		 * interpreted to mean e.g. either of:
+		 * - Apply `f` to every element contained in `m` and return a new
+		 *   container of all the results.
+		 * - Return a computation that is the result of running the computation
+		 *   `m` and then applying `f` to that result.
+		 *
 		 * \see functor::map, deriving_map
 		 */
-		template<
-				typename F,
-				typename U = result_of<F(T)>
-		>
-		static M_<U> map(F&& f, const M& m);
+		template<typename F, typename U = result_of<F(T)>>
+		static M<U> map(F&& f, const M<T>& m);
 
 		/**
 		 * Applies an encapsulated function to an encapsulated value.
 		 *
+		 * Somewhat similar to `map`, except in this case the function `f` is
+		 * also wrapped in a monadic context. I.e., in the case of the list
+		 * monad, `fn` would be a list of functions; in the case of
+		 * `ftl::maybe`, it would _maybe_ be a function; and so on.
+		 *
 		 * \see applicative::apply
 		 */
-		template<
-				typename Mf,
-				typename F = concept_parameter<Mf>,
-				typename U = result_of<F(T)>,
-				typename = typename std::enable_if<
-					std::is_same<M_<F>,Mf>::value
-				>::type
-		>
-		static M_<U> apply(const Mf& fn, const M& m);
+		template<typename F, typename U = result_of<F(T)>>
+		static M<U> apply(const M<F>& fn, const M<T>& m);
 
 		/**
-		 * Bind a value and execute a computation in M on it.
+		 * Bind a value and execute a computation in `M` on it.
 		 *
 		 * The bind operation is the basic operation used to sequence monadic
 		 * computations. In essence, you can say that the left hand side is
 		 * computed first (the definition of "computed" in this case depending
 		 * on the particular instance of monad used), whereafter its result is
 		 * "unwrapped" and fed to `f`, which in turn produces a new monadic
-		 * computation. This second computation is returned, but never "run"
+		 * computation. This second computation is returned, but not "run"
 		 * (to keep it in the context of `M` and to allow further sequencing).
 		 *
 		 * Instances are free to provide `bind` using move semantics on `M`,
 		 * either in addition to `const` reference version, or instead of.
 		 *
-		 * \tparam F must satisfy \ref fn`<M_<U>(T)>`
+		 * \tparam F must satisfy \ref fn`<M<U>(T)>`
 		 */
-		template<
-				typename F,
-				typename U = concept_parameter<result_of<F(T)>>
-		>
-		static M_<U> bind(const M& m, F&& f);
+		template<typename F, typename U = concept_parameter<result_of<F(T)>>>
+		static M<U> bind(const M<T>& m, F&& f);
 
 
 		/**
@@ -184,12 +204,27 @@ namespace ftl {
 		 * e.g. making a list of lists into a plain old list by simply
 		 * concatenating all the inner lists into a single long one.
 		 */
-		static M join(const M_<M>& m);
+		static M<T> join(const M<M<T>>& m);
 #endif
 	};
 
 	/**
 	 * Concepts lite-compatible check for monad instances.
+	 *
+	 * Naturally, this predicate can already be used in conjunction with SFINAE
+	 * to hide particular functions, methods, and classes/structs if a template
+	 * parameter is not a Monad.
+	 *
+	 * Example usage:
+	 * \code
+	 *   template<
+	 *       typename M,
+	 *       typename = typename std::enable_if<Monad<M>()>::type
+	 *   >
+	 *   void myFunc(const M& m) {
+	 *       // Use bind, join, apply, etc on m
+	 *   }
+	 * \endcode 
 	 *
 	 * \ingroup monad
 	 */
@@ -205,15 +240,20 @@ namespace ftl {
 	 * may inherit this struct to get a default implementation of `join`, in
 	 * terms of `bind`.
 	 *
+	 * Both const reference and r-value reference versions are generated.
+	 *
 	 * \tparam M the template specialisation that is to derive `join`.
 	 *
 	 * Example:
 	 * \code
 	 *   template<typename T>
-	 *   struct monad<Identity<T>> : deriving_join<Identity<T>> {
-	 *       // Implementations of bind, map, and pure
+	 *   struct monad<MyMonad<T>> : deriving_join<MyMonad<T>> {
+	 *       // Implementations of bind, map, apply, and pure
 	 *   };
 	 * \endcode
+	 *
+	 * \note Requires that the inheriting monad specialisation implements
+	 *       `bind`. All of the other monadic operations may be derived.
 	 *
 	 * \ingroup monad
 	 */
@@ -240,10 +280,20 @@ namespace ftl {
 	 * implementation of `map` included. The default might not be the most
 	 * performant version possible of `map`.
 	 *
+	 * Both const reference and r-value reference versions are generated.
+	 *
 	 * \tparam M the monad specialisation that is to derive `map`
 	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct monad<MyMonad<T>> : deriving_map<MyMonad<T>> {
+	 *       // Implementations of bind, pure, apply, and join
+	 *   };
+	 * \endcode
+	 *
 	 * \note Requires that the inheriting monad specialisation implements `bind`
-	 *       and `pure`.
+	 *       and `pure`. All of the other monadic operations may be derived.
 	 *
 	 * \ingroup monad
 	 */
@@ -278,19 +328,22 @@ namespace ftl {
 	 * their specialisations of the monad<M> struct) may inherit this struct
 	 * to get a default implementatin of `bind`, in terms of `join` and `map`.
 	 *
+	 * Both const reference and r-value reference versions are generated.
+	 *
 	 * \tparam M The same type monad<M> is being specialised for.
 	 *
 	 * Example:
 	 * \code
 	 *   template<typename T>
-	 *   struct monad<my_type<T>> : deriving_bind<my_type<T>> {
+	 *   struct monad<MyMonad<T>> : deriving_bind<MyMonad<T>> {
 	 *       // Implementation of join and map
 	 *   };
 	 * \endcode
 	 *
-	 * \note To use this `deriving` implementation, there _must_ be an
+	 * \note To use this `deriving` implementation, there must be an
 	 *       actual implementation of `monad::join` and `monad::map`, you
-	 *       cannot rely on `deriving` for either.
+	 *       cannot rely on `deriving` for either. The other monadic operations
+	 *       may be derived if desired, however.
 	 *
 	 * \ingroup monad
 	 */
@@ -325,9 +378,9 @@ namespace ftl {
 	/**
 	 * Inheritable implementation of `monad::apply`.
 	 *
-	 * This inheritable `apply` implementation is given in terms of `bind` and
-	 * `pure`. Thus, `bind` cannot itself be derived when deriving from this
-	 * struct.
+	 * Inheritable `apply` implementation given in terms of `bind` and `pure`. 
+	 *
+	 * Both const reference and r-value reference versions are generated.
 	 *
 	 * \tparam M The same type monad<M> is being specialised for.
 	 *
@@ -338,6 +391,11 @@ namespace ftl {
 	 *       // Implementation of pure and bind
 	 *   };
 	 * \endcode
+	 *
+	 * \note To be able to derive the implementation of `apply`, the inheriting
+	 *       monad instance specialisation must implement `bind` and `pure`
+	 *       "natively". All of the other monadic operations may be derived,
+	 *       however.
 	 *
 	 * \ingroup monad
 	 */
@@ -371,7 +429,22 @@ namespace ftl {
 	/**
 	 * Convenience operator for monad::bind.
 	 *
-	 * Basically makes monadic code a lot cleaner.
+	 * The purpose is to make it more easy to read and write monadic code. All
+	 * arguments are perfectly forwarded, for cases where it matters if the
+	 * const reference or r-value reference version of `bind` is triggered.
+	 *
+	 * Example usage:
+	 * \code
+	 *   MyMonad<int> foo(float);
+	 *
+	 *   MyMonad<int> bar(const MyMonad<float>& m) {
+	 *       using ftl::operator>>=;
+	 *       return m >>= foo;
+	 *       
+	 *       // Equivalent code without using operator:
+	 *       // return ftl::monad<MyMonad<float>>::bind(m, foo);
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup monad
 	 */
@@ -389,7 +462,8 @@ namespace ftl {
 	/**
 	 * Convenience operator for monad::bind.
 	 *
-	 * Mirror of operator >>=
+	 * Mirror of `ftl::operator>>=`. The only difference is the order of the
+	 * arguments.
 	 *
 	 * \ingroup monad
 	 */
@@ -409,8 +483,24 @@ namespace ftl {
 	 *
 	 * Using this operator to chain monadic computations is often times more
 	 * desirable than running them in separate statements, because whatever
-	 * operations \c M hides in its bind operation are still performed this way
-	 * (in other words, nothing:s propagate down the chain etc).
+	 * operations `M` hides in its bind operation are still performed this way.
+	 *
+	 * In other words, `nothing` propagates down the sequence in the case of
+	 * `maybe` (and the same goes for left values with `either`), and so on.
+	 *
+	 * Example usage:
+	 * \code
+	 *   MyMonad<SomeType> foo();
+	 *   MyMonad<OtherType> bar();
+	 *
+	 *   MyMonad<OtherType> example() {
+	 *       using ftl::operator>>;
+	 *       return foo() >> bar();
+	 *
+	 *       // Equivalent code using plain bind:
+	 *       // return foo() >>= [](SomeType){ return bar(); };
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup monad
 	 */
@@ -433,8 +523,8 @@ namespace ftl {
 	/**
 	 * Sequence two monadic computations, return the first.
 	 *
-	 * This operator is used to perform the computations \c m1 and \c m2
-	 * in left-to-right order, and then return the result of \c m1.
+	 * This operator is used to perform the computations `m1` and `m2`
+	 * in left-to-right order, and then return the result of `m1`.
 	 * 
 	 * Use case is when we have two computations that must be done in sequence,
 	 * but it's only the first one that yields an interesting result. Most
@@ -482,7 +572,7 @@ namespace ftl {
 	 * Lifts a function into M.
 	 *
 	 * The function f is lifted into the monadic computation M. Or in other
-	 * words, the value M<A> is unwrapped, passed to f, and its result
+	 * words, the value M<A> is unwrapped, passed to `f`, and its result
 	 * rewrapped.
 	 *
 	 * \ingroup monad
@@ -506,7 +596,7 @@ namespace ftl {
 	 *
 	 * Provided to make it easier to treat monadic bind as a first class
 	 * function, even though many/all monad instances have overloaded
-	 * versions. I.e., in many cases where one might want to pass monad::bind
+	 * versions. I.e., in many cases where one might want to pass `monad::bind`
 	 * as a parameter to a function, it is not possible due to ambiguous
 	 * overloads. In these cases, one could either use a lambda, or&mdash;more
 	 * concisely&mdash;this function object.
@@ -525,6 +615,19 @@ namespace ftl {
 	 * Compile time instance of mBind.
 	 *
 	 * Makes higher order passing of monad<T>::bind even more convenient.
+	 *
+	 * Example usage:
+	 * \code
+	 *   void foo() {
+	 *      bar(mbind);
+	 *   }
+	 *
+	 *   // Alternative, less concise option:
+	 *   template<typename M, typename F>
+	 *   void baz() {
+	 *       bar([](const M& m, const F& f){ return m >>= f; });
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup monad
 	 */
