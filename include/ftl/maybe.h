@@ -520,16 +520,16 @@ namespace ftl {
 		 * Apply `f` if `m` is a value.
 		 */
 		template<typename F, typename U = result_of<F(T)>>
-		static maybe<U> map(const F& f, const maybe<T>& m) {
-			return m ? value(f(*m)) : maybe<U>();
+		static maybe<U> map(F&& f, const maybe<T>& m) {
+			return m ? value(std::forward<F>(f)(*m)) : maybe<U>();
 		}
 		
 		/**
 		 * \overload
 		 */
 		template<typename F, typename U = result_of<F(T)>>
-		static maybe<U> map(const F& f, maybe<T>&& m) {
-			return m ? value(f(std::move(*m))) : maybe<U>();
+		static maybe<U> map(F&& f, maybe<T>&& m) {
+			return m ? value(std::forward<F>(f)(std::move(*m))) : maybe<U>();
 		}
 
 		/**
@@ -540,16 +540,16 @@ namespace ftl {
 		template<
 			typename F,
 			typename U = typename result_of<F(T)>::value_type>
-		static maybe<U> bind(const maybe<T>& m, const F& f) {
-			return m ? f(*m) : maybe<U>();
+		static maybe<U> bind(const maybe<T>& m, F&& f) {
+			return m ? std::forward<F>(f)(*m) : maybe<U>();
 		}
 
 		/// \overload
 		template<
 			typename F,
 			typename U = typename result_of<F(T)>::value_type>
-		static maybe<U> bind(maybe<T>&& m, const F& f) {
-			return m ? f(std::move(*m)) : maybe<U>();
+		static maybe<U> bind(maybe<T>&& m, F&& f) {
+			return m ? std::forward<F>(f)(std::move(*m)) : maybe<U>();
 		}
 
 		static constexpr bool instance = true;
