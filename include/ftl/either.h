@@ -24,6 +24,7 @@
 #define FTL_EITHER_H
 
 #include <stdexcept>
+#include "concepts/orderable.h"
 #include "concepts/monad.h"
 
 namespace ftl {
@@ -49,6 +50,7 @@ namespace ftl {
 	 * The following additional headers and modules are included by this module.
 	 * - <stdexcept>
 	 * - \ref monad
+	 * - \ref orderable
 	 */
 
 	/**
@@ -81,6 +83,7 @@ namespace ftl {
 	 * - \ref movecons
 	 * - \ref assignable
 	 * - \ref eq
+	 * - \ref orderablepg (compares left to right)
 	 *
 	 * Either fulfills the following concepts regardless of its sub-types:
 	 *
@@ -380,13 +383,6 @@ namespace ftl {
 		_dtl::tag_t tag = _dtl::LIMBO;
 	};
 
-	/**
-	 * Either-specialised re_parametrise.
-	 *
-	 * Required because either implements parametric concepts on its R type.
-	 * 
-	 * \ingroup either
-	 */
 	template<typename L, typename R, typename R2>
 	struct re_parametrise<either<L,R>,R2> {
 		using type = either<L,R2>;
@@ -406,11 +402,25 @@ namespace ftl {
 	struct monad<either<L,T>>
 	: deriving_join<either<L,T>>, deriving_apply<either<L,T>> {
 
-		static either<L,T> pure(const T& t) {
+		/**
+		 * Embeds a value as a right value.
+		 *
+		 * Example:
+		 * \code
+		 *   either<int,string> e = monad<either<int,string>>::pure("foo");
+		 *
+		 *  // Exactly equivalent of
+		 *  auto e = make_right<int>(std::string("foo"));
+		 * \endcode
+		 */
+		static constexpr either<L,T> pure(const T& t)
+		noexcept(std::is_nothrow_copy_constructible<T>::value) {
 			return either<L,T>(right_tag_t(), t);
 		}
 
-		static either<L,T> pure(T&& t) {
+		/// \overload
+		static constexpr either<L,T> pure(T&& t)
+		noexcept(std::is_nothrow_move_constructible<T>::value) {
 			return either<L,T>(right_tag_t(), std::move(t));
 		}
 
@@ -420,26 +430,35 @@ namespace ftl {
 		 * If `e` is a left value, it's simply passed on without any
 		 * modification. However, if `e` is a right value, `f` is applied and
 		 * its result is what's passed on.
+		 *
+		 * Example:
+		 * \code
+		 *   auto e1 = ftl::make_right<int>(string("hello"));
+		 *   auto e2 = ftl::make_left<string>(0);
+		 *
+		 *   // e3 == ftl::make_right<int>(string("hello world!"));
+		 *   auto e3 = ftl::fmap([](string s){ return s + " world!"; }, e1);
+		 *   
+		 *   // e4 == ftl::make_left<string>(0);
+		 *   auto e4 = ftl::fmap([](string s){ return s + " world!"; }, e2);
+		 * \endcode
 		 */
-		template<
-				typename F,
-				typename U = result_of<F(T)>
-		>
-		static either<L,U> map(const F& f, const either<L,T>& e) {
+		template<typename F, typename U = result_of<F(T)>>
+		static either<L,U> map(F&& f, const either<L,T>& e) {
 			if(e)
-				return either<L,U>(right_tag_t(), f(*e));
+				return either<L,U>(right_tag_t(), std::forward<F>(f)(*e));
 			else
 				return either<L,U>(left_tag_t(), e.left());
 		}
 
 		/// \overload
-		template<
-				typename F,
-				typename U = result_of<F(T)>
-		>
-		static either<L,U> map(const F& f, either<L,T>&& e) {
+		template<typename F, typename U = result_of<F(T)>>
+		static either<L,U> map(F&& f, either<L,T>&& e) {
 			if(e)
-				return either<L,U>(right_tag_t(), f(std::move(*e)));
+				return either<L,U>(
+						right_tag_t(),
+						std::forward<F>(f)(std::move(*e))
+				);
 			else
 				return either<L,U>(left_tag_t(), std::move(e.left()));
 		}
@@ -495,9 +514,10 @@ namespace ftl {
 	 * \ingroup either
 	 */
 	template<
-		typename R,
-		typename _L,
-		typename L = typename std::decay<_L>::type>
+			typename R,
+			typename _L,
+			typename L = typename std::decay<_L>::type
+	>
 	constexpr either<L,R> make_left(_L&& l)
 	noexcept(std::is_nothrow_constructible<either<L,R>,L>::value) {
 		return either<L,R>(left_tag_t(), std::forward<_L>(l));
@@ -517,12 +537,82 @@ namespace ftl {
 	 * \ingroup either
 	 */
 	template<
-		typename L,
-		typename _R,
-		typename R = plain_type<_R>>
+			typename L,
+			typename _R,
+			typename R = plain_type<_R>
+	>
 	constexpr either<L,R> make_right(_R&& r)
 	noexcept(std::is_nothrow_constructible<either<L,R>,_R>::value) {
 		return either<L,R>(right_tag_t(), std::forward<_R>(r));
+	}
+
+	/**
+	 * Less than comparison of two equivalently parametrised eithers.
+	 *
+	 * Left values are always smaller than right values, and when both lean the
+	 * same way, the comparison operator of that type is used.
+	 *
+	 * Example:
+	 * \code
+	 *   either<int,char> el4 = ftl::make_left<char>(4);
+	 *   either<int,char> el5 = ftl::make_left<char>(5);
+	 *   either<int,char> er1 = ftl::make_right<int>(1);
+	 *   either<int,char> er2 = ftl::make_right<int>(2);
+	 *
+	 *   // These comparisons all result in true
+	 *   el4 < el5 && el4 < er1 && er1 < er2;
+	 *
+	 *   // These all result in false
+	 *   el5 < el4 && er1 < el4 && er2 < er1 && el4 < el4;
+	 * \endcode
+	 *
+	 * \ingroup either
+	 */
+	template<
+			typename L, typename R,
+			typename = typename std::enable_if<Orderable<L>()>::type,
+			typename = typename std::enable_if<Orderable<R>()>::type
+	>
+	constexpr bool operator< (const either<L,R>& e1, const either<L,R>& e2)
+	noexcept {
+		return e1.isLeft()
+			? (e2.isLeft() ? e1.left() < e2.right() : true)
+			: (e2.isRight() ? e1.right() < e2.right() : false);
+	}
+
+	/**
+	 * Greater than comparison of two equivalently parametrised eithers.
+	 *
+	 * Left values are always smaller than right values, and when both lean the
+	 * same way, the comparison operator of that type is used.
+	 *
+	 * Example:
+	 * \code
+	 *   either<int,char> el4 = ftl::make_left<char>(4);
+	 *   either<int,char> el5 = ftl::make_left<char>(5);
+	 *   either<int,char> er1 = ftl::make_right<int>(1);
+	 *   either<int,char> er2 = ftl::make_right<int>(2);
+	 *
+	 *   // These comparisons all result in true
+	 *   el5 > el4 && er1 > el4 && er2 > er1;
+	 *
+	 *   // These all result in false
+	 *   el4 > el5 && el4 > er1 && er1 > er2 && el4 > el4;
+	 *
+	 * \endcode
+	 *
+	 * \ingroup either
+	 */
+	template<
+			typename L, typename R,
+			typename = typename std::enable_if<Orderable<L>()>::type,
+			typename = typename std::enable_if<Orderable<R>()>::type
+	>
+	constexpr bool operator> (const either<L,R>& e1, const either<L,R>& e2)
+	noexcept {
+		return e1.isLeft()
+			? (e2.isLeft() ? e1.left() > e2.right() : false)
+			: (e2.isRight() ? e1.right() > e2.right() : true);
 	}
 
 }
