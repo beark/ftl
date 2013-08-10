@@ -32,9 +32,9 @@ namespace ftl {
 	 *
 	 * Concept encapsulating the mathematical construct of the same name.
 	 *
-	 * Mathematically, a monoid is any set \c S, for which there is an
-	 * associated binary operation, •, and where there exists
-	 * an element \c id of \c S such that the following laws hold:
+	 * Mathematically, a monoid is any set `S`, for which there is an associated
+	 * binary operation, •, and where there exists an element `id` of `S` such
+	 * that the following laws hold:
 	 *
 	 * \li **Right identity law**
 	 *     \code
@@ -49,12 +49,13 @@ namespace ftl {
 	 *       a • (b • c) = (a • b) • c
 	 *     \endcode
 	 *
-	 * Note, however, that in FTL, the binary monoid operation is denoted either
-	 * by `monoid<instance>::append` or by `ftl::operator^`. This is due to the
-	 * limited selection of overloadable operators in C++.
+	 * Note, however, that in FTL, the binary monoid operation is denoted by
+	 * either of `monoid<aType>::append`, `ftl::mappend`, or `ftl::operator^`.
+	 * This is of course due to the limited selection of overloadable operators
+	 * in C++.
 	 *
 	 * For the actual interface instances need to implement, refer to the
-	 * documentation of  `ftl::monoid`.
+	 * documentation of `ftl::monoid`.
 	 *
 	 * \see \ref monoid (module)
 	 */
@@ -88,7 +89,7 @@ namespace ftl {
 		 * Get the identity element for a given monoid.
 		 *
 		 * Which element to be used depends on what operation the monoid
-		 * performs. For example, when using the sum_monoid to give numbers a
+		 * performs. For example, when using the `sum_monoid` to give numbers a
 		 * monoid implementation, 0 is used. This is because
 		 * \code
 		 *   a + 0 = a
@@ -103,8 +104,8 @@ namespace ftl {
 		 *
 		 * While implementations should follow the general style of this
 		 * interface, they are also allowed to accept for instance
-		 * \c const \c M&, but never a non-const reference or other type
-		 * that would allow mutation of either \c m1 or \c m2.
+		 * `const &`, but never a non-const reference or other type
+		 * that would allow mutation of either `m1` or `m2`.
 		 */
 		static M append(M m1, M m2);
 
@@ -119,6 +120,20 @@ namespace ftl {
 	/**
 	 * Concepts lite-compatible check for monoid instances.
 	 *
+	 * Can also be used with SFINAE to "hide" functions and methods from
+	 * non-monoid types.
+	 *
+	 * Example usage:
+	 * \code
+	 *   // Due to SFINAE, myFunc will not be considered an option for
+	 *   // non-monoids.
+	 *   template<
+	 *       typename M,
+	 *       typename = typename std::enable_if<Monoid<M>()>::type
+	 *   >
+	 *   void myFunc(M m1, M m2);
+	 * \endcode
+	 *
 	 * \ingroup monoid
 	 */
 	template<typename M>
@@ -129,62 +144,98 @@ namespace ftl {
 	/**
 	 * Convenience operator to ease use of append.
 	 *
-	 * This default implementation should work for any type that properly
-	 * implements the monoid interface.
+	 * The use of this operator is of course optional, but it can make code
+	 * considerably cleaner. Another option is to use `ftl::mappend`.
+	 *
+	 * Example usage:
+	 * \code
+	 *   void myFunc(const MyMonoid& m1, const MyMonoid& m2) {
+	 *       using ftl::operator^;
+	 *       std::cout << m1 ^ m2 << std::endl;
+	 *   }
+	 *
+	 *   // Equivalent, operator-less version
+	 *   void myFunc2(const MyMonoid&m1, const MyMonoid& m2) {
+	 *       std::cout << ftl::monoid<MyMonoid>::append(m1, m2) << std::endl;
+	 *   }
+	 * \endcode
+	 *
+	 * \note Due to technical constraints, `M1` and `M2` must appear as
+	 *       different types (to achieve perfect forwarding), but in reality,
+	 *       they must be the exact same type, barr constness and reference
+	 *       type.
+	 *
+	 * \see mappend
 	 *
 	 * \ingroup monoid
 	 */
 	template<
-		typename M,
-		typename = typename std::enable_if<Monoid<M>()>::type>
-	M operator^ (const M& m1, const M& m2) {
-		return monoid<M>::append(m1, m2);
+			typename M1,
+			typename M2,
+			typename M = plain_type<M1>,
+			typename = typename std::enable_if<
+				Monoid<M>()
+				&& std::is_same<M,plain_type<M2>>::value
+			>::type
+	>
+	M operator^ (M1&& m1, M2&& m2) {
+		return monoid<M>::append(std::forward<M1>(m1), std::forward<M2>(m2));
 	}
 
 	/**
-	 * \overload
+	 * Convenience function object for `monoid::append`.
+	 *
+	 * Allows easy creation of a function object that can be passed as argument
+	 * to higher-order functions as a substitute for `monoid::append`.
 	 *
 	 * \ingroup monoid
 	 */
-	template<
-		typename M,
-		typename = typename std::enable_if<Monoid<M>()>::type>
-	M operator^ (const M& m1, M&& m2) {
-		return monoid<M>::append(m1, std::move(m2));
-	}
+	struct mAppend {
+		template<
+				typename M1,
+				typename M2,
+				typename M = plain_type<M1>,
+				typename = typename std::enable_if<
+					Monoid<M>()
+					&& std::is_same<M,plain_type<M2>>::value
+				>::type
+		>
+		M operator()(M1&& m1, M2&& m2) {
+			return
+				monoid<M>::append(std::forward<M1>(m1), std::forward<M2>(m2));
+		}
+	};
 
 	/**
-	 * \overload
+	 * Compile time instance of `mAppend`.
+	 *
+	 * Example usage:
+	 * \code
+	 *   template<typename F, typename T>
+	 *   T foo(F f, T t1, T t2) {
+	 *       return f(t1, t2);
+	 *   }
+	 *
+	 *   void bar() {
+	 *       std::cout << foo(ftl::mappend, ftl::sum(2), ftl::sum(2));
+	 *   }
+	 * \endcode
+	 * Outputs "4".
+	 *
+	 * \see mAppend
 	 *
 	 * \ingroup monoid
 	 */
-	template<
-		typename M,
-		typename = typename std::enable_if<Monoid<M>()>::type>
-	M operator^ (M&& m1, const M& m2) {
-		return monoid<M>::append(std::move(m1), m2);
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup monoid
-	 */
-	template<
-		typename M,
-		typename = typename std::enable_if<Monoid<M>()>::type>
-	M operator^ (M&& m1, M&& m2) {
-		return monoid<M>::append(std::move(m1), std::move(m2));
-	}
+	constexpr mAppend mappend;
 
 	/**
 	 * Implementation of monoid for numbers, interpreted as sums.
 	 *
 	 * The reason for wrapping numbers in this struct when using the monoid
 	 * concept is twofold:
-	 * \li To keep the combining monoid \c operator^ from interfering with
-	 *     any such operator defined for the plain type
-	 * \li To allow for secondary or tertiary interpretations, such as products.
+	 * - To keep the combining monoid `operator^` from interfering with
+	 *   any such operator defined for the plain type
+	 * - To allow for secondary or tertiary interpretations, such as products.
 	 *
 	 * The behaviour of the sum monoid is simple:
 	 * \code
@@ -192,20 +243,59 @@ namespace ftl {
 	 *   operator^ => N::operator+
 	 * \endcode
 	 *
-	 * \tparam N Any integer or floating point primitive type, \em or any 
+	 * \tparam N Any integer or floating point primitive type, _or_ any 
 	 *           type that implements `operator+` (in such a way that it does
 	 *           not violate the monoid laws) and can be constructed from the
 	 *           literal `0`.
+	 *
+	 * \par Concepts
+	 * - \ref fullycons
+	 * - \ref eq, if `N` is
+	 * - \ref orderablepg, if `N` is
+	 *
+	 * \par Examples
+	 *
+	 * Trivial usage:
+	 * \code
+	 *   ftl::sum_monoid<int> x = 1, y = 2;
+	 *   std::cout << ftl::mappend(x, y);
+	 * \endcode
+	 * Outputs "3"
+	 *
+	 * Summing the contents of a list:
+	 * \code
+	 *   std::list<int> l{1,2,3,4};
+	 *
+	 *   // map sum to each element, creating a new list of sum_monoids
+	 *   auto l2 = ftl::sum % l;
+	 *
+	 *   // fold iterates the collection and accumulates a result using mappend
+	 *   std::cout << ftl::fold(l2);
+	 * \endcode
+	 * Outputs "10"
 	 *
 	 * \ingroup monoid
 	 */
 	template<typename N>
 	struct sum_monoid {
 
+		/**
+		 * Construct from `N`.
+		 *
+		 * Allows implicit casts from `N` to `sum_monoid`. While this is
+		 * sometimes frowned upon, in the expected use cases of `sum_monoid` it
+		 * makes sense.
+		 */
 		constexpr sum_monoid(N num)
 		noexcept(std::is_nothrow_copy_constructible<N>::value)
 			: n(num) {}
 
+		/**
+		 * Implicit cast to `N`.
+		 *
+		 * This allows more convenient usage, as in the majority of cases,
+		 * the `sum_monoid` should be as transparent as possible.
+		 */
 		constexpr operator N () const noexcept {
 			return n;
 		}
@@ -230,7 +320,7 @@ namespace ftl {
 	}
 
 	/*
-	 * Actual implementation of monoid for sums.
+	 * Actual implementation of \ref monoidpg for sums.
 	 *
 	 * The identity is 0 and the combining operation is +.
 	 *
@@ -256,7 +346,8 @@ namespace ftl {
 	/**
 	 * Implementation of monoid for numbers, when interpreted as products.
 	 *
-	 * The reason behind this struct is exactly the same as with sum_monoid.
+	 * The reason behind this struct is exactly the same as with
+	 * `ftl::sum_monoid`.
 	 *
 	 * The behaviour of the product monoid is simple:
 	 * \code
@@ -268,10 +359,45 @@ namespace ftl {
 	 *           that implements `operator*` (in a way that does not violate the
 	 *           monoid laws) and can be constructed from the literal `1`.
 	 *
+	 * \par Concepts
+	 * - \ref fullycons
+	 * - \ref eq, if `N` is
+	 * - \ref orderablepg, if `N` is
+	 *
+	 * \par Examples
+	 *
+	 * Trivial usage:
+	 * \code
+	 *   float foo() {
+	 *       using ftl::operator^;
+	 *       ftl::prod_monoid<float> x = 3.f, y = 2.5f;
+	 *       return x ^ y ^ ftl::monoid<ftl::prod_monoid<float>>::id();
+	 *   }
+	 * \endcode
+	 * `foo()` will always return the result of `3.f*2.5f*1.f`.
+	 *
+	 * Use the fact that "monoidness" is transitive in the case of `ftl::maybe`
+	 * and its contained type:
+	 * \code
+	 *   ftl::maybe<ftl::prod_monoid<int>> m1{2};
+	 *   ftl::maybe<ftl::prod_monoid<int>> m2{3};
+	 *
+	 *   ftl::maybe<ftl::prod_monoid<int>> m3 = ftl::mappend(m1, m2);
+	 *   if(m3) std::cout << *m3;
+	 * \endcode
+	 * Outputs "6"
+	 *
 	 * \ingroup monoid
 	 */
 	template<typename N>
 	struct prod_monoid {
+		/**
+		 * Construct from `N`.
+		 *
+		 * This allows implicit conversion from `N` to `prod_monoid<N>`. The
+		 * purpose is of course to make the `prod_monoid` as transparent and
+		 * convenient to use as possible.
+		 */
 		constexpr prod_monoid(N num)
 		noexcept(std::is_nothrow_copy_constructible<N>::value)
 			: n(num) {}
@@ -281,6 +407,9 @@ namespace ftl {
 			return prod_monoid(n*m.n);
 		}
 
+		/**
+		 * Implicit conversion back to `N`.
+		 */
 		constexpr operator N () noexcept {
 			return n;
 		}
@@ -330,13 +459,47 @@ namespace ftl {
 	 *   monoid<any>::append() <=> ||
 	 * \endcode
 	 *
+	 * \par Examples
+	 *
+	 * Trivial usage:
+	 * \code
+	 *   bool foo() {
+	 *       using ftl::operator^;
+	 *
+	 *       ftl::any a = false, b = true, c = ftl::monoid<ftl::any>::id();
+	 *
+	 *       return a ^ b ^ c;
+	 *   }
+	 * \endcode
+	 * `foo` will always return `true`.
+	 *
+	 * Check for `nothing` in a list of maybes.
+	 * \code
+	 *   bool nothingIsElemOf(std::list<ftl::maybe<SomeType>> l) {
+	 *       auto f = [](const ftl::maybe<SomeType>& m) -> ftl::any {
+	 *           return m == ftl::nothing;
+	 *       };
+	 *
+	 *       return ftl::foldMap(f, l);
+	 *   }
+	 * \endcode
+	 *
 	 * \ingroup monoid
 	 */
 	struct any {
-		/// Construct from bool
+		/**
+		 * Construct from bool.
+		 *
+		 * Allows implicit conversion from bool to `any`.
+		 */
 		constexpr any(bool bl) noexcept : b(bl) {}
 
-		/// Cast back to bool
+		/**
+		 * Implicit cast back to bool
+		 *
+		 * This allows a more transparent and convenient way of using the
+		 * `any` monoid.
+		 */
 		constexpr operator bool() noexcept {
 			return b;
 		}
@@ -373,13 +536,38 @@ namespace ftl {
 	 *   monoid<any>::append() <=> &&
 	 * \endcode
 	 *
+	 * \par Examples
+	 *
+	 * Trivial usage:
+	 * \code
+	 *   bool foo() {
+	 *       using ftl::operator^;
+	 *
+	 *       ftl::all a = false, b = true, c = ftl::monoid<ftl::any>::id();
+	 *
+	 *       return a ^ b ^ c;
+	 *   }
+	 * \endcode
+	 * `foo` will always return `false`.
+	 *
+	 * Check whether all the `maybe`s in a list are values:
+	 * \code
+	 *   bool allValues(std::list<ftl::maybe<SomeType>> l) {
+	 *       auto f = [](const ftl::maybe<SomeType>& m) -> ftl::all {
+	 *           return m != ftl::nothing;
+	 *       };
+	 *
+	 *       return ftl::foldMap(f, l);
+	 *   }
+	 * \endcode
+	 *
 	 * \ingroup monoid
 	 */
 	struct all {
-		/// Construct from a bool
+		/// Construct from a bool.
 		constexpr all(bool bl) noexcept : b(bl) {}
 
-		/// Cast back to bool
+		/// Implicit cast back to bool.
 		constexpr operator bool() noexcept {
 			return b;
 		}
