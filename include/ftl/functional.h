@@ -126,7 +126,7 @@ namespace ftl {
 	 *
 	 * In essence, the same as ftl::function's implementation.
 	 *
-	 * \ingroup monoid
+	 * \ingroup functional
 	 */
 	template<typename M, typename...Ps>
 	struct monoid<std::function<M(Ps...)>> {
@@ -159,6 +159,62 @@ namespace ftl {
 	template<typename R, typename...Ps>
 	struct parametric_type_traits<std::function<R(Ps...)>> {
 		using parameter_type = R;
+	};
+
+	/**
+	 * Monoid instance for ftl::functions returning monoids.
+	 *
+	 * The reason this works might not be immediately obvious, but basically,
+	 * any function (regardless of arity) that returns a value that is an
+	 * instance of monoid, is in fact also a monoid. It works as follows:
+	 * \code
+	 *   id() <=> A function, returning monoid<result_type>::id(),
+	 *            regardless of parameters.
+	 *   append(a,b) <=> A function that forwards its arguments to both a and b,
+	 *                   and then calls monoid<result_type>::append on the two
+	 *                   results.
+	 * \endcode
+	 *
+	 * \ingroup functional
+	 */
+	template<typename M, typename...Ps>
+	struct monoid<function<M,Ps...>> {
+
+		/**
+		 * Function returning monoid<M>::id().
+		 */
+		static auto id()
+		-> typename std::enable_if<
+				monoid<M>::instance,
+				function<M,Ps...>>::type {
+			return [](Ps...) { return monoid<M>::id(); };
+		}
+
+		/**
+		 * Compute f1 and f2 and combine the results with monoid operation.
+		 *
+		 * \note The parameter pack \c Ps cannot be perfectly forwarded, because
+		 *       both f1 and f2 must be called with the same parameters. It is
+		 *       therefore recommended you use this monoid operation only with
+		 *       functions working on values or `const` references.
+		 *
+		 * \warning Should e.g. f1 mutate one of the parameters, it \em will
+		 *          affect the call to f2. Be very careful if either f1 or f2
+		 *          has side effects.
+		 */
+		static auto append(
+				const function<M,Ps...>& f1,
+				const function<M,Ps...>& f2)
+		-> typename std::enable_if<
+				monoid<M>::instance,
+				function<M,Ps...>>::type {
+			return [=] (Ps...ps) {
+				return monoid<M>::append(f1(ps...), f2(ps...));
+			};
+		}
+
+		/// function<M,Ps...> is only a monoid instance if M is.
+		static constexpr bool instance = monoid<M>::instance;
 	};
 
 	/**
