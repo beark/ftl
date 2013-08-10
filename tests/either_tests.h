@@ -35,7 +35,7 @@ test_set either_tests{
 				auto e1 = ftl::make_left<int>(10);
 				auto e2 = ftl::make_left<int>(10);
 
-				return e1 == e2;
+				return e1 == e2 && !(e1 != e2);
 			})
 		),
 		std::make_tuple(
@@ -44,7 +44,7 @@ test_set either_tests{
 				auto e1 = ftl::make_right<int>(10);
 				auto e2 = ftl::make_right<int>(10);
 
-				return e1 == e2;
+				return e1 == e2 && !(e1 != e2);
 			})
 		),
 		std::make_tuple(
@@ -89,7 +89,7 @@ test_set either_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("functor::map[R] on lvalues"),
+			std::string("functor::map[R&]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 				auto e = ftl::make_right<int>(10);
@@ -99,13 +99,35 @@ test_set either_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("functor::map[L] on lvalues"),
+			std::string("functor::map[a->b,R&&]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+				auto f = [](NoCopy&& n) { return n.property; };
+
+				auto e = f % make_right<char>(NoCopy(2));
+
+				return *e == 2;
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map[L&]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 				auto e = ftl::make_left<int>(10);
 				ftl::either<int,std::string> e2 = [](int){ return std::string("test"); } % e;
 
 				return e2.left() == 10;
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map[a->b,L&&]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+				auto f = [](NoCopy&& n) { return n.property; };
+
+				auto e = f % make_left<NoCopy>('a');
+
+				return e.left() == 'a';
 			})
 		),
 		std::make_tuple(
@@ -196,6 +218,36 @@ test_set either_tests{
 				return e.isLeft() && e.left() == 2;
 			})
 		),
+		std::make_tuple(
+			std::string("monad::join[R<R>]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto e = make_right<int>(make_right<int>(2));
+
+				return monad<either<int,int>>::join(e) == make_right<int>(2);
+			})
+		),
+		std::make_tuple(
+			std::string("monad::join[R<L>]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto e = make_right<int>(make_left<int>(2));
+
+				return monad<either<int,int>>::join(e) == make_left<int>(2);
+			})
+		),
+		std::make_tuple(
+			std::string("monad::join[L<_>]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto e = make_left<either<int,int>>(2);
+
+				return monad<either<int,int>>::join(e) == make_left<int>(2);
+			})
+		)
 	}
 };
 
