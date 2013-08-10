@@ -33,6 +33,15 @@
 using test_t = std::tuple<std::string,std::function<bool()>>;
 using test_set = std::tuple<std::string,std::vector<test_t>>;
 
+struct NoCopy {
+	NoCopy() = default;
+	NoCopy(const NoCopy&) = delete;
+	NoCopy(NoCopy&&) = default;
+	explicit NoCopy(int n) : property(n) {}
+
+	int property;
+};
+
 bool run_test_set(test_set& ts, std::ostream& os);
 
 #endif
