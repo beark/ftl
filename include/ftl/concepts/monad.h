@@ -265,11 +265,11 @@ namespace ftl {
 		using M_ = typename re_parametrise<M,U>::type;
 
 		static M_<T> join(const M_<M_<T>>& m) {
-			return monad<M>::bind(m, id);
+			return monad<M_<M_<T>>>::bind(m, id);
 		}
 
 		static M_<T> join(M_<M_<T>>&& m) {
-			return monad<M>::bind(std::move(m), id);
+			return monad<M_<M_<T>>>::bind(std::move(m), id);
 		}
 	};
 
