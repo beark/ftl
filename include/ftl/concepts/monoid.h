@@ -36,18 +36,18 @@ namespace ftl {
 	 * binary operation, •, and where there exists an element `id` of `S` such
 	 * that the following laws hold:
 	 *
-	 * \li **Right identity law**
-	 *     \code
+	 * - **Right identity law**
+	 *   \code
 	 *       a • id = a
-	 *     \endcode
-	 * \li **Left identity law**
-	 *     \code
+	 *   \endcode
+	 * - **Left identity law**
+	 *   \code
 	 *       id • a = a
-	 *     \endcode
-	 * \li **Law of associativity**
-	 *     \code
+	 *   \endcode
+	 * - **Law of associativity**
+	 *   \code
 	 *       a • (b • c) = (a • b) • c
-	 *     \endcode
+	 *   \endcode
 	 *
 	 * Note, however, that in FTL, the binary monoid operation is denoted by
 	 * either of `monoid<aType>::append`, `ftl::mappend`, or `ftl::operator^`.
@@ -226,7 +226,7 @@ namespace ftl {
 	 *
 	 * \ingroup monoid
 	 */
-	constexpr mAppend mappend;
+	constexpr mAppend mappend{};
 
 	/**
 	 * Implementation of monoid for numbers, interpreted as sums.
