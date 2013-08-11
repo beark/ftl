@@ -43,7 +43,8 @@ namespace ftl {
 	 * Identity function object.
 	 *
 	 * Returns whatever is given as parameter. This can be useful in combination
-	 * with certain higher order functions.
+	 * with certain higher order functions. For example, `foldable::fold` can be
+	 * trivially implemented as `foldable::foldMap(identity(), ...)`.
 	 *
 	 * \ingroup prelude
 	 */
@@ -65,11 +66,24 @@ namespace ftl {
 	 * Makes passing the identity function to higher order functions even more
 	 * convenient.
 	 *
+	 * Example usage:
+	 * \code
+	 *   // Does nothing; v will be {1,2,3}
+	 *   auto v = ftl::fmap(ftl::id, std::vector<int>{1,2,3});
+	 * \endcode
+	 *
 	 * \ingroup prelude
 	 */
 	constexpr identity id{};
 
-	/// Used to distinguish in-place constructors from others
+	/**
+	 * Used to distinguish in-place constructors from others.
+	 *
+	 * Used by e.g. `ftl::maybe` and `ftl::either` to make perfect forwarding
+	 * tot he contained type(s) possible.
+	 *
+	 * \ingroup prelude
+	 */
 	struct inplace_tag {};
 
 	/**
@@ -205,6 +219,118 @@ namespace ftl {
 		};
 	}
 
+	namespace _dtl {
+		// This struct is used to generate curried calling convention for
+		// arbitrary binary functions
+		template<typename F>
+		struct curried_binf {
+		private:
+			template<typename P>
+			struct curried {
+				explicit curried(const P& p) : p(p) {}
+				explicit curried(P&& p) : p(std::move(p)) {}
+
+				P p;
+
+				template<typename T>
+				auto operator() (T&& t) const
+				-> decltype(std::declval<F>()(p, std::forward<T>(t))) {
+					return F()(p, std::forward<T>(t));
+				}
+			};
+
+		public:
+			template<typename P>
+			curried<plain_type<P>> operator() (P&& p) const {
+				return curried<plain_type<P>>(std::forward<P>(p));
+			}
+		};
+
+		// This struct is used to generate curried calling convention for
+		// arbitrary ternary functions
+		template<typename F>
+		struct curried_ternf {
+		private:
+			template<typename P1>
+			struct curried2 {
+			private:
+				template<typename P2>
+				struct curried {
+					constexpr curried(const P1& p1, const P2& p2)
+					noexcept(
+						std::is_nothrow_copy_constructible<P1>::value
+						&& std::is_nothrow_copy_constructible<P2>::value
+					)
+					: p1(p1), p2(p2) {}
+
+					constexpr curried(const P1& p1, P2&& p2)
+					noexcept(
+						std::is_nothrow_copy_constructible<P1>::value
+						&& std::is_nothrow_move_constructible<P2>::value
+					)
+					: p1(p1), p2(std::move(p2)) {}
+
+					constexpr curried(P1&& p1, const P2& p2)
+					noexcept(
+						std::is_nothrow_move_constructible<P1>::value
+						&& std::is_nothrow_copy_constructible<P2>::value
+					)
+					: p1(std::move(p1)), p2(p2) {}
+
+					constexpr curried(P1&& p1, P2&& p2)
+					noexcept(
+						std::is_nothrow_move_constructible<P1>::value
+						&& std::is_nothrow_move_constructible<P2>::value
+					)
+					: p1(std::move(p1)), p2(std::move(p2)) {}
+
+					P1 p1;
+					P2 p2;
+
+					template<typename P3>
+					auto operator() (P3&& p3) const
+					-> decltype(std::declval<F>()(p1, p2, std::forward<P3>(p3))) {
+						return F()(p1, p2, std::forward<P3>(p3));
+					}
+				};
+
+			public:
+				explicit constexpr curried2(const P1& p)
+				noexcept(std::is_nothrow_copy_constructible<P1>::value)
+				: p(p) {}
+
+				explicit constexpr curried2(P1&& p)
+				noexcept(std::is_nothrow_move_assignable<P1>::value)
+				: p(std::move(p)) {}
+
+				P1 p;
+
+				template<typename P2, typename P3>
+				auto operator() (P2&& p2, P3&& p3)
+				-> decltype(std::declval<F>()(p, std::forward<P2>(p2), std::forward<P3>(p3))) {
+					return F()(p, std::forward<P2>(p2), std::forward<P3>(p3));
+				}
+
+				template<typename P2>
+				curried<plain_type<P2>> operator() (P2&& p2) const /* & */  {
+					return curried<plain_type<P2>>(p, std::forward<P2>(p2));
+				}
+
+				/** TODO: Enable r-value overload when gcc-4.8 becomes more standard
+				template<typename P2>
+				curried<plain_type<P2>> operator() (P2&& p2) && {
+					return curried<P1,plain_type<P2>>(std::move(p), std::forward<P2>(p2));
+				}
+				*/
+			};
+
+		public:
+			template<typename P>
+			curried2<plain_type<P>> operator() (P&& p) const {
+				return curried2<plain_type<P>>(std::forward<P>(p));
+			}
+		};
+	}
 }
 
 #endif
