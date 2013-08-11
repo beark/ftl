@@ -40,6 +40,7 @@
 #include "set_tests.h"
 #include "map_tests.h"
 #include "unordered_map_tests.h"
+#include "concept_tests.h"
 
 bool run_test_set(test_set& ts, std::ostream& os) {
 	os << "Running test set '" << std::get<0>(ts) << "'...";
@@ -94,6 +95,7 @@ int main(int, char**) {
 	flawless &= run_test_set(set_tests, std::cout);
 	flawless &= run_test_set(map_tests, std::cout);
 	flawless &= run_test_set(unordered_map_tests, std::cout);
+	flawless &= run_test_set(concept_tests, std::cout);
 
 	if(!flawless)
 		return -1;
