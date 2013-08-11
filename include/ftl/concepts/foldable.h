@@ -30,7 +30,8 @@ namespace ftl {
 	/**
 	 * \page foldablepg Foldable
 	 *
-	 * Abstraction of data structures that can be folded to some summary value.
+	 * Abstraction of data structures that can be folded to some accumulated
+	 * value.
 	 *
 	 * Despite what one may be lead to believe, this concept does not quite
 	 * correspond to the mathematical notion of a catamorphism. Unlike a _true_
@@ -80,6 +81,12 @@ namespace ftl {
 		/**
 		 * Fold a structure containing a monoidal type.
 		 *
+		 * Examples:
+		 * \code
+		 *   std::vector<ftl::sum_monoid<int>> v{sum(2), sum(4), sum(10)};
+		 *   ftl::fold(v); // sum(16)
+		 * \endcode
+		 *
 		 * \tparam T must be a \ref monoid
 		 */
 		template<typename = typename std::enable_if<Monoid<T>()>::type>
@@ -88,7 +95,14 @@ namespace ftl {
 		/**
 		 * Map each element to a monoid and fold the result.
 		 *
-		 * \tparam Fn must satisfy \ref fn`<M(A)>`
+		 * Example:
+		 * \code
+		 *   std::list<int> l{2,2,2};
+		 *
+		 *   ftl::foldMap(ftl::prod<int>, l); // prod(8)
+		 * \endcode
+		 *
+		 * \tparam Fn must satisfy \ref fn`<`\ref monoidpg`(A)>`
 		 */
 		template<
 				typename Fn,
@@ -100,8 +114,16 @@ namespace ftl {
 		/**
 		 * Right associative fold.
 		 *
+		 * Example:
+		 * \code
+		 *   std::forward_list<int> l{4, 8, 5};
+		 *
+		 *   // (4 - (8 - (5 - 3))) = -2
+		 *   ftl::foldr([](int x, int y){ return x-y; }, 3, l);
+		 * \endcode
+		 *
 		 * \param fn Binary folding function
-		 * \param z Zero value to combine the first element with
+		 * \param z Initial "zero" value to start/end the fold
 		 * \param f Structure to fold
 		 *
 		 * \tparam Fn must satisfy \ref fn`<U(T,U)>`
@@ -117,6 +139,15 @@ namespace ftl {
 
 		/**
 		 * Left associative fold.
+		 *
+		 * Example:
+		 * \code
+		 *   std::forward_list<int> l{4, 8, 5};
+		 *
+		 *   // (((3 - 4) - 8) - 5) = -14
+		 *   ftl::foldl([](int x, int y){ return x-y; }, 3, l);
+		 * \endcode
+		 *
 		 *
 		 * \param fn Binary folding function
 		 * \param z Zero value to combine first element with
@@ -142,6 +173,19 @@ namespace ftl {
 	/**
 	 * Concepts lite-compatible check for foldable instances.
 	 *
+	 * Can also be used with SFINAE, for much the same purposes.
+	 *
+	 * Example:
+	 * \code
+	 *   template<
+	 *       typename F,
+	 *       typename = typename std::enable_if<Foldable<F>()>::type
+	 *   >
+	 *   void foo(const F& f) {
+	 *       // Perform folds on f
+	 *   }
+	 * \endcode
+	 *
 	 * \ingroup foldable
 	 */
 	template<typename F>
@@ -154,6 +198,14 @@ namespace ftl {
 	 *
 	 * Foldable instances implementing foldable::foldl can simply inherit from
 	 * this struct to get foldable::foldMap for "free".
+	 *
+	 * Example:
+	 * \code
+	 *     template<>
+	 *     struct foldable<MyFoldable> : deriving_foldMap<MyFoldable> {
+	 *         // Implementation of foldl and foldr
+	 *     };
+	 * \endcode
 	 *
 	 * \tparam F the foldable for which to implement `foldMap`.
 	 *
@@ -186,7 +238,7 @@ namespace ftl {
 	 * this struct to get `foldable::fold` for "free".
 	 *
 	 * It is entirely possible for a foldable implementation to use both 
-	 * `deriving_foldMap<F>` and `deriving_fold`, even in reverse order.
+	 * `deriving_foldMap<F>` and `deriving_fold<F>`, even in reverse order.
 	 *
 	 * \tparam F the foldable instance (not implementation) for which `fold`
 	 *           should apply.
@@ -230,58 +282,117 @@ namespace ftl {
 	}
 
 	/**
-	 * Convenience function alias of foldable<T>::foldMap.
+	 * Convenience function object alias of foldable<T>::foldMap.
+	 *
+	 * Supports curried calling convention, where a user can supply one
+	 * parameter at a time.
 	 *
 	 * \ingroup foldable
 	 */
-	template<
-			typename F,
-			typename T = concept_parameter<F>,
-			typename Fn,
-			typename = typename std::enable_if<Foldable<F>()>::type
-	>
-	auto foldMap(Fn&& fn, const F& f)
-	-> decltype(foldable<F>::foldMap(std::forward<Fn>(fn), f)) {
-		return foldable<F>::foldMap(std::forward<Fn>(fn), f);
-	}
+	struct FoldMap
+#ifndef DOCUMENTATION_GENERATOR
+	: _dtl::curried_binf<FoldMap>
+#endif
+	{
+		template<
+				typename F,
+				typename T = concept_parameter<F>,
+				typename Fn,
+				typename = typename std::enable_if<Foldable<F>()>::type
+		>
+		auto operator() (Fn&& fn, const F& f) const
+		-> decltype(foldable<F>::foldMap(std::forward<Fn>(fn), f)) {
+			return foldable<F>::foldMap(std::forward<Fn>(fn), f);
+		}
+
+		using curried_binf<FoldMap>::operator();
+	};
 
 	/**
-	 * Convenience function alias of foldable<T>::foldr.
+	 * Compile time convenience instance of FoldMap.
+	 *
+	 * Makes `foldable::foldMap` generally a lot cleaner to use, as well as
+	 * easier to pass to higher order functions.
 	 *
 	 * \ingroup foldable
 	 */
-	template<
-			typename F,
-			typename Fn,
-			typename U,
-			typename T = concept_parameter<F>,
-			typename = typename std::enable_if<Foldable<F>()>::type,
-			typename = typename std::enable_if<
-				std::is_same<plain_type<U>, result_of<Fn(T,U)>>::value
-			>::type
-	>
-	U foldr(Fn&& fn, U&& z, const F& f) {
-		return foldable<F>::foldr(std::forward<Fn>(fn), std::forward<U>(z), f);
-	}
+	constexpr FoldMap foldMap{};
 
 	/**
-	 * Convenience function alias of foldable<T>::foldl.
+	 * Convenience function object alias of `foldable::foldr`.
+	 *
+	 * Allows curried calling semantics, e.g. any of:
+	 * \code
+	 *   ftl::foldr(fn, z, f);
+	 *   ftl::foldr(fn)(z, f);
+	 *   ftl::foldr(fn)(z)(f);
+	 * \endcode
+	 * are valid ways of invoking `foldr`.
 	 *
 	 * \ingroup foldable
 	 */
-	template<
-			typename F,
-			typename Fn,
-			typename U,
-			typename T = concept_parameter<F>,
-			typename = typename std::enable_if<Foldable<F>()>::type,
-			typename = typename std::enable_if<
-				std::is_same<plain_type<U>, result_of<Fn(U,T)>>::value
-			>::type
-	>
-	U foldl(Fn&& fn, U&& z, const F& f) {
-		return foldable<F>::foldl(std::forward<Fn>(fn), std::forward<U>(z), f);
-	}
+	struct foldR
+#ifndef DOCUMENTATION_GENERATOR
+	: _dtl::curried_ternf<foldR>
+#endif
+	{
+		template<
+				typename F,
+				typename Fn,
+				typename U,
+				typename T = concept_parameter<F>,
+				typename = typename std::enable_if<Foldable<F>()>::type,
+				typename = typename std::enable_if<
+					std::is_same<plain_type<U>, result_of<Fn(T,U)>>::value
+				>::type
+		>
+		plain_type<U> operator() (Fn&& fn, U&& z, const F& f) const {
+			return foldable<F>::foldr(std::forward<Fn>(fn), std::forward<U>(z), f);
+		}
+
+		using curried_ternf<foldR>::operator();
+	};
+
+	/**
+	 * Compile time convenience instance of foldR.
+	 *
+	 * \ingroup foldable
+	 */
+	constexpr foldR foldr{};
+
+	/**
+	 * Convenience function object alias of foldable<T>::foldl.
+	 *
+	 * \ingroup foldable
+	 */
+	struct foldL
+#ifndef DOCUMENTATION_GENERATOR
+	: _dtl::curried_ternf<foldL>
+#endif
+	{
+		template<
+				typename F,
+				typename Fn,
+				typename U,
+				typename T = concept_parameter<F>,
+				typename = typename std::enable_if<Foldable<F>()>::type,
+				typename = typename std::enable_if<
+					std::is_same<plain_type<U>, result_of<Fn(U,T)>>::value
+				>::type
+		>
+		plain_type<U> operator() (Fn&& fn, U&& z, const F& f) const {
+			return foldable<F>::foldl(std::forward<Fn>(fn), std::forward<U>(z), f);
+		}
+
+		using curried_ternf<foldL>::operator();
+	};
+
+	/**
+	 * Compile time convenience instance of foldL.
+	 *
+	 * \ingroup foldable
+	 */
+	constexpr foldL foldl{};
 
 }
 

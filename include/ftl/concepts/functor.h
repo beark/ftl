@@ -193,14 +193,23 @@ namespace ftl {
 	 * higher order functions, as one might otherwise have to wrap such calls
 	 * in a lambda to deal with the ambiguity in face of overloads.
 	 *
+	 * `fMap` values may be invoked using curried calling style, should such
+	 * be wanted.
+	 *
 	 * \ingroup functor
 	 */
-	struct fMap {
+	struct fMap
+#ifndef DOCUMENTATION_GENERATOR
+	: _dtl::curried_binf<fMap>
+#endif
+	{
 		template<typename Fn, typename F, typename F_ = plain_type<F>>
 		auto operator() (Fn&& fn, F&& f) const
 		-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f))) {
 			return functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f));
 		}
+
+		using _dtl::curried_binf<fMap>::operator();
 	};
 
 	/**

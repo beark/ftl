@@ -251,17 +251,25 @@ namespace ftl {
 	 * can not be used. Particularly useful when passing `apply` as argument to
 	 * higher order functions.
 	 *
+	 * aApply offers curried calling semantics, should it be desired.
+	 *
 	 * \ingroup applicative
 	 */
-	struct aApply {
+	struct aApply
+#ifndef DOCUMENTATION_GENERATOR
+	: _dtl::curried_binf<aApply>
+#endif
+	{
 		template<typename Fn, typename F, typename F_ = plain_type<F>>
-		auto operator()(Fn&& u, F&& v)
+		auto operator() (Fn&& u, F&& v) const
 		-> decltype(applicative<F_>::apply(
 				std::forward<Fn>(u), std::forward<F>(v))) {
 
 			return applicative<F_>::apply(
 				std::forward<Fn>(u), std::forward<F>(v));
 		}
+
+		using _dtl::curried_binf<aApply>::operator();
 	};
 
 	/**
@@ -352,50 +360,16 @@ namespace ftl {
 	 * \ingroup applicative
 	 */
 	template<
-			typename F,
-			typename = typename std::enable_if<MonoidAlt<F>()>::type
+			typename F1,
+			typename F2,
+			typename F = plain_type<F1>,
+			typename = typename std::enable_if<
+				MonoidAlt<F>()
+				&& std::is_same<F,plain_type<F2>>::value
+			>::type
 	>
-	F operator| (const F& f1, const F& f2) {
-		return monoidA<F>::orDo(f1, f2);
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup applicative
-	 */
-	template<
-			typename F,
-			typename = typename std::enable_if<MonoidAlt<F>()>::type
-	>
-	F operator| (F&& f1, const F& f2) {
-		return monoidA<F>::orDo(std::move(f1), f2);
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup applicative
-	 */
-	template<
-			typename F,
-			typename = typename std::enable_if<MonoidAlt<F>()>::type
-	>
-	F operator| (const F& f1, F&& f2) {
-		return monoidA<F>::orDo(f1, std::move(f2));
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup applicative
-	 */
-	template<
-			typename F,
-			typename = typename std::enable_if<MonoidAlt<F>()>::type
-	>
-	F operator| (F&& f1, F&& f2) {
-		return monoidA<F>::orDo(std::move(f1), std::move(f2));
+	F operator| (F1&& f1, F2&& f2) {
+		return monoidA<F>::orDo(std::forward<F1>(f1), std::forward<F2>(f2));
 	}
 
 	// Forward declarations

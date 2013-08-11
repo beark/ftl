@@ -24,6 +24,7 @@
 #define FTL_MONOID_H
 
 #include <type_traits>
+#include "../prelude.h"
 
 namespace ftl {
 
@@ -71,6 +72,7 @@ namespace ftl {
 	 *
 	 * \par Dependencies
 	 * - <type_traits>
+	 * - \ref prelude
 	 */
 
 	/**
@@ -188,9 +190,15 @@ namespace ftl {
 	 * Allows easy creation of a function object that can be passed as argument
 	 * to higher-order functions as a substitute for `monoid::append`.
 	 *
+	 * Instances of this function object support curried calling.
+	 *
 	 * \ingroup monoid
 	 */
-	struct mAppend {
+	struct mAppend
+#ifndef DOCUMENTATION_GENERATOR
+	: _dtl::curried_binf<mAppend>
+#endif
+	{
 		template<
 				typename M1,
 				typename M2,
@@ -200,10 +208,12 @@ namespace ftl {
 					&& std::is_same<M,plain_type<M2>>::value
 				>::type
 		>
-		M operator()(M1&& m1, M2&& m2) {
+		M operator() (M1&& m1, M2&& m2) const {
 			return
 				monoid<M>::append(std::forward<M1>(m1), std::forward<M2>(m2));
 		}
+
+		using curried_binf<mAppend>::operator();
 	};
 
 	/**
@@ -211,13 +221,15 @@ namespace ftl {
 	 *
 	 * Example usage:
 	 * \code
-	 *   template<typename F, typename T>
-	 *   T foo(F f, T t1, T t2) {
-	 *       return f(t1, t2);
-	 *   }
+	 *   int foo() {
+	 *       using ftl::operator%;
+	 *       using ftl::operator*;
 	 *
-	 *   void bar() {
-	 *       std::cout << foo(ftl::mappend, ftl::sum(2), ftl::sum(2));
+	 *       auto m1 = ftl::value(ftl::sum(2));
+	 *       auto m2 = ftl::value(ftl::sum(2));
+	 *
+	 *       // Makes use of applicative style function invocation
+	 *       auto m3 = ftl::mappend % m1 * m2;
 	 *   }
 	 * \endcode
 	 * Outputs "4".

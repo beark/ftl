@@ -603,12 +603,18 @@ namespace ftl {
 	 *
 	 * \ingroup monad
 	 */
-	struct mBind {
+	struct mBind
+#ifndef DOCUMENTATION_GENERATOR
+	: _dtl::curried_binf<mBind>
+#endif
+	{
 		template<typename M, typename F, typename M_ = plain_type<M>>
 		auto operator() (M&& m, F&& f) const
 		-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
 			return monad<M_>::bind(std::forward<M>(m), std::forward<F>(f));
 		}
+
+		using curried_binf<mBind>::operator();
 	};
 
 	/**
