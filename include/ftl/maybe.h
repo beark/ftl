@@ -90,18 +90,18 @@ namespace ftl {
 	 * 
 	 * \par Concepts
 	 * Maybe is an instance of the following concepts:
-	 * \li \ref fullycons
-	 * \li \ref assignable
-	 * \li \ref deref
-	 * \li \ref empty (the empty state is, of course, when the maybe is
+	 * - \ref fullycons
+	 * - \ref assignable
+	 * - \ref deref
+	 * - \ref empty (the empty state is, of course, when the maybe is
 	 *                `nothing`)
-	 * \li \ref eq, if, and only if, `A` is EqComparable
-	 * \li \ref orderable, if, and only if, `T` is Orderable
-	 * \li \ref functor (in `T`)
-	 * \li \ref applicative (in `T`)
-	 * \li \ref monad (in `T`)
-	 * \li \ref monoid, if, and only if, `T` is a Monoid
-	 * \li \ref foldable
+	 * - \ref eq, if, and only if, `A` is EqComparable
+	 * - \ref orderable, if, and only if, `T` is Orderable
+	 * - \ref functor (in `T`)
+	 * - \ref applicative (in `T`)
+	 * - \ref monad (in `T`)
+	 * - \ref monoid, if, and only if, `T` is a Monoid
+	 * - \ref foldable
 	 *
 	 * \ingroup maybe
 	 */
@@ -159,6 +159,9 @@ namespace ftl {
 		: isValid(true) {
 			new (&val) value_type(std::move(v));
 		}
+
+		/// Nothings should cast implicitly to maybes
+		constexpr maybe(nothing_t) noexcept {}
 
 		/**
 		 * In-place value construction constructor.
@@ -502,8 +505,9 @@ namespace ftl {
 	/**
 	 * Implementation of monad for maybe.
 	 *
-	 * \note This automatically gives maybe default applicative and functor
-	 *       instances.
+	 * The `maybe` monad's main win is that it allows a user to postpone the
+	 * need to check for value or nothing. This can result in much more compact
+	 * code, that is nevertheless just as robust&mdash;if not more so.
 	 *
 	 * \ingroup maybe
 	 */
@@ -511,13 +515,38 @@ namespace ftl {
 	struct monad<maybe<T>>
 	: deriving_apply<maybe<T>>, deriving_join<maybe<T>> {
 
-		static constexpr maybe<T> pure(T&& t)
+		/**
+		 * Embed a pure value in a `maybe`.
+		 *
+		 * The same as constructing with `value(t)`.
+		 */
+		static constexpr maybe<T> pure(const T& t)
 		noexcept(std::is_nothrow_copy_constructible<T>::value) {
-			return value(std::forward<T>(t));
+			return value(t);
+		}
+
+		/// \overload
+		static constexpr maybe<T> pure(T&& t)
+		noexcept(std::is_nothrow_move_constructible<T>::value) {
+			return value(std::move(t));
 		}
 
 		/**
 		 * Apply `f` if `m` is a value.
+		 *
+		 * Example:
+		 * \code
+		 *   int foo(int x) {
+		 *       return 2*x;
+		 *   }
+		 *
+		 *   maybe<int> bar(maybe<int> x) {
+		 *       return ftl::fmap(foo, x);
+		 *   }
+		 *
+		 *   bar(ftl::value(5)); // Results in value(10)
+		 *   bar(ftl::nothing);  // Results in nothing
+		 * \endcode
 		 */
 		template<typename F, typename U = result_of<F(T)>>
 		static maybe<U> map(F&& f, const maybe<T>& m) {
@@ -534,6 +563,37 @@ namespace ftl {
 
 		/**
 		 * Applies a function to unwrapped maybe value.
+		 *
+		 * This allows users to sequence an arbitrary number of computations
+		 * that might result in `nothing`, without having to explicitly check
+		 * for `nothing` until the very end&mdash;if then, the result may well
+		 * be further composed.
+		 *
+		 * Example:
+		 * \code
+		 *   maybe<float> foo(int);
+		 *   maybe<string> bar(float);
+		 *   maybe<int> baz(string);
+		 *
+		 *   maybe<int> run(maybe<int> m) {
+		 *       return ((m >>= foo) >>= bar) >>= baz;
+		 *   }
+		 *
+		 *   // Once again, without using bind
+		 *   maybe<int> run2(maybe<int> m) {
+		 *       if(m) {
+		 *           auto m2 = foo(*m);
+		 *           if(m2) {
+		 *               auto m3 = bar(*m2);
+		 *               if(m3) {
+		 *                   return baz(*m3);
+		 *               }
+		 *           }
+		 *       }
+		 *
+		 *       return nothing;
+		 *   }
+		 * \endcode
 		 *
 		 * \tparam F must satisfy \ref fn`<maybe<U>(T)>`
 		 */
