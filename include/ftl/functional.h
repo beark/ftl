@@ -29,17 +29,17 @@ namespace ftl {
 	/**
 	 * \page fn Function
 	 *
-	 * \brief Abstraction of callable objects.
+	 * Abstraction of callable objects.
 	 *
 	 * This differs from the data type ftl::function in that it is not a
 	 * concrete type. While ftl::function is certainly an instance of this
 	 * concept, they are not the only data type to be so.
 	 *
 	 * Other instances include (but are not limited to):
-	 * \li std::function
-	 * \li regular functions
-	 * \li lambdas
-	 * \li *anything* else with an `operator()` defined
+	 * - std::function
+	 * - regular functions
+	 * - lambdas
+	 * - *anything* else with an `operator()` defined
 	 *
 	 * When possible, instances of Function should also include the type alias
 	 * `result_type`, which should be the type returned by calling `operator()`.
@@ -56,7 +56,7 @@ namespace ftl {
 	/**
 	 * \defgroup functional Functional
 	 *
-	 * \brief A collection of higher order utility functions.
+	 * A collection of higher order utility functions.
 	 *
 	 * \code
 	 *   #include <ftl/functional.h>
@@ -78,35 +78,51 @@ namespace ftl {
 	struct monad<function<R,P,Ps...>>
 	: deriving_join<function<R,P,Ps...>>, deriving_apply<function<R,P,Ps...>> {
 
+		// TODO: C++14 - Create version that lambda captures a by move
 		/// Creates a function that returns `a`, regardless of its parameters.
 		static function<R,P,Ps...> pure(R a) {
 			return [a](P,Ps...) { return a; };
 		}
 
+
+		// TODO: C++14 - Create version that lambda captures f and fn by move
 		/// Equivalent of function composition
 		template<
 				typename F,
 				typename S = typename std::result_of<F(R)>::type
 		>
 		static function<S,P,Ps...> map(F f, function<R,P,Ps...> fn) {
-			return [f,fn] (P p, Ps...ps) {
+			return [f,fn] (P&& p, Ps&&...ps) {
 				return f(fn(std::forward<P>(p), std::forward<Ps>(ps)...));
 			};
 		}
 
-		/*
-		template<
-			typename F,
-			typename S = typename std::result_of<F(R)>::type
-		>
-		static function<S,P,Ps...> apply(function<F,P,Ps...> f, function<R,P,Ps...> g) {
-
-			return [=] (P x,Ps...xs) {
-				return f(x,xs...)(g(x,xs...));
-			};
-		}
-		*/
-
+		// TODO: C++14 - Create version that lambda captures f and fn by move
+		/**
+		 * Monadic bind for functions.
+		 *
+		 * In the context of functions, `bind` will return a function, where the
+		 * result of running is to invoke`f` with the parameters, and pass the
+		 * result to `fn`. The latter will in return yield yet another function,
+		 * that is also given the original argument list and its return value is
+		 * what running the result of `bind` gives.
+		 *
+		 * Example:
+		 * \code
+		 *   int example() {
+		 *       auto f = [](int x){
+		 *           return ftl::function<int,int>{[x](int y){ return x+y; }};
+		 *       };
+		 *
+		 *       ftl::function<int,int> addTwo{[](int x){ return x+2; }};
+		 *
+		 *       // addTwo(2) == 4, which is captured by the function `f`
+		 *       // returns, which is then also given the argument 2, resulting
+		 *       // in a return value of 6.
+		 *       return (addTwo >>= f)(2);
+		 *   }
+		 * \endcode
+		 */
 		template<
 				typename Fn,
 				typename Fs = typename std::result_of<Fn(R)>::type,
@@ -168,7 +184,7 @@ namespace ftl {
 	 * any function (regardless of arity) that returns a value that is an
 	 * instance of monoid, is in fact also a monoid. It works as follows:
 	 * \code
-	 *   id() <=> A function, returning monoid<result_type>::id(),
+	 *   id() <=> A function returning monoid<result_type>::id(),
 	 *            regardless of parameters.
 	 *   append(a,b) <=> A function that forwards its arguments to both a and b,
 	 *                   and then calls monoid<result_type>::append on the two
@@ -191,16 +207,16 @@ namespace ftl {
 		}
 
 		/**
-		 * Compute f1 and f2 and combine the results with monoid operation.
+		 * Compute `f1` and `f2` and combine the results with monoid operation.
 		 *
-		 * \note The parameter pack \c Ps cannot be perfectly forwarded, because
-		 *       both f1 and f2 must be called with the same parameters. It is
-		 *       therefore recommended you use this monoid operation only with
-		 *       functions working on values or `const` references.
+		 * \note The parameter pack `Ps` cannot be perfectly forwarded, because
+		 *       both `f1` and `f2` must be called with the same parameters. It
+		 *       is therefore recommended you use this monoid operation only
+		 *       with functions working on values or `const` references.
 		 *
-		 * \warning Should e.g. f1 mutate one of the parameters, it \em will
-		 *          affect the call to f2. Be very careful if either f1 or f2
-		 *          has side effects.
+		 * \warning Should e.g. `f1` mutate one of the parameters, it _will_
+		 *          affect the call to `f2`. Be very careful if either `f1` or
+		 *          `f2` has side effects.
 		 */
 		static auto append(
 				const function<M,Ps...>& f1,
@@ -221,6 +237,8 @@ namespace ftl {
 	 * Monad instance for std::function.
 	 *
 	 * Exactly equivalent of `monad<ftl::function>`.
+	 *
+	 * \ingroup functional
 	 */
 	template<typename R, typename P, typename...Ps>
 	struct monad<std::function<R(P,Ps...)>>
