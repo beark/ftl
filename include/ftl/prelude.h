@@ -50,13 +50,9 @@ namespace ftl {
 	 */
 	struct identity {
 		template<typename T>
-		constexpr const T& operator()(const T& t) const noexcept {
-			return t;
-		}
-
-		template<typename T>
-		constexpr T& operator()(T& t) const noexcept {
-			return t;
+		constexpr auto operator()(T&& t) const noexcept
+		-> decltype(std::forward<T>(t)) {
+			return std::forward<T>(t);
 		}
 	};
 
