@@ -32,17 +32,17 @@ namespace ftl {
 	/**
 	 * \defgroup future Future
 	 *
-	 * Concept instances for std::future.
+	 * Concept instances for `std::future`.
 	 *
 	 * \code
 	 *   #include <ftl/future.h>
 	 * \endcode
 	 *
 	 * This module adds instances of the following concepts to std::future:
-	 * - \ref functor
-	 * - \ref applicative
-	 * - \ref monad
-	 * - \ref monoid
+	 * - \ref functorpg
+	 * - \ref applicativepg
+	 * - \ref monadpg
+	 * - \ref monoidpg
 	 *
 	 * \par Dependencies
 	 * - <future>
@@ -73,18 +73,29 @@ namespace ftl {
 	}
 
 	/**
-	 * Monad instance for std::future.
+	 * Monad instance for `std::future`.
 	 *
-	 * This is a pretty powerful instance. It lets us perform all sorts of
-	 * computations on future values, without actually waiting for them. Only
-	 * when we explicitly _need_ the value will it be computed (when we call
-	 * `get` on the final future).
+	 * What this essentially does is allow one to add additional computations
+	 * "on top of" the deferred/asynchronous one promised by the future. These
+	 * additional computations will only be run once `get()` is called on the
+	 * resulting `future`.
+	 *
+	 * Note that futures are not copyable, so when sequencing them together
+	 * with monadic/applicative/functorial combinators, they must either be
+	 * ecplicitly moved, or be temporaries already. Put differently, _all_
+	 * of the operations defined in this Monad instance work on r-value
+	 * references only.
+	 *
+	 * The launch policy in all cases is `std::launch::deferred`.
 	 *
 	 * \ingroup future
 	 */
 	template<typename T>
 	struct monad<std::future<T>>
-	: deriving_join<std::future<T>> {
+#ifndef DOCUMENTATION_GENERATOR
+	: deriving_join<std::future<T>>
+#endif
+	{
 
 		/**
 		 * Creates a future that returns `t`.
@@ -104,8 +115,23 @@ namespace ftl {
 		 *
 		 * Basically, `f` will not be applied until _both_ of the following
 		 * has happened:
-		 * \li we call `get` on the result of `map`
-		 * \li `fa` finishes waiting from the resulting call to its `get`
+		 * - we call `get()` on the result of `map`
+		 * - `fa` finishes waiting from the resulting call to its `get()`
+		 *
+		 * Example:
+		 * \code
+		 *   double asyncOperation();
+		 *   double complexComputation(double);
+		 *
+		 *   auto computation =
+		 *       ftl::fmap(
+		 *           complexComputation,
+		 *           std::async(std::launch::async, asyncOperation)
+		 *       );
+		 *
+		 *   // May have to wait for asyncOperation to finish
+		 *   use(computation.get());
+		 * \endcode
 		 */
 		template<typename F, typename U = result_of<F(T)>>
 		static std::future<U> map(F f, std::future<T>&& fa) {
@@ -119,9 +145,17 @@ namespace ftl {
 			);
 		}
 
-		template<
-			typename F,
-			typename U = result_of<F(T)>>
+		/**
+		 * In the future, give `f` one of its arguments.
+		 *
+		 * Neither `f` nor `m` is waited on until the _resulting future_
+		 * is waited on.
+		 *
+		 * As always with `apply`, if `f` supports curried calling, several
+		 * applies can be chained together, resulting in arbitrary arity
+		 * function applications.
+		 */
+		template<typename F, typename U = result_of<F(T)>>
 		static std::future<U> apply(std::future<F>&& f, std::future<T>&& m) {
 			return std::move(f) >>= _dtl::inner_ap<T,U>(std::move(m));
 		}
@@ -130,8 +164,8 @@ namespace ftl {
 		/**
 		 * Binds a future value to another future computation.
 		 *
-		 * Getting the value of the resulting future means waiting for \c fa.
-		 * Once that is ready, its value is applied to \c f, resulting in a new
+		 * Getting the value of the resulting future means waiting for `fa`.
+		 * Once that is ready, its value is applied to `f`, resulting in a new
 		 * future, which we also wait for and finally return the value of.
 		 */
 		template<
@@ -149,15 +183,26 @@ namespace ftl {
 			);
 		}
 
-		// Poof! futures are functors, applicatives, and monads!
+#ifdef DOCUMENTATION_GENERATOR
+		/**
+		 * Flattens two nested futures into one.
+		 *
+		 * As is to be expected, the only way of accomplishing this feat is
+		 * to wait for the outer future.
+		 */
+		static std::future<T> join(std::future<std::future<T>>&& f) {
+			return f.get();
+		}
+#endif
+
 		static constexpr bool instance = true;
 
 	};
 
 	/**
-	 * Monoid instance of std::future.
+	 * Monoid instance of `std::future`.
 	 *
-	 * \tparam T must satisfy \ref monoid
+	 * \tparam T must satisfy \ref monoidpg
 	 *
 	 * \ingroup future
 	 */
@@ -172,7 +217,7 @@ namespace ftl {
 				[](){ return monoid<T>::id(); });
 		}
 
-		/// Future representing `f1 ^ f2`
+		/// Future representing `f1.get() ^ f2.get()`
 		static auto append(std::future<T>&& f1, std::future<T>&& f2)
 		-> typename std::enable_if<monoid<T>::instance,std::future<T>>::type {
 			return std::async(

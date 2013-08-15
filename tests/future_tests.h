@@ -84,6 +84,22 @@ test_set future_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("monad::join"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator>>=;
+
+				auto f = std::async(std::launch::deferred, [](){
+					return std::async(std::launch::deferred, [](){
+						return 1;
+					});
+				});
+
+
+				return ftl::monad<std::future<int>>
+					::join(std::move(f)).get() == 1;
+			})
+		),
+		std::make_tuple(
 			std::string("monoid::append"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator^;
