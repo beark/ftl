@@ -51,6 +51,20 @@ namespace ftl {
 	 */
 
 	/**
+	 * Exception type signifying an attempt to access an empty maybe object.
+	 *
+	 * \ingroup maybe
+	 */
+	class invalid_maybe_access : public std::logic_error {
+	public:
+		explicit invalid_maybe_access(const std::string& what)
+		: logic_error(what) {}
+
+		explicit invalid_maybe_access(std::string&& what)
+		: logic_error(std::move(what)) {}
+	};
+
+	/**
 	 * Type that can be used to compare any maybe to `nothing`.
 	 *
 	 * \ingroup maybe
@@ -78,10 +92,102 @@ namespace ftl {
 	 */
 	constexpr nothing_t nothing{};
 
+	template<typename T>
+	class maybe;
+
+	namespace _dtl {
+
+		template<typename T>
+		class base_maybe_it
+		: std::iterator<std::forward_iterator_tag,T> {
+
+		protected:
+			maybe<T>* ref = nullptr;
+
+		public:
+			base_maybe_it() = default;
+			base_maybe_it(const base_maybe_it&) = default;
+			base_maybe_it(base_maybe_it&&) = default;
+			~base_maybe_it() = default;
+
+			explicit constexpr base_maybe_it(maybe<T>* m) noexcept
+			: ref(m && *m ? m : nullptr) {}
+
+			base_maybe_it& operator++ () noexcept {
+				ref = nullptr;
+				return *this;
+			}
+
+			base_maybe_it operator++ (int) noexcept {
+				auto it = *this;
+				ref = nullptr;
+				return it;
+			}
+
+			constexpr bool operator== (const base_maybe_it& it) const noexcept {
+				return ref == it.ref;
+			}
+
+			constexpr bool operator!= (const base_maybe_it& it) const noexcept {
+				return ref != it.ref;
+			}
+
+			base_maybe_it& operator= (const base_maybe_it&) = default;
+			base_maybe_it& operator= (base_maybe_it&&) = default;
+		};
+
+		template<typename T>
+		class maybe_iterator : public base_maybe_it<T> {
+		public:
+			maybe_iterator() = default;
+			maybe_iterator(const maybe_iterator&) = default;
+			maybe_iterator(maybe_iterator&&) = default;
+			~maybe_iterator() = default;
+
+			explicit constexpr maybe_iterator(maybe<T>* m) noexcept
+			: base_maybe_it<T>{m} {}
+
+			constexpr T& operator* () const {
+				return this->ref->operator*();
+			}
+
+			constexpr T* operator-> () const {
+				return this->ref->operator->();
+			}
+
+			maybe_iterator& operator= (const maybe_iterator&) = default;
+			maybe_iterator& operator= (maybe_iterator&&) = default;
+		};
+
+		template<typename T>
+		class const_maybe_iterator : public base_maybe_it<T> {
+		public:
+			const_maybe_iterator() = default;
+			const_maybe_iterator(const const_maybe_iterator&) = default;
+			const_maybe_iterator(const_maybe_iterator&&) = default;
+			~const_maybe_iterator() = default;
+
+			explicit constexpr const_maybe_iterator(maybe<T>* m) noexcept
+			: base_maybe_it<T>{m} {}
+
+			constexpr const T& operator* () const noexcept {
+				return this->ref->value();
+			}
+
+			constexpr const T* operator-> () const noexcept {
+				return this->ref->operator->();
+			}
+
+			const_maybe_iterator& operator= (const const_maybe_iterator&)
+			   	= default;
+			const_maybe_iterator& operator= (const_maybe_iterator&&) = default;
+		};
+	}
+
 	/**
 	 * Abstracts the concept of optional arguments and similar.
 	 *
-	 * \tparam A Must be a completely "plain" type, as in, it must not be
+	 * \tparam T Must be a completely "plain" type, as in, it must not be
 	 *           a reference, nor have `const`, `volatile`, or similar
 	 *           qualifiers. It _may_ be of pointer type (incl. function
 	 *           and method pointer).
@@ -91,7 +197,7 @@ namespace ftl {
 	 * \par Concepts
 	 * Maybe is an instance of the following concepts:
 	 * - \ref fullycons
-	 * - \ref assignable
+	 * - \ref assignable, if `T` is
 	 * - \ref deref
 	 * - \ref empty (the empty state is, of course, when the maybe is
 	 *                `nothing`)
@@ -101,7 +207,8 @@ namespace ftl {
 	 * - \ref applicative (in `T`)
 	 * - \ref monad (in `T`)
 	 * - \ref monoid, if, and only if, `T` is a Monoid
-	 * - \ref foldable
+	 * - \ref foldable, as if it were a container of zero or one element
+	 * - \ref fwditerable, as above
 	 *
 	 * \ingroup maybe
 	 */
@@ -109,18 +216,18 @@ namespace ftl {
 	class maybe {
 	public:
 		/**
-		 * Compatibility typedef.
-		 *
-		 * Allows compatibility with plethora of templated functions/structures
-		 * that require an object have a value_type member.
+		 * Necessary to fulfill the ForwardIterable concept.
 		 */
 		using value_type = T;
 
+		using iterator = _dtl::maybe_iterator<T>;
+		using const_iterator = _dtl::const_maybe_iterator<T>;
+
 		/**
-		 * Default c-tor, equivalent to \c nothing.
+		 * Default c-tor, equivalent to `nothing`.
 		 *
 		 * Memory for the contained type is reserved on the stack, but no
-		 * initialisation is done. In other words, A's constructor is \em not
+		 * initialisation is done. In other words, `T`'s constructor is _not_
 		 * called.
 		 */
 		constexpr maybe() noexcept {}
@@ -175,9 +282,8 @@ namespace ftl {
 			new (&val) value_type(std::forward<Ts>(ts)...);
 		}
 
-		// TODO: Enable the noexcept specifier once is_nothrow_destructible is
-		// available (gcc-4.8).
-		~maybe() /*noexcept(std::is_nothrow_destructible<T>::value)*/ {
+		// TODO: Add std::is_nothrow_constructible<T>::value check (gcc-4.8)
+		~maybe() noexcept {
 			self_destruct();
 		}
 
@@ -197,42 +303,63 @@ namespace ftl {
 
 		/// Copy assignment
 		maybe& operator= (const maybe& m)
-		/* TODO: Enable noexcept specifier once is_nothrow_destructible is
-		 * available.
-		noexcept(  std::is_nothrow_copy_constructible<T>::value
-				&& std::is_nothrow_destructible<T>::value) */ {
+		noexcept(std::is_nothrow_copy_assignable<T>::value) {
 			// Check for self-assignment
 			if(this == &m)
 				return *this;
 
-			self_destruct();
-
 			isValid = m.isValid;
 			if(isValid) {
-				new (&val) value_type(reinterpret_cast<const T&>(m.val));
+				reinterpret_cast<T&>(val) = reinterpret_cast<const T&>(m.val);
 			}
+			else
+				self_destruct();
 
 			return *this;
 		}
 
 		/// Move assignment
 		maybe& operator= (maybe&& m)
-		/* TODO: Enable noexcept specifier once is_nothrow_destructible is
-		 * available.
-		noexcept(  std::is_nothrow_copy_constructible<T>::value
-				&& std::is_nothrow_destructible<T>::value) */ {
+		noexcept(std::is_nothrow_move_assignable<T>::value) {
 			// Check for self-assignment
 			if(this == &m)
 				return *this;
 
-			self_destruct();
-
 			isValid = m.isValid;
 			if(isValid) {
-				new (&val) value_type(
-						std::move(reinterpret_cast<T&>(m.val)));
-				m.isValid = false;
+				reinterpret_cast<T&>(val)
+					= std::move(reinterpret_cast<T&>(m.val));
 			}
+			else
+				self_destruct();
+
+			return *this;
+		}
+
+		/**
+		 * Convenience copy assignment operator.
+		 */
+		maybe& operator= (const T& v)
+		noexcept(std::is_nothrow_copy_assignable<T>::value) {
+			if(isValid)
+				reinterpret_cast<T&>(val) = v;
+
+			else
+				new (&val) T{v};
+
+			return *this;
+		}
+
+		/**
+		 * Convenience move assignment operator.
+		 */
+		maybe& operator= (T&& v)
+		noexcept(std::is_nothrow_move_assignable<T>::value) {
+			if(isValid)
+				reinterpret_cast<T&>(val) = std::move(v);
+
+			else
+				new (&val) T{std::move(v)};
 
 			return *this;
 		}
@@ -255,11 +382,13 @@ namespace ftl {
 		/**
 		 * Dereference operator.
 		 * 
-		 * \throws std::logic_error if `this` is `nothing`.
+		 * \throws `invalid_maybe_access` if `this` is not a value.
 		 */
 		value_type& operator* () {
 			if(!isValid)
-				throw std::logic_error("Attempting to read the value of Nothing.");
+				throw invalid_maybe_access(
+					"Attempting to read the value of Nothing."
+				);
 
 			return reinterpret_cast<T&>(val);
 		}
@@ -267,7 +396,9 @@ namespace ftl {
 		/// \overload
 		const value_type& operator* () const {
 			if(!isValid)
-				throw std::logic_error("Attempting to read the value of Nothing.");
+				throw invalid_maybe_access(
+					"Attempting to read the value of Nothing."
+				);
 
 			return reinterpret_cast<const T&>(val);
 		}
@@ -279,7 +410,9 @@ namespace ftl {
 		 */
 		value_type* operator-> () {
 			if(!isValid)
-				throw std::logic_error("Attempting to read the value of Nothing.");
+				throw invalid_maybe_access(
+					"Attempting to read the value of Nothing."
+				);
 
 			return reinterpret_cast<T*>(&val);
 		}
@@ -287,9 +420,35 @@ namespace ftl {
 		/// \overload
 		const value_type* operator-> () const {
 			if(!isValid)
-				throw std::logic_error("Attempting to read the value of Nothing.");
+				throw invalid_maybe_access(
+					"Attempting to read the value of Nothing."
+				);
 
 			return reinterpret_cast<const T*>(&val);
+		}
+
+		iterator begin() noexcept {
+			return iterator(this);
+		}
+
+		const_iterator begin() const noexcept {
+			return const_iterator(const_cast<maybe*>(this));
+		}
+
+		constexpr const_iterator cbegin() const noexcept {
+			return const_iterator(const_cast<maybe*>(this));
+		}
+
+		iterator end() noexcept {
+			return iterator();
+		}
+
+		const_iterator end() const noexcept {
+			return const_iterator();
+		}
+
+		constexpr const_iterator cend() const noexcept {
+			return const_iterator();
 		}
 
 		/**
@@ -650,22 +809,8 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct foldable<maybe<T>>
-	: deriving_foldMap<maybe<T>>, deriving_fold<maybe<T>> {
-
-		template<
-				typename Fn,
-				typename U,
-				typename = typename std::enable_if<
-					std::is_same<U, result_of<Fn(U,T)>>::value
-				>::type
-		>
-		static U foldl(Fn&& fn, U&& z, const maybe<T>& m) {
-			if(m) {
-				return fn(std::forward<U>(z), *m);
-			}
-
-			return z;
-		}
+	: deriving_foldl<maybe<T>>
+	, deriving_foldMap<maybe<T>>, deriving_fold<maybe<T>> {
 
 		template<
 				typename Fn,
