@@ -23,98 +23,9 @@
 #ifndef FTL_FUTURE_TESTS_H
 #define FTL_FUTURE_TESTS_H
 
-#include <string>
-#include <ftl/future.h>
 #include "base.h"
 
-test_set future_tests{
-	std::string("future"),
-	{
-		std::make_tuple(
-			std::string("functor::map"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator%;
-
-				auto fb = [](int x) { return std::to_string(x); } %
-					std::async(std::launch::async, []() { return 1; });
-
-				return fb.get() == std::string("1");
-			})
-		),
-		std::make_tuple(
-			std::string("applicative::pure"),
-			std::function<bool()>([]() -> bool {
-
-				auto f = ftl::applicative<std::future<int>>::pure(10);
-
-				return f.get() == 10;
-			})
-		),
-		std::make_tuple(
-			std::string("applicative::apply"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator%;
-				using ftl::operator*;
-
-				ftl::function<int,int,int> fn = [](int x, int y){ return x+y; };
-
-				auto f = fn
-					% std::async(std::launch::async, [](){ return 1; })
-					* std::async(std::launch::async, [](){ return 1; });
-
-				return f.get() == 2;
-			})
-		),
-		std::make_tuple(
-			std::string("monad::bind"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator>>=;
-
-				auto f = std::async(std::launch::async, [](){ return 1; });
-				auto fn = [](int x) -> std::future<int> {
-					return std::async(
-						std::launch::deferred,
-						[x]() -> int { return x+1; }
-					);
-				};
-
-				auto g = ftl::monad<std::future<int>>::bind(std::move(f), fn);
-
-				return g.get() == 2;
-			})
-		),
-		std::make_tuple(
-			std::string("monad::join"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator>>=;
-
-				auto f = std::async(std::launch::deferred, [](){
-					return std::async(std::launch::deferred, [](){
-						return 1;
-					});
-				});
-
-
-				return ftl::monad<std::future<int>>
-					::join(std::move(f)).get() == 1;
-			})
-		),
-		std::make_tuple(
-			std::string("monoid::append"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator^;
-
-				auto f =
-					std::async(std::launch::async, [](){ return ftl::sum(1); })
-					^
-					std::async(std::launch::async, [](){ return ftl::sum(1); });
-
-				return static_cast<int>(f.get()) == 2;
-			})
-		),
-	}
-};
+extern test_set future_tests;
 
 #endif
-
 

@@ -23,74 +23,9 @@
 #ifndef FTL_PRELUDE_TESTS_H
 #define FTL_PRELUDE_TESTS_H
 
-#include <ftl/prelude.h>
-#include <ftl/maybe.h>
 #include "base.h"
 
-int curry_me(int x, int y) {
-	return x+y;
-}
-
-test_set prelude_tests{
-	std::string("prelude"),
-	{
-		std::make_tuple(
-			std::string("identity function object"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator%;
-
-				auto m = ftl::id % ftl::value(10);
-
-				return m && *m == 10;
-			})
-		),
-		std::make_tuple(
-			std::string("currying regular functions"),
-			std::function<bool()>([]() -> bool {
-				auto f = ftl::curry(curry_me);
-				return f(2)(2) == f(2,2) && f(2,2) == curry_me(2,2);
-			})
-		),
-		std::make_tuple(
-			std::string("currying std::function"),
-			std::function<bool()>([]() -> bool {
-				std::function<int(int,int)> f = [](int x, int y) { return x+y; };
-				auto g = ftl::curry(f);
-
-				return g(2)(2) == g(2,2) && g(2,2) == f(2,2);
-			})
-		),
-		std::make_tuple(
-			std::string("compose[...,R(*)(Ps...)]"),
-			std::function<bool()>([]() -> bool {
-				auto f = [](int x){ return 2*x; };
-				auto g = [](int x){ return float(x)/3.f; };
-				auto h = ftl::compose(g, f, curry_me);
-
-				return h(2,2) == 8.f/3.f;
-			})
-		),
-		std::make_tuple(
-			std::string("compose[...,function<R,Ps...>]"),
-			std::function<bool()>([]() -> bool {
-				auto f = [](int x){ return 2*x; };
-				auto g = [](int x){ return float(x)/3.f; };
-				auto h = ftl::compose(g, f, ftl::curry(curry_me));
-
-				return h(2,2) == 8.f/3.f;
-			})
-		),
-		std::make_tuple(
-			std::string("flip[function<R,A,B>]"),
-			std::function<bool()>([]() -> bool {
-				ftl::function<int,int,int> f = [](int x, int y){ return x/y; };
-				auto g = ftl::flip(f);
-
-				return g(2,4) == 2;
-			})
-		)
-	}
-};
+extern test_set prelude_tests;
 
 #endif
 

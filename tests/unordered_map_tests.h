@@ -23,81 +23,9 @@
 #ifndef FTL_UNORDERED_MAP_TESTS_H
 #define FTL_UNORDERED_MAP_TESTS_H
 
-#include <ftl/unordered_map.h>
 #include "base.h"
 
-test_set unordered_map_tests{
-	std::string("unordered_map"),
-	{
-		std::make_tuple(
-			std::string("functor::map[a->a,&&]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator%;
-				using std::make_pair;
-
-				auto f = [](int x){ return x+1; };
-				auto s = f % std::unordered_map<int,int>{
-					make_pair(0, 1),
-					make_pair(1, 2),
-					make_pair(2, 3)
-				};
-
-				return s == std::unordered_map<int,int>{
-					make_pair(0, 2),
-					make_pair(1, 3),
-					make_pair(2, 4)
-				};
-			})
-		),
-		std::make_tuple(
-			std::string("functor::map[a->b,&&]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator%;
-				using std::make_pair;
-
-				auto f = [](int x){ return float(x)*1.5f; };
-				auto s1 = std::unordered_map<int,int>{
-					make_pair(0,1),
-					make_pair(1,2),
-					make_pair(2,3)
-				};
-				auto s = f % s1;
-
-				return s == std::unordered_map<int,float>{
-					make_pair(0,1.f*1.5f),
-					make_pair(1,2.f*1.5f),
-					make_pair(2,3.f*1.5f)
-				};
-			})
-		),
-		std::make_tuple(
-			std::string("functor::map[a->a,&]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator%;
-				using std::make_pair;
-
-				auto f = [](int x){ return x+1; };
-				auto s1 = std::unordered_map<int,int>{
-					make_pair(0,1),
-					make_pair(1,2),
-					make_pair(2,3)
-				};
-				auto s = f % s1;
-
-				return s == std::unordered_map<int,int>{
-					make_pair(0,2),
-					make_pair(1,3),
-					make_pair(2,4)
-				};
-			})
-		)
-	}
-};
+extern test_set unordered_map_tests;
 
 #endif
-
-
-
-
-
 

@@ -23,67 +23,9 @@
 #ifndef FTL_STRING_TESTS_H
 #define FTL_STRING_TESTS_H
 
-#include <ftl/string.h>
 #include "base.h"
 
-test_set string_tests{
-	std::string("string"),
-	{
-		std::make_tuple(
-			std::string("monoid::id"),
-			std::function<bool()>([]() -> bool {
-				return ftl::monoid<std::string>::id() == std::string("");
-			})
-		),
-		std::make_tuple(
-			std::string("monoid::append[&,&]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator^;
-
-				auto s1 = std::string("ab");
-				auto s2 = std::string("cd");
-
-				return (s1 ^ s2) == std::string("abcd");
-			})
-		),
-		std::make_tuple(
-			std::string("monoid::append[&,&&]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator^;
-
-				auto s1 = std::string("ab");
-				auto s2 = std::string("cd");
-
-				return (s1 ^ std::move(s2)) == std::string("abcd");
-			})
-		),
-		std::make_tuple(
-			std::string("monoid::append[&&,&]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator^;
-
-				auto s1 = std::string("ab");
-				auto s2 = std::string("cd");
-
-				return (std::move(s1) ^ s2) == std::string("abcd");
-			})
-		),
-		std::make_tuple(
-			std::string("monoid::append[&&,&&]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator^;
-
-				auto s1 = std::string("ab");
-				auto s2 = std::string("cd");
-
-				return (std::move(s1) ^ std::move(s2)) == std::string("abcd");
-			})
-		)
-	}
-};
+extern test_set string_tests;
 
 #endif
-
-
-
 
