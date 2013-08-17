@@ -234,22 +234,8 @@ namespace ftl {
 	 */
 	template<typename T, typename C, typename A>
 	struct foldable<std::set<T,C,A>>
-	: deriving_fold<std::set<T,C,A>>, deriving_foldMap<std::set<T,C,A>> {
-
-		template<
-				typename F,
-				typename U,
-				typename = typename std::enable_if<
-					std::is_same<U, result_of<F(U,T)>>::value
-				>::type
-		>
-		static U foldl(F&& f, U z, const std::set<T,C,A>& s) {
-			for(auto& e : s) {
-				z = f(z, e);
-			}
-
-			return z;
-		}
+	: deriving_foldl<std::set<T,C,A>>
+	, deriving_fold<std::set<T,C,A>>, deriving_foldMap<std::set<T,C,A>> {
 
 		template<
 				typename F,

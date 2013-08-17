@@ -194,10 +194,70 @@ namespace ftl {
 	}
 
 	/**
-	 * Inheritable implementation of foldable::foldMap.
+	 * An inheritable implementation of `foldable::foldl`.
 	 *
-	 * Foldable instances implementing foldable::foldl can simply inherit from
-	 * this struct to get foldable::foldMap for "free".
+	 * Any type that satisfies \ref fwditerable may have their \ref foldablepg
+	 * instance simply inherit this implementation of `foldl` instead of
+	 * implementing it manually.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct foldable<MyContainer<T>> : deriving_foldl<MyContainer<T>> {
+	 *       // Rest of implementation
+	 *   };
+	 * \endcode
+	 */
+	template<
+			typename F,
+			typename = typename std::enable_if<ForwardIterable<F>()>::type
+	>
+	struct deriving_foldl {
+		using T = concept_parameter<F>;
+
+		template<
+				typename Fn,
+				typename U,
+				typename = typename std::enable_if<
+					std::is_convertible<
+						typename std::result_of<Fn(U,T)>::type,
+						U
+					>::value
+				>::type
+		>
+		static U foldl(Fn&& fn, U z, const F& f) {
+			for(auto& e : f) {
+				z = fn(z, e);
+			}
+
+			return z;
+		}
+
+		template<
+				typename Fn,
+				typename U,
+				typename = typename std::enable_if<
+					std::is_convertible<
+						std::result_of<Fn(U,T)>,
+						plain_type<U>
+					>::value
+				>::type
+		>
+		static U foldl(Fn&& fn, U z, F&& f) {
+			for(auto& e : f) {
+				z = fn(z, std::move(e));
+			}
+
+			return z;
+		}
+	};
+
+	/**
+	 * Inheritable implementation of `foldable::foldMap`.
+	 *
+	 * Foldable instances implementing `foldable::foldl` can simply inherit from
+	 * this struct to get `foldable::foldMap` for "free". Naturally, it works
+	 * together with `ftl::deriving_foldl`.
 	 *
 	 * Example:
 	 * \code
