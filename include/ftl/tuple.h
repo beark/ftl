@@ -25,7 +25,7 @@
 
 #include <tuple>
 #include "concepts/monoid.h"
-#include "concepts/applicative.h"
+#include "concepts/monad.h"
 
 namespace ftl {
 
@@ -41,7 +41,7 @@ namespace ftl {
 	 * \par Dependencies
 	 * - <tuple>
 	 * - \ref monoid
-	 * - \ref applicative
+	 * - \ref monad
 	 */
 
 	// Private namespace for various tuple helpers

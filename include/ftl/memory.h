@@ -26,6 +26,7 @@
 #include <memory>
 #include "concepts/monoid.h"
 #include "concepts/monad.h"
+#include "concepts/foldable.h"
 
 namespace ftl {
 
@@ -48,6 +49,7 @@ namespace ftl {
 	 * - <memory>
 	 * - \ref monoid
 	 * - \ref monad
+	 * - \ref foldable
 	 */
 
 	/**

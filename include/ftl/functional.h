@@ -137,6 +137,9 @@ namespace ftl {
 		static constexpr bool instance = true;
 	};
 
+	template<typename>
+	struct monoid;
+
 	/**
 	 * Monoid instance for std::functions returning monoids.
 	 *

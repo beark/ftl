@@ -25,6 +25,7 @@
 
 #include "prelude.h"
 #include "either.h"
+#include "concepts/monoid.h"
 
 namespace ftl {
 	/**
@@ -39,6 +40,7 @@ namespace ftl {
 	 * \par Dependencies
 	 * - \ref prelude
 	 * - \ref either
+	 * - \ref monoid
 	 */
 
 	/**

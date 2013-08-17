@@ -25,6 +25,7 @@
 
 #include "../type_functions.h"
 #include "../function.h"
+#include "../prelude.h"
 
 namespace ftl {
 	// Forward declaration so we can mention applicatives
