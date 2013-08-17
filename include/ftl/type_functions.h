@@ -61,7 +61,6 @@ namespace ftl {
 	 *
 	 * \subpage applicativepg
 	 * \subpage assignable
-	 * \subpage container
 	 * \subpage copyassignable
 	 * \subpage copycons
 	 * \subpage defcons
@@ -70,6 +69,7 @@ namespace ftl {
 	 * \subpage eq
 	 * \subpage foldablepg
 	 * \subpage fullycons
+	 * \subpage fwditerable
 	 * \subpage fn
 	 * \subpage functorpg
 	 * \subpage monadpg
@@ -120,18 +120,15 @@ namespace ftl {
 	 */
 
 	/**
-	 * \page container Container
+	 * \page fwditerable ForwardIterable
 	 *
-	 * Anything that is a container of elements of some type. In FTL, this
-	 * concept is quite relaxed compared to its definition in the standard
-	 * library. Here, a Container is simply anything that provides a forward
-	 * iterable interface (both `const` and non-`const`), i.e., `begin()` and
-	 * `end()`, as well as a `value_type` type definition.
+	 * Any container-like type that can be iterated linearly in one direction.
 	 *
-	 * Often, you'll see other parts of the documentation refer to Container
-	 * with a "template parameter". This means that an additional constraint is
-	 * put on the container, namely that its `value_type` must match the given
-	 * parameter.
+	 * In short, anything that provides a forward iterable interface. More
+	 * formally, this means that `std::begin(forwardIterable)`, and
+	 * `std::end(forwardIterable)` are both valid expressions returning some
+	 * iterator like object that satisfies \ref deref to the type
+	 * `concept_parameter<ForwardIterable>`.
 	 */
 
 	/**
