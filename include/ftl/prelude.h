@@ -23,6 +23,7 @@
 #ifndef FTL_PRELUDE_H
 #define FTL_PRELUDE_H
 
+#include "type_traits.h"
 #include "function.h"
 
 namespace ftl {
@@ -36,6 +37,7 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
+	 * - <ftl/type_traits.h>
 	 * - <ftl/function.h>
 	 */
 
@@ -213,6 +215,41 @@ namespace ftl {
 				return f(std::forward<A>(a))(b);
 			};
 		};
+	}
+
+	/**
+	 * Compile time check for \ref fwditerable instances.
+	 *
+	 * Example:
+	 * \code
+	 *   template<
+	 *       typename Container,
+	 *       typename = typename std::enable_if<
+	 *           ForwardIterable<Container>()
+	 *       >::type
+	 *   >
+	 *   void foo(const Container& c) {
+	 *       // Safe to iterate with e.g. for(auto& e : c)
+	 *   }
+	 * \endcode
+	 *
+	 * \ingroup prelude
+	 */
+	template<typename T>
+	constexpr bool ForwardIterable() {
+		return has_begin<T>::value &&
+			has_end<T>::value &&
+			has_pre_inc<decltype(std::begin(std::declval<T>()))>::value &&
+			has_post_inc<decltype(std::begin(std::declval<T>()))>::value &&
+			std::is_same<
+				concept_parameter<T>,
+				plain_type<decltype(*std::begin(std::declval<T>()))>
+			>::value;
+	}
+
+	template<typename T>
+	constexpr bool BackInsertable() {
+		return has_push_back<T,concept_parameter<T>>::value;
 	}
 
 	namespace _dtl {
