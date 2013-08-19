@@ -53,6 +53,12 @@
 	template<typename T, typename U>\
 	no test_ ## name (...)
 
+// Forward declaration
+namespace std {
+	template<typename>
+	class function;
+}
+	
 namespace ftl {
 	/**
 	 * \defgroup typetraits Type Traits
@@ -305,6 +311,69 @@ namespace ftl {
 			!std::is_same<
 				_dtl::no,
 				decltype(_dtl::test_push_back<T,U>(nullptr))
+			>::value;
+	};
+
+	template<typename,typename...Ts>
+	class function;
+
+	/**
+	 * Checks if a certain type is a monomorphic function object.
+	 *
+	 * This check can be used to distinguish objects that have several
+	 * `operator()` overloads from objects that have exactly one. Note that
+	 * this check does not work on arbitrary user types; it must be specialised
+	 * for each case.
+	 *
+	 * Built in specialisations include:
+	 * - `std::function`
+	 * - function pointers and pointers to member functions
+	 * - `ftl::function`
+	 *
+	 * For everything else, `is_monomorphic<T>::value` will be `false` by
+	 * default.
+	 *
+	 * \ingroup typetraits
+	 */
+	template<typename>
+	struct is_monomorphic {
+		static constexpr bool value = false;
+	};
+
+	template<typename R, typename...Args>
+	struct is_monomorphic<std::function<R(Args...)>> {
+		static constexpr bool value = true;
+	};
+
+	template<typename R, typename...Args>
+	struct is_monomorphic<ftl::function<R,Args...>> {
+		static constexpr bool value = true;
+	};
+
+	template<typename R, typename...Args>
+	struct is_monomorphic<R(*)(Args...)> {
+		static constexpr bool value = true;
+	};
+
+	template<typename C, typename R, typename...Args>
+	struct is_monomorphic<R (C::*)(Args...)> {
+		static constexpr bool value = true;
+	};
+
+	template<typename F, typename...Args>
+	struct is_callable {
+	private:
+
+		template<typename G, typename...Qs>
+		static auto check(G g, Qs...qs) -> decltype(g(qs...));
+
+		static _dtl::no check(...);
+
+	public:
+		static constexpr bool value = 
+			!std::is_same<
+				_dtl::no,
+				decltype(check(std::declval<F>(), std::declval<Args>()...))
 			>::value;
 	};
 }
