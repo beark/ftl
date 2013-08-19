@@ -87,24 +87,6 @@ namespace ftl {
 
 		template<
 			typename F,
-			typename...Ts,
-			size_t...S>
-		auto tup_apply(seq<S...>, const F& f, const std::tuple<Ts...>& t)
-		-> typename std::result_of<F(Ts...)>::type {
-			return f(std::get<S>(t)...);
-		}
-
-		template<
-			typename F,
-			typename...Ts,
-			size_t...S>
-		auto tup_apply(seq<S...>, const F& f, std::tuple<Ts...>&& t)
-		-> typename std::result_of<F(Ts...)>::type {
-			return f(std::get<S>(t)...);
-		}
-
-		template<
-			typename F,
 			typename A,
 			typename B = result_of<F(A)>,
 			typename...Ts,
@@ -303,30 +285,6 @@ namespace ftl {
 
 		static constexpr bool instance = true;
 	};
-
-	/**
-	 * Invoke a function using a tuple's fields as parameters.
-	 *
-	 * \ingroup tuple
-	 */
-	template<typename F, typename...Ts>
-	auto apply(F&& f, const std::tuple<Ts...>& t)
-	-> typename std::result_of<F(Ts...)>::type {
-		using indices_t = typename gen_seq<0,sizeof...(Ts)-1>::type;
-		return _dtl::tup_apply(indices_t(), std::forward<F>(f), t);
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup tuple
-	 */
-	template<typename F, typename...Ts>
-	auto apply(F&& f, std::tuple<Ts...>&& t)
-	-> typename std::result_of<F(Ts...)>::type {
-		using indices_t = typename gen_seq<0,sizeof...(Ts)-1>::type;
-		return _dtl::tup_apply(indices_t(), std::forward<F>(f), std::move(t));
-	}
 
 }
 

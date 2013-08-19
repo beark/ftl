@@ -23,6 +23,7 @@
 #ifndef FTL_PRELUDE_H
 #define FTL_PRELUDE_H
 
+#include <tuple>
 #include "type_traits.h"
 #include "function.h"
 
@@ -37,6 +38,7 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
+	 * - <tuple>
 	 * - <ftl/type_traits.h>
 	 * - <ftl/function.h>
 	 */
@@ -84,6 +86,157 @@ namespace ftl {
 	 */
 	struct inplace_tag {};
 
+	// A number of helpers for tuple_apply
+	namespace _dtl {
+
+		// Helpers for tuple_apply
+		template<
+			typename F,
+			typename...Ts,
+			size_t...S>
+		auto tup_apply(seq<S...>, const F& f, const std::tuple<Ts...>& t)
+		-> typename std::result_of<F(Ts...)>::type {
+			return f(std::get<S>(t)...);
+		}
+
+		template<
+			typename F,
+			typename...Ts,
+			size_t...S>
+		auto tup_apply(seq<S...>, const F& f, std::tuple<Ts...>&& t)
+		-> typename std::result_of<F(Ts...)>::type {
+			return f(std::get<S>(t)...);
+		}
+	}
+
+	/**
+	 * Invoke a function using a tuple's fields as parameters.
+	 *
+	 * Example:
+	 * \code
+	 *   void foo(int, float);
+	 *
+	 *   // Invokes foo with 1 and 2.f as arguments
+	 *   ftl::tuple_apply(foo, std::make_tuple(1, 2.f));
+	 * \endcode
+	 *
+	 * \ingroup prelude
+	 */
+	template<typename F, typename...Ts>
+	auto tuple_apply(F&& f, const std::tuple<Ts...>& t)
+	-> typename std::result_of<F(Ts...)>::type {
+		using indices_t = typename gen_seq<0,sizeof...(Ts)-1>::type;
+		return _dtl::tup_apply(indices_t(), std::forward<F>(f), t);
+	}
+
+	/**
+	 * \overload
+	 *
+	 * \ingroup prelude
+	 */
+	template<typename F, typename...Ts>
+	auto tuple_apply(F&& f, std::tuple<Ts...>&& t)
+	-> typename std::result_of<F(Ts...)>::type {
+		using indices_t = typename gen_seq<0,sizeof...(Ts)-1>::type;
+		return _dtl::tup_apply(indices_t(), std::forward<F>(f), std::move(t));
+	}
+
+	// Implementation details of currying
+	namespace _dtl {
+		template<typename F, typename...Args1>
+		class curried_fn {
+			F f;
+			std::tuple<Args1...> args1;
+
+		public:
+			curried_fn(const F& f, const std::tuple<Args1...>& args)
+			: f(f), args1(args) {}
+
+			curried_fn(F&& f, const std::tuple<Args1...>& args)
+			: f(std::move(f)), args1(args) {}
+
+			curried_fn(const F& f, std::tuple<Args1...>&& args)
+			: f(f), args1(std::move(args)) {}
+
+			curried_fn(F&& f, std::tuple<Args1...>&& args)
+			: f(std::move(f)), args1(std::move(args)) {}
+
+			template<
+					typename...Args2,
+					typename = typename std::enable_if<
+						is_callable<F,Args1...,Args2...>::value
+					>::type
+			>
+			auto operator() (Args2&&...args2) const
+			-> typename std::result_of<F(Args1...,Args2...)>::type {
+				return tuple_apply(
+					f,
+					std::tuple_cat(
+						args1,
+						std::forward_as_tuple(std::forward<Args2>(args2)...)
+					)
+				);
+			}
+
+			template<
+					typename...Args2,
+					typename = typename std::enable_if<
+						!is_callable<F,Args1...,Args2...>::value
+					>::type
+			>
+			auto operator() (Args2&&...args2) const
+			-> curried_fn<F,Args1...,Args2...> {
+				return curried_fn<F,Args1...,Args2...>{
+					f,
+					std::tuple_cat(
+						args1,
+						std::make_tuple(std::forward<Args2>(args2)...)
+					)
+				};
+			}
+
+		};
+
+		template<typename F>
+		class curried_fn<F> {
+			F f;
+
+		public:
+			explicit curried_fn(const F& f)
+			noexcept(std::is_nothrow_copy_constructible<F>::value)
+			: f(f) {}
+
+			explicit curried_fn(F&& f)
+			noexcept(std::is_nothrow_move_constructible<F>::value)
+			: f(std::move(f)) {}
+
+			template<
+					typename...Args,
+					typename = typename std::enable_if<
+						is_callable<F,Args...>::value
+					>::type
+			>
+			auto operator() (Args&&...args) const
+			-> decltype(f(std::forward<Args>(args)...)) {
+				return f(std::forward<Args>(args)...);
+			}
+
+			template<
+					typename...Args,
+					typename = typename std::enable_if<
+						!is_callable<F,Args...>::value
+					>::type
+			>
+			auto operator() (Args&&...args) const
+			-> curried_fn<F,Args...> {
+				return curried_fn<F,Args...>(
+					f,
+					std::make_tuple(std::forward<Args>(args)...)
+				);
+			}
+		};
+	}
+
 	/**
 	 * Curries an n-ary function pointer.
 	 *
@@ -112,6 +265,42 @@ namespace ftl {
 	template<typename R, typename P1, typename P2, typename...Ps>
 	function<R,P1,P2,Ps...> curry(const std::function<R(P1,P2,Ps...)>& f) {
 		return function<R,P1,P2,Ps...>(f);
+	}
+
+	/**
+	 * Curries arbitrary function objects.
+	 *
+	 * Example:
+	 * \code
+	 *   auto f = [](int x, int y, int z){ return x+y-z; };
+	 *
+	 *   auto g = ftl::curry(f);
+	 *
+	 *   // g(1, 2, 3) == g(1, 2)(3) == g(1)(2, 3) == g(1)(2)(3)
+	 * \endcode
+	 *
+	 * \note Because this version of `curry` works on arbitrary function objects
+	 *       with unknown and possibly multiple, overloaded `operator()`s,
+	 *       there is no way to force the result of `curry` to accept only
+	 *       matching types. If you give a curried function object parameters
+	 *       that does not match any of its `operator()`s, it will simply
+	 *       never be invoked, it will just continue to accumulate parameters.
+	 *
+	 * \ingroup prelude
+	 */
+	template<
+			typename F,
+			typename = typename std::enable_if<
+				!is_monomorphic<plain_type<F>>::value
+			>::type
+	>
+#ifndef DOCUMENTATION_GENERATOR
+	_dtl::curried_fn<plain_type<F>>
+#else
+	implementation_defined
+#endif
+	curry(F&& f) {
+		return _dtl::curried_fn<plain_type<F>>(std::forward<F>(f));
 	}
 
 	/**
