@@ -330,6 +330,9 @@ namespace ftl {
 	 *
 	 * Both const reference and r-value reference versions are generated.
 	 *
+	 * This _deriving_ construct is specialised for
+	 * `ftl::back_insertable_container`.
+	 *
 	 * \tparam M The same type monad<M> is being specialised for.
 	 *
 	 * Example:
@@ -373,6 +376,114 @@ namespace ftl {
 				monad<M_<T>>::map(std::forward<F>(f), std::move(m))
 			);
 		}
+	};
+
+	// TODO: Move some place more generic
+	/**
+	 * Derived concept implementation tag for back insertable container types.
+	 *
+	 * This tag can be used with some _deriving_ constructs to generate an
+	 * automatic/default implementation of certain concept methods.
+	 *
+	 * \ingroup monad
+	 */
+	template<typename M>
+	struct back_insertable_container {};
+
+	/**
+	 * Inheritable `bind` implementation for containers supporting `push_back`.
+	 *
+	 * Note that this `monad::bind` implementation is done in terms of
+	 * `functor::map`, hence there must be a user defined implementation of
+	 * that.
+	 *
+	 * Also note that types using this construct to generate a `bind`
+	 * implementation will be capable of binding with any function returning
+	 * a \ref fwditerable, regardless of _which_ ForwardIterable that is.
+	 * I.e., in the example below, you could bind `MyContainer` with a function
+	 * returning e.g. `maybe<T>`, `std::vector<T>`, etc.
+	 *
+	 * Example:
+	 * \code
+	 *   namespace ftl {
+	 *       template<typename T>
+	 *       struct monad<MyContainer<T>>
+	 *       : deriving_bind<back_insertable_container<MyContainer<T>> {
+	 *           // Implementations of pure, map, join, apply
+	 *       };
+	 *   }
+	 * \endcode
+	 *
+	 * \see ftl::deriving_bind
+	 *
+	 * \ingroup monad
+	 */
+	template<typename M_>
+	struct deriving_bind<back_insertable_container<M_>> {
+
+		/// Type alias for cleaner type signatures.
+		using T = concept_parameter<M_>;
+
+		/// Another type alias to get more easily read type signatures.
+		template<typename U>
+		using M = typename re_parametrise<M_,U>::type;
+
+		/**
+		 * This `bind` version follows the standard container theme of modelling
+		 * non-deterministic computations. In other words, `m` is viewed as a
+		 * collection of _possible_ values, each of which `f' will generate a
+		 * new set of possible answers for.
+		 *
+		 * Example:
+		 * \code
+		 *   SomeCollection<int> c{2,4,5};
+		 *   auto c2 = c >>= [](int x){ return SomeCollection<int>{x/2, 2*x}; };
+		 *
+		 *   // Note how each group of two results correspond to one input value
+		 *   // c2 == SomeCollection<int>{1,4, 2,8, 2,10}
+		 * \endcode
+		 */
+		template<
+				typename F,
+				typename Cu = result_of<F(T)>,
+				typename U = concept_parameter<Cu>,
+				typename = typename std::enable_if<
+					ForwardIterable<Cu>()
+				>::type
+		>
+		static M<U> bind(const M<T>& m, F&& f) {
+			auto m2 = std::forward<F>(f) % m;
+			M<U> result;
+			for(auto& c : m2) {
+				for(auto& e : c) {
+					result.emplace_back(std::move(e));
+				}
+			}
+
+			return result;
+		}
+
+		/// \overload
+		template<
+				typename F,
+				typename Cu = result_of<F(T)>,
+				typename U = concept_parameter<Cu>,
+				typename = typename std::enable_if<
+					ForwardIterable<Cu>()
+				>::type
+		>
+		static M<U> bind(M<T>&& m, F&& f) {
+			auto m2 = std::forward<F>(f) % std::move(m);
+			M<U> result;
+			for(auto& c : m2) {
+				for(auto& e : c) {
+					result.emplace_back(std::move(e));
+				}
+			}
+
+			return result;
+		}
+
 	};
 
 	/**
