@@ -282,6 +282,8 @@ namespace ftl {
 					rl.push_back(e);
 				}
 			}
+
+			return rl;
 		}
 
 		/// \overload
