@@ -185,7 +185,8 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct monad<std::vector<T,A>>
-	: deriving_join<std::vector<T,A>>, deriving_apply<std::vector<T,A>> {
+	: deriving_bind<back_insertable_container<std::vector<T,A>>>
+	, deriving_apply<std::vector<T,A>> {
 
 		/// Alias to make type signatures cleaner
 		template<typename U>
@@ -204,7 +205,7 @@ namespace ftl {
 			return v;
 		}
 
-		/// Applies f to each element
+		/// Applies `f` to each element
 		template<typename F, typename U = result_of<F(T)>>
 		static vector<U> map(F&& f, const vector<T>& v) {
 			vector<U> ret;
@@ -236,9 +237,9 @@ namespace ftl {
 		/**
 		 * Move optimised version enabled when `f` does not change domain.
 		 *
-		 * Basically, if the return type of `f` is the same as its parameter type
-		 * and `v` is a temporary (rvalue reference), then `v` is re-used. This
-		 * means no copies are made.
+		 * Basically, if the return type of `f` is the same as its parameter
+		 * type and `v` is a temporary (rvalue reference), then `v` is re-used.
+		 * This means no copies are made.
 		 */
 		template<
 				typename F,
@@ -254,23 +255,78 @@ namespace ftl {
 			return v;
 		}
 
-		/// Equivalent of flip(concatMap)
-		template<
-			typename F,
-			typename U = typename result_of<F(T)>::value_type
-		>
-		static vector<U> bind(const vector<T>& v, F&& f) {
-			return concatMap(std::forward<F>(f), v);
+		/**
+		 * Joins nested vectors by way of concatenation.
+		 *
+		 * The resulting vector contains every element of every vector contained
+		 * in the original vector. Relative order is preserved (from the
+		 * perspective of depth first iteration).
+		 */
+		static vector<T> join(const vector<vector<T>>& v) {
+			vector<T> rv;
+			for(const auto& vv : v) {
+				for(const auto& e : vv) {
+					rv.push_back(e);
+				}
+			}
+
+			return rv;
 		}
 
-		/// Rvalue reference version of bind
-		template<
-			typename F,
-			typename U = typename result_of<F(T)>::value_type
-		>
-		static vector<U> bind(vector<T>&& v, F&& f) {
-			return concatMap(std::forward<F>(f), std::move(v));
+		/// \overload
+		static vector<T> join(vector<vector<T>>&& v) {
+			vector<T> rv(2*v.size());
+			for(auto& vv : v) {
+				for(auto& e : vv) {
+					rv.emplace_back(std::move(e));
+				}
+			}
+
+			return rv;
 		}
+
+#ifdef DOCUMENTATION_GENERATOR
+		/**
+		 * Can be viewed as a non-deterministic computation: `v` is a vector of
+		 * possible values, each of which we apply `f` to. As `f` itself is also
+		 * non-deterministic, it may return several possible answers for each
+		 * element in `v`. Finally, all of the results are collected in a flat
+		 * vector.
+		 *
+		 * \note `f` is allowed to return _any_ \ref fwditerable, not only
+		 *       vectors. The final result, however, is always a vector.
+		 *
+		 * Example:
+		 * \code
+		 *   auto v =
+		 *       vector<int>{1, 2, 3}
+		 *       >>= [](int x){ return vector<int>{x-1, x, x+1}; };
+		 *
+		 *   // Note how each group of three corresponds to one input element
+		 *   // v == vector<int>{0,1,2, 1,2,3, 2,3,4}
+		 * \endcode
+		 */
+		template<
+				typename F,
+				typename Cu = result_of<F(T)>,
+				typename U = concept_parameter<Cu>,
+				typename = typename std::enable_if<
+					ForwardIterable<Cu>()
+				>::type
+		>
+		static vector<U> bind(const vector<T>& v, F&& f);
+
+		/// \overload
+		template<
+				typename F,
+				typename Cu = result_of<F(T)>,
+				typename U = concept_parameter<Cu>,
+				typename = typename std::enable_if<
+					ForwardIterable<Cu>()
+				>::type
+		>
+		static vector<U> bind(vector<T>&& v, F&& f);
+#endif
 
 		static constexpr bool instance = true;
 	};

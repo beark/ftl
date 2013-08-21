@@ -21,6 +21,7 @@
  * distribution.
  */
 #include <ftl/vector.h>
+#include <ftl/maybe.h>
 #include "vector_tests.h"
 
 test_set vector_tests{
@@ -166,7 +167,7 @@ test_set vector_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("monad::bind"),
+			std::string("monad::bind[&,->vector]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator>>=;
 
@@ -175,6 +176,34 @@ test_set vector_tests{
 				auto f = [](int x){ return std::vector<int>{x,x+1}; };
 
 				return (v >>= f) == std::vector<int>{1,2,2,3,3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("monad::bind[&,->maybe]"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator>>=;
+
+				std::vector<int> v{1,2,3,4};
+
+				auto f = [](int x){
+					return x % 2 == 0 ? ftl::value(x) : ftl::maybe<int>{};
+				};
+
+				return (v >>= f) == std::vector<int>{2,4};
+			})
+		),
+		std::make_tuple(
+			std::string("monad::bind[&&,->maybe]"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator>>=;
+
+				auto f = [](int x){
+					return x % 2 == 0 ? ftl::value(x) : ftl::maybe<int>{};
+				};
+
+				return
+					(std::vector<int>{1,2,3,4} >>= f)
+					== std::vector<int>{2,4};
 			})
 		),
 		std::make_tuple(
