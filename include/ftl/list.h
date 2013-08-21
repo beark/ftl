@@ -168,17 +168,17 @@ namespace ftl {
 	};
 
 	/**
-	 * Monad implementation for std::list.
+	 * Monad implementation for `std::list`.
 	 *
-	 * Note that this instance is only valid for std::lists using an
-	 * allocator of the form `template<typename> class Allocator`, where the
-	 * template parameter to the allocator is the elment type of the list.
+	 * Behaves like most collections; which is to say, the monad can be said
+	 * to model nondeterministic computations.
 	 *
 	 * \ingroup list
 	 */
 	template<typename T, typename A>
 	struct monad<std::list<T,A>>
-	: deriving_bind<std::list<T,A>>, deriving_apply<std::list<T,A>> {
+	: deriving_bind<back_insertable_container<std::list<T,A>>>
+	, deriving_apply<std::list<T,A>> {
 
 		/// Alias to make type signatures cleaner
 		template<typename U>
@@ -204,10 +204,16 @@ namespace ftl {
 		}
 
 		/**
-		 * Applies f to each element.
+		 * Applies `f` to each element.
 		 *
-		 * The result of each call to f is collected and returned as an element
-		 * in the list returned by the call to map.
+		 * The result of each call to `f` is collected and returned as an
+		 * element in the list returned by the call to map.
+		 *
+		 * Example:
+		 * \code
+		 *   auto l = ftl::fmap([](int x){ return x+1; }, list<int>{1,2,3});
+		 *   // l == list<int>{2,3,4}
+		 * \endcode
 		 */
 		template<typename F, typename U = result_of<F(T)>>
 		static list<U> map(F&& f, const list<T>& l) {
@@ -219,6 +225,11 @@ namespace ftl {
 			return ret;
 		}
 
+		/**
+		 * R-value overload.
+		 *
+		 * Moves elements out of `l` when applying `f`.
+		 */
 		template<
 				typename F,
 				typename U = result_of<F(T)>,
@@ -238,9 +249,9 @@ namespace ftl {
 		/**
 		 * Move optimised version enabled when `f` does not change domain.
 		 *
-		 * Basically, if the return type of `f` is the same as its parameter type
-		 * and `l` is a temporary (rvalue reference), then l is re-used. This
-		 * means no copies are made.
+		 * Basically, if the return type of `f` is the same as its parameter
+		 * type and `l` is a temporary (rvalue reference), then `l` is mutated.
+		 * instead of copied. This means no copies are made.
 		 */
 		template<
 				typename F,
@@ -284,16 +295,44 @@ namespace ftl {
 		}
 
 #ifdef DOCUMENTATION_GENERATOR
-		/// Equivalent of flip(concatMap)
+		/**
+		 * Can be viewed as a non-deterministic computation: `l` is a list of
+		 * possible values, each of which we apply `f` to. As `f` itself is also
+		 * non-deterministic, it may return several possible answers for each
+		 * element in `l`. Finally, all of the results are collected in a flat
+		 * list.
+		 *
+		 * \note `f` is allowed to return _any_ \ref fwditerable, not only
+		 *       lists. The final result, however, is always a list.
+		 *
+		 * Example:
+		 * \code
+		 *   auto l =
+		 *       list<int>{1, 2, 3}
+		 *       >>= [](int x){ return list<int>{x-1, x, x+1}; };
+		 *
+		 *   // Note how each group of three corresponds to one input element
+		 *   // l == list<int>{0,1,2, 1,2,3, 2,3,4}
+		 * \endcode
+		 */
 		template<
 				typename F,
-				typename U = typename result_of<F(T)>::value_type
+				typename Cu = result_of<F(T)>,
+				typename U = concept_parameter<Cu>,
+				typename = typename std::enable_if<
+					ForwardIterable<Cu>()
+				>::type
 		>
 		static list<U> bind(const list<T>& l, F&& f);
 
+		/// \overload
 		template<
 				typename F,
-				typename U = typename result_of<F(T)>::value_type
+				typename Cu = result_of<F(T)>,
+				typename U = concept_parameter<Cu>,
+				typename = typename std::enable_if<
+					ForwardIterable<Cu>()
+				>::type
 		>
 		static list<U> bind(list<T>&& l, F&& f);
 #endif

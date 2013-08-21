@@ -21,6 +21,7 @@
  * distribution.
  */
 #include <ftl/list.h>
+#include <ftl/maybe.h>
 #include "list_tests.h"
 
 test_set list_tests{
@@ -166,7 +167,7 @@ test_set list_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("monad::bind"),
+			std::string("monad::bind[&,->list]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator>>=;
 
@@ -175,6 +176,31 @@ test_set list_tests{
 				auto f = [](int x){ return std::list<int>{x,x+1}; };
 
 				return (l >>= f) == std::list<int>{1,2,2,3,3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("monad::bind[T&&,->list<T>]"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator>>=;
+
+				auto f = [](int x){ return std::list<int>{x,x+1}; };
+
+				return (std::list<int>{1,2,3} >>= f)
+					== std::list<int>{1,2,2,3,3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("monad::bind[&,->maybe]"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator>>=;
+
+				std::list<int> l{1,2,3,4};
+
+				auto f = [](int x){
+					return x > 2 ? ftl::value(x) : ftl::maybe<int>{};
+				};
+
+				return (l >>= f) == std::list<int>{3,4};
 			})
 		),
 		std::make_tuple(
