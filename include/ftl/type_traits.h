@@ -46,6 +46,13 @@
 	template<typename T>\
 	no test_ ## name (...)
 
+#define FTL_GEN_METH0_TEST(name)\
+	template<typename T>\
+	bool test_ ## name (decltype(std::declval<T>() . name ())*);\
+	\
+	template<typename T, typename U>\
+	no test_ ## name (...)
+
 #define FTL_GEN_METH1_TEST(name)\
 	template<typename T, typename U>\
 	bool test_ ## name (decltype(std::declval<T>() . name (std::declval<U>()))*);\
@@ -86,7 +93,9 @@ namespace ftl {
 		FTL_GEN_BINOP_TEST(<, gt);
 
 		FTL_GEN_UNFN_TEST(std::begin, begin);
+		FTL_GEN_METH0_TEST(rbegin);
 		FTL_GEN_UNFN_TEST(std::end, end);
+		FTL_GEN_METH0_TEST(rend);
 
 		FTL_GEN_METH1_TEST(push_back);
 	}
@@ -275,6 +284,37 @@ namespace ftl {
 			>::value;
 	};
 
+	// TODO: C++14 - std::rbegin
+	/**
+	 * Test a type for `T::rbegin()` compatibility.
+	 *
+	 * Example:
+	 * \code
+	 *   template<
+	 *   	typename T,
+	 *   	typename = typename std::enable_if<
+	 *   	    ftl::has_rbegin<T>::value
+	 *   	    && ftl::has_rend<T>::value
+	 *   	>::type
+	 *   >
+	 *   void foo() {
+	 *       for(auto it = some_t.rbegin(); it != some_t.rend(); ++it) {
+	 *           // ...
+	 *       }
+	 *   }
+	 * \endcode
+	 *
+	 * \ingroup typetraits
+	 */
+	template<typename T>
+	struct has_rbegin {
+		static constexpr bool value =
+			!std::is_same<
+				_dtl::no,
+				decltype(_dtl::test_rbegin<T>(nullptr))
+			>::value;
+	};
+
 	/**
 	 * Test a type for `std::end()` compatibility.
 	 *
@@ -302,6 +342,36 @@ namespace ftl {
 			!std::is_same<
 				_dtl::no,
 				decltype(_dtl::test_end<T>(nullptr))
+			>::value;
+	};
+
+	/**
+	 * Test a type for `T::rend()` compatibility.
+	 *
+	 * Example:
+	 * \code
+	 *   template<
+	 *   	typename T,
+	 *   	typename = typename std::enable_if<
+	 *   	    ftl::has_rbegin<T>::value
+	 *   	    && ftl::has_rend<T>::value
+	 *   	>::type
+	 *   >
+	 *   void foo() {
+	 *       for(auto it = some_t.rbegin(); it != some_t.rend(); ++it) {
+	 *           // ...
+	 *       }
+	 *   }
+	 * \endcode
+	 *
+	 * \ingroup typetraits
+	 */
+	template<typename T>
+	struct has_rend {
+		static constexpr bool value =
+			!std::is_same<
+				_dtl::no,
+				decltype(_dtl::test_rend<T>(nullptr))
 			>::value;
 	};
 
