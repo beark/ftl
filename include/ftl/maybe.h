@@ -171,7 +171,7 @@ namespace ftl {
 			: base_maybe_it<T>{m} {}
 
 			constexpr const T& operator* () const noexcept {
-				return this->ref->value();
+				return this->ref->operator*();
 			}
 
 			constexpr const T* operator-> () const noexcept {
