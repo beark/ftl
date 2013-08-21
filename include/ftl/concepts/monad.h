@@ -639,6 +639,50 @@ namespace ftl {
 	 */
 	constexpr mBind mbind{};
 
+	/**
+	 * Convenience function object.
+	 *
+	 * Provided to make it easier to treat monadic join as a first class
+	 * function, even though many/all monad instances have overloaded
+	 * versions. I.e., in many cases where one might want to pass `monad::join`
+	 * as a parameter to a function, it is not possible due to ambiguous
+	 * overloads. In these cases, one could either use a lambda, or&mdash;more
+	 * concisely&mdash;this function object.
+	 *
+	 * \ingroup monad
+	 */
+	struct mJoin {
+		template<
+				typename M,
+				typename = typename std::enable_if<Monad<plain_type<M>>()>::type
+		>
+		auto operator() (M&&  m) const
+		-> decltype(monad<plain_type<M>>::bind(std::forward<M>(m))) {
+			return monad<plain_type<M>>::bind(std::forward<M>(m));
+		}
+	};
+
+	/**
+	 * Compile time instance of mJind.
+	 *
+	 * Makes higher order passing of `monad<T>::join` even more convenient.
+	 *
+	 * Example usage:
+	 * \code
+	 *   void foo() {
+	 *      bar(mjoin);
+	 *   }
+	 *
+	 *   // Alternative, less concise option:
+	 *   template<typename M>
+	 *   void baz() {
+	 *       bar([](const M& m){ return monad<M>::join(m); });
+	 *   }
+	 * \endcode
+	 *
+	 * \ingroup monad
+	 */
+	constexpr mJoin mjoin{};
 }
 
 #endif
