@@ -437,6 +437,19 @@ namespace ftl {
 	}
 
 	template<typename T>
+	constexpr bool ReverseIterable() {
+		return has_rbegin<T>::value &&
+			has_rend<T>::value &&
+			// TODO: C++14 - std::rbegin(std::declval<T>())
+			has_pre_inc<decltype(std::declval<T>().rbegin())>::value &&
+			has_post_inc<decltype(std::declval<T>().rbegin())>::value &&
+			std::is_same<
+				concept_parameter<T>,
+				plain_type<decltype(*std::declval<T>().rbegin())>
+			>::value;
+	}
+
+	template<typename T>
 	constexpr bool BackInsertable() {
 		return has_push_back<T,concept_parameter<T>>::value;
 	}
