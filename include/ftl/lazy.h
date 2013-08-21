@@ -24,8 +24,9 @@
 #define FTL_LAZY_H
 
 #include <memory>
+#include "prelude.h"
+#include "concepts/monoid.h"
 #include "either.h"
-#include "tuple.h"
 
 namespace ftl {
 	/**
@@ -38,8 +39,9 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
+	 * - \ref prelude
+	 * - \ref monoid
 	 * - \ref either
-	 * - \ref tuple
 	 */
 
 	/**
@@ -185,7 +187,7 @@ namespace ftl {
 		// TODO: Make this work with zero-argument fs
 		auto t = std::make_tuple(std::forward<Args>(args)...);
 		return lazy<T>{[f,t]() {
-				return apply(f, t);
+				return tuple_apply(f, t);
 		}};
 	}
 
