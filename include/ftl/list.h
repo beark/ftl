@@ -178,6 +178,7 @@ namespace ftl {
 	template<typename T, typename A>
 	struct monad<std::list<T,A>>
 	: deriving_bind<back_insertable_container<std::list<T,A>>>
+	, deriving_join<std::list<T,A>>
 	, deriving_apply<std::list<T,A>> {
 
 		/// Alias to make type signatures cleaner
@@ -268,6 +269,7 @@ namespace ftl {
 			return l;
 		}
 
+#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Joins nested lists by way of concatenation.
 		 *
@@ -275,29 +277,14 @@ namespace ftl {
 		 * in the original list. Relative order is preserved (from the
 		 * perspective of depth first iteration).
 		 */
-		static list<T> join(const list<list<T>>& l) {
-			list<T> rl;
-			for(const auto& ll : l) {
-				for(const auto& e : ll) {
-					rl.push_back(e);
-				}
-			}
-
-			return rl;
-		}
+		static list<T> join(const list<list<T>>& l);
 
 		/// \overload
-		static list<T> join(list<list<T>>&& l) {
-			list<T> rl;
-			for(auto& ll : l) {
-				rl.splice(rl.end(), std::move(ll));
-			}
+		static list<T> join(list<list<T>>&& l);
 
-			return rl;
-		}
-
-#ifdef DOCUMENTATION_GENERATOR
 		/**
+		 * Monad bind operation.
+		 *
 		 * Can be viewed as a non-deterministic computation: `l` is a list of
 		 * possible values, each of which we apply `f` to. As `f` itself is also
 		 * non-deterministic, it may return several possible answers for each

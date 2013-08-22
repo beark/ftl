@@ -186,6 +186,7 @@ namespace ftl {
 	template<typename T, typename A>
 	struct monad<std::vector<T,A>>
 	: deriving_bind<back_insertable_container<std::vector<T,A>>>
+	, deriving_join<std::vector<T,A>>
 	, deriving_apply<std::vector<T,A>> {
 
 		/// Alias to make type signatures cleaner
@@ -255,6 +256,7 @@ namespace ftl {
 			return v;
 		}
 
+#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Joins nested vectors by way of concatenation.
 		 *
@@ -262,30 +264,11 @@ namespace ftl {
 		 * in the original vector. Relative order is preserved (from the
 		 * perspective of depth first iteration).
 		 */
-		static vector<T> join(const vector<vector<T>>& v) {
-			vector<T> rv;
-			for(const auto& vv : v) {
-				for(const auto& e : vv) {
-					rv.push_back(e);
-				}
-			}
-
-			return rv;
-		}
+		static vector<T> join(const vector<vector<T>>& v);
 
 		/// \overload
-		static vector<T> join(vector<vector<T>>&& v) {
-			vector<T> rv(2*v.size());
-			for(auto& vv : v) {
-				for(auto& e : vv) {
-					rv.emplace_back(std::move(e));
-				}
-			}
+		static vector<T> join(vector<vector<T>>&& v);
 
-			return rv;
-		}
-
-#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Can be viewed as a non-deterministic computation: `v` is a vector of
 		 * possible values, each of which we apply `f` to. As `f` itself is also
