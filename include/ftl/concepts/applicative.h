@@ -193,6 +193,39 @@ namespace ftl {
 	}
 
 	/**
+	 * Inheritable default implementation of `applicative::pure`.
+	 *
+	 * This implementation of `pure` is applicable to any type with either a
+	 * suitable unary constructor (e.g., one taking a single
+	 * `concept_parameter<F>` as argument), or a constructor taking an
+	 * initialiser list of the same kind.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct applicative<UserType<T>> : deriving_pure<UserType<T>> {
+	 *       // Implementation of map and apply
+	 *   };
+	 * \endcode
+	 *
+	 * \ingroup applicative
+	 */
+	template<typename F>
+	struct deriving_pure {
+		using T = concept_parameter<F>;
+
+		static constexpr F pure(const T& t)
+		noexcept(std::is_nothrow_constructible<F,const T&>::value) {
+			return F{t};
+		}
+
+		static constexpr F pure(T&& t)
+		noexcept(std::is_nothrow_constructible<F,T&&>::value) {
+			return F{std::move(t)};
+		}
+	};
+
+	/**
 	 * Convenience operator to ease applicative style programming.
 	 *
 	 * \code
