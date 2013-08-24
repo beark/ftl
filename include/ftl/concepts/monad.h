@@ -380,18 +380,20 @@ namespace ftl {
 
 	// TODO: Move some place more generic
 	/**
-	 * Derived concept implementation tag for back insertable container types.
+	 * Derived concept implementation tag for any mutable container type.
 	 *
 	 * This tag can be used with some _deriving_ constructs to generate an
 	 * automatic/default implementation of certain concept methods.
 	 *
+	 * \tparam M must be \ref fwditerable and Insertable.
+	 *
 	 * \ingroup monad
 	 */
 	template<typename M>
-	struct back_insertable_container {};
+	struct insertable_container {};
 
 	/**
-	 * Inheritable `bind` implementation for containers supporting `push_back`.
+	 * Inheritable `bind` implementation for containers supporting `insert`.
 	 *
 	 * Note that this `monad::bind` implementation is done in terms of
 	 * `functor::map`, hence there must be a user defined implementation of
@@ -408,7 +410,7 @@ namespace ftl {
 	 *   namespace ftl {
 	 *       template<typename T>
 	 *       struct monad<MyContainer<T>>
-	 *       : deriving_bind<back_insertable_container<MyContainer<T>> {
+	 *       : deriving_bind<insertable_container<MyContainer<T>> {
 	 *           // Implementations of pure, map, join, apply
 	 *       };
 	 *   }
@@ -419,7 +421,7 @@ namespace ftl {
 	 * \ingroup monad
 	 */
 	template<typename M_>
-	struct deriving_bind<back_insertable_container<M_>> {
+	struct deriving_bind<insertable_container<M_>> {
 
 		/// Type alias for cleaner type signatures.
 		using T = concept_parameter<M_>;
@@ -454,10 +456,9 @@ namespace ftl {
 		static M<U> bind(const M<T>& m, F&& f) {
 			auto m2 = std::forward<F>(f) % m;
 			M<U> result;
+			auto it = std::inserter(result, result.begin());
 			for(auto& c : m2) {
-				for(auto& e : c) {
-					result.emplace_back(std::move(e));
-				}
+				it = std::move(c.begin(), c.end(), it);
 			}
 
 			return result;
@@ -475,10 +476,9 @@ namespace ftl {
 		static M<U> bind(M<T>&& m, F&& f) {
 			auto m2 = std::forward<F>(f) % std::move(m);
 			M<U> result;
+			auto it = std::inserter(result, result.begin());
 			for(auto& c : m2) {
-				for(auto& e : c) {
-					result.emplace_back(std::move(e));
-				}
+				it = std::move(c.begin(), c.end(), it);
 			}
 
 			return result;

@@ -177,7 +177,7 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct monad<std::list<T,A>>
-	: deriving_bind<back_insertable_container<std::list<T,A>>>
+	: deriving_bind<insertable_container<std::list<T,A>>>
 	, deriving_join<std::list<T,A>>
 	, deriving_apply<std::list<T,A>> {
 
