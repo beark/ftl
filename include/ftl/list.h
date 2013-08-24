@@ -336,26 +336,7 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct foldable<std::list<T,A>>
-	: deriving_foldl<std::list<T,A>>
-	, deriving_fold<std::list<T,A>>, deriving_foldMap<std::list<T,A>> {
-
-		template<
-				typename Fn,
-				typename U,
-				typename = typename std::enable_if<
-					std::is_same<U, result_of<Fn(T,U)>>::value
-				>::type
-		>
-		static U foldr(Fn&& fn, U z, const std::list<T,A>& l) {
-			for(auto it = l.rbegin(); it != l.rend(); ++it) {
-				z = fn(*it, z);
-			}
-
-			return z;
-		}
-
-		static constexpr bool instance = true;
-	};
+	: deriving_foldable<bidirectional_iterable<std::list<T,A>>> {};
 
 }
 
