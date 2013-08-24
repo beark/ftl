@@ -71,7 +71,7 @@ namespace ftl {
 	/**
 	 * Maps and concatenates in one step.
 	 *
-	 * \tparam F must satisfy \ref fn`<`\ref container`<B>(A)>`
+	 * \tparam F must satisfy \ref fn`<`\ref fwditerable`<U>(T)>`
 	 *
 	 * \ingroup fwdlist
 	 */
@@ -79,7 +79,7 @@ namespace ftl {
 			typename F,
 			typename T,
 			typename A,
-			typename U = typename result_of<F(T)>::value_type,
+			typename U = concept_parameter<result_of<F(T)>>,
 			typename Au = typename re_parametrise<A,U>::type
 	>
 	std::forward_list<U,Au> concatMap(
@@ -110,7 +110,7 @@ namespace ftl {
 			typename F,
 			typename T,
 			typename A,
-			typename U = typename result_of<F(T)>::value_type,
+			typename U = concept_parameter<result_of<F(T)>>,
 			typename Au = typename re_parametrise<A,U>::type
 	>
 	std::forward_list<U,Au> concatMap(
@@ -134,7 +134,7 @@ namespace ftl {
 	}
 
 	/**
-	 * Monoid implementation for std::forward_list
+	 * Monoid implementation for `std::forward_list`
 	 *
 	 * Identity element is the empty list, monoid operation is list
 	 * concatenation.
@@ -196,7 +196,7 @@ namespace ftl {
 	 * Monad instance of forward_lists
 	 *
 	 * This instance is equivalent to the other container monads, e.g.
-	 * monad<std::list<T>>, and monad<std::vector<T>>.
+	 * `monad<std::list<T>>`, and `monad<std::vector<T>>`.
 	 *
 	 * \ingroup fwdlist
 	 */
@@ -232,7 +232,7 @@ namespace ftl {
 		/**
 		 * Maps the given function over all elements in the list.
 		 *
-		 * Similar to std::transform, except `l` is not mutated and `f` is
+		 * Similar to `std::transform`, except `l` is not mutated and `f` is
 		 * allowed to change domain.
 		 */
 		template<typename F, typename U = result_of<F(T)>>
@@ -267,7 +267,7 @@ namespace ftl {
 		}
 
 		/**
-		 * A no-copies map.
+		 * Mutating, no-copy optimised version.
 		 *
 		 * Kicks in if `f` does not change domain and `l` is a temporary.
 		 */
@@ -289,7 +289,25 @@ namespace ftl {
 		/**
 		 * Monadic bind operation.
 		 *
-		 * Equivalent of `flip(concatMap)`.
+		 * Can be viewed as a non-deterministic computation: `l` is a list of
+		 * possible values, each of which we apply `f` to. As `f` itself is also
+		 * non-deterministic, it may return several possible answers for each
+		 * element in `l`. Finally, all of the results are collected in a flat
+		 * list.
+		 *
+		 * \note `f` is allowed to return _any_ \ref fwditerable, not only
+		 *       `forward_list`. The final result, however, is always a
+		 *       `forward_list`.
+		 *
+		 * Example:
+		 * \code
+		 *   auto l =
+		 *       forward_list<int>{1, 2, 3}
+		 *       >>= [](int x){ return list<int>{x-1, x, x+1}; };
+		 *
+		 *   // Note how each group of three corresponds to one input element
+		 *   // l == forward_list<int>{0,1,2, 1,2,3, 2,3,4}
+		 * \endcode
 		 */
 		template<typename F, typename U = typename result_of<F(T)>::value_type>
 		static forward_list<U> bind(const forward_list<T>& l, F&& f) {
