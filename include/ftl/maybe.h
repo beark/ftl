@@ -99,7 +99,7 @@ namespace ftl {
 
 		template<typename T>
 		class base_maybe_it
-		: std::iterator<std::forward_iterator_tag,T> {
+		: public std::iterator<std::forward_iterator_tag,T> {
 
 		protected:
 			maybe<T>* ref = nullptr;
