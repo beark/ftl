@@ -816,7 +816,9 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = typename std::enable_if<
-					std::is_same<U, result_of<Fn(T,U)>>::value
+					std::is_convertible<
+						typename std::result_of<Fn(T,U)>::type,U
+					>::value
 				>::type
 		>
 		static U foldr(Fn&& fn, U&& z, const maybe<T>& m) {
