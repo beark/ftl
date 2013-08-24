@@ -194,6 +194,15 @@ namespace ftl {
 	}
 
 	/**
+	 * Tag used to derive a \ref bidiriterable specific concept instance/method.
+	 */
+	template<typename>
+	struct bidirectional_iterable {};
+
+	template<typename>
+	struct deriving_foldable {};
+	
+	/**
 	 * An inheritable implementation of `foldable::foldl`.
 	 *
 	 * Any type that satisfies \ref fwditerable may have their \ref foldablepg
@@ -207,6 +216,8 @@ namespace ftl {
 	 *       // Rest of implementation
 	 *   };
 	 * \endcode
+	 *
+	 * \ingroup foldable
 	 */
 	template<
 			typename F,
@@ -246,6 +257,64 @@ namespace ftl {
 		static U foldl(Fn&& fn, U z, F&& f) {
 			for(auto& e : f) {
 				z = fn(z, std::move(e));
+			}
+
+			return z;
+		}
+	};
+
+	/**
+	 * An inheritable implementation of `foldable::foldr`.
+	 *
+	 * Any type that satisfies \ref reviterable may have their \ref foldablepg
+	 * instance simply inherit this implementation of `foldr` instead of
+	 * implementing it manually.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct foldable<MyContainer<T>> : deriving_foldr<MyContainer<T>> {
+	 *       // Rest of implementation
+	 *   };
+	 * \endcode
+	 *
+	 * \ingroup foldable
+	 */
+	template<typename F>
+	struct deriving_foldr {
+		using T = concept_parameter<F>;
+
+		template<
+				typename Fn,
+				typename U,
+				typename = typename std::enable_if<
+					std::is_convertible<
+						typename std::result_of<Fn(T,U)>::type,
+						U
+					>::value
+				>::type
+		>
+		static U foldr(Fn&& fn, U z, const F& f) {
+			for(auto it = f.rbegin(); it != f.rend(); ++it) {
+				z = fn(*it, z);
+			}
+
+			return z;
+		}
+
+		template<
+				typename Fn,
+				typename U,
+				typename = typename std::enable_if<
+					std::is_convertible<
+						std::result_of<Fn(T,U)>,
+						U
+					>::value
+				>::type
+		>
+		static U foldr(Fn&& fn, U z, F&& f) {
+			for(auto it = f.rbegin(); it != f.rend(); ++it) {
+				z = fn(std::move(*it), z);
 			}
 
 			return z;
@@ -324,6 +393,27 @@ namespace ftl {
 		static M fold(const F& f) {
 			return foldable<F>::foldMap(id, f);
 		}
+	};
+
+	/**
+	 * Inheritable implementation of the _full_ \ref foldablepg concept.
+	 *
+	 * Requires that the instance type is \ref bidiriterable.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct foldable<MyContainer<T>>
+	 *   : deriving_foldable<bidirectional_iterable<MyContainer<T>>> {};
+	 * \endcode
+	 *
+	 * \ingroup foldable
+	 */
+	template<typename F>
+	struct deriving_foldable<bidirectional_iterable<F>>
+	: deriving_foldl<F>, deriving_foldr<F>, deriving_fold<F>
+	, deriving_foldMap<F> {
+		static constexpr bool instance = true;
 	};
 
 	/**
