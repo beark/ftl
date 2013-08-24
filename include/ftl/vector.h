@@ -185,7 +185,8 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct monad<std::vector<T,A>>
-	: deriving_bind<insertable_container<std::vector<T,A>>>
+	: deriving_pure<std::vector<T,A>>
+	, deriving_bind<insertable_container<std::vector<T,A>>>
 	, deriving_join<std::vector<T,A>>
 	, deriving_apply<std::vector<T,A>> {
 
@@ -193,18 +194,12 @@ namespace ftl {
 		template<typename U>
 		using vector = typename re_parametrise<std::vector<T,A>,U>::type;
 
+#ifdef DOCUMENTATION_GENERATOR
 		/// Creates a one element vector
-		static vector<T> pure(const T& t) {
-			vector<T> v{};
-			v.push_back(t);
-			return v;
-		}
+		static vector<T> pure(const T& t);
 
-		static vector<T> pure(T&& t) {
-			vector<T> v{};
-			v.emplace_back(std::move(t));
-			return v;
-		}
+		static vector<T> pure(T&& t);
+#endif
 
 		/// Applies `f` to each element
 		template<typename F, typename U = result_of<F(T)>>

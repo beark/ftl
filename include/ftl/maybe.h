@@ -672,23 +672,22 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct monad<maybe<T>>
-	: deriving_apply<maybe<T>>, deriving_join<maybe<T>> {
+	: deriving_pure<maybe<T>>, deriving_apply<maybe<T>>
+	, deriving_join<maybe<T>> {
 
+#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Embed a pure value in a `maybe`.
 		 *
 		 * The same as constructing with `value(t)`.
 		 */
 		static constexpr maybe<T> pure(const T& t)
-		noexcept(std::is_nothrow_copy_constructible<T>::value) {
-			return value(t);
-		}
+		noexcept(std::is_nothrow_copy_constructible<T>::value);
 
 		/// \overload
 		static constexpr maybe<T> pure(T&& t)
-		noexcept(std::is_nothrow_move_constructible<T>::value) {
-			return value(std::move(t));
-		}
+		noexcept(std::is_nothrow_move_constructible<T>::value);
+#endif
 
 		/**
 		 * Apply `f` if `m` is a value.

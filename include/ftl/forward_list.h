@@ -202,7 +202,8 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct monad<std::forward_list<T,A>>
-	: deriving_join<std::forward_list<T,A>>
+	: deriving_pure<std::forward_list<T,A>>
+	, deriving_join<std::forward_list<T,A>>
 	, deriving_apply<std::forward_list<T,A>> {
 
 		/// Alias to make type signatures more easily read.
@@ -210,24 +211,18 @@ namespace ftl {
 		using forward_list
 			= typename re_parametrise<std::forward_list<T,A>,U>::type;
 
+#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Embed a `T` in a forward list.
 		 *
 		 * Simply creates a singleton list, containing `t`.
 		 */
-		static forward_list<T> pure(const T& t) {
-			forward_list<T> l;
-			l.emplace_front(t);
-			return l;
-		}
+		static forward_list<T> pure(const T& t);
 
 
 		/// \overload
-		static forward_list<T> pure(T&& t) {
-			forward_list<T> l;
-			l.emplace_front(std::move(t));
-			return l;
-		}
+		static forward_list<T> pure(T&& t);
+#endif
 
 		/**
 		 * Maps the given function over all elements in the list.

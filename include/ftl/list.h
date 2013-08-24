@@ -177,7 +177,8 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct monad<std::list<T,A>>
-	: deriving_bind<insertable_container<std::list<T,A>>>
+	: deriving_pure<std::list<T,A>>
+	, deriving_bind<insertable_container<std::list<T,A>>>
 	, deriving_join<std::list<T,A>>
 	, deriving_apply<std::list<T,A>> {
 
@@ -185,24 +186,18 @@ namespace ftl {
 		template<typename U>
 		using list = typename re_parametrise<std::list<T,A>,U>::type;
 
+#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Produces a singleton list.
 		 *
 		 * That is, pure generates a one element list, where that single element
 		 * is `a`.
 		 */
-		static list<T> pure(const T& a) {
-			list<T> l{};
-			l.emplace_back(a);
-			return l;
-		}
+		static list<T> pure(const T& a);
 
 		/// \overload
-		static list<T> pure(T&& a) {
-			list<T> l{};
-			l.emplace_back(std::move(a));
-			return l;
-		}
+		static list<T> pure(T&& a);
+#endif
 
 		/**
 		 * Applies `f` to each element.

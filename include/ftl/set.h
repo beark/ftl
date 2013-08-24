@@ -168,10 +168,19 @@ namespace ftl {
 
 		// What to do if/when f returns same U for different T?
 		/**
-		 * Maps a function to every element of the set.
+		 * Maps a function to every element of the set. Note that the resulting
+		 * set may contain fewer elements than the original, if several results
+		 * of applying `f` happen to coincide.
 		 *
 		 * \tparam F must satisfy \ref fn`<U(T)>`, for some type `U` that is
 		 *           strictly orderable by `Cmp<U>`.
+		 *
+		 * Example:
+		 * \code
+		 *   auto s = [](int x){ return x/2; } % std::set<int>{1,2,3,4,5,6};
+		 *
+		 *   // s == std::set<int>{0,1,2,3}
+		 * \endcode
 		 */
 		template<typename F, typename U = result_of<F(T)>>
 		static set<U> map(F&& f, const set<T>& s) {
@@ -200,6 +209,13 @@ namespace ftl {
 		 * Preservation of relative order (from the perspective of depth-first
 		 * iteration of the original set of sets) is not guaranteed, simply
 		 * because the resulting set is (naturally) sorted.
+		 *
+		 * Example:
+		 * \code
+		 *   auto s = ftl::mjoin(std::set<std::set<int>>{{1,3},{2,3,4},{0,5}});
+		 *
+		 *   // s == std::set<int>{0,1,2,3,4}
+		 * \endcode
 		 */
 		static set<T> join(const set<set<T>>& s) {
 			 set<T> rs;
@@ -228,32 +244,13 @@ namespace ftl {
 	};
 
 	/**
-	 * Foldable instance for std::set.
+	 * Foldable instance for `std::set`.
 	 *
 	 * \ingroup set
 	 */
 	template<typename T, typename C, typename A>
 	struct foldable<std::set<T,C,A>>
-	: deriving_foldl<std::set<T,C,A>>
-	, deriving_fold<std::set<T,C,A>>, deriving_foldMap<std::set<T,C,A>> {
-
-		template<
-				typename F,
-				typename U,
-				typename = typename std::enable_if<
-					std::is_same<U, result_of<F(T,U)>>::value
-				>::type
-		>
-		static U foldr(F&& f, U z, const std::set<T,C,A>& s) {
-			for(auto it = s.rbegin(); it != s.rend(); ++it) {
-				z = f(*it, z);
-			}
-
-			return z;
-		}
-
-		static constexpr bool instance = true;
-	};
+	: deriving_foldable<bidirectional_iterable<std::set<T,C,A>>> {};
 
 }
 
