@@ -93,7 +93,7 @@ namespace ftl {
 	template<typename T>
 	struct monad<std::future<T>>
 #ifndef DOCUMENTATION_GENERATOR
-	: deriving_join<std::future<T>>
+	: deriving_join<in_terms_of_bind<std::future<T>>>
 #endif
 	{
 
@@ -190,9 +190,7 @@ namespace ftl {
 		 * As is to be expected, the only way of accomplishing this feat is
 		 * to wait for the outer future.
 		 */
-		static std::future<T> join(std::future<std::future<T>>&& f) {
-			return f.get();
-		}
+		static std::future<T> join(std::future<std::future<T>>&& f);
 #endif
 
 		static constexpr bool instance = true;

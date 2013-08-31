@@ -203,7 +203,7 @@ namespace ftl {
 	template<typename T, typename A>
 	struct monad<std::forward_list<T,A>>
 	: deriving_pure<std::forward_list<T,A>>
-	, deriving_join<std::forward_list<T,A>>
+	, deriving_join<in_terms_of_bind<std::forward_list<T,A>>>
 	, deriving_apply<std::forward_list<T,A>> {
 
 		/// Alias to make type signatures more easily read.

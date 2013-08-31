@@ -117,7 +117,8 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct monad<std::shared_ptr<T>>
-	: deriving_join<std::shared_ptr<T>>, deriving_apply<std::shared_ptr<T>> {
+	: deriving_join<in_terms_of_bind<std::shared_ptr<T>>>
+	, deriving_apply<std::shared_ptr<T>> {
 
 		static std::shared_ptr<T> pure(T&& a) {
 			return std::make_shared<T>(std::forward<T>(a));

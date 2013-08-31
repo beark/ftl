@@ -129,7 +129,7 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct monad<lazyT<M>>
-	: deriving_join<lazyT<M>>, deriving_apply<lazyT<M>> {
+	: deriving_join<in_terms_of_bind<lazyT<M>>>, deriving_apply<lazyT<M>> {
 		/// Concept parameter of the particular instance.
 		using T = typename lazyT<M>::T;
 

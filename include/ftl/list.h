@@ -177,16 +177,13 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct monad<std::list<T,A>>
-	: deriving_pure<std::list<T,A>>
-	, deriving_bind<insertable_container<std::list<T,A>>>
-	, deriving_join<std::list<T,A>>
-	, deriving_apply<std::list<T,A>> {
+	: deriving_monad<back_insertable_container<std::list<T,A>>> {
 
+#ifdef DOCUMENTATION_GENERATOR
 		/// Alias to make type signatures cleaner
 		template<typename U>
 		using list = typename re_parametrise<std::list<T,A>,U>::type;
 
-#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Produces a singleton list.
 		 *
@@ -197,7 +194,6 @@ namespace ftl {
 
 		/// \overload
 		static list<T> pure(T&& a);
-#endif
 
 		/**
 		 * Applies `f` to each element.
@@ -212,59 +208,16 @@ namespace ftl {
 		 * \endcode
 		 */
 		template<typename F, typename U = result_of<F(T)>>
-		static list<U> map(F&& f, const list<T>& l) {
-			list<U> ret;
-			for(const auto& e : l) {
-				ret.push_back(f(e));
-			}
-
-			return ret;
-		}
+		static list<U> map(F&& f, const list<T>& l);
 
 		/**
 		 * R-value overload.
 		 *
 		 * Moves elements out of `l` when applying `f`.
 		 */
-		template<
-				typename F,
-				typename U = result_of<F(T)>,
-				typename = typename std::enable_if<
-					!std::is_same<T,U>::value
-				>::type
-		>
-		static list<U> map(F&& f, list<T>&& l) {
-			list<U> ret;
-			for(auto& e : l) {
-				ret.push_back(f(std::move(e)));
-			}
+		template<typename F, typename U = result_of<F(T)>>
+		static list<U> map(F&& f, list<T>&& l);
 
-			return ret;
-		}
-
-		/**
-		 * Move optimised version enabled when `f` does not change domain.
-		 *
-		 * Basically, if the return type of `f` is the same as its parameter
-		 * type and `l` is a temporary (rvalue reference), then `l` is mutated.
-		 * instead of copied. This means no copies are made.
-		 */
-		template<
-				typename F,
-				typename U = result_of<F(T)>,
-				typename = typename std::enable_if<
-					std::is_same<T,U>::value
-				>::type
-		>
-		static list<T> map(F&& f, list<T>&& l) {
-			for(auto& e : l) {
-				e = f(e);
-			}
-
-			return l;
-		}
-
-#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Joins nested lists by way of concatenation.
 		 *
@@ -320,8 +273,6 @@ namespace ftl {
 		>
 		static list<U> bind(list<T>&& l, F&& f);
 #endif
-
-		static constexpr bool instance = true;
 	};
 
 	/**

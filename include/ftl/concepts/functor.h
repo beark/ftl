@@ -150,6 +150,98 @@ namespace ftl {
 		return functor<F>::instance;
 	}
 
+	// TODO: Move some place more generic
+	/**
+	 * Derived concept implementation tag for any mutable container type.
+	 *
+	 * This tag can be used with some _deriving_ constructs to generate an
+	 * automatic/default implementation of certain concept methods.
+	 *
+	 * \tparam M must be \ref fwditerable and Insertable.
+	 *
+	 * \ingroup functor
+	 */
+	template<typename M>
+	struct back_insertable_container {};
+
+	template<typename F>
+	struct deriving_map;
+
+	/**
+	 * Implementation of `functor::map`, inheritable by many containers.
+	 *
+	 * Provides a default implementation of `fmap` that can be inherited by any
+	 * container type fulfilling the following:
+	 * - Must be \ref fwditerable
+	 * - There must exist a method, `emplace_back(T&&)`, behaving semantically
+	 *   equivalent of e.g. the `std::list::emplace_back` of the same signature.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct functor<Container<T>>
+	 *   : deriving_map<back_insertable_container<Container<T>>> {
+	 *       static constexpr bool instance = true;
+	 *   };
+	 * \endcode
+	 *
+	 * \note This is only an implementation of `map`, it does not include the
+	 *       `instance` constant, even though it is sufficient for a full
+	 *       functor implementation.
+	 *
+	 * \ingroup functor
+	 */
+	template<typename F_>
+	struct deriving_map<back_insertable_container<F_>> {
+		using T = concept_parameter<F_>;
+
+		template<typename U>
+		using F = typename re_parametrise<F_,U>::type;
+
+		template<typename Fn, typename U = result_of<Fn(T)>>
+		static F<U> map(Fn&& fn, const F<T>& f) {
+			F<U> result;
+			for(auto& e : f) {
+				result.emplace_back(fn(e));
+			}
+
+			return result;
+		}
+
+		template<
+				typename Fn, typename U = result_of<Fn(T)>,
+				typename = typename std::enable_if<
+					!std::is_same<U,T>::value
+					|| !std::is_copy_assignable<T>::value
+					&& !std::is_move_assignable<T>::value
+				>::type
+		>
+		static F<U> map(Fn&& fn, F<T>&& f) {
+			F<U> result;
+			for(auto& e : f) {
+				result.emplace_back(fn(std::move(e)));
+			}
+
+			return result;
+		}
+
+		template<
+				typename Fn,
+				typename = typename std::enable_if<
+					std::is_same<result_of<Fn(T)>,T>::value
+					&& (std::is_copy_assignable<T>::value
+					|| std::is_move_assignable<T>::value)
+				>::type
+		>
+		static F<T> map(Fn&& fn, F<T>&& f) {
+			for(auto& e : f) {
+				e = fn(std::move(e));
+			}
+
+			return f;
+		}
+	};
+
 	/**
 	 * Convenience operator for `functor::map`.
 	 *

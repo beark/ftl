@@ -76,7 +76,8 @@ namespace ftl {
 	 */
 	template<typename R, typename P, typename...Ps>
 	struct monad<function<R,P,Ps...>>
-	: deriving_join<function<R,P,Ps...>>, deriving_apply<function<R,P,Ps...>> {
+	: deriving_join<in_terms_of_bind<function<R,P,Ps...>>>
+	, deriving_apply<function<R,P,Ps...>> {
 
 		// TODO: C++14 - Create version that lambda captures a by move
 		/// Creates a function that returns `a`, regardless of its parameters.
@@ -245,7 +246,7 @@ namespace ftl {
 	 */
 	template<typename R, typename P, typename...Ps>
 	struct monad<std::function<R(P,Ps...)>>
-	: deriving_join<std::function<R(P,Ps...)>>
+	: deriving_join<in_terms_of_bind<std::function<R(P,Ps...)>>>
 	, deriving_apply<std::function<R(P,Ps...)>> {
 		static std::function<R(P,Ps...)> pure(R r) {
 			return std::function<R(P,Ps...)> {

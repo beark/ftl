@@ -234,6 +234,33 @@ namespace ftl {
 	}
 
 	/**
+	 * Tag that can be used to specify which concept implementation to derive.
+	 *
+	 * This particular tag is used to specify that some monad method should be
+	 * derived in terms of `monad::bind`. Thus, there must be an existing
+	 * implementation of `bind` that does not rely on whatever method is being
+	 * derived in terms of it.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct monad<AType<T>>
+	 *   : deriving_map<in_terms_of_bind<AType<T>> {
+	 *       // Bind must be here, or else independently derived
+	 *
+	 *       // Probably other method implementations
+	 *   };
+	 * \endcode
+	 *
+	 * \ingroup monad
+	 */
+	template<typename M>
+	struct in_terms_of_bind {};
+
+	template<typename>
+	struct deriving_join;
+
+	/**
 	 * Inheritable implementation of `monad<M>::join`.
 	 *
 	 * Monad implementations (as in, the template specialisations of monad<M>)
@@ -247,7 +274,8 @@ namespace ftl {
 	 * Example:
 	 * \code
 	 *   template<typename T>
-	 *   struct monad<MyMonad<T>> : deriving_join<MyMonad<T>> {
+	 *   struct monad<MyMonad<T>>
+	 *   : deriving_join<in_terms_of_bind<MyMonad<T>>> {
 	 *       // Implementations of bind, map, apply, and pure
 	 *   };
 	 * \endcode
@@ -258,7 +286,7 @@ namespace ftl {
 	 * \ingroup monad
 	 */
 	template<typename M>
-	struct deriving_join {
+	struct deriving_join<in_terms_of_bind<M>> {
 		using T = concept_parameter<M>;
 		
 		template<typename U>
@@ -287,18 +315,19 @@ namespace ftl {
 	 * Example:
 	 * \code
 	 *   template<typename T>
-	 *   struct monad<MyMonad<T>> : deriving_map<MyMonad<T>> {
+	 *   struct monad<MyMonad<T>>
+	 *   : deriving_map<in_terms_of_bind<MyMonad<T>>> {
 	 *       // Implementations of bind, pure, apply, and join
 	 *   };
 	 * \endcode
 	 *
-	 * \note Requires that the inheriting monad specialisation implements `bind`
-	 *       and `pure`. All of the other monadic operations may be derived.
+	 * \note `M` must not have its `bind` operation implemented in terms of
+	 *       `map` and `join`.
 	 *
 	 * \ingroup monad
 	 */
 	template<typename M>
-	struct deriving_map {
+	struct deriving_map<in_terms_of_bind<M>> {
 		using T = concept_parameter<M>;
 		
 		template<typename U>
@@ -378,20 +407,6 @@ namespace ftl {
 		}
 	};
 
-	// TODO: Move some place more generic
-	/**
-	 * Derived concept implementation tag for any mutable container type.
-	 *
-	 * This tag can be used with some _deriving_ constructs to generate an
-	 * automatic/default implementation of certain concept methods.
-	 *
-	 * \tparam M must be \ref fwditerable and Insertable.
-	 *
-	 * \ingroup monad
-	 */
-	template<typename M>
-	struct insertable_container {};
-
 	/**
 	 * Inheritable `bind` implementation for containers supporting `insert`.
 	 *
@@ -410,7 +425,7 @@ namespace ftl {
 	 *   namespace ftl {
 	 *       template<typename T>
 	 *       struct monad<MyContainer<T>>
-	 *       : deriving_bind<insertable_container<MyContainer<T>> {
+	 *       : deriving_bind<back_insertable_container<MyContainer<T>> {
 	 *           // Implementations of pure, map, join, apply
 	 *       };
 	 *   }
@@ -421,7 +436,7 @@ namespace ftl {
 	 * \ingroup monad
 	 */
 	template<typename M_>
-	struct deriving_bind<insertable_container<M_>> {
+	struct deriving_bind<back_insertable_container<M_>> {
 
 		/// Type alias for cleaner type signatures.
 		using T = concept_parameter<M_>;
@@ -535,6 +550,41 @@ namespace ftl {
 			);
 		}
 
+	};
+
+	template<typename M>
+	struct deriving_monad;
+
+	/**
+	 * Inheritable monad implementation for many containers.
+	 *
+	 * Requires the following out of `M` to be valid:
+	 * - Must obviously be \ref fwditerable
+	 * - There must exist an `M::insert(iterator pos, const T& value)`,
+	 *   returning an iterator to the inserted element. An R-value version is
+	 *   also beneficial in some cases.
+	 * - `ftl::deriving_pure` must be applicable to `M`.
+	 *
+	 * Any container fulfilling these requirements can have its monad
+	 * implementation almost automatically, by letting it derive from this
+	 * implementation.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   struct monad<Container<T>>
+	 *   : deriving_monad<back_insertable_container<Container<T>>> {};
+	 * \endcode
+	 *
+	 * \ingroup monad
+	 */
+	template<typename M>
+	struct deriving_monad<back_insertable_container<M>>
+	: deriving_pure<M>, deriving_map<back_insertable_container<M>>
+	, deriving_bind<back_insertable_container<M>>
+	, deriving_join<in_terms_of_bind<M>>, deriving_apply<M> {
+
+		static constexpr bool instance = true;
 	};
 
 	/**

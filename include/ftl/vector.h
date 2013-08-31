@@ -185,73 +185,24 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct monad<std::vector<T,A>>
-	: deriving_pure<std::vector<T,A>>
-	, deriving_bind<insertable_container<std::vector<T,A>>>
-	, deriving_join<std::vector<T,A>>
-	, deriving_apply<std::vector<T,A>> {
+	: deriving_monad<back_insertable_container<std::vector<T,A>>> {
 
+#ifdef DOCUMENTATION_GENERATOR
 		/// Alias to make type signatures cleaner
 		template<typename U>
 		using vector = typename re_parametrise<std::vector<T,A>,U>::type;
 
-#ifdef DOCUMENTATION_GENERATOR
 		/// Creates a one element vector
 		static vector<T> pure(const T& t);
 
-		static vector<T> pure(T&& t);
-#endif
-
 		/// Applies `f` to each element
 		template<typename F, typename U = result_of<F(T)>>
-		static vector<U> map(F&& f, const vector<T>& v) {
-			vector<U> ret;
-			ret.reserve(v.size());
-			for(const auto& e : v) {
-				ret.push_back(f(e));
-			}
-
-			return ret;
-		}
+		static vector<U> map(F&& f, const vector<T>& v);
 
 		/// Rvalue version of map
-		template<
-				typename F,
-				typename U = result_of<F(T)>,
-				typename =
-					typename std::enable_if<!std::is_same<T,U>::value>::type
-		>
-		static vector<U> map(F&& f, vector<T>&& v) {
-			vector<U> ret;
-			ret.reserve(v.size());
-			for(auto& e : v) {
-				ret.push_back(f(std::move(e)));
-			}
+		template<typename F, typename U = result_of<F(T)>>
+		static vector<U> map(F&& f, vector<T>&& v);
 
-			return ret;
-		}
-
-		/**
-		 * Move optimised version enabled when `f` does not change domain.
-		 *
-		 * Basically, if the return type of `f` is the same as its parameter
-		 * type and `v` is a temporary (rvalue reference), then `v` is re-used.
-		 * This means no copies are made.
-		 */
-		template<
-				typename F,
-				typename U = result_of<F(T)>,
-				typename =
-					typename std::enable_if<std::is_same<T,U>::value>::type
-		>
-		static vector<T> map(F&& f, vector<T>&& v) {
-			for(auto& e : v) {
-				e = f(e);
-			}
-
-			return v;
-		}
-
-#ifdef DOCUMENTATION_GENERATOR
 		/**
 		 * Joins nested vectors by way of concatenation.
 		 *
@@ -305,8 +256,6 @@ namespace ftl {
 		>
 		static vector<U> bind(vector<T>&& v, F&& f);
 #endif
-
-		static constexpr bool instance = true;
 	};
 
 	/**
