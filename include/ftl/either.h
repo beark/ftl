@@ -516,12 +516,12 @@ namespace ftl {
 	 */
 	template<
 			typename R,
-			typename _L,
-			typename L = typename std::decay<_L>::type
+			typename L_,
+			typename L = typename std::decay<L_>::type
 	>
-	constexpr either<L,R> make_left(_L&& l)
+	constexpr either<L,R> make_left(L_&& l)
 	noexcept(std::is_nothrow_constructible<either<L,R>,L>::value) {
-		return either<L,R>(left_tag_t(), std::forward<_L>(l));
+		return either<L,R>(left_tag_t(), std::forward<L_>(l));
 	}
 
 	/**
@@ -539,12 +539,12 @@ namespace ftl {
 	 */
 	template<
 			typename L,
-			typename _R,
-			typename R = plain_type<_R>
+			typename R_,
+			typename R = plain_type<R_>
 	>
-	constexpr either<L,R> make_right(_R&& r)
-	noexcept(std::is_nothrow_constructible<either<L,R>,_R>::value) {
-		return either<L,R>(right_tag_t(), std::forward<_R>(r));
+	constexpr either<L,R> make_right(R_&& r)
+	noexcept(std::is_nothrow_constructible<either<L,R>,R_>::value) {
+		return either<L,R>(right_tag_t(), std::forward<R_>(r));
 	}
 
 	/**
