@@ -16,6 +16,29 @@ Showcases
 ---------
 A couple of quick showcases of some rather neat things the FTL gives you.
 
+### Curried Function Calling
+One of the typically functional conventions brought to C++ by FTL is support for curried functions and function objects. A curried function is an n-ary function that can be invoked one argument at a time; each step returning a _new_ function object of arity _n-1_. Once enough parameters have been applied (when _n_ reaches _0_), the actual computation is performed and the result is returned. One of the uses of this is to achieve very convenient partial function application. For example:
+```cpp
+auto plus = ftl::curry(std::plus<int>);
+auto addOne = plus(1);
+
+auto x = addOne(2); // x = 3
+auto y = addOne(x); // y = 4
+```
+As mentioned, all of the function objects provided by FTL are curried by default and do not require an `ftl::curry` call first. Partial application is thus in many cases extremely concise and clean. Note, however, that without, for instance, a wrapping lambda function, it is not possible to partially apply parameters other than in the exact order they appear. For example, the following are all valid:
+```cpp
+auto f = curriedTernaryFn(1);
+auto g = curriedTernaryFn(1,2);
+
+f(2)(3) == f(2,3) && f(2,3) == g(3); // true
+```
+But it is not possible to "skip" a parameter or leave a placeholder, as in:
+```cpp
+using std::placeholders::_1;
+auto f = std::bind(ternaryFn, _1, 2, 3);
+```
+Currying by itself is a very nice thing to have, but what _truly_ makes it shine is when used in combination with e.g. higher order functions. See for instance applicative style coding, which is not nearly as nice without currying.
+
 ### Expanding The Standard Library
 One of the nice things about FTL is that it does not try to replace or supercede the standard library, it tries to _expand_ it when possible. These expansions include giving existing types concept instances for e.g. Functor, Monad, Monoid, and others. For example, in FTL, `std::shared_ptr` is a monad. This means we can sequence a series of operations working on shared pointers without ever having to explicitly check for validity&mdash;while still being assured there are no attempts to access an invalid pointer.
 
@@ -73,8 +96,7 @@ if(x && y && z) {
     result = make_shared(algorithm(*x, *y, *z));
 }
 ```
-
-If `algorithm` had happened to already be wrapped in an `ftl::function`, then the FTL-version would have been even shorter, because the `curry` call could have been elided. `ftl::function` supports both conventional calls and curried calls out of the box. That is, if `f` is an `ftl::function<int,int,int,int>`, it could be called in any of the following ways `f(1,2,3)`, `f(1)(2,3)`, `f(1)(2)(3)`. Naturally, it would be possible to store the intermediate results of each of the partial applications above, should you want.
+If `algorithm` had happened to be wrapped in an `ftl::function`, or else be one of the built-in, curried-by-default function objects of FTL, then the `curry` call could have been elided for even cleaner code.
 
 ### Transformers
 No, not as in Optimus Prime! As in a monad transformer: a type transformer that takes one monad as parameter and "magically" adds functionality to it in the form of one of many other monads. For example, let's say you want to add the functionality of the `maybe` monad to the list monad. You'd have to create a new type that combines the powers, then write all of those crazy monad instances and whatnot, right? Wrong!
