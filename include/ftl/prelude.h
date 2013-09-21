@@ -487,7 +487,7 @@ namespace ftl {
 		struct curried_ternf {
 		private:
 			template<typename P1>
-			struct curried2 {
+			struct curried1 {
 			private:
 				template<typename P2>
 				struct curried {
@@ -530,11 +530,11 @@ namespace ftl {
 				};
 
 			public:
-				explicit constexpr curried2(const P1& p)
+				explicit constexpr curried1(const P1& p)
 				noexcept(std::is_nothrow_copy_constructible<P1>::value)
 				: p(p) {}
 
-				explicit constexpr curried2(P1&& p)
+				explicit constexpr curried1(P1&& p)
 				noexcept(std::is_nothrow_move_assignable<P1>::value)
 				: p(std::move(p)) {}
 
@@ -559,10 +559,49 @@ namespace ftl {
 				*/
 			};
 
+			template<typename P1, typename P2>
+			struct curried2 {
+				P1 p1;
+				P2 p2;
+
+				curried2(const P1& p1, const P2& p2)
+				noexcept(std::is_nothrow_copy_constructible<P1>::value
+						&& std::is_nothrow_copy_constructible<P2>::value)
+				: p1(p1), p2(p2) {}
+
+				curried2(const P1& p1, P2&& p2)
+				noexcept(std::is_nothrow_copy_constructible<P1>::value
+						&& std::is_nothrow_move_constructible<P2>::value)
+				: p1(p1), p2(std::move(p2)) {}
+
+				curried2(P1&& p1, const P2& p2)
+				noexcept(std::is_nothrow_move_constructible<P1>::value
+						&& std::is_nothrow_copy_constructible<P2>::value)
+				: p1(std::move(p1)), p2(p2) {}
+
+				curried2(P1&& p1, const P2&& p2)
+				noexcept(std::is_nothrow_move_constructible<P1>::value
+						&& std::is_nothrow_move_constructible<P2>::value)
+				: p1(std::move(p1)), p2(std::move(p2)) {}
+
+				template<typename P3>
+				auto operator() (P3&& p3) const
+				-> decltype(std::declval<F>()(p1, p2, std::forward<P3>(p3))) {
+					return F()(p1, p2, std::forward<P3>(p3));
+				}
+			};
+
 		public:
 			template<typename P>
-			curried2<plain_type<P>> operator() (P&& p) const {
-				return curried2<plain_type<P>>(std::forward<P>(p));
+			curried1<plain_type<P>> operator() (P&& p) const {
+				return curried1<plain_type<P>>(std::forward<P>(p));
+			}
+
+			template<typename P1, typename P2>
+			curried2<plain_type<P1>,plain_type<P2>> operator() (P1&& p1, P2&& p2) const {
+				return curried2<plain_type<P1>,plain_type<P2>>(
+					std::forward<P1>(p1), std::forward<P2>(p2)
+				);
 			}
 		};
 	}
