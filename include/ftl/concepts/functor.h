@@ -289,6 +289,11 @@ namespace ftl {
 	 * `fMap` values may be invoked using curried calling style, should such
 	 * be wanted.
 	 *
+	 * Note that, unlike when invoking `functor::map` directly, it is possible
+	 * to map a function returning `void`. In such cases, `fMap` behaves like
+	 * `mapM_` of Haskell: the function is applied purely for its side effects,
+	 * and no values are stored or returned.
+	 *
 	 * \ingroup functor
 	 */
 	struct fMap
@@ -360,9 +365,23 @@ namespace ftl {
 	 * Compile time instance of fMap.
 	 *
 	 * Makes it even more convenient to pass `functor::map` as parameter to
-	 * higher order functions.
+	 * higher order functions. Also makes for a good alternative to
+	 * `ftl::operator%` for those who prefer to keep their code clear of
+	 * potentially confusing operators.
 	 *
-	 * Example usage:
+	 * \par Example uses
+	 * Using `fmap` to map a function with side effects and no return value
+	 * \code
+	 *   std::list<int> l{1,2,3};
+	 *
+	 *   ftl::fmap([](int x){ std::cout << x << ", "; }, l);
+	 * \endcode
+	 * Output:
+	 * \code
+	 *   1, 2, 3, 
+	 * \endcode
+	 *
+	 * As parameter to a higher order function
 	 * \code
 	 *   template<
 	 *       typename F1, typename F2,
