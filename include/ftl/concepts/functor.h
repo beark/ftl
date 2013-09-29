@@ -296,13 +296,64 @@ namespace ftl {
 	: _dtl::curried_binf<fMap>
 #endif
 	{
-		template<typename Fn, typename F, typename F_ = plain_type<F>>
+		template<
+				typename Fn,
+				typename F,
+				typename F_ = plain_type<F>,
+				typename = typename std::enable_if<
+					!std::is_same<
+						result_of<Fn(concept_parameter<F_>)>,
+						void
+					>::value
+				>::type
+		>
 		auto operator() (Fn&& fn, F&& f) const
-		-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f))) {
+		-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f))){
 			return functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f));
 		}
 
+		template<
+				typename Fn,
+				typename F,
+				typename F_ = plain_type<F>,
+				typename = typename std::enable_if<
+					std::is_same<
+						result_of<Fn(concept_parameter<F_>)>,
+						void
+					>::value
+				>::type
+		>
+		void operator() (Fn&& fn, F&& f) const {
+			mapM<F_>::apply(std::forward<Fn>(fn), std::forward<F>(f));
+		}
+
 		using _dtl::curried_binf<fMap>::operator();
+
+	private:
+		template<typename F>
+		struct mapM {
+			template<typename Fn>
+			static void apply(Fn fn, const F& f) {
+				functor<F>::map(
+					[fn](const concept_parameter<F>& t) -> int {
+						fn(t);
+						return 0;
+					},
+					f
+				);
+			}
+
+			template<typename Fn>
+			static void apply(Fn fn, F&& f) {
+				functor<F>::map(
+					[fn](concept_parameter<F>&& t) -> int {
+						fn(std::move(t));
+						return 0;
+					},
+					std::move(f)
+				);
+			}
+		};
 	};
 
 	/**
