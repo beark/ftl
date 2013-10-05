@@ -155,7 +155,7 @@ test_set fwdlist_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator*;
 
-				std::forward_list<ftl::function<int,int>> lf{
+				std::forward_list<ftl::function<int(int)>> lf{
 					[](int x){ return x-1; },
 					[](int x){ return x+1; }
 				};

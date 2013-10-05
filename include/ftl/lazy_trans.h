@@ -148,7 +148,7 @@ namespace ftl {
 		 * computation that will result in `t`.
 		 */
 		static lT<T> pure(T t) {
-			function<T> f = [t](){ return t; };
+			function<T()> f = [t](){ return t; };
 			return lT<T>{monad<M_<lazy<T>>>::pure(lazy<T>(f))};
 		}
 

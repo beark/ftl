@@ -62,7 +62,7 @@ namespace ftl {
 			explicit inner_ap(std::future<A>&& f) noexcept
 			: _f(std::move(f)) {}
 
-			std::future<B> operator() (function<B,A> fn) {
+			std::future<B> operator() (function<B(A)> fn) {
 				return std::move(_f) >>= [fn](A&& a) {
 					return monad<std::future<B>>::pure(fn(std::forward<A>(a)));
 				};

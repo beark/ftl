@@ -175,6 +175,25 @@ test_set maybe_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("functor::map[->void,&]"),
+			std::function<bool()>([]() -> bool {
+				int x;
+				auto m = ftl::value(10);
+				ftl::fmap([&x](int y){ x = y-1; }, m);
+
+				return x == 9;
+			})
+		),
+		std::make_tuple(
+			std::string("functor::map[->void,&&]"),
+			std::function<bool()>([]() -> bool {
+				int x;
+				ftl::fmap([&x](int y){ x = y-1; }, ftl::value(10));
+
+				return x == 9;
+			})
+		),
+		std::make_tuple(
 			std::string("applicative::pure"),
 			std::function<bool()>([]() -> bool {
 				auto m = ftl::applicative<ftl::maybe<float>>::pure(12.f);

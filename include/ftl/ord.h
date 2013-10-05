@@ -176,7 +176,7 @@ namespace ftl {
 	 * \ingroup ord
 	 */
 	template<typename T>
-	function<ord,const T&,const T&> getComparator() {
+	function<ord(const T&,const T&)> getComparator() {
 		return [] ( const T& a, const T& b) { return compare(a, b); };
 	}
 
@@ -231,7 +231,7 @@ namespace ftl {
 			typename A,
 			typename R,
 			typename = typename std::enable_if<Orderable<R>()>::type>
-	function<ord,const A&,const A&> comparing(R (A::*method)() const) {
+	function<ord(const A&,const A&)> comparing(R (A::*method)() const) {
 		return [=] (const A& a, const A& b) {
 			return compare((a.*method)(), (b.*method)());
 		};
@@ -264,7 +264,7 @@ namespace ftl {
 			typename A,
 			typename B,
 			typename = typename std::enable_if<Orderable<B>()>::type>
-	function<ord,const A&,const A&> comparing(function<B,A> f) {
+	function<ord(const A&,const A&)> comparing(function<B(A)> f) {
 		return [=] (const A& a, const A& b) {
 			return compare(f(a), f(b));
 		};
@@ -281,8 +281,8 @@ namespace ftl {
 	 * \ingroup ord
 	 */
 	template<typename A>
-	function<bool,const A&,const A&> asc(
-			function<ord,const A&,const A&> cmp) {
+	function<bool(const A&,const A&)> asc(
+			function<ord(const A&,const A&)> cmp) {
 		return [=] (const A& a, const A& b) {
 			return cmp(a, b) == ord::Lt;
 		};
@@ -299,8 +299,8 @@ namespace ftl {
 	 * \ingroup ord
 	 */
 	template<typename A>
-	function<bool,const A&,const A&> desc(
-			function<ord,const A&,const A&> cmp) {
+	function<bool(const A&,const A&)> desc(
+			function<ord(const A&,const A&)> cmp) {
 		return [=] (const A& a, const A& b) {
 			return cmp(a, b) == ord::Gt;
 		};
@@ -317,8 +317,8 @@ namespace ftl {
 	 * \ingroup ord
 	 */
 	template<typename A>
-	function<bool,const A&,const A&> equal(
-			function<ord,const A&,const A&> cmp) {
+	function<bool(const A&,const A&)> equal(
+			function<ord(const A&,const A&)> cmp) {
 		return [=] (A a, A b) {
 			return cmp(a, b) == ord::Eq;
 		};

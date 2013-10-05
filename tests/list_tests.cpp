@@ -156,7 +156,7 @@ test_set list_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator*;
 
-				std::list<ftl::function<int,int>> lf{
+				std::list<ftl::function<int(int)>> lf{
 					[](int x){ return x-1; },
 					[](int x){ return x+1; }
 				};
@@ -211,8 +211,14 @@ test_set list_tests{
 				std::list<int> l{1,2,3};
 				auto f = [](int x, int y){ return x+y; };
 
+				auto curried1_foldl = foldl(f);
+				auto curried2_foldl = foldl(f, 0);
 
-				return foldl(f, 0, l) == 6;
+				auto test1 = curried1_foldl(0)(l);
+				auto test2 = curried1_foldl(0,l);
+				auto test3 = curried2_foldl(l);
+
+				return test1 == test2 && test2 == test3 && test3 == 6;
 			})
 		),
 		std::make_tuple(

@@ -34,7 +34,7 @@ test_set eithert_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 				using ftl::function;
-				using ef = ftl::eitherT<std::string,function<int,int>>;
+				using ef = ftl::eitherT<std::string,function<int(int)>>;
 
 				auto f = ftl::applicative<ef>::pure(1);
 				auto g = [](int x){ return float(x)/4.f; } % f;
@@ -47,7 +47,7 @@ test_set eithert_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 				using ftl::function;
-				using ef = ftl::eitherT<std::string,function<int,int>>;
+				using ef = ftl::eitherT<std::string,function<int(int)>>;
 
 				ef f{
 					ftl::inplace_tag(),
@@ -63,7 +63,7 @@ test_set eithert_tests{
 			std::string("applicative::pure"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using ef = ftl::eitherT<float,function<int,int>>;
+				using ef = ftl::eitherT<float,function<int(int)>>;
 
 				auto f = ftl::applicative<ef>::pure(10);
 
@@ -73,10 +73,10 @@ test_set eithert_tests{
 		std::make_tuple(
 			std::string("applicative::apply[R,R]"),
 			std::function<bool()>([]() -> bool {
-				using ef = ftl::eitherT<float,ftl::function<int,int>>;
+				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
-				ftl::function<int,int,int> f = [](int x, int y){ return x+y; };
+				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
 				ef x{inplace_tag(), [](int x){ return make_right<float>(2*x); }};
 				ef y{inplace_tag(), [](int x){ return make_right<float>(x/2); }};
 
@@ -88,10 +88,10 @@ test_set eithert_tests{
 		std::make_tuple(
 			std::string("applicative::apply[L,R]"),
 			std::function<bool()>([]() -> bool {
-				using ef = ftl::eitherT<float,ftl::function<int,int>>;
+				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
-				ftl::function<int,int,int> f = [](int x, int y){ return x+y; };
+				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
 				ef x{ inplace_tag(), [](int){ return make_left<int>(0.f); }};
 				ef y{inplace_tag(), [](int x){ return make_right<float>(x/2); }};
 
@@ -103,10 +103,10 @@ test_set eithert_tests{
 		std::make_tuple(
 			std::string("applicative::apply[R,L]"),
 			std::function<bool()>([]() -> bool {
-				using ef = ftl::eitherT<float,ftl::function<int,int>>;
+				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
-				ftl::function<int,int,int> f = [](int x, int y){ return x+y; };
+				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
 				ef x{ inplace_tag(), [](int x){ return make_right<float>(2*x); }};
 				ef y{inplace_tag(), [](int){ return make_left<int>(0.f); }};
 
@@ -118,10 +118,10 @@ test_set eithert_tests{
 		std::make_tuple(
 			std::string("applicative::apply[L,L]"),
 			std::function<bool()>([]() -> bool {
-				using ef = ftl::eitherT<float,ftl::function<int,int>>;
+				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
-				ftl::function<int,int,int> f = [](int x, int y){ return x+y; };
+				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
 				ef x{ inplace_tag(), [](int){ return make_left<int>(0.f); }};
 				ef y{inplace_tag(), [](int){ return make_left<int>(0.f); }};
 
@@ -133,12 +133,12 @@ test_set eithert_tests{
 		std::make_tuple(
 			std::string("monad::bind[R,->R]"),
 			std::function<bool()>([]() -> bool {
-				using ef = ftl::eitherT<float,ftl::function<int,int>>;
+				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
 				ef f{inplace_tag(), [](int x){ return make_right<float>(x); }};
 				auto g = f >>= [](int x){
-					return eitherT<float,function<float,int>>{
+					return eitherT<float,function<float(int)>>{
 						inplace_tag(),
 						[x](int y){ return make_right<float>(float(x+y)/4.f); }
 					};
@@ -149,12 +149,12 @@ test_set eithert_tests{
 		std::make_tuple(
 			std::string("monad::bind[L,->R]"),
 			std::function<bool()>([]() -> bool {
-				using ef = ftl::eitherT<float,ftl::function<int,int>>;
+				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
 				ef f{inplace_tag(), [](int){ return make_left<int>(0.f); }};
 				auto g = f >>= [](int x){
-					return eitherT<float,function<float,int>>{
+					return eitherT<float,function<float(int)>>{
 						inplace_tag(),
 						[x](int y){ return make_right<float>(float(x+y)/4.f); }
 					};
@@ -165,12 +165,12 @@ test_set eithert_tests{
 		std::make_tuple(
 			std::string("monad::bind[R,->L]"),
 			std::function<bool()>([]() -> bool {
-				using ef = ftl::eitherT<float,ftl::function<int,int>>;
+				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
 				ef f{inplace_tag(), [](int x){ return make_right<float>(x); }};
 				auto g = f >>= [](int x){
-					return eitherT<float,function<float,int>>{
+					return eitherT<float,function<float(int)>>{
 						inplace_tag(),
 						[x](int){ return make_left<float>(0.f); }
 					};
@@ -181,12 +181,12 @@ test_set eithert_tests{
 		std::make_tuple(
 			std::string("monad::bind[lift]"),
 			std::function<bool()>([]() -> bool {
-				using ef = ftl::eitherT<float,ftl::function<int,int>>;
+				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
 				ef f{inplace_tag(), [](int x){ return make_right<float>(x); }};
 				auto g = f >>= [](int x){
-					return function<float,int>{
+					return function<float(int)>{
 						[x](int y){ return float(x+y)/4.f; }
 					};
 				};
@@ -196,12 +196,12 @@ test_set eithert_tests{
 		std::make_tuple(
 			std::string("monad::bind[L,->L]"),
 			std::function<bool()>([]() -> bool {
-				using ef = ftl::eitherT<float,ftl::function<int,int>>;
+				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
 				ef f{inplace_tag(), [](int){ return make_left<int>(0.f); }};
 				auto g = f >>= [](int x){
-					return eitherT<float,function<float,int>>{
+					return eitherT<float,function<float(int)>>{
 						inplace_tag(),
 						[x](int){ return make_left<float>(0.f); }
 					};

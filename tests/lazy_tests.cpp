@@ -124,7 +124,7 @@ test_set lazy_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				function<int,int,int> fn = [](int x, int y){ return x+y; };
+				function<int(int,int)> fn = [](int x, int y){ return x+y; };
 
 				auto l = fn
 					% applicative<lazy<int>>::pure(1)

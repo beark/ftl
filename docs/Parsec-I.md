@@ -23,7 +23,7 @@ using parser = /* some strange type */
 ```
 What's that? Parsers are just an alias of some weird type, with essentially no public interface that we can find? Something must surely be wrong? Well, let's give it a chance to prove itself at least...
 
-So, what else does this interface tell us? First, apparently parsers are monads. This actually tells us quite a bit: we now know we can use all of the [functor](Functor.md), [applicative functor](Applicative.md), and [monad](Monad.md) interfaces to interact with parsers. Second, we know parsers are also instances of monoidal alternatives, which gives us one more way of combining parsers, as well as the ability to create parsers that automatically fail. Ok, this is all good and stuff, but how do we use a parser?
+So, what else does this interface tell us? First, apparently parsers are monads. This actually tells us quite a bit: we now know we can use all of the functor, applicative functor, and monad interfaces to interact with parsers. Second, we know parsers are also instances of monoidal alternatives, which gives us one more way of combining parsers, as well as the ability to create parsers that automatically fail. Ok, this is all good and stuff, but how do we use a parser?
 
 ```cpp
     /**
@@ -119,7 +119,7 @@ parser<std::vector<int>> parseList() {
     return cons % parseNatural() * (whitespace() >> parseList());
 }
 ```
-A few new things here that require explanation. `operator*` is from [applicative functors](Applicative.md), which we know parsers to be. What it does is to "unwrap" the function on its left hand side (`cons % parseInt()`), "unwrap" the contextual value on its right hand side (`whitespace() >> lazy(parseList)`), apply the function to the value, and finally re-wrap the result. But how is `cons % parseInt()` a function? Didn't we just recently see that `operator%`/`map` already applies a function to a context wrapped value? The only conclusion is that applying `cons` to an int must result in _another_ function. `cons` is _curried_!
+A few new things here that require explanation. `operator*` is from applicative functors, which we know parsers to be. What it does is to "unwrap" the function on its left hand side (`cons % parseInt()`), "unwrap" the contextual value on its right hand side (`whitespace() >> lazy(parseList)`), apply the function to the value, and finally re-wrap the result. But how is `cons % parseInt()` a function? Didn't we just recently see that `operator%`/`map` already applies a function to a context wrapped value? The only conclusion is that applying `cons` to an int must result in _another_ function. `cons` is _curried_!
 
 Unfortunately, C++ does not give us automatically curried functions like in Haskell, so `cons` is not actually likely to be of the form we require, assuming we implement it as a normal function when we get to that. Fortunately, FTL provides us an easy means to curry functions: `curry`. Right, this gives us:
 ```cpp

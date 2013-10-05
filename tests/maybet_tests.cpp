@@ -34,7 +34,7 @@ test_set maybet_tests{
 				using ftl::operator%;
 				using ftl::function;
 				using ftl::value;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 
 				auto f = ftl::applicative<mf>::pure(1);
 				auto g = [](int x){ return float(x)/4.f; } % f;
@@ -48,7 +48,7 @@ test_set maybet_tests{
 				using ftl::operator%;
 				using ftl::function;
 				using ftl::value;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 
 				mf f{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
 				auto g = [](int x){ return float(x)/4.f; } % f;
@@ -60,7 +60,7 @@ test_set maybet_tests{
 			std::string("applicative::pure"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 
 				auto f = ftl::applicative<mf>::pure(10);
 
@@ -71,11 +71,11 @@ test_set maybet_tests{
 			std::string("applicative::apply[value,value]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator%;
 				using ftl::operator*;
 
-				ftl::function<int,int,int> f = [](int x, int y){ return x+y; };
+				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
 				mf x{ftl::inplace_tag(), [](int x){ return ftl::value(2*x); }};
 				mf y{ftl::inplace_tag(), [](int x){ return ftl::value(x/2); }};
 
@@ -88,11 +88,11 @@ test_set maybet_tests{
 			std::string("applicative::apply[nothing,value]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator%;
 				using ftl::operator*;
 
-				ftl::function<int,int,int> f = [](int x, int y){ return x+y; };
+				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
 				mf x{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
 				mf y{ftl::inplace_tag(), [](int x){ return ftl::value(x/2); }};
 
@@ -105,11 +105,11 @@ test_set maybet_tests{
 			std::string("applicative::apply[value,nothing]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator%;
 				using ftl::operator*;
 
-				ftl::function<int,int,int> f = [](int x, int y){ return x+y; };
+				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
 				mf x{ftl::inplace_tag(), [](int x){ return ftl::value(2*x); }};
 				mf y{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
 
@@ -122,11 +122,11 @@ test_set maybet_tests{
 			std::string("applicative::apply[nothing,nothing]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator%;
 				using ftl::operator*;
 
-				ftl::function<int,int,int> f = [](int x, int y){ return x+y; };
+				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
 				mf x{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
 				mf y{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
 
@@ -139,12 +139,12 @@ test_set maybet_tests{
 			std::string("monad::bind[value,->value]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
 				mf f{ftl::inplace_tag(), [](int x){ return ftl::value(x); }};
 				auto g = f >>= [](int x){
-					return ftl::maybeT<function<float,int>>{
+					return ftl::maybeT<function<float(int)>>{
 						ftl::inplace_tag(),
 						[x](int y){ return ftl::value(float(x+y)/4.f); }
 					};
@@ -156,12 +156,12 @@ test_set maybet_tests{
 			std::string("monad::bind[nothing,->value]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
 				mf f{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
 				auto g = f >>= [](int x){
-					return ftl::maybeT<function<float,int>>{
+					return ftl::maybeT<function<float(int)>>{
 						ftl::inplace_tag(),
 						[x](int y){ return ftl::value(float(x+y)/4.f); }
 					};
@@ -173,12 +173,12 @@ test_set maybet_tests{
 			std::string("monad::bind[value,->nothing]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
 				mf f{ftl::inplace_tag(), [](int x){ return ftl::value(x); }};
 				auto g = f >>= [](int){
-					return ftl::maybeT<function<float,int>>{
+					return ftl::maybeT<function<float(int)>>{
 						ftl::inplace_tag(),
 						[](int){ return ftl::maybe<float>{}; }
 					};
@@ -190,12 +190,12 @@ test_set maybet_tests{
 			std::string("monad::bind[nothing,->nothing]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
 				mf f{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
 				auto g = f >>= [](int){
-					return ftl::maybeT<function<float,int>>{
+					return ftl::maybeT<function<float(int)>>{
 						ftl::inplace_tag(),
 						[](int){ return ftl::maybe<float>{}; }
 					};
@@ -207,12 +207,12 @@ test_set maybet_tests{
 			std::string("monad::bind[lift]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::function;
-				using mf = ftl::maybeT<function<int,int>>;
+				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
 				mf f{ftl::inplace_tag(), [](int x){ return ftl::value(x); }};
 				auto g = f >>= [](int x){
-					return function<float,int>{
+					return function<float(int)>{
 						[x](int y){ return float(x+y)/4.f; }
 					};
 				};

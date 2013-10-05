@@ -71,7 +71,7 @@ test_set ord_tests{
 			std::string("comparing[fn]"),
 			std::function<bool()>([]() -> bool {
 				using std::string;
-				ftl::function<int,const string&> f{
+				ftl::function<int(const string&)> f{
 					[](const string& s){ return std::stoi(s); }
 				};
 

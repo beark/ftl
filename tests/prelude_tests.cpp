@@ -91,7 +91,7 @@ test_set prelude_tests{
 		std::make_tuple(
 			std::string("flip[function<R,A,B>]"),
 			std::function<bool()>([]() -> bool {
-				ftl::function<int,int,int> f = [](int x, int y){ return x/y; };
+				ftl::function<int(int,int)> f = [](int x, int y){ return x/y; };
 				auto g = ftl::flip(f);
 
 				return g(2,4) == 2;

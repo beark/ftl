@@ -58,7 +58,7 @@ test_set concept_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto mf = value(function<int,int>([](int x){
+				auto mf = value(function<int(int)>([](int x){
 						return x+1;
 				}));
 

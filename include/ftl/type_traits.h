@@ -384,7 +384,7 @@ namespace ftl {
 			>::value;
 	};
 
-	template<typename,typename...Ts>
+	template<typename>
 	class function;
 
 	/**
@@ -416,7 +416,7 @@ namespace ftl {
 	};
 
 	template<typename R, typename...Args>
-	struct is_monomorphic<ftl::function<R,Args...>> {
+	struct is_monomorphic<ftl::function<R(Args...)>> {
 		static constexpr bool value = true;
 	};
 

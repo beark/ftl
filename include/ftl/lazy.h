@@ -109,8 +109,8 @@ namespace ftl {
 		 * that would normally force evaluation will simply use the now computed
 		 * value.
 		 */
-		explicit lazy(const function<T>& f)
-		: val(new either<function<T>,T>(make_left<T>(f)))
+		explicit lazy(const function<T()>& f)
+		: val(new either<function<T()>,T>(make_left<T>(f)))
 		{}
 
 		/**
@@ -157,10 +157,10 @@ namespace ftl {
 			if(*val)
 				return;
 
-			*val = make_right<function<T>>(val->left()());
+			*val = make_right<function<T()>>(val->left()());
 		}
 
-		mutable std::shared_ptr<either<function<T>,T>> val;
+		mutable std::shared_ptr<either<function<T()>,T>> val;
 	};
 
 	/**
@@ -297,7 +297,7 @@ namespace ftl {
 		 */
 		template<typename F, typename U = result_of<F(T)>>
 		static lazy<U> map(F f, lazy<T> l) {
-			return lazy<U>{function<U>{[f,l]() { return f(*l); }}};
+			return lazy<U>{function<U()>{[f,l]() { return f(*l); }}};
 		}
 
 		/**

@@ -53,7 +53,7 @@ test_set future_tests{
 				using ftl::operator%;
 				using ftl::operator*;
 
-				ftl::function<int,int,int> fn = [](int x, int y){ return x+y; };
+				ftl::function<int(int,int)> fn = [](int x, int y){ return x+y; };
 
 				auto f = fn
 					% std::async(std::launch::async, [](){ return 1; })

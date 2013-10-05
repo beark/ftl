@@ -31,10 +31,10 @@ test_set functional_tests{
 			std::string("function allows curried calling"),
 			std::function<bool()>([]() -> bool {
 
-				ftl::function<int,int,int> f =
+				ftl::function<int(int,int)> f =
 					[](int x, int y){ return x + y; };
 
-				ftl::function<int,int,int,int> g =
+				ftl::function<int(int,int,int)> g =
 					[](int x, int y, int z){ return x + y + z; };
 
 				return f(1)(2) == 3 && g(1)(2,3) == 6;
@@ -45,8 +45,8 @@ test_set functional_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 
-				ftl::function<int,int> unary = [](int x){ return 2*x; };
-				ftl::function<int,int,int> binary = [](int x, int y){ return x + y; };
+				ftl::function<int(int)> unary = [](int x){ return 2*x; };
+				ftl::function<int(int,int)> binary = [](int x, int y){ return x + y; };
 
 				auto f = [](int x){ return float(x)/3.f; };
 
@@ -59,7 +59,7 @@ test_set functional_tests{
 			std::string("applicative<function>::pure"),
 			std::function<bool()>([]() -> bool {
 
-				auto f = ftl::applicative<ftl::function<int,int>>::pure(10);
+				auto f = ftl::applicative<ftl::function<int(int)>>::pure(10);
 
 				return f(-1) == 10 && f(1) == 10 && f(100) == 10;
 			})
@@ -71,8 +71,8 @@ test_set functional_tests{
 				using ftl::applicative;
 				using ftl::operator*;
 
-				function<int,int> f = [](int x){ return 2*x; };
-				auto f_ = applicative<function<function<int,int>,int>>::pure(f);
+				function<int(int)> f = [](int x){ return 2*x; };
+				auto f_ = applicative<function<function<int(int)>(int)>>::pure(f);
 
 				auto g = f_ * f;
 
@@ -85,9 +85,9 @@ test_set functional_tests{
 				using ftl::function;
 				using ftl::operator>>=;
 
-				function<int,int> f = [](int x){ return 2*x; };
+				function<int(int)> f = [](int x){ return 2*x; };
 				auto g = [](int x){
-					return function<float,int>{
+					return function<float(int)>{
 						[x](int y){ return float(x+y)*1.5f; }
 					};
 				};

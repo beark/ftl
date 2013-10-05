@@ -70,7 +70,7 @@ auto yield(T&& t) -> decltype(ftl::make_right<error>(std::forward<T>(t))) {
  * \li MonoidAlternative
  */
 template<typename T>
-using parser = ftl::eitherT<error,ftl::function<T,std::istream&>>;
+using parser = ftl::eitherT<error,ftl::function<T(std::istream&)>>;
 
 /**
  * Function for running parsers.
@@ -136,7 +136,7 @@ parser<std::string> many1(parser<char> p);
  * This is useful e.g. if you want a parser to recurse.
  */
 template<typename T>
-parser<T> lazy(ftl::function<parser<T>> f) {
+parser<T> lazy(ftl::function<parser<T>()> f) {
 	return parser<T>([f](std::istream& is) {
 		return (*f())(is);
 	});

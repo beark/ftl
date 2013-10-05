@@ -55,9 +55,9 @@ test_set lazyt_tests{
 			std::string("applicative::apply"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
-				using lazyF = lazyT<function<int,int>>;
+				using lazyF = lazyT<function<int(int)>>;
 
-				ftl::function<int,int,int> f = [](int x, int y){ return x+y; };
+				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
 				lazyF x{
 					inplace_tag(),
 					[](int x){ return monad<lazy<int>>::pure(2*x); }

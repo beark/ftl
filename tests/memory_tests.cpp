@@ -78,7 +78,7 @@ test_set memory_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto f = function<int,int,int>(
+				auto f = function<int(int,int)>(
 					[](int x, int y){ return x-y; }
 				);
 
@@ -95,7 +95,7 @@ test_set memory_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto f = function<int,int,int>(
+				auto f = function<int(int,int)>(
 					[](int x, int y){ return x-y; }
 				);
 
@@ -112,7 +112,7 @@ test_set memory_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto f = function<int,int,int>(
+				auto f = function<int(int,int)>(
 					[](int x, int y){ return x-y; }
 				);
 
@@ -129,7 +129,7 @@ test_set memory_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto f = function<int,int,int>(
+				auto f = function<int(int,int)>(
 					[](int x, int y){ return x-y; }
 				);
 

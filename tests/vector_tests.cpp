@@ -156,7 +156,7 @@ test_set vector_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator*;
 
-				std::vector<ftl::function<int,int>> vf{
+				std::vector<ftl::function<int(int)>> vf{
 					[](int x){ return x-1; },
 					[](int x){ return x+1; }
 				};

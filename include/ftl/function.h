@@ -42,7 +42,7 @@
 
 namespace ftl {
 
-	template<typename,typename...> class function;
+	template<typename> class function;
 
 	template<typename>
 	struct force_function_heap_allocation : std::false_type {};
@@ -124,7 +124,7 @@ namespace ftl {
 		};
 
 		template<typename R, typename...Ps>
-		struct is_valid_function_argument<function<R, Ps...>, R (Ps...)> {
+		struct is_valid_function_argument<function<R(Ps...)>, R (Ps...)> {
 			static constexpr bool value = false;
 		};
 
@@ -340,7 +340,7 @@ namespace ftl {
 
 		template<typename R, typename P>
 		struct curried<R,P> {
-			function<R> operator()(P) const {
+			function<R()> operator()(P) const {
 				throw(std::logic_error("Curried calling of parameterless function"));
 			}
 		};
@@ -348,8 +348,8 @@ namespace ftl {
 		template<typename R, typename P1, typename P2, typename...Ps>
 		struct curried<R,P1,P2,Ps...> {
 
-			function<R,P2,Ps...> operator() (P1 p1) const {
-				auto self = *reinterpret_cast<const function<R,P1,P2,Ps...>*>(this);
+			function<R(P2,Ps...)> operator() (P1 p1) const {
+				auto self = *reinterpret_cast<const function<R(P1,P2,Ps...)>*>(this);
 				return [self,p1] (P2 p2, Ps...ps) {
 					return self.operator()(p1, std::forward<P2>(p2), std::forward<Ps>(ps)...);
 				};
@@ -395,8 +395,11 @@ namespace ftl {
 	 *
 	 * \ingroup functional
 	 */
+	template<typename F>
+	class function {};
+
 	template<typename R, typename...Ps>
-	class function : _dtl::curried<R,Ps...> {
+	class function<R(Ps...)> : _dtl::curried<R,Ps...> {
 	public:
 		/**
 		 * Type sequence representation of the function's parameter list.
@@ -623,6 +626,16 @@ namespace ftl {
 
 			call = &_dtl::empty_call<R, Ps...>;
 		}
+	};
+
+	template<typename R, typename S, typename...Ps>
+	struct re_parametrise<function<R(Ps...)>,S> {
+		using type = function<S(Ps...)>;
+	};
+
+	template<typename R, typename...Ps>
+	struct parametric_type_traits<function<R(Ps...)>> {
+		using parameter_type = R;
 	};
 
 }

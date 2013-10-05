@@ -75,13 +75,13 @@ namespace ftl {
 	 * \ingroup functional
 	 */
 	template<typename R, typename P, typename...Ps>
-	struct monad<function<R,P,Ps...>>
-	: deriving_join<in_terms_of_bind<function<R,P,Ps...>>>
-	, deriving_apply<function<R,P,Ps...>> {
+	struct monad<function<R(P,Ps...)>>
+	: deriving_join<in_terms_of_bind<function<R(P,Ps...)>>>
+	, deriving_apply<function<R(P,Ps...)>> {
 
 		// TODO: C++14 - Create version that lambda captures a by move
 		/// Creates a function that returns `a`, regardless of its parameters.
-		static function<R,P,Ps...> pure(R a) {
+		static function<R(P,Ps...)> pure(R a) {
 			return [a](P,Ps...) { return a; };
 		}
 
@@ -92,7 +92,7 @@ namespace ftl {
 				typename F,
 				typename S = typename std::result_of<F(R)>::type
 		>
-		static function<S,P,Ps...> map(F f, function<R,P,Ps...> fn) {
+		static function<S(P,Ps...)> map(F f, function<R(P,Ps...)> fn) {
 			return [f,fn] (P&& p, Ps&&...ps) {
 				return f(fn(std::forward<P>(p), std::forward<Ps>(ps)...));
 			};
@@ -129,7 +129,7 @@ namespace ftl {
 				typename Fs = typename std::result_of<Fn(R)>::type,
 				typename S = typename std::result_of<Fs(P,Ps...)>::type
 		>
-		static function<S,P,Ps...> bind(function<R,P,Ps...> f, Fn fn) {
+		static function<S(P,Ps...)> bind(function<R(P,Ps...)> f, Fn fn) {
 			return [=](P p, Ps...ps) {
 				return fn(f(p, ps...))(p, ps...);
 			};
@@ -198,7 +198,7 @@ namespace ftl {
 	 * \ingroup functional
 	 */
 	template<typename M, typename...Ps>
-	struct monoid<function<M,Ps...>> {
+	struct monoid<function<M(Ps...)>> {
 
 		/**
 		 * Function returning monoid<M>::id().
@@ -206,7 +206,7 @@ namespace ftl {
 		static auto id()
 		-> typename std::enable_if<
 				monoid<M>::instance,
-				function<M,Ps...>>::type {
+				function<M(Ps...)>>::type {
 			return [](Ps...) { return monoid<M>::id(); };
 		}
 
@@ -223,11 +223,11 @@ namespace ftl {
 		 *          `f2` has side effects.
 		 */
 		static auto append(
-				const function<M,Ps...>& f1,
-				const function<M,Ps...>& f2)
+				const function<M(Ps...)>& f1,
+				const function<M(Ps...)>& f2)
 		-> typename std::enable_if<
 				monoid<M>::instance,
-				function<M,Ps...>>::type {
+				function<M(Ps...)>>::type {
 			return [=] (Ps...ps) {
 				return monoid<M>::append(f1(ps...), f2(ps...));
 			};

@@ -1,7 +1,7 @@
 Parser Combinator Part II: Parser Generator Library
 ===================================================
 
-After [part I](Prasec-I.md), it is time to have a look at how to make a library that implements and exposes the various functional concepts introduced in FTL. In this case, that means creating the library we previously used.
+After [part I](Parsec-I.md), it is time to have a look at how to make a library that implements and exposes the various functional concepts introduced in FTL. In this case, that means creating the library we previously used.
 
 First thing's first: unlike the first tutorial, this one will move a bit faster and will not always explain the rationale behind every decision and step. The idea is not to teach you how to code&mdash;not even in a functional style&mdash;but how to use the FTL, after all. However, the steps described herein roughly correspond to the author's process of designing the library in the first place.
 
@@ -15,12 +15,12 @@ Now that that's out of the way, let's get started.
 The primary data type of the library deserves to go first, don't you think? To arrive at a first draft, we ask ourselves, "What is a parser?" One answer would be, "Something that can be run on an input stream, the result of which is either a parse error or a representation of whatever it was we wanted to parse." Turning that into code is quite easy:
 ```cpp
 template<typename T>
-using parser = ftl::function<ftl::either<error,T>,std::istream&>;
+using parser = ftl::function<ftl::either<error,T>(std::istream&)>;
 ```
 While very straight forward, we can be a lot more clever than that. To save ourselves a lot of trouble implementing all sorts of functions or concepts or whatnot for combining parsers (remember, it's a parser _combinator_ library), we could just use a transformer.
 ```cpp
     template<typename T>
-    using parser = ftl::eitherT<error,ftl::function<T,std::istream&>>;
+    using parser = ftl::eitherT<error,ftl::function<T(std::istream&)>>;
 ```
 And that's it. Done. Two lines of code and we have a fully functional monad instance and monoidal alternative instance, just like that. Well, technically, the first type alias was already a monad (though not a monoidal alternative), but it wouldn't have worked the way users of our library expects. For one, when creating a new parser that depends on the result of one sequenced before it, it would have to accept an `either<error,T>` as parameter instead of just `T` and would have had to explicitly handle the case where the either was an error. This conflicts with the point of a library: to save work for users.
 

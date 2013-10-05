@@ -253,8 +253,8 @@ namespace ftl {
 	 * \ingroup prelude
 	 */
 	template<typename R, typename P1, typename P2, typename...Ps>
-	function<R,P1,P2,Ps...> curry(R (*f) (P1, P2, Ps...)) {
-		return function<R,P1,P2,Ps...>(f);
+	function<R(P1,P2,Ps...)> curry(R (*f) (P1, P2, Ps...)) {
+		return function<R(P1,P2,Ps...)>(f);
 	}
 
 	/**
@@ -263,8 +263,8 @@ namespace ftl {
 	 * \ingroup prelude
 	 */
 	template<typename R, typename P1, typename P2, typename...Ps>
-	function<R,P1,P2,Ps...> curry(const std::function<R(P1,P2,Ps...)>& f) {
-		return function<R,P1,P2,Ps...>(f);
+	function<R(P1,P2,Ps...)> curry(const std::function<R(P1,P2,Ps...)>& f) {
+		return function<R(P1,P2,Ps...)>(f);
 	}
 
 	/**
@@ -309,7 +309,7 @@ namespace ftl {
 	 * \ingroup prelude
 	 */
 	template<typename R, typename T1, typename T2>
-	function<R,T1,T2> uncurry(function<function<R,T2>,T1> f) {
+	function<R(T1,T2)> uncurry(function<function<R(T2)>(T1)> f) {
 		return [f] (T1 t1, T2 t2) {
 			return f(std::forward<T1>(t1))(std::forward<T2>(t2));
 		};
@@ -327,7 +327,7 @@ namespace ftl {
 		typename A,
 		typename B = typename std::result_of<F(A)>::type,
 		typename...Ps>
-	function<B,Ps...> compose(F f, A (*fn)(Ps...)) {
+	function<B(Ps...)> compose(F f, A (*fn)(Ps...)) {
 		return [f,fn](Ps...ps) {
 			return f(fn(std::forward<Ps>(ps)...));
 		};
@@ -345,7 +345,7 @@ namespace ftl {
 		typename A,
 		typename B = typename std::result_of<F(A)>::type,
 		typename...Ps>
-	function<B,Ps...> compose(F f, function<A,Ps...> fn) {
+	function<B(Ps...)> compose(F f, function<A(Ps...)> fn) {
 		return [f,fn](Ps...ps) {
 			return f(fn(std::forward<Ps>(ps)...));
 		};
@@ -374,7 +374,7 @@ namespace ftl {
 	 * \ingroup prelude
 	 */
 	template<typename A, typename B, typename R>
-	function<R,B,A> flip(function<R,A,B> f) {
+	function<R(B,A)> flip(function<R(A,B)> f) {
 		return [f](B b, A a) {
 			return f(std::forward<A>(a), std::forward<B>(b));
 		};
@@ -386,7 +386,7 @@ namespace ftl {
 	 * \ingroup prelude
 	 */
 	template<typename A, typename B, typename R>
-	function<R,B,A> flip(R (&f) (A,B)) {
+	function<R(B,A)> flip(R (&f) (A,B)) {
 		return [&f](B b, A a) {
 			return f(std::forward<A>(a), std::forward<B>(b));
 		};
@@ -398,7 +398,7 @@ namespace ftl {
 	 * \ingroup prelude
 	 */
 	template<typename R, typename A, typename B>
-	function<function<R,A>,B> flip(function<function<R,B>,A> f) {
+	function<function<R(A)>(B)> flip(function<function<R(B)>(A)> f) {
 		return [f](B b) {
 			return [f,b](A a) {
 				return f(std::forward<A>(a))(b);
