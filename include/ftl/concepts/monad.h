@@ -501,10 +501,14 @@ namespace ftl {
 
 	};
 
+	template<typename M>
+	struct deriving_apply {};
+
 	/**
 	 * Inheritable implementation of `monad::apply`.
 	 *
-	 * Inheritable `apply` implementation given in terms of `bind` and `pure`. 
+	 * The derived implementation will be in terms of `bind` and `pure`. Hence,
+	 * these must be implemented by some means.
 	 *
 	 * Both const reference and r-value reference versions are generated.
 	 *
@@ -513,20 +517,16 @@ namespace ftl {
 	 * Example:
 	 * \code
 	 *   template<typename T>
-	 *   struct monad<my_type<T>> : deriving_apply<my_type<T>> {
+	 *   struct monad<my_type<T>>
+	 *   : deriving_apply<in_terms_of_bind<my_type<T>>> {
 	 *       // Implementation of pure and bind
 	 *   };
 	 * \endcode
 	 *
-	 * \note To be able to derive the implementation of `apply`, the inheriting
-	 *       monad instance specialisation must implement `bind` and `pure`
-	 *       "natively". All of the other monadic operations may be derived,
-	 *       however.
-	 *
 	 * \ingroup monad
 	 */
 	template<typename M>
-	struct deriving_apply {
+	struct deriving_apply<in_terms_of_bind<M>> {
 		using T = concept_parameter<M>;
 
 		template<typename U>
@@ -582,7 +582,8 @@ namespace ftl {
 	struct deriving_monad<back_insertable_container<M>>
 	: deriving_pure<M>, deriving_map<back_insertable_container<M>>
 	, deriving_bind<back_insertable_container<M>>
-	, deriving_join<in_terms_of_bind<M>>, deriving_apply<M> {
+	, deriving_join<in_terms_of_bind<M>>
+	, deriving_apply<in_terms_of_bind<M>> {
 
 		static constexpr bool instance = true;
 	};

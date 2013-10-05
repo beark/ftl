@@ -156,7 +156,7 @@ namespace ftl {
 	template<typename L, typename M>
 	struct monad<eitherT<L,M>>
 	: deriving_join<in_terms_of_bind<eitherT<L,M>>>
-	, deriving_apply<eitherT<L,M>> {
+	, deriving_apply<in_terms_of_bind<eitherT<L,M>>> {
 		using T = typename eitherT<L,M>::T;
 
 		template<typename U>

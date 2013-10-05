@@ -401,7 +401,7 @@ namespace ftl {
 	template<typename L, typename T>
 	struct monad<either<L,T>>
 	: deriving_join<in_terms_of_bind<either<L,T>>>
-	, deriving_apply<either<L,T>> {
+	, deriving_apply<in_terms_of_bind<either<L,T>>> {
 
 		/**
 		 * Embeds a value as a right value.

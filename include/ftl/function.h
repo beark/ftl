@@ -328,6 +328,9 @@ namespace ftl {
 			}
 		}
 
+		/* TODO: Make currying work even when we give N > 1, N < Nparams
+		 * arguments to a function of Nparams parameters.
+		 */
 		template<typename...>
 		struct curried {};
 

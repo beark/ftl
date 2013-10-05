@@ -141,7 +141,8 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct monad<maybeT<M>>
-	: deriving_join<in_terms_of_bind<maybeT<M>>>, deriving_apply<maybeT<M>> {
+	: deriving_join<in_terms_of_bind<maybeT<M>>>
+	, deriving_apply<in_terms_of_bind<maybeT<M>>> {
 		/// Shorthand for the concept parameter
 		using T = typename maybeT<M>::T;
 

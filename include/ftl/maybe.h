@@ -672,7 +672,8 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct monad<maybe<T>>
-	: deriving_pure<maybe<T>>, deriving_apply<maybe<T>>
+	: deriving_pure<maybe<T>>
+	, deriving_apply<in_terms_of_bind<maybe<T>>>
 	, deriving_join<in_terms_of_bind<maybe<T>>> {
 
 #ifdef DOCUMENTATION_GENERATOR

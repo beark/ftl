@@ -273,7 +273,8 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct monad<lazy<T>>
-   	: deriving_join<in_terms_of_bind<lazy<T>>>, deriving_apply<lazy<T>> {
+   	: deriving_join<in_terms_of_bind<lazy<T>>>
+	, deriving_apply<in_terms_of_bind<lazy<T>>> {
 		/**
 		 * Create a computation that computes `t`
 		 *
