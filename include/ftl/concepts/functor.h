@@ -212,8 +212,8 @@ namespace ftl {
 				typename Fn, typename U = result_of<Fn(T)>,
 				typename = typename std::enable_if<
 					!std::is_same<U,T>::value
-					|| !std::is_copy_assignable<T>::value
-					&& !std::is_move_assignable<T>::value
+					|| (!std::is_copy_assignable<T>::value
+					&& !std::is_move_assignable<T>::value)
 				>::type
 		>
 		static F<U> map(Fn&& fn, F<T>&& f) {
@@ -298,7 +298,7 @@ namespace ftl {
 	 */
 	struct fMap
 #ifndef DOCUMENTATION_GENERATOR
-	: _dtl::curried_binf<fMap>
+	: private _dtl::curried_binf<fMap>
 #endif
 	{
 		template<

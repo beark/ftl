@@ -196,7 +196,7 @@ namespace ftl {
 	 */
 	struct mAppend
 #ifndef DOCUMENTATION_GENERATOR
-	: _dtl::curried_binf<mAppend>
+	: private _dtl::curried_binf<mAppend>
 #endif
 	{
 		template<

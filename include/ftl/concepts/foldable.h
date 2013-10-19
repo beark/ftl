@@ -441,7 +441,7 @@ namespace ftl {
 	 */
 	struct FoldMap
 #ifndef DOCUMENTATION_GENERATOR
-	: _dtl::curried_binf<FoldMap>
+	: private _dtl::curried_binf<FoldMap>
 #endif
 	{
 		template<
@@ -483,7 +483,7 @@ namespace ftl {
 	 */
 	struct foldR
 #ifndef DOCUMENTATION_GENERATOR
-	: _dtl::curried_ternf<foldR>
+	: private _dtl::curried_ternf<foldR>
 #endif
 	{
 		template<
@@ -517,7 +517,7 @@ namespace ftl {
 	 */
 	struct foldL
 #ifndef DOCUMENTATION_GENERATOR
-	: _dtl::curried_ternf<foldL>
+	: private _dtl::curried_ternf<foldL>
 #endif
 	{
 		template<

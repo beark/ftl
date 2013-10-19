@@ -398,11 +398,11 @@ namespace ftl {
 	 *
 	 * \ingroup functional
 	 */
-	template<typename F>
+	template<typename>
 	class function {};
 
 	template<typename R, typename...Ps>
-	class function<R(Ps...)> : _dtl::curried<R,Ps...> {
+	class function<R(Ps...)> : private _dtl::curried<R,Ps...> {
 	public:
 		/**
 		 * Type sequence representation of the function's parameter list.

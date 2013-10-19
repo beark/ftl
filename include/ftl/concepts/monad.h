@@ -767,7 +767,7 @@ namespace ftl {
 	 */
 	struct mBind
 #ifndef DOCUMENTATION_GENERATOR
-	: _dtl::curried_binf<mBind>
+	: private _dtl::curried_binf<mBind>
 #endif
 	{
 		template<typename M, typename F, typename M_ = plain_type<M>>

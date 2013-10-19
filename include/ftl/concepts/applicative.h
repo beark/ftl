@@ -290,7 +290,7 @@ namespace ftl {
 	 */
 	struct aApply
 #ifndef DOCUMENTATION_GENERATOR
-	: _dtl::curried_binf<aApply>
+	: private _dtl::curried_binf<aApply>
 #endif
 	{
 		template<typename Fn, typename F, typename F_ = plain_type<F>>
