@@ -400,7 +400,6 @@ namespace ftl {
 	 * \ingroup functor
 	 */
 	constexpr fMap fmap{};
-
 }
 
 #endif

@@ -818,9 +818,13 @@ namespace ftl {
 				typename M,
 				typename = typename std::enable_if<Monad<plain_type<M>>()>::type
 		>
-		auto operator() (M&&  m) const
-		-> decltype(monad<plain_type<M>>::bind(std::forward<M>(m))) {
-			return monad<plain_type<M>>::bind(std::forward<M>(m));
+		auto operator() (M&& m) const
+		-> decltype(
+			monad<concept_parameter<plain_type<M>>>::join(std::forward<M>(m))
+		) {
+			return monad<concept_parameter<plain_type<M>>>::join(
+				std::forward<M>(m:
+			);
 		}
 	};
 
