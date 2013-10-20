@@ -42,6 +42,16 @@ test_set prelude_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("const_ function object"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto m = ftl::const_(42) % ftl::value(3);
+
+				return m && *m == 42;
+			})
+		),
+		std::make_tuple(
 			std::string("currying regular functions"),
 			std::function<bool()>([]() -> bool {
 				auto f = ftl::curry(curry_me);

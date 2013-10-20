@@ -605,6 +605,40 @@ namespace ftl {
 			}
 		};
 	}
+
+	/**
+	 * Constant function object.
+	 *
+	 * Always returns the first parameter. Sometimes useful when dealing with
+	 * higher-order functions.
+	 *
+	 * \ingroup prelude
+	 */
+	struct constant : private _dtl::curried_binf<constant>
+	{
+		template<typename T, typename U>
+		constexpr auto operator() (T&& t, U&&) noexcept
+		-> decltype(std::forward<T>(t)) {
+			return std::forward<T>(t);
+		}
+
+		using _dtl::curried_binf<constant>::operator();
+	};
+
+	/**
+	 * Compile time instance of a `constant` function object.
+	 *
+	 * \par Examples
+	 *
+	 * A simple example:
+	 * \code
+	 *   ftl::fmap(const_(42), std::list<int>{1,2,3}); // {42, 42, 42}
+	 * \endcode
+	 *
+	 * \ingroup prelude
+	 */
+	constexpr constant const_;
+
 }
 
 #endif
