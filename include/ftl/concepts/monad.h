@@ -823,7 +823,7 @@ namespace ftl {
 			monad<concept_parameter<plain_type<M>>>::join(std::forward<M>(m))
 		) {
 			return monad<concept_parameter<plain_type<M>>>::join(
-				std::forward<M>(m:
+				std::forward<M>(m)
 			);
 		}
 	};
