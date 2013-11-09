@@ -25,6 +25,7 @@
 
 #include "monoid.h"
 #include "../prelude.h"
+#include "common.h"
 
 namespace ftl {
 	/**
@@ -192,12 +193,6 @@ namespace ftl {
 	constexpr bool Foldable() noexcept {
 		return foldable<F>::instance;
 	}
-
-	/**
-	 * Tag used to derive a \ref bidiriterable specific concept instance/method.
-	 */
-	template<typename>
-	struct bidirectional_iterable {};
 
 	template<typename>
 	struct deriving_foldable {};

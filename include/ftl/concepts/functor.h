@@ -26,6 +26,7 @@
 #include "../type_functions.h"
 #include "../function.h"
 #include "../prelude.h"
+#include "common.h"
 
 namespace ftl {
 	// Forward declaration so we can mention applicatives
@@ -149,20 +150,6 @@ namespace ftl {
 	constexpr bool Functor() noexcept {
 		return functor<F>::instance;
 	}
-
-	// TODO: Move some place more generic
-	/**
-	 * Derived concept implementation tag for any mutable container type.
-	 *
-	 * This tag can be used with some _deriving_ constructs to generate an
-	 * automatic/default implementation of certain concept methods.
-	 *
-	 * \tparam M must be \ref fwditerable and Insertable.
-	 *
-	 * \ingroup functor
-	 */
-	template<typename M>
-	struct back_insertable_container {};
 
 	template<typename F>
 	struct deriving_map;
