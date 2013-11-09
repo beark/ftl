@@ -240,6 +240,88 @@ test_set vector_tests{
 
 				return fold(v) == 12;
 			})
+		),
+		std::make_tuple(
+			std::string("zippable::zipWith[3,3]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::vector<int> v1{1,2,3};
+				std::vector<int> v2{2,2,2};
+
+				auto v3 = zipWith([](int x, int y){ return x + y; }, v1, v2);
+
+				return v3 == std::vector<int>{3,4,5};
+			})
+		),
+		std::make_tuple(
+			std::string("zippable::zipWith[2,3]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::vector<int> v1{1,2};
+				std::vector<int> v2{2,2,2};
+
+				auto v3 = zipWith([](int x, int y){ return x + y; }, v1, v2);
+
+				return v3 == std::vector<int>{3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("zippable::zipWith[3,2]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::vector<int> v1{1,2,3};
+				std::vector<int> v2{2,2};
+
+				auto v3 = zipWith([](int x, int y){ return x + y; }, v1, v2);
+
+				return v3 == std::vector<int>{3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("zippable::zipWith[0,3]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::vector<int> v1{};
+				std::vector<int> v2{2,2};
+
+				auto v3 = zipWith([](int x, int y){ return x + y; }, v1, v2);
+
+				return v3 == std::vector<int>{};
+			})
+		),
+		std::make_tuple(
+			std::string("zippable::zipWith[3,0]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::vector<int> v1{1,2,3};
+				std::vector<int> v2{};
+
+				auto v3 = zipWith([](int x, int y){ return x + y; }, v1, v2);
+
+				return v3 == std::vector<int>{};
+			})
+		),
+		std::make_tuple(
+			std::string("zippable::zip[3,3]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::vector<int> v1{1,2,3};
+				std::vector<float> v2{3.f,2.f,1.f};
+
+				auto v3 = zip(v1, v2);
+
+				return v3 == std::vector<std::tuple<int,float>>{
+					std::make_tuple(1,3.f),
+					std::make_tuple(2,2.f),
+					std::make_tuple(3,1.f)
+				};
+			})
 		)
 	}
 };

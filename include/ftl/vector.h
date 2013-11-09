@@ -26,6 +26,7 @@
 #include <vector>
 #include "concepts/foldable.h"
 #include "concepts/monad.h"
+#include "concepts/zippable.h"
 
 namespace ftl {
 
@@ -44,6 +45,7 @@ namespace ftl {
 	 * - \ref functor
 	 * - \ref applicative
 	 * - \ref monad
+	 * - \ref zippable
 	 *
 	 * \par Dependencies
 	 * - <vector>
@@ -265,9 +267,16 @@ namespace ftl {
 	 */
 	template<typename T, typename A>
 	struct foldable<std::vector<T,A>>
-	: deriving_foldable<bidirectional_iterable<std::vector<T,A>>> {
-		static constexpr bool instance = true;
-	};
+	: deriving_foldable<bidirectional_iterable<std::vector<T,A>>> {};
+
+	/**
+	 * Zippable instance for std::vector.
+	 *
+	 * \ingroup vector
+	 */
+	template<typename T, typename A>
+	struct zippable<std::vector<T,A>>
+	: deriving_zippable<back_insertable_container<std::vector<T,A>>> {};
 
 }
 
