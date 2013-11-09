@@ -26,6 +26,7 @@
 #include <forward_list>
 #include "concepts/foldable.h"
 #include "concepts/monad.h"
+#include "concepts/zippable.h"
 
 namespace ftl {
 
@@ -39,16 +40,18 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * This module adds the following concept instances to std::forward_list:
-	 * - \ref monoid
-	 * - \ref foldable
-	 * - \ref functor
-	 * - \ref applicative
-	 * - \ref monad
+	 * - \ref monoidpg
+	 * - \ref foldablepg
+	 * - \ref functorpg
+	 * - \ref applicativepg
+	 * - \ref monadpg
+	 * - \ref zippablepg
 	 *
 	 * \par Dependencies
 	 * - <forward_list>
 	 * - \ref foldable
 	 * - \ref monad
+	 * - \ref zippable
 	 */
 
 	/**
@@ -364,6 +367,40 @@ namespace ftl {
 					std::forward<F>(f),
 					std::forward<U>(z),
 					l.cbegin(), l.cend());
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	template<typename T, typename A>
+	struct zippable<std::forward_list<T,A>> {
+
+		template<typename U>
+		using A_ = typename re_parametrise<A,U>::type;
+
+		template<
+				typename F,
+				typename FwdIt,
+				typename U = concept_parameter<FwdIt>,
+				typename V = result_of<F(T,U)>,
+				typename = typename std::enable_if<ForwardIterable<FwdIt>()>::type
+		>
+		static std::forward_list<V,A_<V>> zipWith(
+				F f, const std::forward_list<T,A>& l, const FwdIt& it
+		) {
+			std::forward_list<V,A_<V>> result;
+
+			auto insert_it = result.before_begin();
+			auto it1 = l.begin();
+			auto it2 = it.begin();
+			while(it1 != l.end() && it2 != std::end(it)) {
+				insert_it = result.insert_after(insert_it, f(*it1, *it2));
+
+				++it1;
+				++it2;
+			}
+
+			return result;
 		}
 
 		static constexpr bool instance = true;
