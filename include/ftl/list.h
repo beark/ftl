@@ -287,6 +287,15 @@ namespace ftl {
 	struct foldable<std::list<T,A>>
 	: deriving_foldable<bidirectional_iterable<std::list<T,A>>> {};
 
+	/**
+	 * \ref zippablepg instance for `std::list`.
+	 *
+	 * This particular instance allows a `vector` to be zipped with
+	 * any type that satisfies \ref fwditerable. Thus, one can zip a
+	 * `vector` with a `forward_list`, `list` or even `ftl::maybe`.
+	 *
+	 * \ingroup list
+	 */
 	template<typename T, typename A>
 	struct zippable<std::list<T,A>>
 	: deriving_zippable<back_insertable_container<std::list<T,A>>> {};

@@ -272,6 +272,10 @@ namespace ftl {
 	/**
 	 * Zippable instance for std::vector.
 	 *
+	 * This particular instance allows a `vector` to be zipped with
+	 * any type that satisfies \ref fwditerable. Thus, one can zip a
+	 * `vector` with a `forward_list`, `list` or even `ftl::maybe`.
+	 *
 	 * \ingroup vector
 	 */
 	template<typename T, typename A>

@@ -372,6 +372,15 @@ namespace ftl {
 		static constexpr bool instance = true;
 	};
 
+	/**
+	 * \ref zippablepg implementation for `std::forward_list`.
+	 *
+	 * This particular instance allows a `forward_list` to be zipped with
+	 * any type that satisfies \ref fwditerable. Thus, one can zip a
+	 * `forward_list` with a `vector`, `list` or even `maybe`.
+	 *
+	 * \ingroup fwdlist
+	 */
 	template<typename T, typename A>
 	struct zippable<std::forward_list<T,A>> {
 

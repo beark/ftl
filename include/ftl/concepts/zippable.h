@@ -145,6 +145,11 @@ namespace ftl {
 	 * preferable due to details that cannot be known by this generalised
 	 * implementation.
 	 *
+	 * Note that deriving this implementation results in a `zipWith` that for
+	 * second parameter accepts an instance of any type that satisfies
+	 * \ref fwditerable. In other words, it would be possible to zip a list
+	 * deriving this implementation with e.g. a `maybe<SomeType>`.
+	 *
 	 * Example:
 	 * \code
 	 *   template<typename T>
@@ -163,7 +168,10 @@ namespace ftl {
 
 		template<
 				typename F, typename Iterable,
-				typename U = result_of<F(T,concept_parameter<Iterable>)>
+				typename U = result_of<F(T,concept_parameter<Iterable>)>,
+				typename = typename std::enable_if<
+					ForwardIterable<Iterable>()
+				>::type
 		>
 		static Z_<U> zipWith(F f, const Z_<T>& z, const Iterable& i) {
 			auto it1 = z.begin();
