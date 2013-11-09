@@ -243,6 +243,88 @@ test_set list_tests{
 
 				return fold(l) == 12;
 			})
+		),
+		std::make_tuple(
+			std::string("zippable::zipWith[3,3]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::list<int> l1{1,2,3};
+				std::list<int> l2{2,2,2};
+
+				auto l3 = ftl::zipWith([](int x, int y){ return x + y; }, l1, l2);
+
+				return l3 == std::list<int>{3,4,5};
+			})
+		),
+		std::make_tuple(
+			std::string("zippable::zipWith[2,3]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::list<int> l1{1,2};
+				std::list<int> l2{2,2,2};
+
+				auto l3 = ftl::zipWith([](int x, int y){ return x + y; }, l1, l2);
+
+				return l3 == std::list<int>{3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("zippable::zipWith[3,2]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::list<int> l1{1,2,3};
+				std::list<int> l2{2,2};
+
+				auto l3 = ftl::zipWith([](int x, int y){ return x + y; }, l1, l2);
+
+				return l3 == std::list<int>{3,4};
+			})
+		),
+		std::make_tuple(
+			std::string("zippable::zipWith[0,3]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::list<int> l1{};
+				std::list<int> l2{2,2};
+
+				auto l3 = ftl::zipWith([](int x, int y){ return x + y; }, l1, l2);
+
+				return l3 == std::list<int>{};
+			})
+		),
+		std::make_tuple(
+			std::string("zippable::zipWith[3,0]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::list<int> l1{1,2,3};
+				std::list<int> l2{};
+
+				auto l3 = ftl::zipWith([](int x, int y){ return x + y; }, l1, l2);
+
+				return l3 == std::list<int>{};
+			})
+		),
+		std::make_tuple(
+			std::string("zippable::zip[3,3]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::list<int> l1{1,2,3};
+				std::list<float> l2{3.f,2.f,1.f};
+
+				auto l3 = ftl::zip(l1, l2);
+
+				return l3 == std::list<std::tuple<int,float>>{
+					std::make_tuple(1,3.f),
+					std::make_tuple(2,2.f),
+					std::make_tuple(3,1.f)
+				};
+			})
 		)
 	}
 };

@@ -26,6 +26,7 @@
 #include <list>
 #include "concepts/foldable.h"
 #include "concepts/monad.h"
+#include "concepts/zippable.h"
 
 namespace ftl {
 
@@ -39,16 +40,18 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * This module adds the following concept instances to std::list:
-	 * - \ref monoid
-	 * - \ref foldable
-	 * - \ref functor
-	 * - \ref applicative
-	 * - \ref monad
+	 * - \ref monoidpg
+	 * - \ref foldablepg
+	 * - \ref functorpg
+	 * - \ref applicativepg
+	 * - \ref monadpg
+	 * - \ref zippablepg
 	 *
 	 * \par Dependencies
 	 * - <list>
 	 * - \ref foldable
 	 * - \ref monad
+	 * - \ref zippable
 	 */
 
 	/**
@@ -283,6 +286,10 @@ namespace ftl {
 	template<typename T, typename A>
 	struct foldable<std::list<T,A>>
 	: deriving_foldable<bidirectional_iterable<std::list<T,A>>> {};
+
+	template<typename T, typename A>
+	struct zippable<std::list<T,A>>
+	: deriving_zippable<back_insertable_container<std::list<T,A>>> {};
 
 }
 
