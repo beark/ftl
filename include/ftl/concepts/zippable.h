@@ -82,10 +82,10 @@ namespace ftl {
 	template<typename Z_>
 	struct zippable {
 		/// Element/value type of the zippable
-		using T = concept_parameter<Z_>;
+		using T = Value_type<Z_>;
 
 		template<typename U>
-		using Z = typename re_parametrise<Z_,U>::type;
+		using Z = Rebind<Z_,U>;
 
 // Just as in monad, we don't want the compiler to find these, but the API
 // reference generator should.
@@ -161,14 +161,14 @@ namespace ftl {
 	 */
 	template<typename Z>
 	struct deriving_zippable<back_insertable_container<Z>> {
-		using T = concept_parameter<Z>;
+		using T = Value_type<Z>;
 
 		template<typename U>
-		using Z_ = typename re_parametrise<Z,U>::type;
+		using Z_ = Rebind<Z,U>;
 
 		template<
 				typename F, typename Iterable,
-				typename U = result_of<F(T,concept_parameter<Iterable>)>,
+				typename U = result_of<F(T,Value_type<Iterable>)>,
 				typename = typename std::enable_if<
 					ForwardIterable<Iterable>()
 				>::type
@@ -268,9 +268,9 @@ namespace ftl {
 				typename = typename std::enable_if<Zippable<Z>()>::type
 		>
 		auto operator() (const Z& z, const I& i) const
-		-> decltype(zippable<Z>::zipWith(mktup<concept_parameter<Z>,concept_parameter<I>>{}, z, i)) {
+		-> decltype(zippable<Z>::zipWith(mktup<Value_type<Z>,Value_type<I>>{}, z, i)) {
 
-			return zippable<Z>::zipWith(mktup<concept_parameter<Z>,concept_parameter<I>>{}, z, i);
+			return zippable<Z>::zipWith(mktup<Value_type<Z>,Value_type<I>>{}, z, i);
 		}
 
 		using curried_binf<Zip>::operator();

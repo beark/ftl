@@ -431,7 +431,7 @@ namespace ftl {
 			has_pre_inc<decltype(std::begin(std::declval<T>()))>::value &&
 			has_post_inc<decltype(std::begin(std::declval<T>()))>::value &&
 			std::is_same<
-				concept_parameter<T>,
+				Value_type<T>,
 				plain_type<decltype(*std::begin(std::declval<T>()))>
 			>::value;
 	}
@@ -444,14 +444,14 @@ namespace ftl {
 			has_pre_inc<decltype(std::declval<T>().rbegin())>::value &&
 			has_post_inc<decltype(std::declval<T>().rbegin())>::value &&
 			std::is_same<
-				concept_parameter<T>,
+				Value_type<T>,
 				plain_type<decltype(*std::declval<T>().rbegin())>
 			>::value;
 	}
 
 	template<typename T>
 	constexpr bool BackInsertable() {
-		return has_push_back<T,concept_parameter<T>>::value;
+		return has_push_back<T,Value_type<T>>::value;
 	}
 
 	namespace _dtl {

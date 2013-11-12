@@ -314,7 +314,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = concept_parameter<result_of<F(T)>>
+				typename U = Value_type<result_of<F(T)>>
 		>
 		static lazy<U> bind(lazy<T> l, F f) {
 			return lazy<U>{[f,l]() {

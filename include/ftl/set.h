@@ -53,17 +53,14 @@ namespace ftl {
 
 	template<
 			typename T,
-			typename U,
 			typename Cmp,
 			typename A
 	>
-	struct re_parametrise<std::set<T,Cmp,A>,U> {
-	private:
-		using Cmpu = typename re_parametrise<Cmp,U>::type;
-		using Au = typename re_parametrise<A,U>::type;
+	struct parametric_type_traits<std::set<T,Cmp,A>> {
+		using value_type = T;
 
-	public:
-		using type = std::set<U,Cmpu,Au>;
+		template<typename U>
+		using rebind = std::set<U,Rebind<Cmp,U>,Rebind<A,U>>;
 	};
 
 	/**
@@ -149,7 +146,7 @@ namespace ftl {
 
 		/// Alias for cleaner type signatures
 		template<typename U>
-		using set = typename re_parametrise<std::set<T,Cmp,A>,U>::type;
+		using set = Rebind<std::set<T,Cmp,A>,U>;
 
 		/**
 		 * Embeds a single value in a set.

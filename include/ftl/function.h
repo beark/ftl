@@ -631,14 +631,12 @@ namespace ftl {
 		}
 	};
 
-	template<typename R, typename S, typename...Ps>
-	struct re_parametrise<function<R(Ps...)>,S> {
-		using type = function<S(Ps...)>;
-	};
-
 	template<typename R, typename...Ps>
 	struct parametric_type_traits<function<R(Ps...)>> {
-		using parameter_type = R;
+		using value_type = R;
+
+		template<typename S>
+		using rebind = function<S(Ps...)>;
 	};
 
 }

@@ -73,10 +73,10 @@ namespace ftl {
 	class eitherT {
 	public:
 		/// Quick reference to the type concepts are implemented on
-		using T = concept_parameter<M>;
+		using T = Value_type<M>;
 
 		/// The transformed type `eitherT` wraps
-		using Met = typename re_parametrise<M,either<L,T>>::type;
+		using Met = Rebind<M,either<L,T>>;
 
 		/**
 		 * Construct from an unwrapped equivalent of the transformed type.
@@ -133,16 +133,13 @@ namespace ftl {
 		Met mEither;
 	};
 
-	// Re-parametrising an eitherT requires non-default actions.
-	template<typename M, typename L, typename U>
-	struct re_parametrise<eitherT<L,M>,U> {
-		using type = eitherT<L,typename re_parametrise<M,U>::type>;
-	};
-
 	// eitherT's parametric traits are non-default.
 	template<typename L, typename M>
 	struct parametric_type_traits<eitherT<L,M>> {
-		using parameter_type = concept_parameter<M>;
+		using value_type = Value_type<M>;
+
+		template<typename T>
+		using rebind = eitherT<L,Rebind<M,T>>;
 	};
 
 	/**
@@ -160,14 +157,14 @@ namespace ftl {
 		using T = typename eitherT<L,M>::T;
 
 		template<typename U>
-		using M_ = typename re_parametrise<M,U>::type;
+		using M_ = Rebind<M,U>;
 
 		/** 
 		 * Type define to make remaining type signatures easier to read.
 		 *
 		 * `M_` in this case can be thought of as the unparametrised base monad
 		 * `M` (i.e., the type parameter of `M_` is applied as the concept
-		 * parameter of `M` in a `re_parametrise` call).
+		 * parameter of `M` in a `Rebind` call).
 		 */
 		template<typename U>
 		using eT = eitherT<L,M_<U>>;
@@ -213,7 +210,7 @@ namespace ftl {
 		 *
 		 * Uses `M`'s bind operation on top of `either`'s. 
 		 */
-		template<typename F, typename U = concept_parameter<result_of<F(T)>>>
+		template<typename F, typename U = Value_type<result_of<F(T)>>>
 		static eT<U> bind(const eT<T>& e, F&& f) {
 			using monad_t = result_of<F(T)>;
 
@@ -234,16 +231,13 @@ namespace ftl {
 		// Helper struct required to implement automatic lift and hoist
 		template<typename M2>
 		struct bind_helper {
-			using U = concept_parameter<M2>;
+			using U = Value_type<M2>;
 
 			// Automatic lift when binding to operations in M_
 			template<
 					typename F,
 					typename = typename std::enable_if<
-						std::is_same<
-							typename re_parametrise<M,U>::type,
-							M2
-						>::value
+						std::is_same<Rebind<M,U>, M2>::value
 					>
 			>
 			static eT<U> bind(const eT<T>& e, F f) {
@@ -264,10 +258,7 @@ namespace ftl {
 			template<
 					typename F,
 					typename = typename std::enable_if<
-						std::is_same<
-							typename re_parametrise<M,U>::type,
-							M2
-						>::value
+						std::is_same<Rebind<M,U>, M2>::value
 					>
 			>
 			static eT<U> bind(eT<T>&& e, F f) {
@@ -288,7 +279,7 @@ namespace ftl {
 		// Normal case, we're binding with a computation in eitherT
 		template<typename M2>
 		struct bind_helper<eitherT<L,M2>> {
-			using U = concept_parameter<M2>;
+			using U = Value_type<M2>;
 
 			template<typename F>
 			static eT<U> bind(const eT<T>& e, F f) {
@@ -365,7 +356,7 @@ namespace ftl {
 	struct foldable<eitherT<L,M>>
 	: deriving_foldMap<eitherT<L,M>>, deriving_fold<eitherT<L,M>> {
 
-		using T = concept_parameter<M>;
+		using T = Value_type<M>;
 		using Met = typename eitherT<L,M>::Met;
 
 		template<
@@ -422,7 +413,7 @@ namespace ftl {
 	 */
 	template<typename L, typename M>
 	struct monoidA<eitherT<L,M>> {
-		using T = concept_parameter<M>;
+		using T = Value_type<M>;
 		using Met = typename eitherT<L,M>::Met;
 
 		/**

@@ -46,34 +46,12 @@ namespace ftl {
 	 * - \ref foldable
 	 */
 
-	/**
-	 * Re parameterisation specialisation of std::map.
-	 *
-	 * Applies the parametrisation recursively to the allocator type,
-	 * meaning that if it requires special consideration, a user can simply
-	 * specialise `re_parametrise` in an appropriate manner.
-	 *
-	 * \note When parameterising the allocator `A`, it's given
-	 *       `std::pair<const K,U>` as type parameter. If this is not the
-	 *       desired behaviour, it is possible to write a template
-	 *       specialisation that catches this and extracts `U`.
-	 *
-	 * \see ftl::re_parametrise.
-	 *
-	 * \ingroup map
-	 */
-	template<typename K, typename T, typename C, typename A, typename U>
-	struct re_parametrise<std::map<K,T,C,A>,U> {
-	private:
-		using Au = typename re_parametrise<A,std::pair<const K,U>>::type;
+	template<typename K, typename V, typename C, typename A>
+	struct parametric_type_traits<std::map<K,V,C,A>> {
+		using value_type = V;
 
-	public:
-		using type = std::map<K,U,C,Au>;
-	};
-
-	template<typename K, typename V, typename...Ts>
-	struct parametric_type_traits<std::map<K,V,Ts...>> {
-		using parameter_type = V;
+		template<typename W>
+		using rebind = std::map<K,W,C,Rebind<A,std::pair<const K,W>>>;
 	};
 
 	/**
@@ -86,7 +64,7 @@ namespace ftl {
 
 		/// Type alias for more easily read type signatures.
 		template<typename U>
-		using Map = typename re_parametrise<std::map<K,T,C,A>,U>::type;
+		using Map = Rebind<std::map<K,T,C,A>,U>;
 
 		/**
 		 * Maps the function `f` over all values in `m`.

@@ -61,8 +61,8 @@ namespace ftl {
 	template<typename M>
 	class maybeT {
 	public:
-		using T = concept_parameter<M>;
-		using Mmt = typename re_parametrise<M,maybe<T>>::type;
+		using T = Value_type<M>;
+		using Mmt = Rebind<M,maybe<T>>;
 
 		/**
 		 * Default construction.
@@ -113,23 +113,15 @@ namespace ftl {
 	};
 
 	/**
-	 * ftl::maybeT specialisation of re_parametrise.
-	 *
-	 * Necessary because maybeT isn't parametrised in quite the default manner.
-	 */
-	template<typename M, typename U>
-	struct re_parametrise<maybeT<M>,U> {
-		/// Simply re-parametrises the inner/base monad.
-		using type = maybeT<typename re_parametrise<M,U>::type>;
-	};
-
-	/**
 	 * Parametric type traits for ftl::maybeT.
 	 */
 	template<typename M>
 	struct parametric_type_traits<maybeT<M>> {
 		/// The concept parameter of a maybeT is the same as its base monad's.
-		using parameter_type = concept_parameter<M>;
+		using value_type = Value_type<M>;
+
+		template<typename T>
+		using rebind = maybeT<Rebind<M,T>>;
 	};
 
 	/**
@@ -147,7 +139,7 @@ namespace ftl {
 		using T = typename maybeT<M>::T;
 
 		template<typename U>
-		using M_ = typename re_parametrise<M,U>::type;
+		using M_ = Rebind<M,U>;
 
 		/// Easy reference to maybeT of various parameterisations.
 		template<typename U>
@@ -190,7 +182,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = concept_parameter<result_of<F(T)>>
+				typename U = Value_type<result_of<F(T)>>
 		>
 		static mT<U> bind(const mT<T>& m, F&& f) {
 
@@ -204,7 +196,7 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename U = concept_parameter<result_of<F(T)>>
+				typename U = Value_type<result_of<F(T)>>
 		>
 		static mT<U> bind(mT<T>&& m, F&& f) {
 
@@ -219,15 +211,12 @@ namespace ftl {
 		template<typename M2>
 		struct bind_helper {
 			
-			using U = concept_parameter<M2>;
+			using U = Value_type<M2>;
 
 			template<
 					typename F,
 					typename = typename std::enable_if<
-						std::is_same<
-							typename re_parametrise<M,U>::type,
-							M2
-						>::value
+						std::is_same<Rebind<M,U>, M2>::value
 					>
 			>
 			static mT<U> bind(const mT<T>& m, F f) {
@@ -244,10 +233,7 @@ namespace ftl {
 			template<
 					typename F,
 					typename = typename std::enable_if<
-						std::is_same<
-							typename re_parametrise<M,U>::type,
-							M2
-						>::value
+						std::is_same<Rebind<M,U>, M2>::value
 					>
 			>
 			static mT<U> bind(mT<T>&& m, F f) {
@@ -264,7 +250,7 @@ namespace ftl {
 
 		template<typename M2>
 		struct bind_helper<maybeT<M2>> {
-			using U = concept_parameter<M2>;
+			using U = Value_type<M2>;
 
 			template<typename F>
 			static mT<U> bind(const mT<T>& m, F f) {
@@ -304,7 +290,7 @@ namespace ftl {
 		/// Embeds a `nothing` in `M`.
 		static maybeT<M> fail() {
 			using Mmt = typename maybeT<M>::Mmt;
-			using T = concept_parameter<M>;
+			using T = Value_type<M>;
 
 			return monad<Mmt>::pure(maybe<T>{});
 		}
@@ -315,7 +301,7 @@ namespace ftl {
 		 */
 		static maybeT<M> orDo(const maybeT<M>& mm1, maybeT<M> mm2) {
 
-			using T = concept_parameter<M>;
+			using T = Value_type<M>;
 			using Mmt = typename maybeT<M>::Mmt;
 
 			return maybeT<M> {
@@ -349,7 +335,7 @@ namespace ftl {
 	struct foldable<maybeT<M>>
 	: deriving_fold<maybeT<M>>, deriving_foldMap<maybeT<M>> {
 
-		using T = concept_parameter<M>;
+		using T = Value_type<M>;
 		using Mmt = typename maybeT<M>::Mmt;
 
 		template<

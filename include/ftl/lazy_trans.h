@@ -45,7 +45,7 @@ namespace ftl {
 	 * The lazy transformer.
 	 *
 	 * Transforms the monad instance `M`, applied to `T`, into what is
-	 * essentially `re_parametrise<M,lazy<T>>::type`, except the functor series
+	 * essentially `Rebind<M,lazy<T>>`, except the functor series
 	 * of operations are lifted so that they work on `T` instead of `lazy<T>`
 	 * as they would in the former case.
 	 *
@@ -64,10 +64,10 @@ namespace ftl {
 	class lazyT {
 	public:
 		/// Convenient access to parameter type
-		using T = concept_parameter<M>;
+		using T = Value_type<M>;
 
 		/// Convenient access to underlying type
-		using Mlt = typename re_parametrise<M,lazy<T>>::type;
+		using Mlt = Rebind<M,lazy<T>>;
 
 		/// Construct from underlying type
 		explicit constexpr lazyT(const Mlt& l)
@@ -109,14 +109,12 @@ namespace ftl {
 		Mlt mLazy;
 	};
 
-	template<typename M, typename U>
-	struct re_parametrise<lazyT<M>,U> {
-		using type = lazyT<typename re_parametrise<M,U>::type>;
-	};
-
 	template<typename M>
 	struct parametric_type_traits<lazyT<M>> {
-		using parameter_type = concept_parameter<M>;
+		using value_type = Value_type<M>;
+
+		template<typename T>
+		using rebind = lazyT<Rebind<M,T>>;
 	};
 
 	/**
@@ -136,7 +134,7 @@ namespace ftl {
 
 		/// Type alias to simplify signatures involving the base monad.
 		template<typename U>
-		using M_ = typename re_parametrise<M,U>::type;
+		using M_ = Rebind<M,U>;
 
 		/// Type alias to simplify signatures involving the lazy transformer.
 		template<typename U>
@@ -193,7 +191,7 @@ namespace ftl {
 		 *   auto r2 = lmi >>= bar;
 		 * \endcode
 		 */
-		template<typename F, typename U = concept_parameter<result_of<F(T)>>>
+		template<typename F, typename U = Value_type<result_of<F(T)>>>
 		static lT<U> bind(const lT<T>& l, F&& f) {
 			using monad_t = result_of<F(T)>;
 			return bind_helper<monad_t>::bind(l, std::forward<F>(f));
@@ -202,7 +200,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename U =
-					concept_parameter<result_of<F(T)>>
+					Value_type<result_of<F(T)>>
 		>
 		static lT<U> bind(lT<T>&& l, F&& f) {
 			using monad_t = result_of<F(T)>;
@@ -214,15 +212,12 @@ namespace ftl {
 	private:
 		template<typename M2>
 		struct bind_helper {
-			using U = concept_parameter<M2>;
+			using U = Value_type<M2>;
 
 			template<
 					typename F,
 					typename = typename std::enable_if<
-						std::is_same<
-							typename re_parametrise<M,U>::type,
-							M2
-						>::value
+						std::is_same<Rebind<M,U>, M2>::value
 					>
 			>
 			static lT<U> bind(const lT<T>& l, F f) {
@@ -236,10 +231,7 @@ namespace ftl {
 			template<
 					typename F,
 					typename = typename std::enable_if<
-						std::is_same<
-							typename re_parametrise<M,U>::type,
-							M2
-						>::value
+						std::is_same<Rebind<M,U>, M2>::value
 					>
 			>
 			static lT<U> bind(lT<T>&& l, F f) {
@@ -253,7 +245,7 @@ namespace ftl {
 
 		template<typename M2>
 		struct bind_helper<lazyT<M2>> {
-			using U = concept_parameter<M2>;
+			using U = Value_type<M2>;
 
 			template<typename F>
 			static lT<U> bind(const lT<T>& l, F f) {

@@ -54,21 +54,12 @@ namespace ftl {
 	 * - \ref zippable
 	 */
 
-	/**
-	 * Specialisation of re_parametrise for forward_lists.
-	 *
-	 * This makes sure the allocator is also properly parametrised on the
-	 * new element type.
-	 *
-	 * \ingroup list
-	 */
-	template<typename T, typename U, typename A>
-	struct re_parametrise<std::forward_list<T,A>,U> {
-	private:
-		using Au = typename re_parametrise<A,U>::type;
+	template<typename T, typename A>
+	struct parametric_type_traits<std::forward_list<T,A>> {
+		using value_type = T;
 
-	public:
-		using type = std::forward_list<U,Au>;
+		template<typename U>
+		using rebind = std::forward_list<U,Rebind<A,U>>;
 	};
 
 	/**
@@ -82,8 +73,8 @@ namespace ftl {
 			typename F,
 			typename T,
 			typename A,
-			typename U = concept_parameter<result_of<F(T)>>,
-			typename Au = typename re_parametrise<A,U>::type
+			typename U = Value_type<result_of<F(T)>>,
+			typename Au = Rebind<A,U>
 	>
 	std::forward_list<U,Au> concatMap(
 			F&& f,
@@ -113,8 +104,8 @@ namespace ftl {
 			typename F,
 			typename T,
 			typename A,
-			typename U = concept_parameter<result_of<F(T)>>,
-			typename Au = typename re_parametrise<A,U>::type
+			typename U = Value_type<result_of<F(T)>>,
+			typename Au = Rebind<A,U>
 	>
 	std::forward_list<U,Au> concatMap(
 			F&& f,
@@ -211,8 +202,7 @@ namespace ftl {
 
 		/// Alias to make type signatures more easily read.
 		template<typename U>
-		using forward_list
-			= typename re_parametrise<std::forward_list<T,A>,U>::type;
+		using forward_list = Rebind<std::forward_list<T,A>,U>;
 
 #ifdef DOCUMENTATION_GENERATOR
 		/**
@@ -385,12 +375,12 @@ namespace ftl {
 	struct zippable<std::forward_list<T,A>> {
 
 		template<typename U>
-		using A_ = typename re_parametrise<A,U>::type;
+		using A_ = Rebind<A,U>;
 
 		template<
 				typename F,
 				typename FwdIt,
-				typename U = concept_parameter<FwdIt>,
+				typename U = Value_type<FwdIt>,
 				typename V = result_of<F(T,U)>,
 				typename = typename std::enable_if<ForwardIterable<FwdIt>()>::type
 		>

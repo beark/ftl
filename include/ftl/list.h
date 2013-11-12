@@ -54,21 +54,12 @@ namespace ftl {
 	 * - \ref zippable
 	 */
 
-	/**
-	 * Specialisation of re_parametrise for lists.
-	 *
-	 * This makes sure the allocator is also properly parametrised on the
-	 * new element type.
-	 *
-	 * \ingroup list
-	 */
-	template<typename T, typename U, typename A>
-	struct re_parametrise<std::list<T,A>,U> {
-	private:
-		using Au = typename re_parametrise<A,U>::type;
+	template<typename T, typename A>
+	struct parametric_type_traits<std::list<T,A>> {
+		using value_type = T;
 
-	public:
-		using type = std::list<U,Au>;
+		template<typename U>
+		using rebind = std::list<U,Rebind<A,U>>;
 	};
 
 	/**
@@ -83,7 +74,7 @@ namespace ftl {
 			typename T,
 			typename A,
 			typename U = typename result_of<F(T)>::value_type,
-			typename Au = typename re_parametrise<A,U>::type
+			typename Au = Rebind<A,U>
 	>
 	std::list<U,Au> concatMap(F&& f, const std::list<T,A>& l) {
 
@@ -102,7 +93,7 @@ namespace ftl {
 			typename T,
 			typename A,
 			typename U = typename result_of<F(T)>::value_type,
-			typename Au = typename re_parametrise<A,U>::type
+			typename Au = Rebind<A,U>
 	>
 	std::list<U,Au> concatMap(F&& f, std::list<T,A>&& l) {
 
@@ -185,7 +176,7 @@ namespace ftl {
 #ifdef DOCUMENTATION_GENERATOR
 		/// Alias to make type signatures cleaner
 		template<typename U>
-		using list = typename re_parametrise<std::list<T,A>,U>::type;
+		using list = Rebind<std::list<T,A>,U>;
 
 		/**
 		 * Produces a singleton list.
@@ -258,7 +249,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename Cu = result_of<F(T)>,
-				typename U = concept_parameter<Cu>,
+				typename U = Value_type<Cu>,
 				typename = typename std::enable_if<
 					ForwardIterable<Cu>()
 				>::type
@@ -269,7 +260,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename Cu = result_of<F(T)>,
-				typename U = concept_parameter<Cu>,
+				typename U = Value_type<Cu>,
 				typename = typename std::enable_if<
 					ForwardIterable<Cu>()
 				>::type

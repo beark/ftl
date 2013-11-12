@@ -483,6 +483,26 @@ namespace ftl {
 		using type = T;
 	};
 
+	namespace _dtl {
+		template<typename T, typename>
+		struct default_rebind {
+			using type = T;
+		};
+
+		template<template<typename> class Tt, typename T, typename U>
+		struct default_rebind<Tt<T>,U> {
+			using type = Tt<U>;
+		};
+
+		template<
+				template<typename...> class Tt,
+				typename T, typename U, typename...Ts
+		>
+		struct default_rebind<Tt<T,Ts...>,U> {
+			using type = Tt<U,Ts...>;
+		};
+	}
+
 	/**
 	 * Traits for various parametric types.
 	 *
@@ -494,7 +514,7 @@ namespace ftl {
 	template<typename T>
 	struct parametric_type_traits {
 		/**
-		 * Gets the type parameter of `T` on which most concepts are built.
+		 * Gets the type parameter of `T` on which concepts apply.
 		 *
 		 * Many of the concepts in FTL are parametric in one type, e.g.
 		 * ftl::functor<ftl::maybe<U>> is parametrised by `U`. This type level
@@ -503,62 +523,53 @@ namespace ftl {
 		 * The only time this trait needs to be specialised is when the type
 		 * parameter `T` uses in concepts is _not_ the left-most in `T`'s
 		 * parameter list.
+		 *
+		 * Example demonstrating semantics:
+		 * \code
+		 *   // x is of type int
+		 *   typename parametric_type_traits<either<string,int>::value_type x;
+		 * \endcode
 		 */
-		using parameter_type = typename inner_type<T>::type;
+		using value_type = typename inner_type<T>::type;
+
+		/**
+		 * Specialisable type function to rebind a parametric type.
+		 *
+		 * The purpose of this type function is to swap the `value_type` of a
+		 * parametric type. This is useful when writing templated functions that
+		 * deal with genericised parameters, such as a function from a
+		 * `functor<T>` to `functor<U>` (i.e., the concrete types could be
+		 * `maybe<int>` and `maybe<float>` for some instantiation).
+		 *
+		 * Example:
+		 * \code
+		 *   // x could be e.g. list<int>, if M is a list of some type T
+		 *   parametric_type_traits<M>::template rebind<int> x;
+		 * \endcode
+		 */
+		template<typename U>
+		using rebind = typename _dtl::default_rebind<T,U>::type;
 	};
 
 	/**
 	 * Convenient way of getting the primary concept type of a parametric type.
 	 *
+	 * This is equivalent of `parametric_type_traits<T>::value_type`, but makes
+	 * for much more concise code.
+	 *
 	 * \ingroup typelevel
 	 */
 	template<typename T>
-	using concept_parameter =
-		typename parametric_type_traits<T>::parameter_type;
-
-	template<template<typename...> class Tt, typename...Ts>
-	struct parametrise {
-		using type = Tt<Ts...>;
-	};
+	using Value_type =
+		typename parametric_type_traits<T>::value_type;
 
 	/**
-	 * Changes the concept parameter type of some template type.
-	 *
-	 * Example
-	 * \code
-	 *   template<typename V>
-	 *   typename re_parametrise<V,int>::type foo(const V& v) {
-	 *       return ... // Somehow convert v to the promised type
-	 *   }
-	 *
-	 *   void bar() {
-	 *       std::vector<int> v = foo(std::vector<float>{});
-	 *   }
-	 * \endcode
-	 *
-	 * Any parametric type that specialises parametric_type_traits should
-	 * specialice re_parametrise too (more specifically, if their specialisation
-	 * changed the behaviour of concept_parameter.
+	 * Alias of `parametric_type_traits<X>::template rebind<T>`.
 	 *
 	 * \ingroup typelevel
 	 */
-	template<typename T, typename>
-	struct re_parametrise {
-		using type = T;
-	};
-
-	template<template<typename> class Tt, typename T, typename U>
-	struct re_parametrise<Tt<T>,U> {
-		using type = Tt<U>;
-	};
-
-	template<
-			template<typename...> class Tt,
-			typename T, typename U, typename...Ts
-	>
-	struct re_parametrise<Tt<T,Ts...>,U> {
-		using type = Tt<U,Ts...>;
-	};
+	template<typename X, typename T>
+	using Rebind = typename parametric_type_traits<X>::template rebind<T>;
 
 	/**
 	 * Check if a type is just a parametrised version of some templated base.

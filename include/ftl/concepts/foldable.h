@@ -74,7 +74,7 @@ namespace ftl {
 	template<typename F>
 	struct foldable {
 		/// Typedef for easier reference to the type to fold on
-		using T = concept_parameter<F>;
+		using T = Value_type<F>;
 
 // Just as in monad, we don't want the compiler to find these, but the API
 // reference generator should.
@@ -219,7 +219,7 @@ namespace ftl {
 			typename = typename std::enable_if<ForwardIterable<F>()>::type
 	>
 	struct deriving_foldl {
-		using T = concept_parameter<F>;
+		using T = Value_type<F>;
 
 		template<
 				typename Fn,
@@ -277,7 +277,7 @@ namespace ftl {
 	 */
 	template<typename F>
 	struct deriving_foldr {
-		using T = concept_parameter<F>;
+		using T = Value_type<F>;
 
 		template<
 				typename Fn,
@@ -339,7 +339,7 @@ namespace ftl {
 	struct deriving_foldMap {
 		template<
 				typename Fn,
-				typename T = concept_parameter<F>,
+				typename T = Value_type<F>,
 				typename M = result_of<Fn(T)>,
 				typename = typename std::enable_if<Monoid<M>()>::type
 		>
@@ -382,7 +382,7 @@ namespace ftl {
 	template<typename F>
 	struct deriving_fold {
 		template<
-				typename M = concept_parameter<F>,
+				typename M = Value_type<F>,
 				typename = typename std::enable_if<Monoid<M>()>::type
 		>
 		static M fold(const F& f) {
@@ -418,7 +418,7 @@ namespace ftl {
 	 */
 	template<
 			typename F,
-			typename M = concept_parameter<F>,
+			typename M = Value_type<F>,
 			typename = typename std::enable_if<Foldable<F>()>::type,
 			typename = typename std::enable_if<Monoid<M>()>::type
 	>
@@ -441,7 +441,7 @@ namespace ftl {
 	{
 		template<
 				typename F,
-				typename T = concept_parameter<F>,
+				typename T = Value_type<F>,
 				typename Fn,
 				typename = typename std::enable_if<Foldable<F>()>::type
 		>
@@ -485,7 +485,7 @@ namespace ftl {
 				typename F,
 				typename Fn,
 				typename U,
-				typename T = concept_parameter<F>,
+				typename T = Value_type<F>,
 				typename = typename std::enable_if<Foldable<F>()>::type,
 				typename = typename std::enable_if<
 					std::is_same<plain_type<U>, result_of<Fn(T,U)>>::value
@@ -519,7 +519,7 @@ namespace ftl {
 				typename F,
 				typename Fn,
 				typename U,
-				typename T = concept_parameter<F>,
+				typename T = Value_type<F>,
 				typename = typename std::enable_if<Foldable<F>()>::type,
 				typename = typename std::enable_if<
 					std::is_same<plain_type<U>, result_of<Fn(U,T)>>::value

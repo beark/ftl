@@ -96,13 +96,13 @@ namespace ftl {
 	template<typename F_>
 	struct functor {
 		/// Convenient access to the type `F_` is parametrised on.
-		using T = concept_parameter<F_>;
+		using T = Value_type<F_>;
 
 		/**
 		 * Clean way of referring to differently parametrised `F`s.
 		 */
 		template<typename U>
-		using F = typename re_parametrise<F_,U>::type;
+		using F = Rebind<F_,U>;
 
 		/**
 		 * Maps a function to the contained value(s).
@@ -180,10 +180,10 @@ namespace ftl {
 	 */
 	template<typename F_>
 	struct deriving_map<back_insertable_container<F_>> {
-		using T = concept_parameter<F_>;
+		using T = Value_type<F_>;
 
 		template<typename U>
-		using F = typename re_parametrise<F_,U>::type;
+		using F = Rebind<F_,U>;
 
 		template<typename Fn, typename U = result_of<Fn(T)>>
 		static F<U> map(Fn&& fn, const F<T>& f) {
@@ -294,7 +294,7 @@ namespace ftl {
 				typename F_ = plain_type<F>,
 				typename = typename std::enable_if<
 					!std::is_same<
-						result_of<Fn(concept_parameter<F_>)>,
+						result_of<Fn(Value_type<F_>)>,
 						void
 					>::value
 				>::type
@@ -310,7 +310,7 @@ namespace ftl {
 				typename F_ = plain_type<F>,
 				typename = typename std::enable_if<
 					std::is_same<
-						result_of<Fn(concept_parameter<F_>)>,
+						result_of<Fn(Value_type<F_>)>,
 						void
 					>::value
 				>::type
@@ -327,7 +327,7 @@ namespace ftl {
 			template<typename Fn>
 			static void apply(Fn fn, const F& f) {
 				functor<F>::map(
-					[fn](const concept_parameter<F>& t) -> int {
+					[fn](const Value_type<F>& t) -> int {
 						fn(t);
 						return 0;
 					},
@@ -338,7 +338,7 @@ namespace ftl {
 			template<typename Fn>
 			static void apply(Fn fn, F&& f) {
 				functor<F>::map(
-					[fn](concept_parameter<F>&& t) -> int {
+					[fn](Value_type<F>&& t) -> int {
 						fn(std::move(t));
 						return 0;
 					},

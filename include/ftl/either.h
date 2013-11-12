@@ -383,14 +383,12 @@ namespace ftl {
 		_dtl::tag_t tag = _dtl::LIMBO;
 	};
 
-	template<typename L, typename R, typename R2>
-	struct re_parametrise<either<L,R>,R2> {
-		using type = either<L,R2>;
-	};
-
 	template<typename L, typename R>
 	struct parametric_type_traits<either<L,R>> {
-		using parameter_type = R;
+		using value_type = R;
+
+		template<typename S>
+		using rebind = either<L,S>;
 	};
 
 	/**

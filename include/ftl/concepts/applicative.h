@@ -86,14 +86,14 @@ namespace ftl {
 		 * Clean way of expressing `F` parametrised over different types.
 		 */
 		template<typename U>
-		using F = typename re_parametrise<F_,U>::type;
+		using F = Rebind<F_,U>;
 
 		/**
 		 * The type this particular instance of `F` is parametrised on.
 		 *
 		 * For example, in the case of `maybe<int>`, `T = int`.
 		 */
-		using T = concept_parameter<F_>;
+		using T = Value_type<F_>;
 
 		/**
 		 * Encapsulate a pure value in the applicative functor.
@@ -148,7 +148,7 @@ namespace ftl {
 		 */
 		template<
 				typename Ff,
-				typename Fn = concept_parameter<plain_type<Ff>>,
+				typename Fn = Value_type<plain_type<Ff>>,
 				typename U = result_of<Fn(T)>>
 		static F<U> apply(Ff&& fn, const F<T>& f) {
 			return monad<F_>::apply(std::forward<Ff>(fn), f);
@@ -157,7 +157,7 @@ namespace ftl {
 		/// \overload
 		template<
 				typename Ff,
-				typename Fn = concept_parameter<plain_type<Ff>>,
+				typename Fn = Value_type<plain_type<Ff>>,
 				typename U = result_of<Fn(T)>>
 		static F<U> apply(Ff&& fn, F<T>&& f) {
 			return monad<F_>::apply(std::forward<Ff>(fn), std::move(f));
@@ -197,7 +197,7 @@ namespace ftl {
 	 *
 	 * This implementation of `pure` is applicable to any type with either a
 	 * suitable unary constructor (e.g., one taking a single
-	 * `concept_parameter<F>` as argument), or a constructor taking an
+	 * `Value_type<F>` as argument), or a constructor taking an
 	 * initialiser list of the same kind.
 	 *
 	 * Example:
@@ -212,7 +212,7 @@ namespace ftl {
 	 */
 	template<typename F>
 	struct deriving_pure {
-		using T = concept_parameter<F>;
+		using T = Value_type<F>;
 
 		static constexpr F pure(const T& t)
 		noexcept(std::is_nothrow_constructible<F,const T&>::value) {
@@ -264,7 +264,7 @@ namespace ftl {
 	 */
 	template<typename F>
 	struct aPure {
-		using T = concept_parameter<F>;
+		using T = Value_type<F>;
 
 		F operator() (const T& t) const {
 			return applicative<F>::pure(t);
@@ -424,11 +424,11 @@ namespace ftl {
 	 */
 	template<
 			typename F,
-			typename A = concept_parameter<F>,
+			typename A = Value_type<F>,
 			typename = typename std::enable_if<MonoidAlt<F>()>::type
 	>
-	typename re_parametrise<F,maybe<A>>::type optional(const F& f) {
-		using Fm = typename re_parametrise<F,maybe<A>>::type;
+	Rebind<F,maybe<A>> optional(const F& f) {
+		using Fm = Rebind<F,maybe<A>>;
 		return value<A> % f | applicative<Fm>::pure(maybe<A>{});
 	}
 }

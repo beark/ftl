@@ -127,7 +127,7 @@ namespace ftl {
 		 * This results in much cleaner type signatures.
 		 */
 		template<typename U>
-		using M = typename re_parametrise<M_,U>::type;
+		using M = Rebind<M_,U>;
 
 		/**
 		 * The type `M` is a monad on.
@@ -136,7 +136,7 @@ namespace ftl {
 		 * case, `T` depends on how (if at all) `M` specialises the
 		 * `parametric_traits` struct.
 		 */
-		using T = concept_parameter<M_>;
+		using T = Value_type<M_>;
 
 		/**
 		 * Encapsulate a "pure" value.
@@ -193,7 +193,7 @@ namespace ftl {
 		 *
 		 * \tparam F must satisfy \ref fn`<M<U>(T)>`
 		 */
-		template<typename F, typename U = concept_parameter<result_of<F(T)>>>
+		template<typename F, typename U = Value_type<result_of<F(T)>>>
 		static M<U> bind(const M<T>& m, F&& f);
 
 
@@ -287,10 +287,10 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct deriving_join<in_terms_of_bind<M>> {
-		using T = concept_parameter<M>;
+		using T = Value_type<M>;
 		
 		template<typename U>
-		using M_ = typename re_parametrise<M,U>::type;
+		using M_ = Rebind<M,U>;
 
 		static M_<T> join(const M_<M_<T>>& m) {
 			return monad<M_<M_<T>>>::bind(m, id);
@@ -328,10 +328,10 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct deriving_map<in_terms_of_bind<M>> {
-		using T = concept_parameter<M>;
+		using T = Value_type<M>;
 		
 		template<typename U>
-		using M_ = typename re_parametrise<M,U>::type;
+		using M_ = Rebind<M,U>;
 
 		template<typename F, typename U = result_of<F(T)>>
 		static M_<U> map(F f, const M_<T>& m) {
@@ -381,14 +381,14 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct deriving_bind {
-		using T = concept_parameter<M>;
+		using T = Value_type<M>;
 
 		template<typename U>
-		using M_ = typename re_parametrise<M,U>::type;
+		using M_ = Rebind<M,U>;
 
 		template<
 				typename F,
-				typename U = concept_parameter<result_of<F(T)>>
+				typename U = Value_type<result_of<F(T)>>
 		>
 		static M_<U> bind(const M_<T>& m, F&& f) {
 			return monad<M_<U>>::join(
@@ -398,7 +398,7 @@ namespace ftl {
 
 		template<
 				typename F,
-				typename U = concept_parameter<result_of<F(T)>>
+				typename U = Value_type<result_of<F(T)>>
 		>
 		static M_<U> bind(M_<T>&& m, F&& f) {
 			return monad<M_<U>>::join(
@@ -439,11 +439,11 @@ namespace ftl {
 	struct deriving_bind<back_insertable_container<M_>> {
 
 		/// Type alias for cleaner type signatures.
-		using T = concept_parameter<M_>;
+		using T = Value_type<M_>;
 
 		/// Another type alias to get more easily read type signatures.
 		template<typename U>
-		using M = typename re_parametrise<M_,U>::type;
+		using M = Rebind<M_,U>;
 
 		/**
 		 * This `bind` version follows the standard container theme of modelling
@@ -463,7 +463,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename Cu = result_of<F(T)>,
-				typename U = concept_parameter<Cu>,
+				typename U = Value_type<Cu>,
 				typename = typename std::enable_if<
 					ForwardIterable<Cu>()
 				>::type
@@ -483,7 +483,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename Cu = result_of<F(T)>,
-				typename U = concept_parameter<Cu>,
+				typename U = Value_type<Cu>,
 				typename = typename std::enable_if<
 					ForwardIterable<Cu>()
 				>::type
@@ -527,15 +527,15 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct deriving_apply<in_terms_of_bind<M>> {
-		using T = concept_parameter<M>;
+		using T = Value_type<M>;
 
 		template<typename U>
-		using M_ = typename re_parametrise<M,U>::type;
+		using M_ = Rebind<M,U>;
 
 		template<
 				typename Mf,
 				typename Mf_ = plain_type<Mf>,
-				typename F = concept_parameter<Mf_>,
+				typename F = Value_type<Mf_>,
 				typename U = result_of<F(T)>
 		>
 		static M_<U> apply(Mf&& f, M m) {
@@ -670,10 +670,10 @@ namespace ftl {
 			typename Mt,
 			typename Mu,
 			typename Mt_ = plain_type<Mt>,
-			typename T = concept_parameter<Mt_>,
+			typename T = Value_type<Mt_>,
 			typename = typename std::enable_if<Monad<Mt_>()>::type,
 			typename = typename std::enable_if<
-				std::is_same<typename re_parametrise<Mu,T>::type, Mt_>::value
+				std::is_same<Rebind<Mu,T>, Mt_>::value
 			>::type
 	>
 	Mu operator>> (Mt&& m1, const Mu& m2) {
@@ -698,10 +698,10 @@ namespace ftl {
 			typename Mt,
 			typename Mu,
 			typename = typename std::enable_if<Monad<Mt>()>::type,
-			typename T = concept_parameter<Mt>,
-			typename U = concept_parameter<Mu>,
+			typename T = Value_type<Mt>,
+			typename U = Value_type<Mu>,
 			typename = typename std::enable_if<
-				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
+				std::is_same<Rebind<Mu,T>, Mt>::value
 			>::type
 	>
 	Mt operator<< (const Mt& m1, Mu m2) {
@@ -716,10 +716,10 @@ namespace ftl {
 			typename Mt,
 			typename Mu,
 			typename = typename std::enable_if<Monad<Mt>()>::type,
-			typename T = concept_parameter<Mt>,
-			typename U = concept_parameter<Mu>,
+			typename T = Value_type<Mt>,
+			typename U = Value_type<Mu>,
 			typename = typename std::enable_if<
-				std::is_same<typename re_parametrise<Mu,T>::type, Mt>::value
+				std::is_same<Rebind<Mu,T>, Mt>::value
 			>::type
 	>
 	Mt operator<< (Mt&& m1, Mu m2) {
@@ -742,10 +742,10 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename F,
-			typename T = concept_parameter<Mt>,
+			typename T = Value_type<Mt>,
 			typename = typename std::enable_if<Monad<Mt>()>::type,
 			typename U = result_of<F(T)>,
-			typename Mu = typename re_parametrise<Mt,U>::type
+			typename Mu = Rebind<Mt,U>
 	>
 	Mu liftM(F f, const Mt& m) {
 		return m >>= [f] (const T& t) {
@@ -820,9 +820,9 @@ namespace ftl {
 		>
 		auto operator() (M&& m) const
 		-> decltype(
-			monad<concept_parameter<plain_type<M>>>::join(std::forward<M>(m))
+			monad<Value_type<plain_type<M>>>::join(std::forward<M>(m))
 		) {
-			return monad<concept_parameter<plain_type<M>>>::join(
+			return monad<Value_type<plain_type<M>>>::join(
 				std::forward<M>(m)
 			);
 		}
