@@ -48,10 +48,16 @@ namespace ftl {
 
 	template<typename K, typename V, typename C, typename A>
 	struct parametric_type_traits<std::map<K,V,C,A>> {
+	private:
+		template<typename U>
+		using rebind_allocator
+			= typename std::allocator_traits<A>::template rebind_alloc<U>;
+
+	public:
 		using value_type = V;
 
 		template<typename W>
-		using rebind = std::map<K,W,C,Rebind<A,std::pair<const K,W>>>;
+		using rebind = std::map<K,W,C,rebind_allocator<std::pair<const K,W>>>;
 	};
 
 	/**

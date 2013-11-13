@@ -57,10 +57,16 @@ namespace ftl {
 			typename A
 	>
 	struct parametric_type_traits<std::set<T,Cmp,A>> {
+	private:
+		template<typename U>
+		using rebind_allocator
+			= typename std::allocator_traits<A>::template rebind_alloc<U>;
+
+	public:
 		using value_type = T;
 
 		template<typename U>
-		using rebind = std::set<U,Rebind<Cmp,U>,Rebind<A,U>>;
+		using rebind = std::set<U,Rebind<Cmp,U>,rebind_allocator<U>>;
 	};
 
 	/**

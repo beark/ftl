@@ -55,11 +55,17 @@ namespace ftl {
 
 	template<typename K, typename V, typename H, typename C, typename A>
 	struct parametric_type_traits<std::unordered_map<K,V,H,C,A>> {
+	private:
+		template<typename U>
+		using rebind_allocator
+			= typename std::allocator_traits<A>::template rebind_alloc<U>;
+
+	public:
 		using value_type = V;
 
 		template<typename W>
 		using rebind =
-			std::unordered_map<K,W,H,C,Rebind<A,std::pair<const K,W>>>;
+			std::unordered_map<K,W,H,C,rebind_allocator<std::pair<const K,W>>>;
 	};
 
 	/**
