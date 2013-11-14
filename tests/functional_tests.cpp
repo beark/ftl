@@ -51,7 +51,8 @@ test_set functional_tests{
 				auto f = [](int x){ return float(x)/3.f; };
 
 				return (f % unary)(2) == 4.f/3.f
-					&& (f % binary)(2,2) == 4.f/3.f;
+					&& (f % binary)(2,2) == 4.f/3.f
+					&& (unary % binary)(2,2) == 8;
 				;
 			})
 		),
@@ -132,8 +133,7 @@ test_set functional_tests{
 
 				return f(-1) == 10 && f(1) == 10 && f(100) == 10;
 			})
-		)/*,
-		   TODO: FIX!
+		),
 		std::make_tuple(
 			std::string("applicative<std::function>::apply"),
 			std::function<bool()>([]() -> bool {
@@ -146,10 +146,9 @@ test_set functional_tests{
 
 				auto g = f_ * f;
 
-				// Why isn't this working?
 				return g(1) == 4;
 			})
-		)*/,
+		),
 		std::make_tuple(
 			std::string("monad<std::function>::bind"),
 			std::function<bool()>([]() -> bool {
