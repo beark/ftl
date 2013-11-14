@@ -92,9 +92,15 @@ namespace ftl {
 		explicit constexpr ord(int n) noexcept : o(n < 0 ? Lt : (n > 0 ? Gt : Eq)) {}
 
 		constexpr ord(const ord& order) noexcept : o(order.o) {}
-		constexpr ord(ord&& order) noexcept : o(std::move(order.o)) {}
+
+		// TODO: constexpr in c++14
+		ord(ord&& order) noexcept : o(std::move(order.o)) {}
+
 		constexpr ord(const ordering& order) noexcept : o(order) {}
-		constexpr ord(ordering&& order) noexcept : o(std::move(order)) {}
+
+		// TODO: constexpr in c++14
+		ord(ordering&& order) noexcept : o(std::move(order)) {}
+		
 		~ord() noexcept = default;
 
 		constexpr bool operator== (const ord& order) noexcept {
@@ -195,7 +201,8 @@ namespace ftl {
 	 */
 	template<>
 	struct monoid<ord> {
-		static constexpr ord id() noexcept {
+		// TODO: constexpr c++14
+		static ord id() noexcept {
 			return ord::Eq;
 		}
 
@@ -264,8 +271,8 @@ namespace ftl {
 			typename A,
 			typename B,
 			typename = typename std::enable_if<Orderable<B>()>::type>
-	function<ord(const A&,const A&)> comparing(function<B(A)> f) {
-		return [=] (const A& a, const A& b) {
+	function<ord(A,A)> comparing(function<B(A)> f) {
+		return [=] (A a, A b) {
 			return compare(f(a), f(b));
 		};
 	}

@@ -62,7 +62,13 @@ test_set ord_tests{
 		std::make_tuple(
 			std::string("comparing[method]"),
 			std::function<bool()>([]() -> bool {
-				auto cmp = ftl::comparing(&std::string::size);
+				// Weird clang workaround because some libc++ bug or incompatibility
+				ftl::function<size_t(const std::string&)> string_length =
+				[](const std::string& s) {
+					return s.size();
+				};
+
+				auto cmp = ftl::comparing(string_length);
 
 				return cmp(std::string("ab"),std::string("b")) == ftl::ord::Gt;
 			})

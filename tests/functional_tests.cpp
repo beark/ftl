@@ -104,7 +104,13 @@ test_set functional_tests{
 				using ftl::function;
 				using ftl::operator^;
 
-				auto f = ftl::comparing(&std::string::size);
+				// Weird clang workaround because some libc++ bug or incompatibility
+				function<size_t(const std::string&)> string_length =
+				[](const std::string& s) {
+					return s.size();
+				};
+
+				auto f = ftl::comparing(string_length);
 				auto g = ftl::getComparator<std::string>();
 
 				return (f ^ g)(std::string("aa"), std::string("ab")) == ftl::ord::Lt;

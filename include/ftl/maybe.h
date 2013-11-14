@@ -62,6 +62,10 @@ namespace ftl {
 
 		explicit invalid_maybe_access(std::string&& what)
 		: logic_error(std::move(what)) {}
+
+		explicit invalid_maybe_access(const char* what)
+		: logic_error(what) {}
+
 	};
 
 	/**
@@ -386,9 +390,9 @@ namespace ftl {
 		 */
 		value_type& operator* () {
 			if(!isValid)
-				throw invalid_maybe_access(
+				throw invalid_maybe_access{
 					"Attempting to read the value of Nothing."
-				);
+				};
 
 			return reinterpret_cast<T&>(val);
 		}
@@ -396,9 +400,9 @@ namespace ftl {
 		/// \overload
 		const value_type& operator* () const {
 			if(!isValid)
-				throw invalid_maybe_access(
+				throw invalid_maybe_access{
 					"Attempting to read the value of Nothing."
-				);
+				};
 
 			return reinterpret_cast<const T&>(val);
 		}
@@ -410,9 +414,9 @@ namespace ftl {
 		 */
 		value_type* operator-> () {
 			if(!isValid)
-				throw invalid_maybe_access(
+				throw invalid_maybe_access{
 					"Attempting to read the value of Nothing."
-				);
+				};
 
 			return reinterpret_cast<T*>(&val);
 		}
@@ -420,9 +424,9 @@ namespace ftl {
 		/// \overload
 		const value_type* operator-> () const {
 			if(!isValid)
-				throw invalid_maybe_access(
+				throw invalid_maybe_access{
 					"Attempting to read the value of Nothing."
-				);
+				};
 
 			return reinterpret_cast<const T*>(&val);
 		}

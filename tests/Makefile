@@ -1,7 +1,7 @@
 CPP=g++
 CXXFLAGS=-std=c++11 -I../include/ -Wall -Wextra
 LDFLAGS=-pthread
-OLVL=-O2
+OLVL=-O3
 
 TEST_OBJS=concept_tests.o either_tests.o eithert_tests.o functional_tests.o\
 	  future_tests.o fwdlist_tests.o lazy_tests.o lazyt_tests.o\

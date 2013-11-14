@@ -203,11 +203,13 @@ namespace ftl {
 	 *
 	 * \ingroup zippable
 	 */
-	struct ZipWith
-#ifndef DOCUMENTATION_GENERATOR
-	: private _dtl::curried_ternf<ZipWith>
-#endif
+	struct ZipWith : private _dtl::curried_ternf<ZipWith>
 	{
+		constexpr ZipWith() noexcept {}
+		constexpr ZipWith(const ZipWith&) noexcept {}
+		constexpr ZipWith(ZipWith&&) noexcept {}
+		~ZipWith() = default;
+
 		template<
 				typename F, typename Z, typename I,
 				typename = typename std::enable_if<Zippable<Z>()>::type
@@ -263,6 +265,11 @@ namespace ftl {
 		};
 
 	public:
+		constexpr Zip() noexcept {}
+		constexpr Zip(const Zip&) noexcept {}
+		constexpr Zip(Zip&&) noexcept {}
+		~Zip() = default;
+
 		template<
 				typename Z, typename I,
 				typename = typename std::enable_if<Zippable<Z>()>::type

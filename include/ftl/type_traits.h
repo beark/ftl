@@ -24,6 +24,8 @@
 #define FTL_TYPE_TRAITS_H
 
 #include <utility>
+#include <iterator>
+#include <functional>
 
 #define FTL_GEN_BINOP_TEST(op, name)\
 	template<typename T>\
@@ -60,12 +62,6 @@
 	template<typename T, typename U>\
 	no test_ ## name (...)
 
-// Forward declaration
-namespace std {
-	template<typename>
-	class function;
-}
-	
 namespace ftl {
 	/**
 	 * \defgroup typetraits Type Traits
@@ -82,6 +78,8 @@ namespace ftl {
 	 *
 	 * \par Dependencies
 	 * - <utility>
+	 * - <iterator>
+	 * - <functional>
 	 */
 
 	namespace _dtl {

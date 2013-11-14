@@ -616,6 +616,11 @@ namespace ftl {
 	 */
 	struct constant : private _dtl::curried_binf<constant>
 	{
+		constexpr constant() noexcept {}
+		constexpr constant(const constant&) noexcept {}
+		constexpr constant(constant&&) noexcept {}
+		~constant() = default;
+
 		template<typename T, typename U>
 		constexpr auto operator() (T&& t, U&&) noexcept
 		-> decltype(std::forward<T>(t)) {
