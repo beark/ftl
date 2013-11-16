@@ -31,7 +31,8 @@ namespace ftl {
 	/**
 	 * \defgroup prelude Prelude
 	 *
-	 * A number of utility functions useful with higher order functions.
+	 * A collection of utilities and functions, typically useful in combination
+	 * with the other, more specialised FTL modules.
 	 *
 	 * \code
 	 *   #include <ftl/prelude.h>
@@ -75,6 +76,27 @@ namespace ftl {
 	 * \ingroup prelude
 	 */
 	constexpr identity id{};
+
+	
+	/**
+	 * A short-hand alias of `std::enable_if`.
+	 *
+	 * \note Consider this a temporary solution until concepts lite or something
+	 * similar becomes readily available. As soon as that comes to pass, this
+	 * construct will be considered deprecated.
+	 *
+	 * Example:
+	 * \code
+	 *   template<typename M, typename = Requires<Monad<M>()>>
+	 *   void foo(const M& m) {
+	 *       // Safely perform monadic operations on m
+	 *   }
+	 * \endcode
+	 *
+	 * \ingroup prelude
+	 */
+	template<bool Pred>
+	using Requires = typename std::enable_if<Pred>::type;
 
 	/**
 	 * Used to distinguish in-place constructors from others.
@@ -163,9 +185,9 @@ namespace ftl {
 
 			template<
 					typename...Args2,
-					typename = typename std::enable_if<
+					typename = Requires<
 						is_callable<F,Args1...,Args2...>::value
-					>::type
+					>
 			>
 			auto operator() (Args2&&...args2) const
 			-> typename std::result_of<F(Args1...,Args2...)>::type {
@@ -180,9 +202,9 @@ namespace ftl {
 
 			template<
 					typename...Args2,
-					typename = typename std::enable_if<
+					typename = Requires<
 						!is_callable<F,Args1...,Args2...>::value
-					>::type
+					>
 			>
 			auto operator() (Args2&&...args2) const
 			-> curried_fn<F,Args1...,Args2...> {
@@ -212,9 +234,9 @@ namespace ftl {
 
 			template<
 					typename...Args,
-					typename = typename std::enable_if<
+					typename = Requires<
 						is_callable<F,Args...>::value
-					>::type
+					>
 			>
 			auto operator() (Args&&...args) const
 			-> decltype(f(std::forward<Args>(args)...)) {
@@ -223,9 +245,9 @@ namespace ftl {
 
 			template<
 					typename...Args,
-					typename = typename std::enable_if<
+					typename = Requires<
 						!is_callable<F,Args...>::value
-					>::type
+					>
 			>
 			auto operator() (Args&&...args) const
 			-> curried_fn<F,Args...> {
@@ -290,9 +312,7 @@ namespace ftl {
 	 */
 	template<
 			typename F,
-			typename = typename std::enable_if<
-				!is_monomorphic<plain_type<F>>::value
-			>::type
+			typename = Requires<!is_monomorphic<plain_type<F>>::value>
 	>
 #ifndef DOCUMENTATION_GENERATOR
 	_dtl::curried_fn<plain_type<F>>
@@ -413,9 +433,9 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *       typename Container,
-	 *       typename = typename std::enable_if<
+	 *       typename = Requires<
 	 *           ForwardIterable<Container>()
-	 *       >::type
+	 *       >
 	 *   >
 	 *   void foo(const Container& c) {
 	 *       // Safe to iterate with e.g. for(auto& e : c)

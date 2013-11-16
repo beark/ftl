@@ -219,7 +219,7 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *       typename M,
-	 *       typename = typename std::enable_if<Monad<M>()>::type
+	 *       typename = Requires<Monad<M>()>
 	 *   >
 	 *   void myFunc(const M& m) {
 	 *       // Use bind, join, apply, etc on m
@@ -464,9 +464,7 @@ namespace ftl {
 				typename F,
 				typename Cu = result_of<F(T)>,
 				typename U = Value_type<Cu>,
-				typename = typename std::enable_if<
-					ForwardIterable<Cu>()
-				>::type
+				typename = Requires<ForwardIterable<Cu>()>
 		>
 		static M<U> bind(const M<T>& m, F&& f) {
 			auto m2 = std::forward<F>(f) % m;
@@ -484,9 +482,9 @@ namespace ftl {
 				typename F,
 				typename Cu = result_of<F(T)>,
 				typename U = Value_type<Cu>,
-				typename = typename std::enable_if<
+				typename = Requires<
 					ForwardIterable<Cu>()
-				>::type
+				>
 		>
 		static M<U> bind(M<T>&& m, F&& f) {
 			auto m2 = std::forward<F>(f) % std::move(m);
@@ -614,7 +612,7 @@ namespace ftl {
 			typename M,
 			typename F,
 			typename M_ = plain_type<M>,
-			typename = typename std::enable_if<Monad<M_>()>::type
+			typename = Requires<Monad<M_>()>
 	>
 	auto operator>>= (M&& m, F&& f)
 	-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
@@ -633,7 +631,7 @@ namespace ftl {
 			typename M,
 			typename F,
 			typename M_ = plain_type<M>,
-			typename = typename std::enable_if<Monad<M_>()>::type
+			typename = Requires<Monad<M_>()>
 	>
 	auto operator<<= (F&& f, M&& m)
 	-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
@@ -671,10 +669,10 @@ namespace ftl {
 			typename Mu,
 			typename Mt_ = plain_type<Mt>,
 			typename T = Value_type<Mt_>,
-			typename = typename std::enable_if<Monad<Mt_>()>::type,
-			typename = typename std::enable_if<
+			typename = Requires<Monad<Mt_>()>,
+			typename = Requires<
 				std::is_same<Rebind<Mu,T>, Mt_>::value
-			>::type
+			>
 	>
 	Mu operator>> (Mt&& m1, const Mu& m2) {
 		return monad<Mt_>::bind(std::forward<Mt>(m1), [m2](const T&) {
@@ -697,12 +695,12 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mu,
-			typename = typename std::enable_if<Monad<Mt>()>::type,
+			typename = Requires<Monad<Mt>()>,
 			typename T = Value_type<Mt>,
 			typename U = Value_type<Mu>,
-			typename = typename std::enable_if<
+			typename = Requires<
 				std::is_same<Rebind<Mu,T>, Mt>::value
-			>::type
+			>
 	>
 	Mt operator<< (const Mt& m1, Mu m2) {
 		return monad<Mt>::bind(m1, [m2](T t) {
@@ -715,12 +713,12 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mu,
-			typename = typename std::enable_if<Monad<Mt>()>::type,
+			typename = Requires<Monad<Mt>()>,
 			typename T = Value_type<Mt>,
 			typename U = Value_type<Mu>,
-			typename = typename std::enable_if<
+			typename = Requires<
 				std::is_same<Rebind<Mu,T>, Mt>::value
-			>::type
+			>
 	>
 	Mt operator<< (Mt&& m1, Mu m2) {
 		return monad<Mt>::bind(m1, [m2](T t) {
@@ -743,7 +741,7 @@ namespace ftl {
 			typename Mt,
 			typename F,
 			typename T = Value_type<Mt>,
-			typename = typename std::enable_if<Monad<Mt>()>::type,
+			typename = Requires<Monad<Mt>()>,
 			typename U = result_of<F(T)>,
 			typename Mu = Rebind<Mt,U>
 	>
@@ -816,7 +814,7 @@ namespace ftl {
 	struct mJoin {
 		template<
 				typename M,
-				typename = typename std::enable_if<Monad<plain_type<M>>()>::type
+				typename = Requires<Monad<plain_type<M>>()>
 		>
 		auto operator() (M&& m) const
 		-> decltype(

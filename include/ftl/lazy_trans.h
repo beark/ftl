@@ -216,7 +216,7 @@ namespace ftl {
 
 			template<
 					typename F,
-					typename = typename std::enable_if<
+					typename = Requires<
 						std::is_same<Rebind<M,U>, M2>::value
 					>
 			>
@@ -230,7 +230,7 @@ namespace ftl {
 
 			template<
 					typename F,
-					typename = typename std::enable_if<
+					typename = Requires<
 						std::is_same<Rebind<M,U>, M2>::value
 					>
 			>

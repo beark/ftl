@@ -90,7 +90,7 @@ namespace ftl {
 		 *
 		 * \tparam T must be a \ref monoid
 		 */
-		template<typename = typename std::enable_if<Monoid<T>()>::type>
+		template<typename = Requires<Monoid<T>()>>
 		static T fold(const F& f);
 
 		/**
@@ -108,7 +108,7 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename M = typename std::result_of<Fn(T)>::type,
-				typename = typename std::enable_if<Monoid<M>()>::type
+				typename = Requires<Monoid<M>()>
 		>
 		static M foldMap(Fn&& fn, const F& f);
 
@@ -132,9 +132,9 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename U,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_same<U, result_of<Fn(T,U)>>::value
-				>::type
+				>
 		>
 		static U foldr(Fn&& fn, U&& z, const F& f);
 
@@ -159,9 +159,9 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename U,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_same<U, result_of<Fn(U,T)>>::value
-				>::type
+				>
 		>
 		static U foldl(Fn&& fn, U&& z, const F& f);
 
@@ -180,7 +180,7 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *       typename F,
-	 *       typename = typename std::enable_if<Foldable<F>()>::type
+	 *       typename = Requires<Foldable<F>()>
 	 *   >
 	 *   void foo(const F& f) {
 	 *       // Perform folds on f
@@ -216,7 +216,7 @@ namespace ftl {
 	 */
 	template<
 			typename F,
-			typename = typename std::enable_if<ForwardIterable<F>()>::type
+			typename = Requires<ForwardIterable<F>()>
 	>
 	struct deriving_foldl {
 		using T = Value_type<F>;
@@ -224,12 +224,12 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename U,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_convertible<
 						typename std::result_of<Fn(U,T)>::type,
 						U
 					>::value
-				>::type
+				>
 		>
 		static U foldl(Fn&& fn, U z, const F& f) {
 			for(auto& e : f) {
@@ -242,12 +242,12 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename U,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_convertible<
-						std::result_of<Fn(U,T)>,
+						typename std::result_of<Fn(U,T)>::type,
 						plain_type<U>
 					>::value
-				>::type
+				>
 		>
 		static U foldl(Fn&& fn, U z, F&& f) {
 			for(auto& e : f) {
@@ -282,12 +282,12 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename U,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_convertible<
 						typename std::result_of<Fn(T,U)>::type,
 						U
 					>::value
-				>::type
+				>
 		>
 		static U foldr(Fn&& fn, U z, const F& f) {
 			for(auto it = f.rbegin(); it != f.rend(); ++it) {
@@ -300,12 +300,12 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename U,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_convertible<
-						std::result_of<Fn(T,U)>,
+						typename std::result_of<Fn(T,U)>::type,
 						U
 					>::value
-				>::type
+				>
 		>
 		static U foldr(Fn&& fn, U z, F&& f) {
 			for(auto it = f.rbegin(); it != f.rend(); ++it) {
@@ -341,7 +341,7 @@ namespace ftl {
 				typename Fn,
 				typename T = Value_type<F>,
 				typename M = result_of<Fn(T)>,
-				typename = typename std::enable_if<Monoid<M>()>::type
+				typename = Requires<Monoid<M>()>
 		>
 		static M foldMap(Fn fn, const F& f) {
 			return foldable<F>::foldl(
@@ -383,7 +383,7 @@ namespace ftl {
 	struct deriving_fold {
 		template<
 				typename M = Value_type<F>,
-				typename = typename std::enable_if<Monoid<M>()>::type
+				typename = Requires<Monoid<M>()>
 		>
 		static M fold(const F& f) {
 			return foldable<F>::foldMap(id, f);
@@ -419,8 +419,7 @@ namespace ftl {
 	template<
 			typename F,
 			typename M = Value_type<F>,
-			typename = typename std::enable_if<Foldable<F>()>::type,
-			typename = typename std::enable_if<Monoid<M>()>::type
+			typename = Requires<Foldable<F>() && Monoid<M>()>
 	>
 	M fold(const F& f) {
 		return foldable<F>::fold(f);
@@ -443,7 +442,7 @@ namespace ftl {
 				typename F,
 				typename T = Value_type<F>,
 				typename Fn,
-				typename = typename std::enable_if<Foldable<F>()>::type
+				typename = Requires<Foldable<F>()>
 		>
 		auto operator() (Fn&& fn, const F& f) const
 		-> decltype(foldable<F>::foldMap(std::forward<Fn>(fn), f)) {
@@ -486,10 +485,10 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename T = Value_type<F>,
-				typename = typename std::enable_if<Foldable<F>()>::type,
-				typename = typename std::enable_if<
+				typename = Requires<Foldable<F>()>,
+				typename = Requires<
 					std::is_same<plain_type<U>, result_of<Fn(T,U)>>::value
-				>::type
+				>
 		>
 		plain_type<U> operator() (Fn&& fn, U&& z, const F& f) const {
 			return foldable<F>::foldr(std::forward<Fn>(fn), std::forward<U>(z), f);
@@ -520,10 +519,10 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename T = Value_type<F>,
-				typename = typename std::enable_if<Foldable<F>()>::type,
-				typename = typename std::enable_if<
+				typename = Requires<Foldable<F>()>,
+				typename = Requires<
 					std::is_same<plain_type<U>, result_of<Fn(U,T)>>::value
-				>::type
+				>
 		>
 		plain_type<U> operator() (Fn&& fn, U&& z, const F& f) const {
 			return foldable<F>::foldl(std::forward<Fn>(fn), std::forward<U>(z), f);

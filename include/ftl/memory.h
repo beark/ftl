@@ -158,9 +158,7 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename U,
-				typename = typename std::enable_if<
-					std::is_same<U, result_of<Fn(U,T)>>::value
-				>::type
+				typename = Requires<std::is_same<U, result_of<Fn(U,T)>>::value>
 		>
 		static U foldl(Fn&& fn, U&& z, std::shared_ptr<T> p) {
 			if(p) {
@@ -173,9 +171,7 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename U,
-				typename = typename std::enable_if<
-					std::is_same<U, result_of<Fn(T,U)>>::value
-					>::type
+				typename = Requires<std::is_same<U, result_of<Fn(T,U)>>::value>
 				>
 		static U foldr(Fn&& fn, U&& z, std::shared_ptr<T> p) {
 			if(p) {

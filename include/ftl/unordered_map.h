@@ -101,9 +101,9 @@ namespace ftl {
 		template<
 				typename F,
 				typename U = result_of<F(T)>,
-				typename = typename std::enable_if<
+				typename = Requires<
 					!std::is_same<T,U>::value
-				>::type
+				>
 		>
 		static unordered_map<U> map(F&& f, unordered_map<T>&& m) {
 			unordered_map<U> rm;
@@ -121,9 +121,9 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_same<T,result_of<F(T)>>::value
-				>::type
+				>
 		>
 		static unordered_map<T> map(F&& f, unordered_map<T>&& m) {
 			for(auto& kv : m) {

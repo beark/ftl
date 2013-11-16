@@ -93,9 +93,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename U = result_of<F(T)>,
-				typename = typename std::enable_if<
-					!std::is_same<T,U>::value
-				>::type
+				typename = Requires<!std::is_same<T,U>::value>
 		>
 		static Map<U> map(F&& f, Map<T>&& m) {
 			Map<U> rm;
@@ -113,9 +111,9 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_same<T,result_of<F(T)>>::value
-				>::type
+				>
 		>
 		static Map<T> map(F&& f, Map<T>&& m) {
 			for(auto& kv : m) {
@@ -140,9 +138,9 @@ namespace ftl {
 		template<
 				typename F,
 				typename U,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_same<U, result_of<F(U,T)>>::value
-				>::type
+				>
 		>
 		static U foldl(F&& f, U z, const std::map<K,T,C,A>& m) {
 			for(auto& kv : m) {
@@ -155,9 +153,9 @@ namespace ftl {
 		template<
 				typename F,
 				typename U,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_same<U, result_of<F(T,U)>>::value
-				>::type
+				>
 		>
 		static U foldr(F&& f, U z, const std::map<K,T,C,A>& m) {
 			for(auto it = m.rbegin(); it != m.rend(); ++it) {

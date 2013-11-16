@@ -245,8 +245,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename U = result_of<F(T)>,
-				typename =
-					typename std::enable_if<!std::is_same<T,U>::value>::type
+				typename = Requires<!std::is_same<T,U>::value>
 
 		>
 		static forward_list<U> map(F&& f, forward_list<T>&& l) {
@@ -267,9 +266,8 @@ namespace ftl {
 		 */
 		template<
 				typename F,
-				typename = typename std::enable_if<
-					std::is_same<T, result_of<F(T)>>::value
-				>::type>
+				typename = Requires<std::is_same<T, result_of<F(T)>>::value>
+		>
 		static forward_list<T> map(F&& f, forward_list<T>&& l) {
 
 			auto rl = std::move(l);
@@ -354,9 +352,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename U,
-				typename = typename std::enable_if<
-					std::is_same<U, result_of<F(T,U)>>::value
-				>::type
+				typename = Requires<std::is_same<U, result_of<F(T,U)>>::value>
 		>
 		static U foldr(F&& f, U&& z, const std::forward_list<T,A>& l) {
 			return _dtl::fwdfoldr(
@@ -388,7 +384,7 @@ namespace ftl {
 				typename FwdIt,
 				typename U = Value_type<FwdIt>,
 				typename V = result_of<F(T,U)>,
-				typename = typename std::enable_if<ForwardIterable<FwdIt>()>::type
+				typename = Requires<ForwardIterable<FwdIt>()>
 		>
 		static std::forward_list<V,A_<V>> zipWith(
 				F f, const std::forward_list<T,A>& l, const FwdIt& it

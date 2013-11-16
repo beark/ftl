@@ -131,7 +131,7 @@ namespace ftl {
 	 *   // non-monoids.
 	 *   template<
 	 *       typename M,
-	 *       typename = typename std::enable_if<Monoid<M>()>::type
+	 *       typename = Requires<Monoid<M>()>
 	 *   >
 	 *   void myFunc(M m1, M m2);
 	 * \endcode
@@ -175,10 +175,10 @@ namespace ftl {
 			typename M1,
 			typename M2,
 			typename M = plain_type<M1>,
-			typename = typename std::enable_if<
+			typename = Requires<
 				Monoid<M>()
 				&& std::is_same<M,plain_type<M2>>::value
-			>::type
+			>
 	>
 	M operator^ (M1&& m1, M2&& m2) {
 		return monoid<M>::append(std::forward<M1>(m1), std::forward<M2>(m2));
@@ -203,10 +203,10 @@ namespace ftl {
 				typename M1,
 				typename M2,
 				typename M = plain_type<M1>,
-				typename = typename std::enable_if<
+				typename = Requires<
 					Monoid<M>()
 					&& std::is_same<M,plain_type<M2>>::value
-				>::type
+				>
 		>
 		M operator() (M1&& m1, M2&& m2) const {
 			return

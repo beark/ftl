@@ -39,7 +39,8 @@ namespace ftl {
 	 * pair containing the corresponding elements of the original lists.
 	 *
 	 * \par Laws
-	 * - `zipWith(const_, a, b) == a`
+	 * - `zipWith(const_, a, b) == a`, for any `a` and `b` where
+	 *   `length(b) >= length(a)`
 	 * - Given the zipped value `z = zipWith(f, a, b)`, for any `f` lacking
 	 *   side effects, then `length(z) == min(length(a), length(b))`
 	 *
@@ -115,7 +116,7 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *       typename Z,
-	 *       typename = typename std::enable_if<Zippable<Z>()>::type
+	 *       typename = Requires<Zippable<Z>()>
 	 *   >
 	 *   void foo(const Z& z) {
 	 *       // Perform zips on z
@@ -169,9 +170,9 @@ namespace ftl {
 		template<
 				typename F, typename Iterable,
 				typename U = result_of<F(T,Value_type<Iterable>)>,
-				typename = typename std::enable_if<
+				typename = Requires<
 					ForwardIterable<Iterable>()
-				>::type
+				>
 		>
 		static Z_<U> zipWith(F f, const Z_<T>& z, const Iterable& i) {
 			auto it1 = z.begin();
@@ -212,7 +213,7 @@ namespace ftl {
 
 		template<
 				typename F, typename Z, typename I,
-				typename = typename std::enable_if<Zippable<Z>()>::type
+				typename = Requires<Zippable<Z>()>
 		>
 		auto operator() (F&& f, const Z& z, const I& i) const
 		-> decltype(zippable<Z>::zipWith(std::forward<F>(f), z, i)) {
@@ -272,7 +273,7 @@ namespace ftl {
 
 		template<
 				typename Z, typename I,
-				typename = typename std::enable_if<Zippable<Z>()>::type
+				typename = Requires<Zippable<Z>()>
 		>
 		auto operator() (const Z& z, const I& i) const
 		-> decltype(zippable<Z>::zipWith(mktup<Value_type<Z>,Value_type<I>>{}, z, i)) {

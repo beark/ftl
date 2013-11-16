@@ -215,9 +215,7 @@ namespace ftl {
 
 			template<
 					typename F,
-					typename = typename std::enable_if<
-						std::is_same<Rebind<M,U>, M2>::value
-					>
+					typename = Requires<std::is_same<Rebind<M,U>, M2>::value>
 			>
 			static mT<U> bind(const mT<T>& m, F f) {
 				return mT<U>{
@@ -232,9 +230,7 @@ namespace ftl {
 
 			template<
 					typename F,
-					typename = typename std::enable_if<
-						std::is_same<Rebind<M,U>, M2>::value
-					>
+					typename = Requires<std::is_same<Rebind<M,U>, M2>::value>
 			>
 			static mT<U> bind(mT<T>&& m, F f) {
 				return mT<U>{
@@ -341,9 +337,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename U,
-				typename = typename std::enable_if<
-					std::is_same<U, result_of<F(T,U)>>::value
-				>::type
+				typename = Requires<std::is_same<U, result_of<F(T,U)>>::value>
 		>
 		static U foldl(F f, U z, const maybeT<M>& mT) {
 			return foldable<Mmt>::foldl(
@@ -361,9 +355,7 @@ namespace ftl {
 		template<
 				typename F,
 				typename U,
-				typename = typename std::enable_if<
-					std::is_same<U, result_of<F(T,U)>>::value
-				>::type
+				typename = Requires<std::is_same<U, result_of<F(T,U)>>::value>
 		>
 		static U foldr(F f, U z, const maybeT<M>& mT) {
 			return foldable<Mmt>::foldr(

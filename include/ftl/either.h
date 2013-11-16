@@ -569,8 +569,7 @@ namespace ftl {
 	 */
 	template<
 			typename L, typename R,
-			typename = typename std::enable_if<Orderable<L>()>::type,
-			typename = typename std::enable_if<Orderable<R>()>::type
+			typename = Requires<Orderable<L>() && Orderable<R>()>
 	>
 	constexpr bool operator< (const either<L,R>& e1, const either<L,R>& e2)
 	noexcept {
@@ -604,8 +603,7 @@ namespace ftl {
 	 */
 	template<
 			typename L, typename R,
-			typename = typename std::enable_if<Orderable<L>()>::type,
-			typename = typename std::enable_if<Orderable<R>()>::type
+			typename = Requires<Orderable<L>() && Orderable<R>()>
 	>
 	constexpr bool operator> (const either<L,R>& e1, const either<L,R>& e2)
 	noexcept {

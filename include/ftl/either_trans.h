@@ -236,7 +236,7 @@ namespace ftl {
 			// Automatic lift when binding to operations in M_
 			template<
 					typename F,
-					typename = typename std::enable_if<
+					typename = Requires<
 						std::is_same<Rebind<M,U>, M2>::value
 					>
 			>
@@ -257,7 +257,7 @@ namespace ftl {
 
 			template<
 					typename F,
-					typename = typename std::enable_if<
+					typename = Requires<
 						std::is_same<Rebind<M,U>, M2>::value
 					>
 			>
@@ -362,9 +362,9 @@ namespace ftl {
 		template<
 				typename F,
 				typename U,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_same<U, result_of<F(U,T)>>::value
-				>::type
+				>
 		>
 		static U foldl(F f, U z, const eitherT<L,M>& me) {
 			return foldable<Met>::foldl(
@@ -383,9 +383,9 @@ namespace ftl {
 		template<
 				typename F,
 				typename U,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_same<U, result_of<F(T,U)>>::value
-				>::type
+				>
 		>
 		static U foldr(F f, U z, const eitherT<L,M>& me) {
 			return foldable<Met>::foldr(

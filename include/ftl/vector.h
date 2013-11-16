@@ -238,9 +238,7 @@ namespace ftl {
 				typename F,
 				typename Cu = result_of<F(T)>,
 				typename U = Value_type<Cu>,
-				typename = typename std::enable_if<
-					ForwardIterable<Cu>()
-				>::type
+				typename = Requires<ForwardIterable<Cu>()>
 		>
 		static vector<U> bind(const vector<T>& v, F&& f);
 
@@ -249,9 +247,7 @@ namespace ftl {
 				typename F,
 				typename Cu = result_of<F(T)>,
 				typename U = Value_type<Cu>,
-				typename = typename std::enable_if<
-					ForwardIterable<Cu>()
-				>::type
+				typename = Requires<ForwardIterable<Cu>()>
 		>
 		static vector<U> bind(vector<T>&& v, F&& f);
 #endif

@@ -107,7 +107,7 @@ namespace ftl {
 	 * Example:
 	 * \code
 	 *   template<typename T>
-	 *   auto foo() -> typename std::enable_if<ftl::has_eq<T>::value>::type {
+	 *   auto foo() -> Requires<ftl::has_eq<T>::value> {
 	 *       // ...
 	 *       if(some_t == other_t)
 	 *       // ...
@@ -131,7 +131,7 @@ namespace ftl {
 	 * Example:
 	 * \code
 	 *   template<typename T>
-	 *   auto foo() -> typename std::enable_if<ftl::has_neq<T>::value>::type {
+	 *   auto foo() -> Requires<ftl::has_neq<T>::value> {
 	 *       // ...
 	 *       if(some_t != other_t)
 	 *       // ...
@@ -156,7 +156,7 @@ namespace ftl {
 	 * Example:
 	 * \code
 	 *   template<typename T>
-	 *   auto foo() -> typename std::enable_if<ftl::has_lt<T>::value>::type {
+	 *   auto foo() -> Requires<ftl::has_lt<T>::value> {
 	 *       // ...
 	 *       if(some_t < other_t)
 	 *       // ...
@@ -180,7 +180,7 @@ namespace ftl {
 	 * Example:
 	 * \code
 	 *   template<typename T>
-	 *   auto foo() -> typename std::enable_if<ftl::has_gt<T>::value>::type {
+	 *   auto foo() -> Requires<ftl::has_gt<T>::value> {
 	 *       // ...
 	 *       if(some_t > other_t)
 	 *       // ...
@@ -204,8 +204,7 @@ namespace ftl {
 	 * Example:
 	 * \code
 	 *   template<typename T>
-	 *   auto foo()
-	 *   -> typename std::enable_if<ftl::has_pre_inc<T>::value>::type {
+	 *   auto foo() -> Requires<ftl::has_pre_inc<T>::value> {
 	 *       // ...
 	 *       ++some_t;
 	 *   }
@@ -232,7 +231,7 @@ namespace ftl {
 	 * \code
 	 *   template<typename T>
 	 *   auto foo()
-	 *   -> typename std::enable_if<ftl::has_post_inc<T>::value>::type {
+	 *   -> Requires<ftl::has_post_inc<T>::value> {
 	 *       // ...
 	 *       some_t++;
 	 *   }
@@ -259,10 +258,10 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *   	typename T,
-	 *   	typename = typename std::enable_if<
+	 *   	typename = Requires<
 	 *   	    ftl::has_begin<T>::value
 	 *   	    && ftl::has_end<T>::value
-	 *   	>::type
+	 *   	>
 	 *   >
 	 *   void foo() {
 	 *       for(auto& e : some_t) {
@@ -290,10 +289,10 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *   	typename T,
-	 *   	typename = typename std::enable_if<
+	 *   	typename = Requires<
 	 *   	    ftl::has_rbegin<T>::value
 	 *   	    && ftl::has_rend<T>::value
-	 *   	>::type
+	 *   	>
 	 *   >
 	 *   void foo() {
 	 *       for(auto it = some_t.rbegin(); it != some_t.rend(); ++it) {
@@ -320,10 +319,10 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *   	typename T,
-	 *   	typename = typename std::enable_if<
+	 *   	typename = Requires<
 	 *   	    ftl::has_begin<T>::value
 	 *   	    && ftl::has_end<T>::value
-	 *   	>::type
+	 *   	>
 	 *   >
 	 *   void foo() {
 	 *       for(auto& e : some_t) {
@@ -350,10 +349,10 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *   	typename T,
-	 *   	typename = typename std::enable_if<
+	 *   	typename = Requires<
 	 *   	    ftl::has_rbegin<T>::value
 	 *   	    && ftl::has_rend<T>::value
-	 *   	>::type
+	 *   	>
 	 *   >
 	 *   void foo() {
 	 *       for(auto it = some_t.rbegin(); it != some_t.rend(); ++it) {

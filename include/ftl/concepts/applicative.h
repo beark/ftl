@@ -180,7 +180,7 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *       typename F,
-	 *       typename = typename std::enable_if<Applicative<F>()>::type
+	 *       typename = Requires<Applicative<F>()>
 	 *   >
 	 *   myFunction(const F& f);
 	 * \endcode
@@ -240,10 +240,10 @@ namespace ftl {
 			typename F,
 			typename Fn,
 			typename F_ = plain_type<F>,
-			typename = typename std::enable_if<Applicative<F_>()>::type,
-			typename = typename std::enable_if<
+			typename = Requires<Applicative<F_>()>,
+			typename = Requires<
 				is_same_template<plain_type<Fn>,F_>::value
-			>::type
+			>
 	>
 	auto operator* (Fn&& u, F&& v)
 	-> decltype(applicative<F_>::apply(
@@ -396,10 +396,10 @@ namespace ftl {
 			typename F1,
 			typename F2,
 			typename F = plain_type<F1>,
-			typename = typename std::enable_if<
+			typename = Requires<
 				MonoidAlt<F>()
 				&& std::is_same<F,plain_type<F2>>::value
-			>::type
+			>
 	>
 	F operator| (F1&& f1, F2&& f2) {
 		return monoidA<F>::orDo(std::forward<F1>(f1), std::forward<F2>(f2));
@@ -425,7 +425,7 @@ namespace ftl {
 	template<
 			typename F,
 			typename A = Value_type<F>,
-			typename = typename std::enable_if<MonoidAlt<F>()>::type
+			typename = Requires<MonoidAlt<F>()>
 	>
 	Rebind<F,maybe<A>> optional(const F& f) {
 		using Fm = Rebind<F,maybe<A>>;

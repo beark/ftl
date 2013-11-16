@@ -139,7 +139,7 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *       typename F,
-	 *       typename = typename std::enable_if<Functor<F>()>::type
+	 *       typename = Requires<Functor<F>()>
 	 *   >
 	 *   void myFunc(const F& f);
 	 * \endcode
@@ -197,11 +197,11 @@ namespace ftl {
 
 		template<
 				typename Fn, typename U = result_of<Fn(T)>,
-				typename = typename std::enable_if<
+				typename = Requires<
 					!std::is_same<U,T>::value
 					|| (!std::is_copy_assignable<T>::value
 					&& !std::is_move_assignable<T>::value)
-				>::type
+				>
 		>
 		static F<U> map(Fn&& fn, F<T>&& f) {
 			F<U> result;
@@ -214,11 +214,11 @@ namespace ftl {
 
 		template<
 				typename Fn,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_same<result_of<Fn(T)>,T>::value
 					&& (std::is_copy_assignable<T>::value
 					|| std::is_move_assignable<T>::value)
-				>::type
+				>
 		>
 		static F<T> map(Fn&& fn, F<T>&& f) {
 			for(auto& e : f) {
@@ -260,7 +260,7 @@ namespace ftl {
 		typename F,
 		typename Fn,
 		typename F_ = plain_type<F>,
-		typename = typename std::enable_if<Functor<F_>()>::type>
+		typename = Requires<Functor<F_>()>>
 	auto operator% (Fn&& fn, F&& f)
 	-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f))) {
 		return functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f));
@@ -292,12 +292,12 @@ namespace ftl {
 				typename Fn,
 				typename F,
 				typename F_ = plain_type<F>,
-				typename = typename std::enable_if<
+				typename = Requires<
 					!std::is_same<
 						result_of<Fn(Value_type<F_>)>,
 						void
 					>::value
-				>::type
+				>
 		>
 		auto operator() (Fn&& fn, F&& f) const
 		-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f))){
@@ -308,12 +308,12 @@ namespace ftl {
 				typename Fn,
 				typename F,
 				typename F_ = plain_type<F>,
-				typename = typename std::enable_if<
+				typename = Requires<
 					std::is_same<
 						result_of<Fn(Value_type<F_>)>,
 						void
 					>::value
-				>::type
+				>
 		>
 		void operator() (Fn&& fn, F&& f) const {
 			mapM<F_>::apply(std::forward<Fn>(fn), std::forward<F>(f));
