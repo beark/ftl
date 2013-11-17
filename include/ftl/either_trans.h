@@ -236,9 +236,7 @@ namespace ftl {
 			// Automatic lift when binding to operations in M_
 			template<
 					typename F,
-					typename = Requires<
-						std::is_same<Rebind<M,U>, M2>::value
-					>
+					typename = Requires<std::is_same<Rebind<M,U>, M2>::value>
 			>
 			static eT<U> bind(const eT<T>& e, F f) {
 				return eT<U>{
@@ -257,9 +255,7 @@ namespace ftl {
 
 			template<
 					typename F,
-					typename = Requires<
-						std::is_same<Rebind<M,U>, M2>::value
-					>
+					typename = Requires<std::is_same<Rebind<M,U>, M2>::value>
 			>
 			static eT<U> bind(eT<T>&& e, F f) {
 				return eT<U>{

@@ -220,6 +220,22 @@ test_set maybet_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("monad::bind[lift&&]"),
+			std::function<bool()>([]() -> bool {
+				using ftl::function;
+				using mf = ftl::maybeT<function<int(int)>>;
+				using ftl::operator>>=;
+
+				mf f{ftl::inplace_tag(), [](int x){ return ftl::value(x); }};
+				auto g = std::move(f) >>= [](int x){
+					return function<float(int)>{
+						[x](int y){ return float(x+y)/4.f; }
+					};
+				};
+				return (*g)(2) == ftl::value(1.f);
+			})
+		),
+		std::make_tuple(
 			std::string("monoidA::orDo[value,value]"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;

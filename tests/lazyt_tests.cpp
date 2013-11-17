@@ -99,6 +99,20 @@ test_set lazyt_tests{
 
 				return ***b == 6;
 			})
+		),
+		std::make_tuple(
+			std::string("monad::bind[lift&&]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+				using lazyM = lazyT<maybe<int>>;
+
+				lazyM a = aPure<lazyM>()(3);
+				auto b = std::move(a) >>= [](int x) {
+					return aPure<maybe<int>>()(x*2);
+				};
+
+				return ***b == 6;
+			})
 		)
 	}
 };

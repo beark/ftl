@@ -24,6 +24,7 @@
 #include <ftl/either_trans.h>
 #include <ftl/list.h>
 #include <ftl/functional.h>
+#include <ftl/string.h>
 #include "eithert_tests.h"
 
 test_set eithert_tests{
@@ -194,6 +195,21 @@ test_set eithert_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("monad::bind[lift&&]"),
+			std::function<bool()>([]() -> bool {
+				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
+				using namespace ftl;
+
+				ef f{inplace_tag(), [](int x){ return make_right<float>(x); }};
+				auto g = std::move(f) >>= [](int x){
+					return function<float(int)>{
+						[x](int y){ return float(x+y)/4.f; }
+					};
+				};
+				return (*g)(2) == make_right<float>(1.f);
+			})
+		),
+		std::make_tuple(
 			std::string("monad::bind[L,->L]"),
 			std::function<bool()>([]() -> bool {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
@@ -265,9 +281,8 @@ test_set eithert_tests{
 
 				return r == 7;
 			})
-		)
+		),
 		/* Crashes gcc, works as it should in clang
-		,
 		std::make_tuple(
 			std::string("foldable::foldMap"),
 			std::function<bool()>([]() -> bool {
@@ -286,8 +301,44 @@ test_set eithert_tests{
 
 				return r == 7;
 			})
-		)
+		),
 		*/
+		std::make_tuple(
+			std::string("monoidA::fail"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+				using ef = eitherT<std::string,function<int(int)>>;
+
+				auto f = monoidA<ef>::fail();
+
+				auto e = (*f)(10);
+
+				return e.isLeft() && e.left() == std::string("");
+			})
+		),
+		std::make_tuple(
+			std::string("monoidA::orDo"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+				using ef = eitherT<std::string,function<int(int)>>;
+
+				auto f = monoidA<ef>::fail();
+				auto g = ef{
+					inplace_tag(),
+					[](int x) {
+						return make_right<std::string>(2*x);
+					}
+				};
+
+				auto h = f | g;
+				auto i = g | f;
+
+				auto x = (*h)(4);
+				auto y = (*i)(4);
+
+				return x && x.right() == 8 && y && y.right() == 8;
+			})
+		)
 	}
 };
 
