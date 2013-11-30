@@ -21,6 +21,7 @@
  * distribution.
  */
 #include <string>
+#include <list>
 #include <ftl/ord.h>
 #include "ord_tests.h"
 
@@ -62,15 +63,9 @@ test_set ord_tests{
 		std::make_tuple(
 			std::string("comparing[method]"),
 			std::function<bool()>([]() -> bool {
-				// Weird clang workaround because some libc++ bug or incompatibility
-				ftl::function<size_t(const std::string&)> string_length =
-				[](const std::string& s) {
-					return s.size();
-				};
+				auto cmp = ftl::comparing(&std::list<int>::size);
 
-				auto cmp = ftl::comparing(string_length);
-
-				return cmp(std::string("ab"),std::string("b")) == ftl::ord::Gt;
+				return cmp(std::list<int>{1,2,3},std::list<int>{3,2}) == ftl::ord::Gt;
 			})
 		),
 		std::make_tuple(
