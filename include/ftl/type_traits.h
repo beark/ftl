@@ -193,7 +193,7 @@ namespace ftl {
 	template<typename T>
 	struct has_lt {
 		static constexpr bool value =
-			!std::is_convertible<
+			std::is_convertible<
 				decltype(_dtl::test_lt<T>(nullptr)),
 				bool
 			>::value;
@@ -217,7 +217,7 @@ namespace ftl {
 	template<typename T>
 	struct has_gt {
 		static constexpr bool value =
-			!std::is_convertible<
+			std::is_convertible<
 				decltype(_dtl::test_gt<T>(nullptr)),
 				bool
 			>::value;
