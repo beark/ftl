@@ -40,6 +40,15 @@ test_set lazy_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("operator->"),
+			std::function<bool()>([]() -> bool {
+
+				ftl::lazy<std::string> l1{[](){ return std::string("blah"); }};
+
+				return l1->size() == 4 && l1->at(0) == 'b';
+			})
+		),
+		std::make_tuple(
 			std::string("mutable reference in deferred computation"),
 			std::function<bool()>([]() -> bool {
 				std::string s("a");
@@ -100,6 +109,23 @@ test_set lazy_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("eq is lazy"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto l1 = ftl::defer([](int x){ return x; }, 1);
+				auto l2(l1);
+				auto l3 = [](int x){ return x+1; } % l1;
+
+				auto r1 = l1 == l3;
+				auto r2 = l1 != l2;
+
+				return r1.status() == ftl::value_status::deferred
+					&& r2.status() == ftl::value_status::deferred
+					&& !r1 && !r2;
+			})
+		),
+		std::make_tuple(
 			std::string("preserves lt and gt"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
@@ -108,6 +134,23 @@ test_set lazy_tests{
 				auto l2 = [](int x){ return x+1; } % l1;
 
 				return l1 < l2 && l2 > l1 && !(l2 < l1) && !(l1 > l2);
+			})
+		),
+		std::make_tuple(
+			std::string("lt and gt are lazy"),
+			std::function<bool()>([]() -> bool {
+				using ftl::operator%;
+
+				auto l1 = ftl::defer([](int x){ return x; }, 1);
+				auto l2(l1);
+				auto l3 = [](int x){ return x+1; } % l1;
+
+				auto r1 = l1 < l3;
+				auto r2 = l1 > l2;
+
+				return r1.status() == ftl::value_status::deferred
+					&& r2.status() == ftl::value_status::deferred
+					&& r1 && !r2;
 			})
 		),
 		std::make_tuple(
