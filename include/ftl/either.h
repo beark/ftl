@@ -364,13 +364,13 @@ namespace ftl {
 			return *this;
 		}
 
-		constexpr bool operator== (const either& e) {
+		constexpr bool operator== (const either& e) const noexcept {
 			return tag == e.tag && tag != _dtl::LIMBO
 				? (tag == _dtl::LEFT ? l == e.l : r == e.r)
 				: false;
 		}
 
-		constexpr bool operator!= (const either& e) {
+		constexpr bool operator!= (const either& e) const noexcept {
 			return !(*this == e);
 		}
 

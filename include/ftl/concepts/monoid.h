@@ -414,7 +414,7 @@ namespace ftl {
 		noexcept(std::is_nothrow_copy_constructible<N>::value)
 			: n(num) {}
 
-		constexpr prod_monoid operator* (const prod_monoid& m)
+		constexpr prod_monoid operator* (const prod_monoid& m) const
 		noexcept(std::is_nothrow_move_constructible<prod_monoid>::value) {
 			return prod_monoid(n*m.n);
 		}
@@ -422,7 +422,7 @@ namespace ftl {
 		/**
 		 * Implicit conversion back to `N`.
 		 */
-		constexpr operator N () noexcept {
+		constexpr operator N () const noexcept {
 			return n;
 		}
 
@@ -512,7 +512,7 @@ namespace ftl {
 		 * This allows a more transparent and convenient way of using the
 		 * `any` monoid.
 		 */
-		constexpr operator bool() noexcept {
+		constexpr operator bool() const noexcept {
 			return b;
 		}
 
@@ -580,7 +580,7 @@ namespace ftl {
 		constexpr all(bool bl) noexcept : b(bl) {}
 
 		/// Implicit cast back to bool.
-		constexpr operator bool() noexcept {
+		constexpr operator bool() const noexcept {
 			return b;
 		}
 

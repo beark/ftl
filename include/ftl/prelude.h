@@ -642,7 +642,7 @@ namespace ftl {
 		~constant() = default;
 
 		template<typename T, typename U>
-		constexpr auto operator() (T&& t, U&&) noexcept
+		constexpr auto operator() (T&& t, U&&) const noexcept
 		-> decltype(std::forward<T>(t)) {
 			return std::forward<T>(t);
 		}

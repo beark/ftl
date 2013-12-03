@@ -103,35 +103,35 @@ namespace ftl {
 		
 		~ord() noexcept = default;
 
-		constexpr bool operator== (const ord& order) noexcept {
+		constexpr bool operator== (const ord& order) const noexcept {
 			return o == order.o;
 		}
 
-		constexpr bool operator== (ordering order) noexcept {
+		constexpr bool operator== (ordering order) const noexcept {
 			return o == order;
 		}
 
-		constexpr bool operator!= (const ord& order) noexcept {
+		constexpr bool operator!= (const ord& order) const noexcept {
 			return o != order.o;
 		}
 
-		constexpr bool operator!= (ordering order) noexcept {
+		constexpr bool operator!= (ordering order) const noexcept {
 			return o != order;
 		}
 
-		constexpr bool operator< (const ord& order) noexcept {
+		constexpr bool operator< (const ord& order) const noexcept {
 			return o < order.o;
 		}
 
-		constexpr bool operator<= (const ord& order) noexcept {
+		constexpr bool operator<= (const ord& order) const noexcept {
 			return o <= order.o;
 		}
 
-		constexpr bool operator> (const ord& order) noexcept {
+		constexpr bool operator> (const ord& order) const noexcept {
 			return o > order.o;
 		}
 
-		constexpr bool operator>= (const ord& order) noexcept {
+		constexpr bool operator>= (const ord& order) const noexcept {
 			return o >= order.o;
 		}
 
