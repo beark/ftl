@@ -57,66 +57,12 @@ namespace ftl {
 	 */
 
 	/**
-	 * \page concepts Concepts
-	 *
-	 * \subpage applicativepg
-	 * \subpage assignable
-	 * \subpage copyassignable
-	 * \subpage copycons
-	 * \subpage defcons
-	 * \subpage deref
-	 * \subpage empty
-	 * \subpage eq
-	 * \subpage foldablepg
-	 * \subpage fullycons
-	 * \subpage fwditerable
-	 * \subpage fn
-	 * \subpage functorpg
-	 * \subpage monadpg
-	 * \subpage monoidpg
-	 * \subpage monoidapg
-	 * \subpage moveassignable
-	 * \subpage movecons
-	 * \subpage orderablepg
-	 */
-
-	/**
 	 * \page fullycons FullyConstructible
 	 *
 	 * Types with a "full" set of constructors.
 	 *
 	 * Any type that has the full set of standard constructors, i.e., implements
 	 * \ref defcons, \ref copycons, and \ref movecons.
-	 */
-
-	/**
-	 * \page defcons DefaultConstructible
-	 *
-	 * Any type that has a default constructor.
-	 *
-	 * This includes types that have an implicit default constructor (by either
-	 * not declaring any of the standard constructors, or declaring it as
-	 * `default`).
-	 */
-
-	/**
-	 * \page copycons CopyConstructible
-	 *
-	 * Any type that has a copy constructor.
-	 *
-	 * This includes types that have an implicit copy constructor (by either not
-	 * declaring any of the standard constructors, or declaring it as
-	 * `default`).
-	 */
-
-	/**
-	 * \page movecons MoveConstructible
-	 *
-	 * Any type that has a move constructor.
-	 *
-	 * This includes types that have an implicit move constructor (by either not
-	 * declaring any of the standard constructors, or declaring it as
-	 * `default`).
 	 */
 
 	/**
@@ -161,22 +107,6 @@ namespace ftl {
 	 * \code
 	 *   if(someValue)
 	 * \endcode
-	 */
-
-	/**
-	 * \page copyassignable CopyAssignable
-	 *
-	 * Types that can be copy assigned to.
-	 *
-	 * Any type that has defined a copy assignment operator.
-	 */
-
-	/**
-	 * \page moveassignable MoveAssignable
-	 *
-	 * Types that can be move assigned to.
-	 *
-	 * Any type that has defined a move assignment operator.
 	 */
 
 	/**

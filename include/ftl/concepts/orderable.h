@@ -63,7 +63,9 @@ namespace ftl {
 	 */
 
 	/**
-	 * Concepts lite predicate to check for \ref eq instances.
+	 * Predicate to check for \ref eq instances.
+	 *
+	 * Satisfied if, and only if, `E` satisfies both `has_eq` and `has_neq`.
 	 *
 	 * \ingroup orderable
 	 */
@@ -73,7 +75,10 @@ namespace ftl {
 	}
 
 	/**
-	 * Concepts lite predicate to check for \ref orderablepg instances.
+	 * Predicate to check for \ref orderablepg instances.
+	 *
+	 * Satisfied if, and only if, `Ord` satisfies `Eq`, as well as `has_lt` and
+	 * `has_gt`.
 	 *
 	 * \ingroup orderable
 	 */

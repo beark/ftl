@@ -26,6 +26,31 @@
 namespace ftl {
 	
 	/**
+	 * \page concepts Concepts
+	 *
+	 * \subpage applicativepg
+	 * \subpage assignable
+	 * \subpage copyassignable
+	 * \subpage copycons
+	 * \subpage defcons
+	 * \subpage destructible
+	 * \subpage deref
+	 * \subpage empty
+	 * \subpage eq
+	 * \subpage foldablepg
+	 * \subpage fullycons
+	 * \subpage fwditerable
+	 * \subpage fn
+	 * \subpage functorpg
+	 * \subpage monadpg
+	 * \subpage monoidpg
+	 * \subpage monoidapg
+	 * \subpage moveassignable
+	 * \subpage movecons
+	 * \subpage orderablepg
+	 */
+
+	/**
 	 * Derived concept implementation tag for any mutable container type.
 	 *
 	 * This tag can be used with some _deriving_ constructs to generate an

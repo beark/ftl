@@ -27,9 +27,26 @@
 #include <iterator>
 #include <functional>
 
+#define FTL_GEN_PREUNOP_TEST(op, name)\
+	template<typename T>\
+	auto test_ ## name (decltype(op std::declval<T>())*)\
+	-> decltype(op std::declval<T>());\
+	\
+	template<typename T>\
+	no test_ ## name (...)
+
+#define FTL_GEN_POSTUNOP_TEST(op, name)\
+	template<typename T>\
+	auto test_ ## name (decltype(std::declval<T>() op)*)\
+	-> decltype(op std::declval<T>());\
+	\
+	template<typename T>\
+	no test_ ## name (...)
+
 #define FTL_GEN_BINOP_TEST(op, name)\
 	template<typename T>\
-	bool test_ ## name (decltype(std::declval<T>() op std::declval<T>())*);\
+	auto test_ ## name (decltype(std::declval<T>() op std::declval<T>())*)\
+	-> decltype(std::declval<T>() op std::declval<T>());\
 	\
 	template<typename T>\
 	no test_ ## name (...)
@@ -119,14 +136,18 @@ namespace ftl {
 	template<typename T>
 	struct has_eq {
 		static constexpr bool value = 
-			!std::is_same<
-				_dtl::no,
-				decltype(_dtl::test_eq<T>(nullptr))
+			std::is_convertible<
+				decltype(_dtl::test_eq<T>(nullptr)),
+				bool
 			>::value;
 	};
 
 	/**
-	 * Test a type for `operator!=()`
+	 * Test a type for `operator!=()`.
+	 *
+	 * \tparam T To satisfy `has_new`, there must be an `operator!=` accepting
+	 *           either two const references or two values of type `T` and
+	 *           returning something that is contextually convertible to `bool`.
 	 *
 	 * Example:
 	 * \code
@@ -143,15 +164,19 @@ namespace ftl {
 	template<typename T>
 	struct has_neq {
 		static constexpr bool value = 
-			!std::is_same<
-				_dtl::no,
-				decltype(_dtl::test_neq<T>(nullptr))
+			std::is_convertible<
+				decltype(_dtl::test_neq<T>(nullptr)),
+				bool
 			>::value;
 	};
 
 
 	/**
 	 * Test a type for `operator<()`
+	 *
+	 * \tparam T Satisfies the predicate if there exists an `operator<`
+	 *           taking either two `T` or two `const T&` and returning something
+	 *           contextually convertible to `bool`.
 	 *
 	 * Example:
 	 * \code
@@ -168,9 +193,9 @@ namespace ftl {
 	template<typename T>
 	struct has_lt {
 		static constexpr bool value =
-			!std::is_same<
-				_dtl::no,
-				decltype(_dtl::test_lt<T>(nullptr))
+			!std::is_convertible<
+				decltype(_dtl::test_lt<T>(nullptr)),
+				bool
 			>::value;
 	};
 
@@ -192,9 +217,9 @@ namespace ftl {
 	template<typename T>
 	struct has_gt {
 		static constexpr bool value =
-			!std::is_same<
-				_dtl::no,
-				decltype(_dtl::test_gt<T>(nullptr))
+			!std::is_convertible<
+				decltype(_dtl::test_gt<T>(nullptr)),
+				bool
 			>::value;
 	};
 
