@@ -20,6 +20,7 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
  */
+#include <vector>
 #include <ftl/functional.h>
 #include <ftl/ord.h>
 #include "functional_tests.h"
@@ -104,16 +105,11 @@ test_set functional_tests{
 				using ftl::function;
 				using ftl::operator^;
 
-				// Weird clang workaround because some libc++ bug or incompatibility
-				function<size_t(const std::string&)> string_length =
-				[](const std::string& s) {
-					return s.size();
-				};
+				auto f = ftl::comparing(&std::vector<int>::size);
+				auto g = ftl::getComparator<std::vector<int>>();
 
-				auto f = ftl::comparing(string_length);
-				auto g = ftl::getComparator<std::string>();
-
-				return (f ^ g)(std::string("aa"), std::string("ab")) == ftl::ord::Lt;
+				return (f ^ g)(std::vector<int>{1,2}, std::vector<int>{1,3})
+					== ftl::ord::Lt;
 			})
 		),
 		std::make_tuple(
