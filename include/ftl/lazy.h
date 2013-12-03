@@ -74,6 +74,11 @@ namespace ftl {
 	 * If no instance of a particular computation ever forces it, then it simply
 	 * won't be evaluated at all.
 	 *
+	 * As a convenience, there is a specialisation of `lazy` for `bool` that
+	 * allows contextual conversions of `lazy<bool>` to `bool`, allowing
+	 * expressions such as `if(lazyBool) doSomething();`. This will force
+	 * evaluation.
+	 *
 	 * \note Lazy values are immutable. Bypassing this with some creative
 	 *       casting may result in undefined behaviour.
 	 *
@@ -130,10 +135,10 @@ namespace ftl {
 		 */
 		const T* operator->() const {
 			if(*val)
-				return &(*val);
+				return &(**val);
 
 			force();
-			return &(*val);
+			return &(**val);
 		}
 
 		lazy& operator= (const lazy&) = default;
@@ -161,6 +166,58 @@ namespace ftl {
 		}
 
 		mutable std::shared_ptr<either<function<T()>,T>> val;
+	};
+
+	// Bool specialisation to allow contextual conversion
+	template<>
+	class lazy<bool> {
+	public:
+		lazy() = delete;
+		lazy(const lazy&) = default;
+		lazy(lazy&&) = default;
+		~lazy() = default;
+
+		explicit lazy(const function<bool()>& f)
+		: val(new either<function<bool()>,bool>(make_left<bool>(f)))
+		{}
+
+		const bool& operator*() const {
+			force();
+			return **val;
+		}
+
+		const bool* operator->() const {
+			if(*val)
+				return &(**val);
+
+			force();
+			return &(**val);
+		}
+
+		lazy& operator= (const lazy&) = default;
+		lazy& operator= (lazy&&) = default;
+
+		explicit operator bool() {
+			force();
+			return **val;
+		}
+
+		value_status status() const {
+			if(*val)
+				return value_status::ready;
+
+			return value_status::deferred;
+		}
+
+	private:
+		void force() const {
+			if(*val)
+				return;
+
+			*val = make_right<function<bool()>>(val->left()());
+		}
+
+		mutable std::shared_ptr<either<function<bool()>,bool>> val;
 	};
 
 	/**
@@ -194,74 +251,70 @@ namespace ftl {
 	/**
 	 * Equality comparison.
 	 *
-	 * This function forces _both_ `l1` and `l2`.
+	 * Does not evaluate `l1` or `l2` until the returned computation is
+	 * itself evaluated.
 	 *
 	 * \tparam T must have an `operator==`.
 	 *
 	 * \ingroup lazy
 	 */
 	template<typename T>
-	auto operator==(const lazy<T>& l1, const lazy<T>& l2)
-	-> decltype(std::declval<T>() == std::declval<T>()) {
-		return *l1 == *l2;
+	lazy<bool> operator==(lazy<T> l1, lazy<T> l2) {
+		return lazy<bool>{[l1,l2]() {
+			return *l1 == *l2;
+		}};
 	}
 
 	/**
 	 * Not equal comparison.
 	 *
-	 * This function forces _both_ `l1` and `l2`.
+	 * Does not evaluate `l1` or `l2` until the returned computation is
+	 * itself evaluated.
 	 *
 	 * \tparam T must have an `operator!=`.
 	 *
 	 * \ingroup lazy
 	 */
 	template<typename T>
-	auto operator!=(const lazy<T>& l1, const lazy<T>& l2)
-	-> decltype(std::declval<T>() != std::declval<T>()) {
-		return *l1 != *l2;
+	lazy<bool> operator!=(lazy<T> l1, lazy<T> l2) {
+		return lazy<bool>{[l1,l2]() {
+			return *l1 != *l2;
+		}};
 	}
 
 	/**
 	 * Less than comparison
 	 *
-	 * This function forces _both_ `lhs` and `rhs`.
+	 * Does not evaluate `lhs` or `rhs` until the returned computation is
+	 * itself evaluated.
 	 *
 	 * \tparam T must have an `operator<`.
 	 *
 	 * \ingroup lazy
 	 */
 	template<typename T>
-	auto operator< (const lazy<T>& lhs, const lazy<T>& rhs)
-	-> decltype(std::declval<T>() < std::declval<T>()) {
-		return *lhs < *rhs;
+	lazy<bool> operator< (lazy<T> lhs, lazy<T> rhs) {
+		return lazy<bool>{[lhs,rhs]() {
+			return *lhs < *rhs;
+		}};
 	}
 
 	/**
 	 * Greater than comparison
 	 *
-	 * This function forces _both_ `lhs` and `rhs`.
+	 * Does not evaluate `lhs` or `rhs` until the returned computation is
+	 * itself evaluated.
 	 *
 	 * \tparam T must have an `operator>`.
 	 *
 	 * \ingroup lazy
 	 */
 	template<typename T>
-	auto operator> (const lazy<T>& lhs, const lazy<T>& rhs)
-	-> decltype(std::declval<T>() > std::declval<T>()) {
-		return *lhs > *rhs;
+	lazy<bool> operator> (lazy<T> lhs, lazy<T> rhs) {
+		return lazy<bool>{[lhs,rhs]() {
+			return *lhs > *rhs;
+		}};
 	}
-
-	/*
-	 * TODO: Evaluate how wise the following would be
-	template<typename T>
-	struct oderable<lazy<T>> {
-		static lazy<ord> compare(lazy<T> lhs, lazy<T> rhs) {
-			return lazy<ord>{[lhs,rhs](){ return *lhs == *rhs;  }};
-		}
-
-		static constexpr bool instance = orderable<T>::instance;
-	};
-	*/
 
 	/**
 	 * Monad instance for lazy values.
