@@ -45,8 +45,12 @@ namespace ftl {
 	 * Any type that can be compared for both equality and inequality.
 	 *
 	 * More formally, there must exist an `operator==` and an `operator!=` that
-	 * accepts to objects of the type in question and returns either a `bool` or
-	 * something explicitly castable to one.
+	 * both accept two objects of the type in question and returns either a
+	 * `bool` or something contextually convertible to the same.
+	 *
+	 * Further, both comparison operators must be
+	 * - Commutative: `a == b` implies `b == a`
+	 * - Transitive: `a == b` and `b == c` implies `a == c`
 	 *
 	 * \see \ref orderable (module)
 	 */
@@ -56,8 +60,15 @@ namespace ftl {
 	 *
 	 * Anything that can be ordered in some strict sense.
 	 *
-	 * In essence, any type that defines the operators `<`, `==`, and `>`, as
+	 * In essence, any type that defines the operators `<` and `>`, as
 	 * well as implements the concept \ref eq.
+	 *
+	 * Note that the 'less than' and 'greater than' operators must evaluate
+	 * to something contextually convertible to `bool` as well as satisfy the
+	 * following:
+	 * - `a < b` implies `b > a`
+	 * - `a > b` implies `b < a`
+	 * - `a > b` and `a < b` both implies `a != b`
 	 *
 	 * \see \ref orderable (module)
 	 */
@@ -65,7 +76,15 @@ namespace ftl {
 	/**
 	 * Predicate to check for \ref eq instances.
 	 *
-	 * Satisfied if, and only if, `E` satisfies both `has_eq` and `has_neq`.
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   void foo() {
+	 *       static_assert(Eq<T>(), "foo: T is not an instance of Eq");
+	 *
+	 *       // Do interesting comparisons with Ts
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup orderable
 	 */
@@ -77,8 +96,15 @@ namespace ftl {
 	/**
 	 * Predicate to check for \ref orderablepg instances.
 	 *
-	 * Satisfied if, and only if, `Ord` satisfies `Eq`, as well as `has_lt` and
-	 * `has_gt`.
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   void foo() {
+	 *       static_assert(Ord<T>(), "foo: T is not an instance of Ord");
+	 *
+	 *       // Order various Ts
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup orderable
 	 */

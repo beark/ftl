@@ -47,17 +47,32 @@ namespace ftl {
 	 * This includes types that have an implicit default constructor (by either
 	 * not declaring any of the standard constructors, or declaring it as
 	 * `default`).
+	 *
+	 * More formally, the expressions
+	 * - `T t;`
+	 * - `T t{};`
+	 * - `T{}`
+	 * - `T()`
+	 * must all be valid and behave as expected. Which is to say, they should
+	 * construct an instance of `T` with whatever default semantics are
+	 * appropriate.
 	 */
 
 	/**
 	 * Predicate to check if a type is \ref defcons.
 	 *
-	 * The expressions
-	 * - `T t;`
-	 * - `T t{};`
-	 * - `T{}`
-	 * - `T()`
-	 * must all be valid and behave as expected.
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   void foo() {
+	 *       static_assert(
+	 *           DefaultConstructible<T>(),
+	 *           "foo: T is not an instance of DefaultConstructible"
+	 *       );
+	 *
+	 *       // Construct Ts using its default c-tor
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup concepts_basic
 	 */
@@ -74,16 +89,29 @@ namespace ftl {
 	 * This includes types that have an implicit move constructor (by either not
 	 * declaring any of the standard constructors, or declaring it as
 	 * `default`).
+	 *
+	 * More formally, the expressions
+	 * - `T t = rv;`
+	 * - `T(rv);`
+	 * where `rv` is an rvalue reference of `T` must both be valid and behave
+	 * as expected.
 	 */
 
 	/**
 	 * Predicate to check if a type is \ref movecons.
 	 *
-	 * The expressions
-	 * - `T t = rv;`
-	 * - `T(rv);`
-	 * where `rv` is an rvalue reference of `T` must both be valid and behave
-	 * as expected.
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   void foo() {
+	 *       static_assert(
+	 *           MoveConstructible<T>(),
+	 *           "foo: T is not an instance of MoveConstructible"
+	 *       );
+	 *
+	 *       // Construct Ts using its move c-tor
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup concepts_basic
 	 */
@@ -100,16 +128,29 @@ namespace ftl {
 	 * This includes types that have an implicit copy constructor (by either not
 	 * declaring any of the standard constructors, or declaring it as
 	 * `default`).
+	 *
+	 * More formally, the expressions
+	 * - `T t = v;`
+	 * - `T(v);`
+	 * where `v` is an instance of `T` must both be valid and result in objects
+	 * that are equivalent of `v`, while leaving it completely unmodified.
 	 */
 
 	/**
 	 * Predicate to check if a type is \ref copycons.
 	 *
-	 * The expressions
-	 * - `T t = v;`
-	 * - `T(v);`
-	 * where `v` is an instance of `T` must both be valid and result in objects
-	 * that are equivalent of `v`, while leaving it completely unmodified.
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   void foo() {
+	 *       static_assert(
+	 *           CopyConstructible<T>(),
+	 *           "foo: T is not an instance of CopyConstructible"
+	 *       );
+	 *
+	 *       // Construct Ts using its copy c-tor
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup concepts_basic
 	 */
@@ -123,15 +164,28 @@ namespace ftl {
 	 *
 	 * Types that can be move assigned to.
 	 *
-	 * Any type that has defined a move assignment operator.
+	 * Requires that the expression
+	 * - `a = rv;`
+	 * where `rv` is an rvalue reference of `T` is valid. After the operation,
+	 * `a` must be equivalent of whatever `rv` was _before_ it. `rv` may be
+	 * changed by the operation.
 	 */
 
 	/**
 	 * Predicate to check if a type is \ref moveassignable.
 	 *
-	 * The expression
-	 * - `a = rv;`
-	 * where `rv` is an rvalue reference of `T` must be valid.
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   void foo() {
+	 *       static_assert(
+	 *           MoveAssignable<T>(),
+	 *           "foo: T is not an instance of MoveAssignable"
+	 *       );
+	 *
+	 *       // Assign rvalues to Ts
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup concepts_basic
 	 */
@@ -145,17 +199,28 @@ namespace ftl {
 	 *
 	 * Types that can be copy assigned to.
 	 *
-	 * Any type that has defined a copy assignment operator.
+	 * Requires that the expression
+	 * - `a = v;`
+	 * where `v` is an instance of `T` is valid. After the operation, `a`
+	 * must be equivalent of `v`, while leaving the latter completely
+	 * unmodified.
 	 */
 
 	/**
 	 * Predicate to check if a type is \ref copyassignable.
 	 *
-	 * The expression
-	 * - `a = v;`
-	 * where `v` is an instance of `T` must be valid. After the operation, `a`
-	 * must be equivalent of `v`, while leaving the latter completely
-	 * unmodified.
+	 * Example:
+	 * \code
+	 *   template<typename T>
+	 *   void foo() {
+	 *       static_assert(
+	 *           CopyAssignable<T>(),
+	 *           "foo: T is not an instance of CopyAssignable"
+	 *       );
+	 *
+	 *       // Assign lvalues to Ts
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup concepts_basic
 	 */
@@ -169,18 +234,16 @@ namespace ftl {
 	 *
 	 * Types that can be destructed.
 	 *
-	 * Any type that has a non-deleted, `noexcept` destructor.
-	 */
-
-	/**
-	 * Predicate to check if a type is \ref destructible.
-	 *
 	 * The expression
 	 * - `t.~T();`
 	 * must be valid and result in all resources currently held exclusively by
 	 * `t` being freed. No exception must be thrown. Accessing members of `t`
 	 * after the destructor has been called may result in undefined or illegal
 	 * behaviour.
+	 */
+
+	/**
+	 * Predicate to check if a type is \ref destructible.
 	 *
 	 * \ingroup concepts_basic
 	 */
