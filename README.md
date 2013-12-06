@@ -88,7 +88,8 @@ Then we can compute:
  */
 using ftl::operator%;
 using ftl::operator*;
-auto result = ftl::curry(algorithm) % maybeGetAValue() * maybeGetAnother() * maybeGetAThird();
+auto result =
+	ftl::curry(algorithm) % maybeGetAValue() * maybeGetAnother() * maybeGetAThird();
 ```
 which woould compute the result of algorithm, but only if every one of the `maybe` functions returned a value.
 
@@ -106,9 +107,9 @@ Exactly what operation is done by `apply` varies from type to type. For example,
 ```cpp
 curry(std::plus<int>) % std::list<int>{1,2} * std::list<int>{5,10};
 ```
-can be read as "for each element in `{1,2}`, combine it using `std::plus<int>` with each element in `{5,10}`", resulting in the list `{6, 11, 7, 12}`.
+can be read as "for each element in `{1,2}`, combine it using `std::plus<int>` with each element in `{5,10}`", resulting in the list `{6, 11, 7, 12}`. Of course, what happens on a more technical level is that `std::plus<int>` is partially applied to each element in the first list, resulting in a list of unary functions, that in turn gets applied to each element in the second list.
 
-Of course, what happens on a more technical level is that `std::plus<int>` is partially applied to each element in the first list, resulting in a list of unary functions, that in turn gets applied to each element in the second list. A much less technical way of thinking&mdash;to gain some intuition for how applciative expressions behave&mdash;could be that `operator%` is an alias for function application, and `operator*` separates parameters. Except the parameters happen to be wrapped in some "context" or "container".
+A much less technical way of thinking&mdash;to gain some intuition for how applicative expressions behave&mdash;could be that `operator%` is an alias for function application, and `operator*` separates parameters. Except the parameters happen to be wrapped in some "context" or "container".
 
 This type of function application scales to arbitrary arity.
 
