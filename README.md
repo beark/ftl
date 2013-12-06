@@ -3,7 +3,7 @@ FTL - The Functional Template Library
 
 C++ template library for fans of functional programming. The goal of this project is to implement a useful subset of the Haskell Prelude (and a couple of other libraries) in C++. Presently, this subset is small, but rapidly growing. Note, however, that the library and its API are still in heavy flux and the interface of any data type or concept may yet change without notice.
 
-To use the FTL, you need a compiler that implements at least as much of C++11 as gcc-4.7. As of this time, that's more or less gcc-4.7+, as well as clang-3.2+. Both of these are regularly run against the included set of unit tests and should work. MSVC, including the recent 2013 preview, is unfortunately incompatible as of yet.
+To use the FTL, you need a compiler that implements at least as much of C++11 as gcc-4.8. As of this time, known compatible compilers include&mdash;obviously&mdash;gcc 4.8 and clang 3.2 with libc++. Unfortunately clang with libstdc++ does not appear to work. While it would be a lovely thing, MSVC is not currently compatible, including the recent 2013 CTP.
 
 The full API reference can be found [here](http://libftl.org/api/).
 
@@ -72,10 +72,11 @@ Other types that have been similarly endowed with new powers include: `std::futu
 Adding a bit of the Applicative concept to the mix, we can do some quite concise calculations. Now, if we are given:
 ```cpp
 int algorithm(int, int, int);
-shared_ptr<int> getSomeShared();
-shared_ptr<int> getOtherShared();
-shared_ptr<int> getFinalShared();
+ftl::maybe<int> maybeGetAValue();
+ftl::maybe<int> maybeGetAnother();
+ftl::maybe<int> maybeGetAThird();
 ```
+where `ftl::maybe` is a type similar to e.g. `boost::optional`, provided by FTL (mostly to make sure there are no external dependencies save the standard library).
 
 Then we can compute:
 ```cpp
@@ -85,18 +86,31 @@ Then we can compute:
  * applicative programming style. It basically applies a function (the left hand
  * side) to one argument at a time (the right hand side).
  */
-auto result = curry(algorithm) % getSomeShared() * getOtherShared() * getFinalShared();
+using ftl::operator%;
+using ftl::operator*;
+auto result = ftl::curry(algorithm) % maybeGetAValue() * maybeGetAnother() * maybeGetAThird();
 ```
+which woould compute the result of algorithm, but only if every one of the `maybe` functions returned a value.
 
-And of course the equivalent plain version:
+In other words, without Functor's `fmap` and Applicative's `aapply`, it would have looked something like:
 ```cpp
-std::shared_ptr<int> result;
-auto x = getSomeShared(), y = getOtherShared(), z = getFinalShared();
+ftl::maybe<int> result;
+auto x = maybeGetAValue(), y = maybeGetAnother(), z = maybeGetAThird();
 if(x && y && z) {
-    result = make_shared(algorithm(*x, *y, *z));
+    result = ftl::value(algorithm(*x, *y, *z));
 }
 ```
 If `algorithm` had happened to be wrapped in an `ftl::function`, or else be one of the built-in, curried-by-default function objects of FTL, then the `curry` call could have been elided for even cleaner code.
+
+Exactly what operation is done by `apply` varies from type to type. For example, with containers, it generally implies combining their elements in every possible combination. Thus
+```cpp
+curry(std::plus<int>) % std::list<int>{1,2} * std::list<int>{5,10};
+```
+can be read as "for each element in `{1,2}`, combine it using `std::plus<int>` with each element in `{5,10}`", resulting in the list `{6, 11, 7, 12}`.
+
+Of course, what happens on a more technical level is that `std::plus<int>` is partially applied to each element in the first list, resulting in a list of unary functions, that in turn gets applied to each element in the second list. A much less technical way of thinking&mdash;to gain some intuition for how applciative expressions behave&mdash;could be that `operator%` is an alias for function application, and `operator*` separates parameters. Except the parameters happen to be wrapped in some "context" or "container".
+
+This type of function application scales to arbitrary arity.
 
 ### Transformers
 No, not as in Optimus Prime! As in a monad transformer: a type transformer that takes one monad as parameter and "magically" adds functionality to it in the form of one of many other monads. For example, let's say you want to add the functionality of the `maybe` monad to the list monad. You'd have to create a new type that combines the powers, then write all of those crazy monad instances and whatnot, right? Wrong!
@@ -147,7 +161,7 @@ So, basically, this saves us the trouble of having to check for nothingness in t
 Right, this is kinda neat, but not really all that exciting yet. The excitement comes when we stop to think a bit before we just arbitrarily throw together a couple of monads. For instance, check out the magic of the `either`-transformer on top of the `function` monad in the parser generator tutorial [part 2](docs/Parsec-II.md).
 
 ### Yet More Concepts
-In addition to the above concepts, FTL contains several more of the classic Haskell type classes: Monoids, Foldables, and Orderables. These all express nice and abstracted interfaces that apply to many types, both built-in, standard library ones, and user defined ones (assuming one adds a concept instance). For instance, the code below uses the fact that an ordering is a Monoid to sort a vector of `MyType` by first one of its properties, then another.
+In addition to the above concepts, FTL contains several more of the classic Haskell type classes: Monoids, Foldables, Zippables, and Orderables. These all express nice and abstracted interfaces that apply to many types, both built-in, standard library ones, and user defined ones (assuming one adds a concept instance). For instance, the code below uses the fact that an ordering is a Monoid to sort a vector of `MyType` by first one of its properties, then another.
 ```cpp
 using namespace ftl;
 std::sort(vec.begin(), vec.end(),
@@ -163,3 +177,4 @@ std::sort(vec.begin(), vec.end(), [](const MyType& lhs, const MyType& rhs){
 });
 ```
 Personally, I find the former a lot cleaner and easier to read. The sort order is explicitly stated (`asc`), and then it just straight up says that we sort by comparing first `someProperty` and then `anotherProperty`. Fewer chances of subtle typos, less chance of screwing up the comparisons, much easier to extend, what's not to like?
+
