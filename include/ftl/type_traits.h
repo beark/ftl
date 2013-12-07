@@ -422,7 +422,7 @@ namespace ftl {
 	 * - function pointers and pointers to member functions
 	 * - `ftl::function`
 	 *
-	 * For everything else, `is_monomorphic<T>::value` will be `false` by
+	 * For everything else, `is_monomorphic::value` will be `false` by
 	 * default.
 	 *
 	 * \ingroup typetraits

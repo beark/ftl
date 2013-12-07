@@ -74,7 +74,7 @@ namespace ftl {
 	 * formally, this means that `std::begin(forwardIterable)`, and
 	 * `std::end(forwardIterable)` are both valid expressions returning some
 	 * iterator like object that satisfies \ref deref to the type
-	 * `concept_parameter<ForwardIterable>`.
+	 * `Value_type<ForwardIterable>`.
 	 */
 
 	/**

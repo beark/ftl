@@ -36,7 +36,7 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * - <type_traits>
+	 * - `<type_traits>`
 	 */
 
 	/**
@@ -53,6 +53,7 @@ namespace ftl {
 	 * - `T t{};`
 	 * - `T{}`
 	 * - `T()`
+	 *
 	 * must all be valid and behave as expected. Which is to say, they should
 	 * construct an instance of `T` with whatever default semantics are
 	 * appropriate.
@@ -93,6 +94,7 @@ namespace ftl {
 	 * More formally, the expressions
 	 * - `T t = rv;`
 	 * - `T(rv);`
+	 *
 	 * where `rv` is an rvalue reference of `T` must both be valid and behave
 	 * as expected.
 	 */
@@ -132,6 +134,7 @@ namespace ftl {
 	 * More formally, the expressions
 	 * - `T t = v;`
 	 * - `T(v);`
+	 *
 	 * where `v` is an instance of `T` must both be valid and result in objects
 	 * that are equivalent of `v`, while leaving it completely unmodified.
 	 */
@@ -166,6 +169,7 @@ namespace ftl {
 	 *
 	 * Requires that the expression
 	 * - `a = rv;`
+	 *
 	 * where `rv` is an rvalue reference of `T` is valid. After the operation,
 	 * `a` must be equivalent of whatever `rv` was _before_ it. `rv` may be
 	 * changed by the operation.
@@ -201,6 +205,7 @@ namespace ftl {
 	 *
 	 * Requires that the expression
 	 * - `a = v;`
+	 *
 	 * where `v` is an instance of `T` is valid. After the operation, `a`
 	 * must be equivalent of `v`, while leaving the latter completely
 	 * unmodified.
@@ -236,6 +241,7 @@ namespace ftl {
 	 *
 	 * The expression
 	 * - `t.~T();`
+	 *
 	 * must be valid and result in all resources currently held exclusively by
 	 * `t` being freed. No exception must be thrown. Accessing members of `t`
 	 * after the destructor has been called may result in undefined or illegal

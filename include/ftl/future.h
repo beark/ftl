@@ -45,7 +45,7 @@ namespace ftl {
 	 * - \ref monoidpg
 	 *
 	 * \par Dependencies
-	 * - <future>
+	 * - `<future>`
 	 * - \ref monad
 	 * - \ref monoid
 	 */

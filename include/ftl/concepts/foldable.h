@@ -204,7 +204,8 @@ namespace ftl {
 	 * instance simply inherit this implementation of `foldl` instead of
 	 * implementing it manually.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *   template<typename T>
 	 *   struct foldable<MyContainer<T>> : deriving_foldl<MyContainer<T>> {
@@ -259,11 +260,12 @@ namespace ftl {
 	/**
 	 * An inheritable implementation of `foldable::foldr`.
 	 *
-	 * Any type that satisfies \ref reviterable may have their \ref foldablepg
+	 * Any type that satisfies ReverseIterable may have their \ref foldablepg
 	 * instance simply inherit this implementation of `foldr` instead of
 	 * implementing it manually.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *   template<typename T>
 	 *   struct foldable<MyContainer<T>> : deriving_foldr<MyContainer<T>> {
@@ -317,15 +319,14 @@ namespace ftl {
 	 * this struct to get `foldable::foldMap` for "free". Naturally, it works
 	 * together with `ftl::deriving_foldl`.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *     template<>
 	 *     struct foldable<MyFoldable> : deriving_foldMap<MyFoldable> {
 	 *         // Implementation of foldl and foldr
 	 *     };
 	 * \endcode
-	 *
-	 * \tparam F the foldable for which to implement `foldMap`.
 	 *
 	 * \ingroup foldable
 	 */
@@ -362,10 +363,8 @@ namespace ftl {
 	 * It is entirely possible for a foldable implementation to use both 
 	 * `deriving_foldMap<F>` and `deriving_fold<F>`, even in reverse order.
 	 *
-	 * \tparam F the foldable instance (not implementation) for which `fold`
-	 *           should apply.
+	 * \par Examples
 	 *
-	 * Example:
 	 * \code
 	 *   template<typename T>
 	 *   struct foldable<myListType<T>>
@@ -390,7 +389,7 @@ namespace ftl {
 	/**
 	 * Inheritable implementation of the _full_ \ref foldablepg concept.
 	 *
-	 * Requires that the instance type is \ref bidiriterable.
+	 * Requires that the instance type is BidirectionalIterable.
 	 *
 	 * Example:
 	 * \code
@@ -426,9 +425,15 @@ namespace ftl {
 	/**
 	 * Convenience function object for `foldable<T>::fold`.
 	 *
+	 * Behaves as though it was a function of type
+	 * \code
+	 *   (F<M>) -> M
+	 * \endcode
+	 * where `M` satisfies \ref monoidpg.
+	 *
 	 * Example:
 	 * \code
-	 *   list<list<sum_monoid<int>>> l{
+	 *   list<list<ftl::sum_monoid<int>>> l{
 	 *       {ftl::sum(1), ftl::sum(2)},
 	 *       {ftl::sum(3), ftl::sum(4)}
 	 *   };
@@ -463,16 +468,22 @@ namespace ftl {
 	/**
 	 * Function object representing `foldable::foldMap`.
 	 *
+	 * Behaves like a curried function of type
+	 * \code
+	 *   ((A) -> M, F<A>) -> M
+	 * \endcode
+	 *
 	 * Makes it generally a lot cleaner to call `foldMap`, as well as
 	 * easier to pass to higher order functions.
 	 *
-	 * Example:
-	 * ```cpp
+	 * \par Examples
+	 *
+	 * \code
 	 *   auto v = vector<int>{3,3,4};
 	 *
-	 *   auto r = ftl::foldMap([](int x){ return sum(x); }, v);
+	 *   auto r = ftl::foldMap(ftl::sum<int>, v);
 	 *   // r == ftl::sum(10)
-	 * ```
+	 * \endcode
 	 *
 	 * \ingroup foldable
 	 */
@@ -503,13 +514,27 @@ namespace ftl {
 	/**
 	 * Convenience function object for `foldable::foldr`.
 	 *
+	 * Behaves as if it were a curried function of type
+	 * \code
+	 *   ((T,U) -> U, U, F<T>) -> U
+	 * \endcode
+	 *
 	 * Provides easy and concise calling, unlike explicitly looking up the
 	 * instance implementation as `foldable<instance>::foldr`.
 	 *
 	 * A right fold is, as the name implies, right associative. Which is to say,
-	 * the operation `foldr(f, z, {1,2,3})` is equivalent of:
+	 * the operation `foldr(f, z, {1,2,3})` is equivalent to:
 	 * \code
 	 *   f(1, f(2, f(3, z)));
+	 * \endcode
+	 *
+	 * \par Examples
+	 *
+	 * Summing the elements of a list:
+	 * \code
+	 *   std::list<int> l = {1, 2, 3};
+	 *   int sum = ftl::foldr(std::plus<int>(), 0, l);
+	 *   // sum == 6
 	 * \endcode
 	 *
 	 * \ingroup foldable
@@ -541,10 +566,33 @@ namespace ftl {
 	/**
 	 * Convenience function object representing `foldable::foldl`.
 	 *
+	 * Behaves as if it were a curried function of type
+	 * \code
+	 *   ((U,T) -> U, U, F<T>) -> U
+	 * \endcode
+	 *
 	 * A left fold is of course left-associative, meaning that the operation
-	 * `foldl(f, z, {1,2,3})` is equivalent of:
+	 * `foldl(f, z, {1,2,3})` is equivalent to:
 	 * \code
 	 *   f(f(f(z, 1), 2), 3);
+	 * \endcode
+	 *
+	 * \par Examples
+	 *
+	 * Summing the elements of a list:
+	 * \code
+	 *   std::list<int> l = {1, 2, 3};
+	 *   int sum = ftl::foldl(std::plus<int>(), 0, l);
+	 *   // sum == 6
+	 * \endcode
+	 *
+	 * Reversing a list:
+	 * \code
+	 *   std::list<int> l = {1, 2, 3};
+	 *   auto rCons = [](list<int> xs, int x){ xs.push_front(x); return xs; };
+	 *
+	 *   auto reverseL = ftl::foldl(rCons, list<int>{}, l);
+	 *   // reverseL == {3, 2, 1}
 	 * \endcode
 	 *
 	 * \ingroup foldable

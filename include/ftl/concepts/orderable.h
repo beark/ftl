@@ -36,7 +36,7 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * - \ref type_traits
+	 * - \ref typelevel
 	 */
 
 	/**

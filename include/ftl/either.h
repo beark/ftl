@@ -48,7 +48,7 @@ namespace ftl {
 	 *
 	 * \par Dependencies
 	 * The following additional headers and modules are included by this module.
-	 * - <stdexcept>
+	 * - `<stdexcept>`
 	 * - \ref monad
 	 * - \ref orderable
 	 */

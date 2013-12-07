@@ -51,15 +51,15 @@ namespace ftl {
 	 * As with many of the other concepts in FTL, monads have a set of
 	 * associated laws that instances must follow (though technically, there is
 	 * nothing enforcing them):
-	 * - **Left identity law**
+	 * - Left identity law:
 	 *   \code
 	 *     pure(x) >>= f    <=> f(x)
 	 *   \endcode
-	 * - **Right identity law**
+	 * - Right identity law:
 	 *   \code
 	 *     m >>= pure<T>    <=> m
 	 *   \endcode
-	 * - **Law of associativity**
+	 * - Law of associativity:
 	 *   \code
 	 *     (m >>= f) >>= g) <=> m >>= ([f](X x){return f(x);} >>= g)
 	 *   \endcode
@@ -80,6 +80,7 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
+	 * - \ref prelude
 	 * - \ref applicative
 	 */
 
@@ -209,13 +210,14 @@ namespace ftl {
 	};
 
 	/**
-	 * Concepts lite-compatible check for monad instances.
+	 * Predicate to check whether a type is an instance of Monad.
 	 *
 	 * Naturally, this predicate can already be used in conjunction with SFINAE
 	 * to hide particular functions, methods, and classes/structs if a template
 	 * parameter is not a Monad.
 	 *
-	 * Example usage:
+	 * \par Examples
+	 *
 	 * \code
 	 *   template<
 	 *       typename M,
@@ -241,7 +243,8 @@ namespace ftl {
 	 * implementation of `bind` that does not rely on whatever method is being
 	 * derived in terms of it.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *   template<typename T>
 	 *   struct monad<AType<T>>
@@ -261,9 +264,9 @@ namespace ftl {
 	struct deriving_join;
 
 	/**
-	 * Inheritable implementation of `monad<M>::join`.
+	 * Inheritable implementation of `monad::join`.
 	 *
-	 * Monad implementations (as in, the template specialisations of monad<M>)
+	 * Monad implementations (as in, the template specialisations of `monad<>`)
 	 * may inherit this struct to get a default implementation of `join`, in
 	 * terms of `bind`.
 	 *
@@ -271,7 +274,8 @@ namespace ftl {
 	 *
 	 * \tparam M the template specialisation that is to derive `join`.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *   template<typename T>
 	 *   struct monad<MyMonad<T>>
@@ -302,17 +306,16 @@ namespace ftl {
 	};
 
 	/**
-	 * Inheritable implementation of `monad<M>::map`.
+	 * Inheritable implementation of `monad::map`.
 	 *
-	 * Implementations of `monad<M>` may inherit this struct to have a default
+	 * Implementations of `monad<>` may inherit this struct to have a default
 	 * implementation of `map` included. The default might not be the most
 	 * performant version possible of `map`.
 	 *
 	 * Both const reference and r-value reference versions are generated.
 	 *
-	 * \tparam M the monad specialisation that is to derive `map`
+	 * \par Examples
 	 *
-	 * Example:
 	 * \code
 	 *   template<typename T>
 	 *   struct monad<MyMonad<T>>
@@ -362,9 +365,8 @@ namespace ftl {
 	 * This _deriving_ construct is specialised for
 	 * `ftl::back_insertable_container`.
 	 *
-	 * \tparam M The same type monad<M> is being specialised for.
+	 * \par Examples
 	 *
-	 * Example:
 	 * \code
 	 *   template<typename T>
 	 *   struct monad<MyMonad<T>> : deriving_bind<MyMonad<T>> {
@@ -410,9 +412,12 @@ namespace ftl {
 	/**
 	 * Inheritable `bind` implementation for containers supporting `insert`.
 	 *
-	 * Note that this `monad::bind` implementation is done in terms of
-	 * `functor::map`, hence there must be a user defined implementation of
-	 * that.
+	 * The following requirements must be met by `M_`:
+	 * - There must exist an `M::insert(iterator pos, const T& value)`,
+	 *   returning an iterator to the inserted element. An R-value version is
+	 *   also beneficial in some cases.
+	 * - There must be an implementation of `monad::map` available for `M_`
+	 *   that is _not_ derived in terms of `bind`.
 	 *
 	 * Also note that types using this construct to generate a `bind`
 	 * implementation will be capable of binding with any function returning
@@ -451,7 +456,8 @@ namespace ftl {
 		 * collection of _possible_ values, each of which `f' will generate a
 		 * new set of possible answers for.
 		 *
-		 * Example:
+		 * \par Examples
+		 *
 		 * \code
 		 *   SomeCollection<int> c{2,4,5};
 		 *   auto c2 = c >>= [](int x){ return SomeCollection<int>{x/2, 2*x}; };
@@ -526,9 +532,8 @@ namespace ftl {
 	 *
 	 * Both const reference and r-value reference versions are generated.
 	 *
-	 * \tparam M The same type monad<M> is being specialised for.
+	 * \par Examples
 	 *
-	 * Example:
 	 * \code
 	 *   template<typename T>
 	 *   struct monad<my_type<T>>
@@ -583,7 +588,8 @@ namespace ftl {
 	 * implementation almost automatically, by letting it derive from this
 	 * implementation.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *   template<typename T>
 	 *   struct monad<Container<T>>
@@ -603,24 +609,30 @@ namespace ftl {
 	};
 
 	/**
-	 * Convenience operator for monad::bind.
+	 * Convenience operator for `ftl::mbind`.
+	 *
+	 * The following substitution is always true:
+	 * \code
+	 *   a >>= b <=> ftl::mbind(a, b)
+	 * \endcode
 	 *
 	 * The purpose is to make it more easy to read and write monadic code. All
 	 * arguments are perfectly forwarded, for cases where it matters if the
 	 * const reference or r-value reference version of `bind` is triggered.
 	 *
-	 * Example usage:
-	 * \code
-	 *   MyMonad<int> foo(float);
+	 * \par Examples
 	 *
-	 *   MyMonad<int> bar(const MyMonad<float>& m) {
-	 *       using ftl::operator>>=;
-	 *       return m >>= foo;
-	 *       
-	 *       // Equivalent code without using operator:
-	 *       // return ftl::monad<MyMonad<float>>::bind(m, foo);
+	 * \code
+	 *   ftl::maybe<int> maybeGetInt();
+	 *   ftl::maybe<float> mightFail(int);
+	 *
+	 *   ftl::maybe<float> example() {
+	 *       return maybeGetInt() >>= mightFail;
 	 *   }
 	 * \endcode
+	 *
+	 * \note Unlike Haskell, `operator>>=` is _right_ associative in C++,
+	 *       resulting in some convolution when chaining several together.
 	 *
 	 * \ingroup monad
 	 */
@@ -641,6 +653,20 @@ namespace ftl {
 	 * Mirror of `ftl::operator>>=`. The only difference is the order of the
 	 * arguments.
 	 *
+	 * Unlike `operator>>=`, the fixity of this operator is in fact just as
+	 * expected, causing it to sometimes be significantly more convenient.
+	 *
+	 * \par Examples
+	 *
+	 * Clean chaining:
+	 * \code
+	 *   auto m = ftl::value(2.f);
+	 *   auto f = [](float x){ return x == 0 ? nothing : value(8.f/x); };
+	 *
+	 *   auto r = f <<= f <<= m;
+	 *   // r == value(2.f), or 8 / (8 / 2)
+	 * \endcode
+	 *
 	 * \ingroup monad
 	 */
 	template<
@@ -660,11 +686,12 @@ namespace ftl {
 	 * Using this operator to chain monadic computations is often times more
 	 * desirable than running them in separate statements, because whatever
 	 * operations `M` hides in its bind operation are still performed this way.
+	 * For example, `ftl::nothing` propagates down the sequence in the case of
+	 * `ftl::maybe` and so on.
 	 *
-	 * In other words, `nothing` propagates down the sequence in the case of
-	 * `maybe` (and the same goes for left values with `either`), and so on.
+	 * \par Examples
 	 *
-	 * Example usage:
+	 * Basic usage:
 	 * \code
 	 *   MyMonad<SomeType> foo();
 	 *   MyMonad<OtherType> bar();
@@ -676,6 +703,17 @@ namespace ftl {
 	 *       // Equivalent code using plain bind:
 	 *       // return foo() >>= [](SomeType){ return bar(); };
 	 *   }
+	 * \endcode
+	 *
+	 * Side effects of bind are preserved:
+	 * \code
+	 *   auto e1 = ftl::make_left<int>(string("abc"));
+	 *   auto e2 = ftl::make_right<string>(10);
+	 *   auto e3 = ftl::make_right<string>(string("123"));
+	 *
+	 *   auto r1 = e1 >> e2; // r1 == make_left<int>("abc")
+	 *   auto r2 = e2 >> e3; // r2 == make_right<string>("123")
+	 *
 	 * \endcode
 	 *
 	 * \ingroup monad
@@ -699,12 +737,25 @@ namespace ftl {
 	/**
 	 * Sequence two monadic computations, return the first.
 	 *
-	 * This operator is used to perform the computations `m1` and `m2`
-	 * in left-to-right order, and then return the result of `m1`.
+	 * Unlike what might be exptected, this operator is used to perform the
+	 * computations `m1` and `m2` in _left-to-right_ order, and then return the
+	 * result of `m1`.
 	 * 
 	 * Use case is when we have two computations that must be done in sequence,
 	 * but it's only the first one that yields an interesting result. Most
-	 * likely, the second one is only needed for a side effect of some kind.
+	 * likely, the second one is only needed for a side effect of some kind. In
+	 * some sense, this is a workaround to the lack of do-notation.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   auto m1 = ftl::value(8);
+	 *   auto m2 = ftl::value(4);
+	 *   ftl::maybe<int> m3;
+	 *
+	 *   auto r1 = m1 << m2 // r1 == value(8)
+	 *   auto r2 = m1 << m3 // r2 == nothing
+	 * \endcode
 	 *
 	 * \ingroup monad
 	 */
@@ -744,29 +795,6 @@ namespace ftl {
 		});
 	}
 
-	/**
-	 * Lifts a function into M.
-	 *
-	 * The function f is lifted into the monadic computation M. Or in other
-	 * words, the value M<A> is unwrapped, passed to `f`, and its result
-	 * rewrapped.
-	 *
-	 * \ingroup monad
-	 */
-	template<
-			typename Mt,
-			typename F,
-			typename T = Value_type<Mt>,
-			typename = Requires<Monad<Mt>()>,
-			typename U = result_of<F(T)>,
-			typename Mu = Rebind<Mt,U>
-	>
-	Mu liftM(F f, const Mt& m) {
-		return m >>= [f] (const T& t) {
-			return monad<Mu>::pure(f(t));
-		};
-	}
-
 #ifndef DOCUMENTATION_GENERATOR
 	constexpr struct _mbind : private _dtl::curried_binf<_mbind> {
 		template<typename M, typename F, typename M_ = plain_type<M>>
@@ -783,10 +811,17 @@ namespace ftl {
 	/**
 	 * Curried function object representing `monad::bind`.
 	 *
+	 * Has a calling type equivalent to
+	 * \code
+	 *   (M<T>, (T) -> M<U>) -> M<U>
+	 * \endcode
+	 * where `M` is an instance of \ref monadpg.
+	 *
 	 * Makes for much more convenient calling and passing to higher-order
 	 * functions.
 	 *
 	 * \par Examples
+	 *
 	 * Trivial usage to sequence two maybes:
 	 * \code
 	 *   ftl::maybe<int> foo(string s);
@@ -822,11 +857,17 @@ namespace ftl {
 	/**
 	 * Function object representing `monad::join`.
 	 *
+	 * Functions as if it were a function of type
+	 * \code
+	 *   (M<M<T>>) -> M<T>
+	 * \endcode
+	 *
 	 * Proves concise calling syntax for the monadic join operation, allowing
 	 * cleaner code both for regular use and for passing to higher-order
 	 * functions.
 	 *
 	 * \par Examples
+	 *
 	 * Straight forward use to flatten a list of lists. No elements are
 	 * discarded, they will appear in the resulting list in the same order
 	 * as if a depth-first traversal was made of the original list.

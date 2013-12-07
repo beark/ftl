@@ -31,8 +31,7 @@ namespace ftl {
 	/**
 	 * \page zippablepg Zippable
 	 *
-	 * Abstraction of data structures that can be element-wise "zipped"
-	 * together.
+	 * Data structures that can be element-wise "zipped" together.
 	 *
 	 * The classic example of a data type that is Zippable is the list. Zipping
 	 * two lists together would produce a third list, where each element is a
@@ -50,12 +49,14 @@ namespace ftl {
 	/**
 	 * \defgroup zippable Zippable
 	 *
+	 * Functions and interface relating to the \ref zippablepg concept.
+	 *
 	 * \code
 	 *   #include <ftl/concepts/zippable.h>
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * - <tuple>
+	 * - `<tuple>`
 	 * - \ref prelude
 	 */
 
@@ -112,7 +113,8 @@ namespace ftl {
 	 *
 	 * Can also be used with SFINAE, for much the same purposes.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *   template<
 	 *       typename Z,
@@ -151,7 +153,8 @@ namespace ftl {
 	 * \ref fwditerable. In other words, it would be possible to zip a list
 	 * deriving this implementation with e.g. a `maybe<SomeType>`.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *   template<typename T>
 	 *   struct zippable<Container<T>>
@@ -212,9 +215,15 @@ namespace ftl {
 	/**
 	 * Function object representing `zippable::zipWith`.
 	 *
+	 * Behaves as if it were a curried function of type
+	 * \code
+	 *   ((T,U) -> V, Z<T>, Z<U>) -> Z<V>
+	 * \endcode
+	 *
 	 * Allows a clean and terse call syntax of the concept method.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *   auto z = ftl::zipWith(foo, std::list{...}, std::list{...});
 	 * \endcode
@@ -265,10 +274,16 @@ namespace ftl {
 	/**
 	 * Function object essentially equivalent of `zipWith(std::make_tuple)`.
 	 *
+	 * Functionally equivalent of a curried function of type
+	 * \code
+	 *   (Z<T>, Z<U>) -> Z<tuple<T,U>>
+	 * \endcode
+	 *
 	 * In other words, zipping two lists with this function object results in
 	 * a list containing pairs of elements.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *   auto pairs = ftl::zip(list<int>{1,2,3}, list<string>{"a","b"});
 	 *   // list<tuple<int,string>>{make_tuple(1,"a"), make_tuple(2,"b")}

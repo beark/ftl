@@ -48,7 +48,7 @@ namespace ftl {
 	 * - \ref zippablepg
 	 *
 	 * \par Dependencies
-	 * - <forward_list>
+	 * - `<forward_list>`
 	 * - \ref foldable
 	 * - \ref monad
 	 * - \ref zippable

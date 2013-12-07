@@ -51,9 +51,8 @@ namespace ftl {
 	 *   \endcode
 	 *
 	 * Note, however, that in FTL, the binary monoid operation is denoted by
-	 * either of `monoid<aType>::append`, `ftl::mappend`, or `ftl::operator^`.
-	 * This is of course due to the limited selection of overloadable operators
-	 * in C++.
+	 * either of `ftl::mappend` or `ftl::operator^`. This is of course due to
+	 * the limited selection of overloadable operators in C++.
 	 *
 	 * For the actual interface instances need to implement, refer to the
 	 * documentation of `ftl::monoid`.
@@ -71,7 +70,7 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * - <type_traits>
+	 * - `<type_traits>`
 	 * - \ref prelude
 	 */
 
@@ -125,7 +124,8 @@ namespace ftl {
 	 * Can also be used with SFINAE to "hide" functions and methods from
 	 * non-monoid types.
 	 *
-	 * Example usage:
+	 * \par Examples
+	 *
 	 * \code
 	 *   // Due to SFINAE, myFunc will not be considered an option for
 	 *   // non-monoids.
@@ -149,7 +149,8 @@ namespace ftl {
 	 * The use of this operator is of course optional, but it can make code
 	 * considerably cleaner. Another option is to use `ftl::mappend`.
 	 *
-	 * Example usage:
+	 * \par Examples
+	 *
 	 * \code
 	 *   void myFunc(const MyMonoid& m1, const MyMonoid& m2) {
 	 *       using ftl::operator^;
@@ -166,8 +167,6 @@ namespace ftl {
 	 *       different types (to achieve perfect forwarding), but in reality,
 	 *       they must be the exact same type, barr constness and reference
 	 *       type.
-	 *
-	 * \see mappend
 	 *
 	 * \ingroup monoid
 	 */
@@ -209,12 +208,17 @@ namespace ftl {
 	/**
 	 * Convenience function object for `monoid::append`.
 	 *
+	 * In terms of calling semantics, behaves like a curried function of type
+	 * \code
+	 *   (M, M) -> M
+	 * \endcode
+	 * where `M` is any type satisfying \ref monoidpg.
+	 *
 	 * Allows easy creation of a function object that can be passed as argument
 	 * to higher-order functions as a substitute for `monoid::append`.
 	 *
-	 * This function object support curried calling.
+	 * \par Examples
 	 *
-	 * Example usage:
 	 * \code
 	 *   int foo() {
 	 *       using ftl::operator%;
@@ -228,8 +232,6 @@ namespace ftl {
 	 *   }
 	 * \endcode
 	 * Outputs "4".
-	 *
-	 * \see mAppend
 	 *
 	 * \ingroup monoid
 	 */

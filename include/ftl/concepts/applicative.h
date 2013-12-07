@@ -201,7 +201,11 @@ namespace ftl {
 	 * `Value_type<F>` as argument), or a constructor taking an
 	 * initialiser list of the same kind.
 	 *
-	 * Example:
+	 * \tparam F must satisfy `std::is_constructible<F,Value_type<F>>`
+	 *
+	 * \par Examples
+	 *
+	 * Derive a `pure` implementation for `UserType`.
 	 * \code
 	 *   template<typename T>
 	 *   struct applicative<UserType<T>> : deriving_pure<UserType<T>> {
@@ -229,10 +233,11 @@ namespace ftl {
 	/**
 	 * Convenience operator to ease applicative style programming.
 	 *
+	 * In other words,
 	 * \code
-	 *   a * b <=> applicative<F>::apply(a, b)
+	 *   a * b <=> ftl::aapply(a, b)
 	 * \endcode
-	 * Where `a` and `b` are complete types of `F` and `F` is an applicative
+	 * where `a` and `b` are complete types of `F`, and `F` is an applicative
 	 * functor.
 	 *
 	 * \ingroup applicative
@@ -260,6 +265,17 @@ namespace ftl {
 	 * Provided to make it easier to pass applicative::pure as parameter to
 	 * higher order functions, as one might otherwise have to wrap such calls
 	 * in a lambda to deal with the ambiguity in face of overloads.
+	 *
+	 * \par Examples
+	 *
+	 * Using `aPure` to create an instance of some applicative
+	 * \code
+	 *   template<typename F>
+	 *   void example(const F& f) {
+	 *     using Fint = ftl::Rebind<F,int>;
+	 *     Fint x = aPure<Fint>()(12);
+	 *   }
+	 * \endcode
 	 *
 	 * \ingroup applicative
 	 */
@@ -306,7 +322,13 @@ namespace ftl {
 	 * functions and in general use (when there is reason not to use
 	 * `ftl::operator*`).
 	 *
+	 * Acts as if it were a curried function of type
+	 * \code
+	 *   (F<(A) -> B>, F<A>) -> F<B>
+	 * \endcode
+	 *
 	 * \par Examples
+	 *
 	 * Calculate every possible way of summing the values of two lists:
 	 * \code
 	 *   vector<int> v1{1, 3};

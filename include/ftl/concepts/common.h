@@ -48,6 +48,7 @@ namespace ftl {
 	 * \subpage moveassignable
 	 * \subpage movecons
 	 * \subpage orderablepg
+	 * \subpage zippablepg
 	 */
 
 	/**
@@ -64,7 +65,7 @@ namespace ftl {
 	struct back_insertable_container {};
 
 	/**
-	 * Tag used to derive a \ref bidiriterable specific concept instance/method.
+	 * Tag used to derive a BidirectionalIterable specific concept instance/method.
 	 *
 	 * Some _deriving_ are specialised for this tag to provide a semi-automatic
 	 * implementation of a concept.

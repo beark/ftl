@@ -53,11 +53,11 @@ namespace ftl {
 	 * of the mathematical definition from which this concept is derived):
 	 * - **Preservation of identity**
 	 *   \code
-	 *     map(id, t)          <=> t
+	 *     fmap(id, t)          <=> t
 	 *   \endcode
 	 * - **Preservation of composition**
 	 *   \code
-	 *     map(compose(f, g), t)  <=> compose(curry(map)(f), curry(map)(g))(t)
+	 *     fmap(compose(f, g), t)  <=> compose(fmap(f), fmap(g))(t)
 	 *   \endcode
 	 *
 	 * For a detailed description of what exactly an instance needs to
@@ -77,7 +77,7 @@ namespace ftl {
 	 *
 	 * \par Dependencies
 	 * - \ref typelevel
-	 * - <ftl/function.h>
+	 * - \ref prelude
 	 */
 
 	/**
@@ -131,11 +131,10 @@ namespace ftl {
 	};
 
 	/**
-	 * Concepts lite-compatible predicate for functor instances.
+	 * Predicate to check if a particular type is an instance of Functor.
 	 *
-	 * Can be used already for similar purposes by way of SFINAE.
+	 * \par Examples
 	 *
-	 * Example usage:
 	 * \code
 	 *   template<
 	 *       typename F,
@@ -163,7 +162,8 @@ namespace ftl {
 	 * - There must exist a method, `emplace_back(T&&)`, behaving semantically
 	 *   equivalent of e.g. the `std::list::emplace_back` of the same signature.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
 	 * \code
 	 *   template<typename T>
 	 *   struct functor<Container<T>>
@@ -230,29 +230,14 @@ namespace ftl {
 	};
 
 	/**
-	 * Convenience operator for `functor::map`.
+	 * Convenience operator for `fmap`.
 	 *
-	 * This operator perfectly forwards the parameters, so it works regardless
-	 * of r-valueness.
-	 *
-	 * Example usage:
+	 * As expected,
 	 * \code
-	 *   MyFunctor<SomeType> foo(
-	 *       const MyFunctor<OtherType>& f,
-	 *       ftl::function<SomeType,OtherType> fn) {
-	 *
-	 *       using ftl::operator%;
-	 *       return fn % f;
-	 *   }
-	 *
-	 *   // Equivalent operator-less version
-	 *   MyFunctor<SomeType> foo(
-	 *       const MyFunctor<OtherType>& f,
-	 *       ftl::function<SomeType,OtherType> fn) {
-	 *
-	 *       return functor<MyFunctor<OtherType>>::map(fn, f);
-	 *   }
+	 *   a % b <=> ftl::fmap(a, b)
 	 * \endcode
+	 * assuming `a` and `b` are both values of a type implementing the Functor
+	 * concept.
 	 *
 	 * \ingroup functor
 	 */
@@ -338,23 +323,29 @@ namespace ftl {
 	struct ImplementationDefined {
 	}
 	/**
-	 * Convenience function object.
+	 * Function object representing `functor::map`.
 	 *
-	 * Makes it convenient to pass `functor::map` as parameter to higher-order
-	 * functions. Also makes for a good alternative to `ftl::operator%` for
-	 * those who prefer to keep their code clear of potentially confusing
-	 * operators.
+	 * Behaves as if it were a curried function of type
+	 * \code
+	 *   ((T) -> U, F<T>) -> F<U>
+	 * \endcode
+	 *
+	 * Should `U == void`, `fmap` will instead have the function type
+	 * \code
+	 *   ((T) -> void, F<T>) -> void
+	 * \endcode
+	 *
+	 * Makes for a good alternative to `ftl::operator%` for those who prefer
+	 * to keep their code clear of potentially confusing operators.
 	 *
 	 * \par Examples
+	 *
 	 * Using `fmap` to map a function with side effects and no return value:
 	 * \code
 	 *   std::list<int> l{1,2,3};
 	 *
 	 *   ftl::fmap([](int x){ std::cout << x << ", "; }, l);
-	 * \endcode
-	 * Output:
-	 * \code
-	 *   1, 2, 3, 
+	 *   // Output: "1, 2, 3,  "
 	 * \endcode
 	 *
 	 * Mapping a function to eithers:
