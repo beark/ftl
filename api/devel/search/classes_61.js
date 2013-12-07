@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['aapply',['aApply',['../structftl_1_1aApply.html',1,'ftl']]],
   ['all',['all',['../structftl_1_1all.html',1,'ftl']]],
   ['any',['any',['../structftl_1_1any.html',1,'ftl']]],
   ['applicative',['applicative',['../structftl_1_1applicative.html',1,'ftl']]],

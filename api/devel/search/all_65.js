@@ -5,7 +5,7 @@ var searchData=
   ['eithert',['eitherT',['../classftl_1_1eitherT.html',1,'ftl']]],
   ['eithert',['eitherT',['../classftl_1_1eitherT.html#a256c96322cdc8889d67db81146714705',1,'ftl::eitherT::eitherT(const Met &amp;m) noexcept(std::is_nothrow_copy_constructible&lt; Met &gt;::value)'],['../classftl_1_1eitherT.html#a444c42da33fb4077315ec0b653fce4a5',1,'ftl::eitherT::eitherT(Met &amp;&amp;m) noexcept(std::is_nothrow_move_constructible&lt; Met &gt;::value)'],['../classftl_1_1eitherT.html#a9153a989cd6abb2d0d86f8b653d79244',1,'ftl::eitherT::eitherT(inplace_tag, Args &amp;&amp;...args) noexcept(std::is_nothrow_constructible&lt; Met, Args...&gt;::value)'],['../group__eitherT.html',1,'(Global Namespace)']]],
   ['emptystate',['EmptyState',['../empty.html',1,'concepts']]],
-  ['equalitycomparable',['EqualityComparable',['../eq.html',1,'concepts']]],
-  ['equal',['equal',['../group__ord.html#gad316f1510b83278267e63e06562e5beb',1,'ftl']]],
+  ['eq',['Eq',['../group__orderable.html#ga9e7ea60b84fe6ba41aa089364a01eeeb',1,'ftl::Eq()'],['../eq.html',1,'concepts']]],
+  ['equal',['equal',['../group__ord.html#ga00b49be9b6769d96262f765b29b6bf10',1,'ftl']]],
   ['et',['eT',['../structftl_1_1monad_3_01eitherT_3_01L_00_01M_01_4_01_4.html#a6c57510196411c268712cc5f5c6fa8c2',1,'ftl::monad&lt; eitherT&lt; L, M &gt; &gt;']]]
 ];

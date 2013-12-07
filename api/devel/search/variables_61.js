@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['aapply',['aapply',['../group__applicative.html#gace09b85988c92d73243af3b7a8d67f5a',1,'ftl']]]
+  ['aapply',['aapply',['../group__applicative.html#ga0e545d333f5178c78321d46ba46bbc4b',1,'ftl']]]
 ];
