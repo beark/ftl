@@ -193,6 +193,41 @@ test_set concept_tests{
 					&& foldl2(0, v) == 10
 					&& foldl1(v) == 10;
 			})
+		),
+		std::make_tuple(
+			std::string("Zippable: curried zipWith"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto f = [](int x, int y){ return x+y; };
+
+				auto zipWithF = zipWith(f);
+
+				std::vector<int> v1{3,3,4};
+				std::vector<int> v2{1,3,5};
+
+				auto zipWithFV1 = zipWith(f, v1);
+
+				std::vector<int> expected{4,6,9};
+
+				return zipWithF(v1, v2) == expected
+					&& zipWithFV1(v2) == expected;
+			})
+		),
+		std::make_tuple(
+			std::string("fmap(fold, v)"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::vector<std::vector<sum_monoid<int>>> v{
+					{sum(1), sum(2)},
+					{sum(3), sum(4)}
+				};
+
+				auto r = fmap(fold, v);
+
+				return r == std::vector<sum_monoid<int>>{sum(3), sum(7)};
+			})
 		)
 	}
 };
