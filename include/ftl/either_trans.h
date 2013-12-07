@@ -439,7 +439,7 @@ namespace ftl {
 						return monad<Met>::pure(e);
 					}
 					else {
-						return liftM(
+						return fmap(
 							[e](const either<L,T>& e2) -> either<L,T> {
 								if(e2)
 									return e2;
