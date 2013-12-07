@@ -51,9 +51,9 @@ namespace ftl {
 	 *
 	 * To compile a project using FTL, you need to make sure your compiler
 	 * supports the required C++11 features and is set to use them. As of this
-	 * writing, that is, to the author's knowledge, _only_ gcc versions 4.7 and
-	 * later. To tell gcc your project uses C++11 features, add `-std=c++11` to
-	 * its compilation flags.
+	 * writing, that is, to the author's knowledge, gcc (4.8 and later) and
+	 * clang (3.2 and later). To tell gcc/clang your project uses C++11
+	 * features, add `-std=c++11` to its compilation flags.
 	 */
 
 	/**
