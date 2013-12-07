@@ -27,6 +27,9 @@ div.main {
 	background-color: #DAE0E5;
 	padding-bottom: 1em;
 	border-bottom: 1px solid #eaeaea;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 880px;
 }
 
 div.main > header {
@@ -71,7 +74,8 @@ div.main > header > nav > ul > li:first-child {
 }
 
 main {
-	margin-left: 5%;
+	margin-left: 12px;
+	margin-right: 12px;
 }
 
 main h2,
@@ -161,6 +165,18 @@ article ul {
 
 article ul > li {
 	margin: 1em 0;
+}
+
+div.btc {
+	display: inline-block;
+}
+
+div.btc img {
+	width: 200px;
+	padding: 3px;
+	box-shadow: 0 0 3px #000 inset;
+	background-color: white;
+	display: block;
 }
 
 @keyframes header-hover-link {

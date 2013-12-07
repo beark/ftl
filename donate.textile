@@ -1,0 +1,10 @@
+---
+title: Donate
+layout: page
+---
+If you like FTL and happen to feel generous, bitcoin donations are graciously accepted:
+
+{% include btc.html %}
+
+FTL is currently developed solely in the spare time of the author, specifically because he enjoys doing so. Development will continue with or without donations. In other words, consider donations merely one way of showing appreciation among many. The project neither expects nor demands them.
+
