@@ -22,6 +22,7 @@
  */
 #include <ftl/maybe.h>
 #include <ftl/vector.h>
+#include <ftl/list.h>
 #include "concept_tests.h"
 
 test_set concept_tests{
@@ -118,15 +119,18 @@ test_set concept_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("Monad: <<"),
+			std::string("Monad: <<="),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto m1 = value(1);
-				auto m2 = value(2);
-				maybe<int> m3 = nothing;
+				auto m1 = value(0.f);
+				auto m2 = value(2.f);
+				auto f = [](float x){
+					return x == 0 ? nothing : value(8.f / x);
+				};
 
-				return m1 << m2 == value(1) && m1 << m3 == nothing;
+				return (f <<= f <<= m1) == nothing
+					&& (f <<= f <<= m2) == value(2.f);
 			})
 		),
 		std::make_tuple(
@@ -150,8 +154,7 @@ test_set concept_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto f = [](int x){ return sum(x); };
-				auto foldmap = foldMap(f);
+				auto foldmap = foldMap(sum<int>);
 
 				std::vector<int> v{3,3,4};
 
@@ -163,15 +166,13 @@ test_set concept_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto f = [](int x, int y){ return x+y; };
-
-				auto foldr2 = foldr(f);
+				auto foldr2 = foldr(std::plus<int>());
 				auto foldr1 = foldr2(0);
 
 				std::vector<int> v{3,3,4};
 
 				return
-					foldr(f, 0, v) == 10
+					foldr(std::plus<int>(), 0, v) == 10
 					&& foldr2(0, v) == 10
 					&& foldr1(v) == 10;
 			})
@@ -192,6 +193,22 @@ test_set concept_tests{
 					foldl(f, 0, v) == 10
 					&& foldl2(0, v) == 10
 					&& foldl1(v) == 10;
+			})
+		),
+		std::make_tuple(
+			std::string("Foldable: foldl associativity"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto rCons = [](std::list<int> xs, int x){
+					xs.push_front(x);
+					return xs;
+				};
+
+				std::list<int> l{2,3,4};
+
+				return foldl(rCons, std::list<int>{}, l)
+					== std::list<int>{4,3,2};
 			})
 		),
 		std::make_tuple(
