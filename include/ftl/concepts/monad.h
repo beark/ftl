@@ -463,10 +463,19 @@ namespace ftl {
 		template<
 				typename F,
 				typename Cu = result_of<F(T)>,
-				typename U = Value_type<Cu>,
-				typename = Requires<ForwardIterable<Cu>()>
+				typename U = Value_type<Cu>
 		>
 		static M<U> bind(const M<T>& m, F&& f) {
+			static_assert(
+				DefaultConstructible<M<U>>(),
+				"Rebind<M_,U> must result in a DefaultConstructible type"
+			);
+
+			static_assert(
+				ForwardIterable<Cu>(),
+				"F(T) does not return an instance of ForwardIterable"
+			);
+
 			auto m2 = std::forward<F>(f) % m;
 			M<U> result;
 			auto it = std::inserter(result, result.begin());
@@ -481,12 +490,19 @@ namespace ftl {
 		template<
 				typename F,
 				typename Cu = result_of<F(T)>,
-				typename U = Value_type<Cu>,
-				typename = Requires<
-					ForwardIterable<Cu>()
-				>
+				typename U = Value_type<Cu>
 		>
 		static M<U> bind(M<T>&& m, F&& f) {
+			static_assert(
+				DefaultConstructible<M<U>>(),
+				"Rebind<M_,U> must result in a DefaultConstructible type"
+			);
+
+			static_assert(
+				ForwardIterable<Cu>(),
+				"F(T) does not return an instance of ForwardIterable"
+			);
+
 			auto m2 = std::forward<F>(f) % std::move(m);
 			M<U> result;
 			auto it = std::inserter(result, result.begin());
@@ -751,67 +767,42 @@ namespace ftl {
 		};
 	}
 
-	/**
-	 * Convenience function object.
-	 *
-	 * Provided to make it easier to treat monadic bind as a first class
-	 * function, even though many/all monad instances have overloaded
-	 * versions. I.e., in many cases where one might want to pass `monad::bind`
-	 * as a parameter to a function, it is not possible due to ambiguous
-	 * overloads. In these cases, one could either use a lambda, or&mdash;more
-	 * concisely&mdash;this function object.
-	 *
-	 * \ingroup monad
-	 */
-	struct mBind
 #ifndef DOCUMENTATION_GENERATOR
-	: private _dtl::curried_binf<mBind>
-#endif
-	{
+	constexpr struct _mbind : private _dtl::curried_binf<_mbind> {
 		template<typename M, typename F, typename M_ = plain_type<M>>
 		auto operator() (M&& m, F&& f) const
 		-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
 			return monad<M_>::bind(std::forward<M>(m), std::forward<F>(f));
 		}
 
-		using curried_binf<mBind>::operator();
-	};
-
+		using curried_binf<_mbind>::operator();
+	} mbind{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time instance of mBind.
+	 * Curried function object representing `monad::bind`.
 	 *
-	 * Makes higher order passing of monad<T>::bind even more convenient.
+	 * Makes for much more convenient calling and passing to higher-order
+	 * functions.
 	 *
-	 * Example usage:
+	 * \par Examples
+	 * Trivial usage to sequence two maybes:
 	 * \code
-	 *   void foo() {
-	 *      bar(mbind);
-	 *   }
+	 *   ftl::maybe<int> foo(string s);
 	 *
-	 *   // Alternative, less concise option:
-	 *   template<typename M, typename F>
-	 *   void baz() {
-	 *       bar([](const M& m, const F& f){ return m >>= f; });
+	 *   ftl::maybe<int> exampe(ftl::maybe<string> ms) {
+	 *       return ftl::mbind(ms, foo);
 	 *   }
 	 * \endcode
 	 *
 	 * \ingroup monad
 	 */
-	constexpr mBind mbind{};
+	mbind;
+#endif
 
-	/**
-	 * Convenience function object.
-	 *
-	 * Provided to make it easier to treat monadic join as a first class
-	 * function, even though many/all monad instances have overloaded
-	 * versions. I.e., in many cases where one might want to pass `monad::join`
-	 * as a parameter to a function, it is not possible due to ambiguous
-	 * overloads. In these cases, one could either use a lambda, or&mdash;more
-	 * concisely&mdash;this function object.
-	 *
-	 * \ingroup monad
-	 */
-	struct mJoin {
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct _mjoin {
 		template<
 				typename M,
 				typename = Requires<Monad<plain_type<M>>()>
@@ -824,29 +815,31 @@ namespace ftl {
 				std::forward<M>(m)
 			);
 		}
-	};
-
+	} mjoin {};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time instance of mJind.
+	 * Function object representing `monad::join`.
 	 *
-	 * Makes higher order passing of `monad<T>::join` even more convenient.
+	 * Proves concise calling syntax for the monadic join operation, allowing
+	 * cleaner code both for regular use and for passing to higher-order
+	 * functions.
 	 *
-	 * Example usage:
+	 * \par Examples
+	 * Straight forward use to flatten a list of lists. No elements are
+	 * discarded, they will appear in the resulting list in the same order
+	 * as if a depth-first traversal was made of the original list.
 	 * \code
-	 *   void foo() {
-	 *      bar(mjoin);
-	 *   }
-	 *
-	 *   // Alternative, less concise option:
-	 *   template<typename M>
-	 *   void baz() {
-	 *       bar([](const M& m){ return monad<M>::join(m); });
+	 *   std::list<int> flatten(const list<list<int>>& l) {
+	 *       return ftl::mjoin(l);
 	 *   }
 	 * \endcode
 	 *
 	 * \ingroup monad
 	 */
-	constexpr mJoin mjoin{};
+	mjoin;
+#endif
 }
 
 #endif

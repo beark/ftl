@@ -192,25 +192,9 @@ namespace ftl {
 
 	};
 
-	/**
-	 * Convenience function object.
-	 *
-	 * Provides a cleaner interface to `zippable::zipWith`.
-	 *
-	 * Example:
-	 * \code
-	 *   auto z = ftl::ZipWith{}(foo, std::list{...}, std::list{...});
-	 * \endcode
-	 *
-	 * \ingroup zippable
-	 */
-	struct ZipWith : private _dtl::curried_ternf<ZipWith>
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct _zipWith : private _dtl::curried_ternf<_zipWith>
 	{
-		constexpr ZipWith() noexcept {}
-		constexpr ZipWith(const ZipWith&) noexcept {}
-		constexpr ZipWith(ZipWith&&) noexcept {}
-		~ZipWith() = default;
-
 		template<
 				typename F, typename Z, typename I,
 				typename = Requires<Zippable<Z>()>
@@ -220,12 +204,15 @@ namespace ftl {
 			return zippable<Z>::zipWith(std::forward<F>(f), z, i);
 		}
 
-		using curried_ternf<ZipWith>::operator();
-	};
-
+		using curried_ternf<_zipWith>::operator();
+	} zipWith{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time instance of `ZipWith` for even easier `zippable::zipWith`
-	 * invocations.
+	 * Function object representing `zippable::zipWith`.
+	 *
+	 * Allows a clean and terse call syntax of the concept method.
 	 *
 	 * Example:
 	 * \code
@@ -234,17 +221,11 @@ namespace ftl {
 	 *
 	 * \ingroup zippable
 	 */
-	constexpr ZipWith zipWith;
+	zipWith;
+#endif
 
-	/**
-	 * Function object basically equivalent of `zipWith(std::make_tuple)`.
-	 *
-	 * In other words, zipping two lists with this function object results in
-	 * a list containing pairs of elements.
-	 *
-	 * \ingroup zippable
-	 */
-	struct Zip : private _dtl::curried_binf<Zip> {
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct _zip : private _dtl::curried_binf<_zip> {
 	private:
 		template<typename T, typename U>
 		struct mktup {
@@ -266,11 +247,6 @@ namespace ftl {
 		};
 
 	public:
-		constexpr Zip() noexcept {}
-		constexpr Zip(const Zip&) noexcept {}
-		constexpr Zip(Zip&&) noexcept {}
-		~Zip() = default;
-
 		template<
 				typename Z, typename I,
 				typename = Requires<Zippable<Z>()>
@@ -281,11 +257,16 @@ namespace ftl {
 			return zippable<Z>::zipWith(mktup<Value_type<Z>,Value_type<I>>{}, z, i);
 		}
 
-		using curried_binf<Zip>::operator();
-	};
-
+		using curried_binf<_zip>::operator();
+	} zip{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time instance of the `Zip` function object.
+	 * Function object essentially equivalent of `zipWith(std::make_tuple)`.
+	 *
+	 * In other words, zipping two lists with this function object results in
+	 * a list containing pairs of elements.
 	 *
 	 * Example:
 	 * \code
@@ -295,8 +276,8 @@ namespace ftl {
 	 *
 	 * \ingroup zippable
 	 */
-	constexpr Zip zip;
-
+	zip;
+#endif
 }
 
 #endif

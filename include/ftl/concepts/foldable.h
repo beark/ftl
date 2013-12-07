@@ -214,24 +214,24 @@ namespace ftl {
 	 *
 	 * \ingroup foldable
 	 */
-	template<
-			typename F,
-			typename = Requires<ForwardIterable<F>()>
-	>
+	template<typename F>
 	struct deriving_foldl {
+		static_assert(
+			ForwardIterable<F>(),
+			"F does not satisfy ForwardIterable"
+		);
+
 		using T = Value_type<F>;
 
-		template<
-				typename Fn,
-				typename U,
-				typename = Requires<
-					std::is_convertible<
-						typename std::result_of<Fn(U,T)>::type,
-						U
-					>::value
-				>
-		>
+		template<typename Fn, typename U>
 		static U foldl(Fn&& fn, U z, const F& f) {
+			static_assert(
+				std::is_convertible<
+					typename std::result_of<Fn(U,T)>::type,U
+				>::value,
+				"The result of Fn(U,T) must be convertible to U"
+			);
+
 			for(auto& e : f) {
 				z = fn(z, e);
 			}
@@ -239,17 +239,15 @@ namespace ftl {
 			return z;
 		}
 
-		template<
-				typename Fn,
-				typename U,
-				typename = Requires<
-					std::is_convertible<
-						typename std::result_of<Fn(U,T)>::type,
-						plain_type<U>
-					>::value
-				>
-		>
+		template<typename Fn, typename U>
 		static U foldl(Fn&& fn, U z, F&& f) {
+			static_assert(
+				std::is_convertible<
+					typename std::result_of<Fn(U,T)>::type,U
+				>::value,
+				"The result of Fn(U,T) must be convertible to U"
+			);
+
 			for(auto& e : f) {
 				z = fn(z, std::move(e));
 			}
@@ -279,17 +277,15 @@ namespace ftl {
 	struct deriving_foldr {
 		using T = Value_type<F>;
 
-		template<
-				typename Fn,
-				typename U,
-				typename = Requires<
-					std::is_convertible<
-						typename std::result_of<Fn(T,U)>::type,
-						U
-					>::value
-				>
-		>
+		template<typename Fn, typename U>
 		static U foldr(Fn&& fn, U z, const F& f) {
+			static_assert(
+				std::is_convertible<
+					typename std::result_of<Fn(T,U)>::type,U
+				>::value,
+				"The result of Fn(T,U) must be convertible to U"
+			);
+
 			for(auto it = f.rbegin(); it != f.rend(); ++it) {
 				z = fn(*it, z);
 			}
@@ -297,17 +293,15 @@ namespace ftl {
 			return z;
 		}
 
-		template<
-				typename Fn,
-				typename U,
-				typename = Requires<
-					std::is_convertible<
-						typename std::result_of<Fn(T,U)>::type,
-						U
-					>::value
-				>
-		>
+		template<typename Fn, typename U>
 		static U foldr(Fn&& fn, U z, F&& f) {
+			static_assert(
+				std::is_convertible<
+					typename std::result_of<Fn(T,U)>::type,U
+				>::value,
+				"The result of Fn(T,U) must be convertible to U"
+			);
+
 			for(auto it = f.rbegin(); it != f.rend(); ++it) {
 				z = fn(std::move(*it), z);
 			}
@@ -340,10 +334,14 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename T = Value_type<F>,
-				typename M = result_of<Fn(T)>,
-				typename = Requires<Monoid<M>()>
+				typename M = result_of<Fn(T)>
 		>
 		static M foldMap(Fn fn, const F& f) {
+			static_assert(
+				Monoid<M>(),
+				"The result of Fn(T) is not an instance of Monoid."
+			);
+
 			return foldable<F>::foldl(
 					[fn](const T& a, const M& b) {
 						return monoid<M>::append(
@@ -381,11 +379,10 @@ namespace ftl {
 	 */
 	template<typename F>
 	struct deriving_fold {
-		template<
-				typename M = Value_type<F>,
-				typename = Requires<Monoid<M>()>
-		>
+		template<typename M = Value_type<F>>
 		static M fold(const F& f) {
+			static_assert(Monoid<M>(), "M must satisfy Monoid");
+
 			return foldable<F>::foldMap(id, f);
 		}
 	};
@@ -411,33 +408,42 @@ namespace ftl {
 		static constexpr bool instance = true;
 	};
 
-	/**
-	 * Convenience function alias of foldable<T>::fold.
-	 *
-	 * \ingroup foldable
-	 */
-	template<
-			typename F,
-			typename M = Value_type<F>,
-			typename = Requires<Foldable<F>() && Monoid<M>()>
-	>
-	M fold(const F& f) {
-		return foldable<F>::fold(f);
-	}
-
-	/**
-	 * Convenience function object alias of foldable<T>::foldMap.
-	 *
-	 * Supports curried calling convention, where a user can supply one
-	 * parameter at a time.
-	 *
-	 * \ingroup foldable
-	 */
-	struct FoldMap
 #ifndef DOCUMENTATION_GENERATOR
-	: private _dtl::curried_binf<FoldMap>
+	constexpr struct _fold {
+		template<
+				typename F,
+				typename M = Value_type<F>,
+				typename = Requires<Foldable<F>() && Monoid<M>()>
+		>
+		M operator() (const F& f) const {
+			return foldable<F>::fold(f);
+		}
+
+	} fold {};
+#else
+	struct ImplementationDefined {
+	}
+	/**
+	 * Convenience function object for `foldable<T>::fold`.
+	 *
+	 * Example:
+	 * \code
+	 *   list<list<sum_monoid<int>>> l{
+	 *       {ftl::sum(1), ftl::sum(2)},
+	 *       {ftl::sum(3), ftl::sum(4)}
+	 *   };
+	 *
+	 *   auto r = ftl::fmap(ftl::fold, l);
+	 *   // r == {sum(3), sum(7)}
+	 * \endcode
+	 *
+	 * \ingroup foldable
+	 */
+	fold;
 #endif
-	{
+
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct _foldMap : private _dtl::curried_binf<_foldMap> {
 		template<
 				typename F,
 				typename T = Value_type<F>,
@@ -449,37 +455,32 @@ namespace ftl {
 			return foldable<F>::foldMap(std::forward<Fn>(fn), f);
 		}
 
-		using curried_binf<FoldMap>::operator();
-	};
-
+		using curried_binf<_foldMap>::operator();
+	} foldMap {};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time convenience instance of FoldMap.
+	 * Function object representing `foldable::foldMap`.
 	 *
-	 * Makes `foldable::foldMap` generally a lot cleaner to use, as well as
+	 * Makes it generally a lot cleaner to call `foldMap`, as well as
 	 * easier to pass to higher order functions.
 	 *
-	 * \ingroup foldable
-	 */
-	constexpr FoldMap foldMap{};
-
-	/**
-	 * Convenience function object alias of `foldable::foldr`.
+	 * Example:
+	 * ```cpp
+	 *   auto v = vector<int>{3,3,4};
 	 *
-	 * Allows curried calling semantics, e.g. any of:
-	 * \code
-	 *   ftl::foldr(fn, z, f);
-	 *   ftl::foldr(fn)(z, f);
-	 *   ftl::foldr(fn)(z)(f);
-	 * \endcode
-	 * are valid ways of invoking `foldr`.
+	 *   auto r = ftl::foldMap([](int x){ return sum(x); }, v);
+	 *   // r == ftl::sum(10)
+	 * ```
 	 *
 	 * \ingroup foldable
 	 */
-	struct foldR
-#ifndef DOCUMENTATION_GENERATOR
-	: private _dtl::curried_ternf<foldR>
+	foldMap;
 #endif
-	{
+
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct _foldr : private _dtl::curried_ternf<_foldr> {
 		template<
 				typename F,
 				typename Fn,
@@ -494,26 +495,30 @@ namespace ftl {
 			return foldable<F>::foldr(std::forward<Fn>(fn), std::forward<U>(z), f);
 		}
 
-		using curried_ternf<foldR>::operator();
-	};
-
+		using curried_ternf<_foldr>::operator();
+	} foldr {};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time convenience instance of foldR.
+	 * Convenience function object for `foldable::foldr`.
+	 *
+	 * Provides easy and concise calling, unlike explicitly looking up the
+	 * instance implementation as `foldable<instance>::foldr`.
+	 *
+	 * A right fold is, as the name implies, right associative. Which is to say,
+	 * the operation `foldr(f, z, {1,2,3})` is equivalent of:
+	 * \code
+	 *   f(1, f(2, f(3, z)));
+	 * \endcode
 	 *
 	 * \ingroup foldable
 	 */
-	constexpr foldR foldr{};
-
-	/**
-	 * Convenience function object alias of foldable<T>::foldl.
-	 *
-	 * \ingroup foldable
-	 */
-	struct foldL
-#ifndef DOCUMENTATION_GENERATOR
-	: private _dtl::curried_ternf<foldL>
+	foldr;
 #endif
-	{
+
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct _foldl : private _dtl::curried_ternf<_foldl> {
 		template<
 				typename F,
 				typename Fn,
@@ -528,16 +533,24 @@ namespace ftl {
 			return foldable<F>::foldl(std::forward<Fn>(fn), std::forward<U>(z), f);
 		}
 
-		using curried_ternf<foldL>::operator();
-	};
-
+		using curried_ternf<_foldl>::operator();
+	} foldl{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time convenience instance of foldL.
+	 * Convenience function object representing `foldable::foldl`.
+	 *
+	 * A left fold is of course left-associative, meaning that the operation
+	 * `foldl(f, z, {1,2,3})` is equivalent of:
+	 * \code
+	 *   f(f(f(z, 1), 2), 3);
+	 * \endcode
 	 *
 	 * \ingroup foldable
 	 */
-	constexpr foldL foldl{};
-
+	foldl;
+#endif
 }
 
 #endif

@@ -91,7 +91,7 @@ using ftl::operator*;
 auto result =
 	ftl::curry(algorithm) % maybeGetAValue() * maybeGetAnother() * maybeGetAThird();
 ```
-which woould compute the result of algorithm, but only if every one of the `maybe` functions returned a value.
+which would compute the result of algorithm, but only if every one of the `maybe` functions returned a value.
 
 In other words, without Functor's `fmap` and Applicative's `aapply`, it would have looked something like:
 ```cpp

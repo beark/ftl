@@ -23,6 +23,7 @@
 #ifndef FTL_APPLICATIVE_H
 #define FTL_APPLICATIVE_H
 
+#include "basic.h"
 #include "functor.h"
 
 namespace ftl {
@@ -264,6 +265,11 @@ namespace ftl {
 	 */
 	template<typename F>
 	struct aPure {
+		static_assert(
+			Applicative<F>(),
+			"F is not an instance of Applicative"
+		);
+
 		using T = Value_type<F>;
 
 		F operator() (const T& t) const {
@@ -277,22 +283,8 @@ namespace ftl {
 
 	// TODO: C++14: template variable instance of aPure.
 
-	/**
-	 * Convenience function object.
-	 *
-	 * Provided as a short-cut for applicative<T>::apply, when operator*
-	 * can not be used. Particularly useful when passing `apply` as argument to
-	 * higher order functions.
-	 *
-	 * aApply offers curried calling semantics, should it be desired.
-	 *
-	 * \ingroup applicative
-	 */
-	struct aApply
 #ifndef DOCUMENTATION_GENERATOR
-	: private _dtl::curried_binf<aApply>
-#endif
-	{
+	constexpr struct _aapply : private _dtl::curried_binf<_aapply> {
 		template<typename Fn, typename F, typename F_ = plain_type<F>>
 		auto operator() (Fn&& u, F&& v) const
 		-> decltype(applicative<F_>::apply(
@@ -302,29 +294,32 @@ namespace ftl {
 				std::forward<Fn>(u), std::forward<F>(v));
 		}
 
-		using _dtl::curried_binf<aApply>::operator();
-	};
-
+		using _dtl::curried_binf<_aapply>::operator();
+	} aapply{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time instance of aApply.
+	 * Function object representing `applicative::apply`.
 	 *
-	 * Makes it syntactically cheap to use `applicative::apply` in higher-
-	 * order functions and such.
+	 * Makes it syntactically cheap to use `apply` both in higher-order
+	 * functions and in general use (when there is reason not to use
+	 * `ftl::operator*`).
 	 *
-	 * Example:
+	 * \par Examples
+	 * Calculate every possible way of summing the values of two lists:
 	 * \code
-	 *   template<typename F, typename A, typename B>
-	 *   auto foo(const A& a, const B& b) -> ftl::result_of<F(A,B)>;
+	 *   vector<int> v1{1, 3};
+	 *   vector<int> v2{10, 20};
 	 *
-	 *   AnApplicative<ftl::function<U,T>> ff = ...;
-	 *   AnApplicative<T> ft = ...;
-	 *   
-	 *   foo(aapply, ff, ft);
+	 *   auto v3 = ftl::aapply(ftl::fmap(plus<int>, v1), v2);
+	 *   // v3 == {11, 21, 13, 23}
 	 * \endcode
 	 *
 	 * \ingroup applicative
 	 */
-	constexpr aApply aapply{};
+	aapply;
+#endif
 
 	/**
 	 * \page monoidapg Monoidal Alternatives

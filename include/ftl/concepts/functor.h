@@ -266,27 +266,9 @@ namespace ftl {
 		return functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f));
 	}
 
-	/**
-	 * Convenience function object.
-	 *
-	 * Provided to make it easier to pass `functor::map` as parameter to
-	 * higher order functions, as one might otherwise have to wrap such calls
-	 * in a lambda to deal with the ambiguity in face of overloads.
-	 *
-	 * `fMap` values may be invoked using curried calling style, should such
-	 * be wanted.
-	 *
-	 * Note that, unlike when invoking `functor::map` directly, it is possible
-	 * to map a function returning `void`. In such cases, `fMap` behaves like
-	 * `mapM_` of Haskell: the function is applied purely for its side effects,
-	 * and no values are stored or returned.
-	 *
-	 * \ingroup functor
-	 */
-	struct fMap
+
 #ifndef DOCUMENTATION_GENERATOR
-	: private _dtl::curried_binf<fMap>
-#endif
+	constexpr struct _fmap : private _dtl::curried_binf<_fmap>
 	{
 		template<
 				typename Fn,
@@ -301,6 +283,9 @@ namespace ftl {
 		>
 		auto operator() (Fn&& fn, F&& f) const
 		-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f))){
+
+			static_assert(Functor<F_>(), "F is not an instance of Functor");
+
 			return functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f));
 		}
 
@@ -316,10 +301,12 @@ namespace ftl {
 				>
 		>
 		void operator() (Fn&& fn, F&& f) const {
+			static_assert(Functor<F_>(), "F is not an instance of Functor");
+
 			mapM<F_>::apply(std::forward<Fn>(fn), std::forward<F>(f));
 		}
 
-		using _dtl::curried_binf<fMap>::operator();
+		using _dtl::curried_binf<_fmap>::operator();
 
 	private:
 		template<typename F>
@@ -346,18 +333,20 @@ namespace ftl {
 				);
 			}
 		};
-	};
-
+	} fmap{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time instance of fMap.
+	 * Convenience function object.
 	 *
-	 * Makes it even more convenient to pass `functor::map` as parameter to
-	 * higher order functions. Also makes for a good alternative to
-	 * `ftl::operator%` for those who prefer to keep their code clear of
-	 * potentially confusing operators.
+	 * Makes it convenient to pass `functor::map` as parameter to higher-order
+	 * functions. Also makes for a good alternative to `ftl::operator%` for
+	 * those who prefer to keep their code clear of potentially confusing
+	 * operators.
 	 *
-	 * \par Example uses
-	 * Using `fmap` to map a function with side effects and no return value
+	 * \par Examples
+	 * Using `fmap` to map a function with side effects and no return value:
 	 * \code
 	 *   std::list<int> l{1,2,3};
 	 *
@@ -368,25 +357,30 @@ namespace ftl {
 	 *   1, 2, 3, 
 	 * \endcode
 	 *
-	 * As parameter to a higher order function
+	 * Mapping a function to eithers:
 	 * \code
-	 *   template<
-	 *       typename F1, typename F2,
-	 *       typename T, typename U = result_of<F1(F2,T)>
-	 *   >
-	 *   U foo(const F1& f1, const F2& f2, const T& t) {
-	 *       return f1(f2, t);
-	 *   }
+	 *   ftl::either<string,int> e1 = ftl::make_right<string>(10);
+	 *   ftl::either<string,int> e2 = ftl::make_left<int>(string("blah"));
 	 *
-	 *   MyFunctor<SomeType> bar(MyFunctor<SomeType> myFunctor) {
-	 *       // Really a no-op, but demonstrates how convenient fmap can be
-	 *       return foo(fmap, id, myFunctor);
-	 *   }
+	 *   auto plusOne = [](int x){ return x+1; };
+	 *   auto r1 = ftl::fmap(plusOne, e1); // r1 == make_right(11)
+	 *   auto r2 = ftl::fmap(plusOne, e2); // r2 == make_left("blah")
+	 * \endcode
+	 *
+	 * As parameter to a higher-order function:
+	 * \code
+	 *   list<list<int>> l{list<int>{1,2}, list<int>{3,4}};
+	 *
+	 *   auto plusOne = [](int x){ return x+1; };
+	 *
+	 *   // As fmap is curried, we can apply it to one argument at a time
+	 *   auto r = ftl::fmap(ftl::fmap(plusOne), l); // r == {{2,3}, {4,5}}
 	 * \endcode
 	 *
 	 * \ingroup functor
 	 */
-	constexpr fMap fmap{};
+	fmap;
+#endif // DOCUMENTATION_GENERATOR
 }
 
 #endif

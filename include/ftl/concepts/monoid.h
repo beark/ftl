@@ -184,20 +184,8 @@ namespace ftl {
 		return monoid<M>::append(std::forward<M1>(m1), std::forward<M2>(m2));
 	}
 
-	/**
-	 * Convenience function object for `monoid::append`.
-	 *
-	 * Allows easy creation of a function object that can be passed as argument
-	 * to higher-order functions as a substitute for `monoid::append`.
-	 *
-	 * Instances of this function object support curried calling.
-	 *
-	 * \ingroup monoid
-	 */
-	struct mAppend
 #ifndef DOCUMENTATION_GENERATOR
-	: private _dtl::curried_binf<mAppend>
-#endif
+	constexpr struct _mappend : private _dtl::curried_binf<_mappend>
 	{
 		template<
 				typename M1,
@@ -213,11 +201,18 @@ namespace ftl {
 				monoid<M>::append(std::forward<M1>(m1), std::forward<M2>(m2));
 		}
 
-		using curried_binf<mAppend>::operator();
-	};
-
+		using curried_binf<_mappend>::operator();
+	} mappend{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time instance of `mAppend`.
+	 * Convenience function object for `monoid::append`.
+	 *
+	 * Allows easy creation of a function object that can be passed as argument
+	 * to higher-order functions as a substitute for `monoid::append`.
+	 *
+	 * This function object support curried calling.
 	 *
 	 * Example usage:
 	 * \code
@@ -238,7 +233,8 @@ namespace ftl {
 	 *
 	 * \ingroup monoid
 	 */
-	constexpr mAppend mappend{};
+	mappend;
+#endif
 
 	/**
 	 * Implementation of monoid for numbers, interpreted as sums.
