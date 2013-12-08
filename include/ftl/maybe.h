@@ -315,7 +315,7 @@ namespace ftl {
 				reinterpret_cast<T&>(val) = reinterpret_cast<const T&>(m.val);
 			}
 			else if (m.isValid) {
-				new (&val) T(m.val);
+				new (&val) T(reinterpret_cast<const T&>(m.val));
 				isValid = true;
 			}
 			else
