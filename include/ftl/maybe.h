@@ -251,7 +251,6 @@ namespace ftl {
 		: isValid(m.isValid) {
 			if(isValid) {
 				new (&val) value_type(std::move(reinterpret_cast<T&>(m.val)));
-				m.isValid = false;
 			}
 		}
 
@@ -286,7 +285,7 @@ namespace ftl {
 			new (&val) value_type(std::forward<Ts>(ts)...);
 		}
 
-		// TODO: Add std::is_nothrow_constructible<T>::value check (gcc-4.8)
+		// TODO: Add std::is_nothrow_destructible<T>::value check (gcc-4.8)
 		~maybe() noexcept {
 			self_destruct();
 		}
@@ -312,9 +311,12 @@ namespace ftl {
 			if(this == &m)
 				return *this;
 
-			isValid = m.isValid;
-			if(isValid) {
+			if(isValid && m.isValid) {
 				reinterpret_cast<T&>(val) = reinterpret_cast<const T&>(m.val);
+			}
+			else if (m.isValid) {
+				new (&val) T(m.val);
+				isValid = true;
 			}
 			else
 				self_destruct();
@@ -329,10 +331,13 @@ namespace ftl {
 			if(this == &m)
 				return *this;
 
-			isValid = m.isValid;
-			if(isValid) {
+			if(isValid && m.isValid) {
 				reinterpret_cast<T&>(val)
 					= std::move(reinterpret_cast<T&>(m.val));
+			}
+			else if (m.isValid) {
+				new (&val) T(std::move(reinterpret_cast<T&>(m.val));
+				isValid = true;
 			}
 			else
 				self_destruct();
@@ -348,8 +353,10 @@ namespace ftl {
 			if(isValid)
 				reinterpret_cast<T&>(val) = v;
 
-			else
+			else {
 				new (&val) T{v};
+				isValid = true
+			}
 
 			return *this;
 		}
@@ -362,8 +369,10 @@ namespace ftl {
 			if(isValid)
 				reinterpret_cast<T&>(val) = std::move(v);
 
-			else
+			else {
 				new (&val) T{std::move(v)};
+				isValid = true;
+			}
 
 			return *this;
 		}
