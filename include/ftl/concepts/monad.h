@@ -729,9 +729,7 @@ namespace ftl {
 			>
 	>
 	Mu operator>> (Mt&& m1, const Mu& m2) {
-		return monad<Mt_>::bind(std::forward<Mt>(m1), [m2](const T&) {
-			return m2;
-		});
+		return std::forward<Mt>(m1) >>= const_(m2);
 	}
 
 	/**
