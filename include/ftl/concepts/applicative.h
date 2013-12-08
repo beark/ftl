@@ -300,7 +300,7 @@ namespace ftl {
 	// TODO: C++14: template variable instance of aPure.
 
 #ifndef DOCUMENTATION_GENERATOR
-	constexpr struct _aapply : private _dtl::curried_binf<_aapply> {
+	constexpr struct _aapply : public _dtl::curried_binf<_aapply> {
 		template<typename Fn, typename F, typename F_ = plain_type<F>>
 		auto operator() (Fn&& u, F&& v) const
 		-> decltype(applicative<F_>::apply(

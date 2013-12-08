@@ -184,7 +184,7 @@ namespace ftl {
 	}
 
 #ifndef DOCUMENTATION_GENERATOR
-	constexpr struct _mappend : private _dtl::curried_binf<_mappend>
+	constexpr struct _mappend : public _dtl::curried_binf<_mappend>
 	{
 		template<
 				typename M1,

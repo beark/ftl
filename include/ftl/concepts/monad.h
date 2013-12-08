@@ -722,14 +722,15 @@ namespace ftl {
 			typename Mt,
 			typename Mu,
 			typename Mt_ = plain_type<Mt>,
+			typename Mu_ = plain_type<Mu>,
 			typename T = Value_type<Mt_>,
 			typename = Requires<Monad<Mt_>()>,
 			typename = Requires<
-				std::is_same<Rebind<Mu,T>, Mt_>::value
+				std::is_same<Rebind<Mu_,T>, Mt_>::value
 			>
 	>
-	Mu operator>> (Mt&& m1, const Mu& m2) {
-		return std::forward<Mt>(m1) >>= const_(m2);
+	Mu_ operator>> (Mt&& m1, Mu&& m2) {
+		return std::forward<Mt>(m1) >>= const_(std::forward<Mu>(m2));
 	}
 
 	/**
@@ -794,7 +795,7 @@ namespace ftl {
 	}
 
 #ifndef DOCUMENTATION_GENERATOR
-	constexpr struct _mbind : private _dtl::curried_binf<_mbind> {
+	constexpr struct _mbind : public _dtl::curried_binf<_mbind> {
 		template<typename M, typename F, typename M_ = plain_type<M>>
 		auto operator() (M&& m, F&& f) const
 		-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {

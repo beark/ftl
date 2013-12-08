@@ -196,7 +196,7 @@ namespace ftl {
 	};
 
 #ifndef DOCUMENTATION_GENERATOR
-	constexpr struct _zipWith : private _dtl::curried_ternf<_zipWith>
+	constexpr struct _zipWith : public _dtl::curried_ternf<_zipWith>
 	{
 		template<
 				typename F, typename Z, typename I,
@@ -234,7 +234,7 @@ namespace ftl {
 #endif
 
 #ifndef DOCUMENTATION_GENERATOR
-	constexpr struct _zip : private _dtl::curried_binf<_zip> {
+	constexpr struct _zip : public _dtl::curried_binf<_zip> {
 	private:
 		template<typename T, typename U>
 		struct mktup {

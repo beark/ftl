@@ -448,7 +448,7 @@ namespace ftl {
 #endif
 
 #ifndef DOCUMENTATION_GENERATOR
-	constexpr struct _foldMap : private _dtl::curried_binf<_foldMap> {
+	constexpr struct _foldMap : public _dtl::curried_binf<_foldMap> {
 		template<
 				typename F,
 				typename T = Value_type<F>,
@@ -491,7 +491,7 @@ namespace ftl {
 #endif
 
 #ifndef DOCUMENTATION_GENERATOR
-	constexpr struct _foldr : private _dtl::curried_ternf<_foldr> {
+	constexpr struct _foldr : public _dtl::curried_ternf<_foldr> {
 		template<
 				typename F,
 				typename Fn,
@@ -543,7 +543,7 @@ namespace ftl {
 #endif
 
 #ifndef DOCUMENTATION_GENERATOR
-	constexpr struct _foldl : private _dtl::curried_ternf<_foldl> {
+	constexpr struct _foldl : public _dtl::curried_ternf<_foldl> {
 		template<
 				typename F,
 				typename Fn,

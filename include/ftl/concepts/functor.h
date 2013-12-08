@@ -253,7 +253,7 @@ namespace ftl {
 
 
 #ifndef DOCUMENTATION_GENERATOR
-	constexpr struct _fmap : private _dtl::curried_binf<_fmap>
+	constexpr struct _fmap : public _dtl::curried_binf<_fmap>
 	{
 		template<
 				typename Fn,
