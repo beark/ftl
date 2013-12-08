@@ -51,7 +51,7 @@ test_set concept_tests{
 
 				auto m = fm(value(2));
 
-				return m == value(3);
+				return m == value(3) && m == fmap(f)(value(2));
 			})
 		),
 		std::make_tuple(
@@ -65,7 +65,8 @@ test_set concept_tests{
 
 				auto ap = aapply(mf);
 
-				return ap(value(2)) == value(3);
+				return ap(value(2)) == value(3)
+					&& aapply(mf)(value(2)) == value(3);
 			})
 		),
 		std::make_tuple(
@@ -174,7 +175,8 @@ test_set concept_tests{
 				return
 					foldr(std::plus<int>(), 0, v) == 10
 					&& foldr2(0, v) == 10
-					&& foldr1(v) == 10;
+					&& foldr1(v) == 10
+					&& foldr(std::plus<int>())(0)(v) == 10;
 			})
 		),
 		std::make_tuple(
@@ -185,14 +187,15 @@ test_set concept_tests{
 				auto f = [](int x, int y){ return x+y; };
 
 				auto foldl2 = foldl(f);
-				auto foldl1 = foldl2(0);
+				auto foldl1 = foldl(f, 0);
 
 				std::vector<int> v{3,3,4};
 
 				return
 					foldl(f, 0, v) == 10
 					&& foldl2(0, v) == 10
-					&& foldl1(v) == 10;
+					&& foldl1(v) == 10
+					&& foldl(f, 0)(v) == 10;
 			})
 		),
 		std::make_tuple(
@@ -229,6 +232,30 @@ test_set concept_tests{
 
 				return zipWithF(v1, v2) == expected
 					&& zipWithFV1(v2) == expected;
+			})
+		),
+		std::make_tuple(
+			std::string("Zippable: zip"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				std::vector<int> v1{3,3,4};
+				std::vector<int> v2{1,3,5,6};
+
+				std::vector<std::tuple<int,int>> expected1{
+					std::make_tuple(3,1),
+					std::make_tuple(3,3),
+					std::make_tuple(4,5)
+				};
+
+				std::vector<std::tuple<int,int>> expected2{
+					std::make_tuple(1,3),
+					std::make_tuple(3,3),
+					std::make_tuple(5,4)
+				};
+
+				return zip(v1, v2) == expected1
+					&& zip(v2, v1) == expected2;
 			})
 		),
 		std::make_tuple(
