@@ -44,30 +44,31 @@ namespace ftl {
 	 * - <ftl/function.h>
 	 */
 
-	/**
-	 * Identity function object.
-	 *
-	 * Returns whatever is given as parameter. This can be useful in combination
-	 * with certain higher order functions. For example, `foldable::fold` can be
-	 * trivially implemented as `foldable::foldMap(identity(), ...)`.
-	 *
-	 * \ingroup prelude
-	 */
-	struct identity {
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct identity {
 		template<typename T>
 		constexpr auto operator()(T&& t) const noexcept
 		-> decltype(std::forward<T>(t)) {
 			return std::forward<T>(t);
 		}
-	};
-
+	} id{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time instance of identity.
+	 * Identity function object.
 	 *
-	 * Makes passing the identity function to higher order functions even more
-	 * convenient.
+	 * Has semantics equivalent to a function of type
+	 * \code
+	 * (T) -> T
+	 * \endcode
 	 *
-	 * Example usage:
+	 * In some ways, just an alias for `std::forward`. However, `id` is not
+	 * only terser, it is also much easier to pass to higher-order functions.
+	 *
+	 * \par Examples
+	 *
+	 * Trivial usage:
 	 * \code
 	 *   // Does nothing; v will be {1,2,3}
 	 *   auto v = ftl::fmap(ftl::id, std::vector<int>{1,2,3});
@@ -75,7 +76,8 @@ namespace ftl {
 	 *
 	 * \ingroup prelude
 	 */
-	constexpr identity id{};
+	id;
+#endif
 
 	
 	/**
@@ -626,45 +628,50 @@ namespace ftl {
 		};
 	}
 
-	/**
-	 * Constant function object.
-	 *
-	 * Always returns the first parameter. Sometimes useful when dealing with
-	 * higher-order functions.
-	 *
-	 * \ingroup prelude
-	 */
-	struct constant : private _dtl::curried_binf<constant>
-	{
-		constexpr constant() noexcept {}
-		constexpr constant(const constant&) noexcept {}
-		constexpr constant(constant&&) noexcept {}
-		~constant() = default;
-
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct _const : private _dtl::curried_binf<_const> {
 		template<typename T, typename U>
 		constexpr auto operator() (T&& t, U&&) const noexcept
 		-> decltype(std::forward<T>(t)) {
 			return std::forward<T>(t);
 		}
 
-		using _dtl::curried_binf<constant>::operator();
-	};
-
+		using _dtl::curried_binf<_const>::operator();
+	} const_{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Compile time instance of a `constant` function object.
+	 * Function object sometimes useful with higher-order functions.
+	 *
+	 * Has the behaviour of a curried function of type
+	 * \code
+	 *   (T, U) -> T
+	 * \endcode
+	 *
+	 * Basically, `const_` ignores the second parameter and behaves like
+	 * `std::forward` for the first. This can be surprisingly useful in certain
+	 * cases.
 	 *
 	 * \par Examples
 	 *
-	 * A simple example:
+	 * A simple, but useless example:
 	 * \code
 	 *   ftl::fmap(const_(42), std::list<int>{1,2,3}); // {42, 42, 42}
 	 * \endcode
 	 *
+	 * Implementing monad's `operator>>` in terms of `const_` and `operator>>=`:
+	 * \code
+	 *   template<...>
+	 *   M2 operator>> (M1 m1, M2 m2) {
+	 *       return m1 >>= const_(m2);
+	 *   }
+	 * \endcode
+	 *
 	 * \ingroup prelude
 	 */
-	constexpr constant const_;
-
+	const_;
+#endif
 }
-
 #endif
 
