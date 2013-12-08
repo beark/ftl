@@ -336,7 +336,7 @@ namespace ftl {
 					= std::move(reinterpret_cast<T&>(m.val));
 			}
 			else if (m.isValid) {
-				new (&val) T(std::move(reinterpret_cast<T&>(m.val));
+				new (&val) T(std::move(reinterpret_cast<T&>(m.val)));
 				isValid = true;
 			}
 			else
@@ -355,7 +355,7 @@ namespace ftl {
 
 			else {
 				new (&val) T{v};
-				isValid = true
+				isValid = true;
 			}
 
 			return *this;
