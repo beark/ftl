@@ -69,7 +69,7 @@ bool run_test_set(test_set& ts, std::ostream& os) {
 
 	os << nsuc << "/" << std::get<1>(ts).size() << " passed" << std::endl;
 
-	return nfail > 0;
+	return nfail == 0;
 }
 
 int main(int, char**) {
@@ -102,4 +102,3 @@ int main(int, char**) {
 
 	return 0;
 }
-

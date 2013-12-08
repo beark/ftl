@@ -1,7 +1,22 @@
-CPP=g++
-CXXFLAGS=-std=c++11 -I../include/ -Wall -Wextra
-LDFLAGS=-pthread
+GLOBAL_CXXFLAGS=-std=c++11 -I../include/ -Wall -Wextra
+GLOBAL_LDFLAGS=-pthread
 OLVL=-O3
+CXX:=$(shell echo $$CXX)
+
+ifeq ($(CXX), g++)
+	CPP = g++
+else
+	ifeq ($(CXX), clang++)
+		CPP=clang++
+		C_CXXFLAGS=-stdlib=libc++
+		C_LDFLAGS=-lc++
+	else
+		CPP=g++
+	endif
+endif
+
+CXXFLAGS=$(GLOBAL_CXXFLAGS) $(C_CXXFLAGS)
+LDFLAGS=$(GLOBAL_LDFLAGS) $(C_LDFLAGS)
 
 TEST_OBJS=concept_tests.o either_tests.o eithert_tests.o functional_tests.o\
 	  future_tests.o fwdlist_tests.o lazy_tests.o lazyt_tests.o\
@@ -16,7 +31,10 @@ TEST_OBJS=concept_tests.o either_tests.o eithert_tests.o functional_tests.o\
 .PHONY: all clean
 
 all: ftl_tests
-	
+
+test: ftl_tests
+	./ftl_tests
+
 ftl_tests: main.o $(TEST_OBJS)
 	$(CPP) $(LDFLAGS) $(OLVL) -o ftl_tests main.o $(TEST_OBJS)
 
