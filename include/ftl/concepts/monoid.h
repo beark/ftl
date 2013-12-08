@@ -325,9 +325,11 @@ namespace ftl {
 	 */
 	template<typename N>
 	constexpr sum_monoid<N> sum(N num)
-	noexcept(std::is_nothrow_constructible<sum_monoid<N>,N>::value) {
+	noexcept /*(std::is_nothrow_constructible<sum_monoid<N>,N>::value)*/ {
 		return sum_monoid<N>(num);
 	}
+	// TODO: Re-add noexcept condition once it's been figured out why gcc
+	// choked on it in concept_tests: "Foldable: curried foldMap"
 
 	/*
 	 * Actual implementation of \ref monoidpg for sums.
