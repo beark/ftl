@@ -22,6 +22,6 @@ install:
 # command to run tests
 script: 
   - cd tests
-  - if ["`echo $CXX`" == "clang++" ]; then make; fi
-  - if ["`echo $CXX`" == "g++" ]; then make test; fi
+  - if [ "`echo $CXX`" == "clang++" ]; then make; fi
+  - if [ "`echo $CXX`" == "g++" ]; then make test; fi
 
