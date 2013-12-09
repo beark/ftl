@@ -73,28 +73,31 @@ namespace ftl {
 	 *
 	 * \ingroup maybe
 	 */
-	struct nothing_t {
-		constexpr nothing_t() noexcept {}
-		constexpr nothing_t(const nothing_t&) noexcept {}
-		constexpr nothing_t(nothing_t&&) noexcept {}
-	};
-
+	constexpr struct nothing_t {
+	}
 	/**
 	 * Convenience instance value of `nothing_t`.
 	 *
 	 * Useful when one wants to be more explicit than just using the bool cast
 	 * of `maybe`.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
+	 * Checking validity:
 	 * \code
 	 *   ftl::maybe<T> m = ...;
 	 *   if(m != ftl::nothing)
 	 *       do_something();
 	 * \endcode
 	 *
+	 * Assigning nothing:
+	 * \code
+	 *   ftl::maybe<int> x = ftl::nothing;
+	 * \endcode
+	 *
 	 * \ingroup maybe
 	 */
-	constexpr nothing_t nothing{};
+	nothing{};
 
 	template<typename T>
 	class maybe;
@@ -273,6 +276,9 @@ namespace ftl {
 		/// Nothings should cast implicitly to maybes
 		constexpr maybe(nothing_t) noexcept {}
 
+		/// Constructing from nullptr is the same as nothing
+		constexpr maybe(std::nullptr_t) noexcept {}
+
 		/**
 		 * In-place value construction constructor.
 		 *
@@ -280,13 +286,13 @@ namespace ftl {
 		 * to `T`'s constructor.
 		 */
 		template<typename...Ts>
-		maybe(inplace_tag, Ts&&...ts) noexcept(std::is_nothrow_constructible<T,Ts...>::value)
+		maybe(inplace_tag, Ts&&...ts)
+		noexcept(std::is_nothrow_constructible<T,Ts...>::value)
 		: isValid(true) {
 			new (&val) value_type(std::forward<Ts>(ts)...);
 		}
 
-		// TODO: Add std::is_nothrow_destructible<T>::value check (gcc-4.8)
-		~maybe() noexcept {
+		~maybe() {
 			self_destruct();
 		}
 
