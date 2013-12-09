@@ -1,16 +1,23 @@
 language: cpp
 compiler:
-    #  - clang
+  - clang
   - gcc
 # command to install dependencies
 install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update
   # install g++ 4.8, if tests are run with g++
-  - if [ "`echo $CXX`" == "g++" ]; then sudo apt-get install g++-4.8; fi
+  - if [ "`echo $CXX`" == "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "`echo $CXX`" == "g++" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50; fi
   # install libc++ if tests are run with clang++
-  #- if [ "`echo $CXX`" == "clang++" ]; then sudo apt-get install libc++-dev; fi
+  - if [ "`echo $CXX`" == "clang++" ]; then cwd=$(pwd); fi
+  - if [ "`echo $CXX`" == "clang++" ]; then svn co http://llvm.org/svn/llvm-project/libcxx/trunk@181765 libcxx; fi
+  - if [ "`echo $CXX`" == "clang++" ]; then cd libcxx && ./buildit; fi
+  - if [ "`echo $CXX`" == "clang++" ]; then sudo cp ./libc++.so.1.0 /usr/lib/; fi
+  - if [ "`echo $CXX`" == "clang++" ]; then sudo mkdir /usr/include/c++/v1; fi
+  - if [ "`echo $CXX`" == "clang++" ]; then cd .. && sudo cp -r include/* /usr/include/c++/v1/; fi
+  - if [ "`echo $CXX`" == "clang++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
+  - if [ "`echo $CXX`" == "clang++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
 
 # command to run tests
 script: 
