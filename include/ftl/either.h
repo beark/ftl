@@ -32,7 +32,6 @@ namespace ftl {
 	namespace _dtl {
 		enum tag_t {
 			LEFT,
-			LIMBO,
 			RIGHT
 		};
 	}
@@ -140,8 +139,6 @@ namespace ftl {
 			default:
 				break;
 			}
-
-			e.tag = _dtl::LIMBO;
 		}
 
 		/**
@@ -289,10 +286,7 @@ namespace ftl {
 				else {
 					l.~L();
 					tag = e.tag;
-
-					if(tag == _dtl::RIGHT) {
-						new (&r) R(e.r);
-					}
+					new (&r) R(e.r);
 				}
 				break;
 
@@ -303,23 +297,9 @@ namespace ftl {
 				else {
 					r.~R();
 					tag = e.tag;
-
-					if(tag == _dtl::LEFT) {
-						new (&l) L(e.l);
-					}
+					new (&l) L(e.l);
 				}
 				break;
-
-			case _dtl::LIMBO:
-				tag = e.tag;
-
-				if(tag == _dtl::RIGHT) {
-					r = e.r;
-				}
-
-				else if(tag == _dtl::LEFT) {
-					l = e.l;
-				}
 			}
 
 			return *this;
@@ -334,13 +314,8 @@ namespace ftl {
 				else {
 					l.~L();
 					tag = e.tag;
-
-					if(e.tag == _dtl::RIGHT) {
-						new (&r) R(std::move(e.r));
-					}
-
+					new (&r) R(std::move(e.r));
 				}
-				e.tag = _dtl::LIMBO;
 				break;
 
 			case _dtl::RIGHT:
@@ -350,14 +325,8 @@ namespace ftl {
 				else {
 					r.~R();
 					tag = e.tag;
-
-					if(e.tag == _dtl::LEFT)
-						new (&l) L(std::move(e.l));
+					new (&l) L(std::move(e.l));
 				}
-				e.tag = _dtl::LIMBO;
-				break;
-
-			case _dtl::LIMBO:
 				break;
 			}
 
@@ -365,7 +334,7 @@ namespace ftl {
 		}
 
 		constexpr bool operator== (const either& e) const noexcept {
-			return tag == e.tag && tag != _dtl::LIMBO
+			return tag == e.tag
 				? (tag == _dtl::LEFT ? l == e.l : r == e.r)
 				: false;
 		}
@@ -380,7 +349,7 @@ namespace ftl {
 			R r;
 		};
 
-		_dtl::tag_t tag = _dtl::LIMBO;
+		_dtl::tag_t tag;
 	};
 
 	template<typename L, typename R>
