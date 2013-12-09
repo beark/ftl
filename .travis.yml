@@ -4,9 +4,9 @@ compiler:
   - gcc
 # command to install dependencies
 install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update
   # install g++ 4.8, if tests are run with g++
+  - if [ "`echo $CXX`" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
+  - if [ "`echo $CXX`" == "g++" ]; then sudo apt-get update; fi
   - if [ "`echo $CXX`" == "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "`echo $CXX`" == "g++" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50; fi
   # install libc++ if tests are run with clang++
@@ -22,4 +22,6 @@ install:
 # command to run tests
 script: 
   - cd tests
-  - make # test
+  - if ["`echo $CXX`" == "clang++" ]; then make; fi
+  - if ["`echo $CXX`" == "g++" ]; then make test; fi
+
