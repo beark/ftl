@@ -620,8 +620,12 @@ namespace ftl {
 	 * arguments are perfectly forwarded, for cases where it matters if the
 	 * const reference or r-value reference version of `bind` is triggered.
 	 *
+	 * For added convenience, `operator>>=` will automatically apply
+	 * `std::mem_fn` when binding with member functions.
+	 *
 	 * \par Examples
 	 *
+	 * Simple usage example:
 	 * \code
 	 *   ftl::maybe<int> maybeGetInt();
 	 *   ftl::maybe<float> mightFail(int);
@@ -629,6 +633,16 @@ namespace ftl {
 	 *   ftl::maybe<float> example() {
 	 *       return maybeGetInt() >>= mightFail;
 	 *   }
+	 * \endcode
+	 *
+	 * Binding with a member function:
+	 * \code
+	 *   struct example_type {
+	 *       list<string> foo() const;
+	 *   };
+	 *
+	 *   list<example_type> l = ...;
+	 *   list<string> r = l >>= &example_type::foo;
 	 * \endcode
 	 *
 	 * \note Unlike Haskell, `operator>>=` is _right_ associative in C++,
@@ -640,11 +654,45 @@ namespace ftl {
 			typename M,
 			typename F,
 			typename M_ = plain_type<M>,
-			typename = Requires<Monad<M_>()>
+			typename = Requires<
+				Monad<M_>()
+#ifndef DOCUMENTATION_GENERATOR
+				&& !std::is_member_function_pointer<F>::value
+#endif
+			>
 	>
 	auto operator>>= (M&& m, F&& f)
 	-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
 		return monad<M_>::bind(std::forward<M>(m), std::forward<F>(f));
+	}
+
+	template<
+			typename M,
+			typename Mu,
+			typename M_ = plain_type<M>,
+			typename = Requires<
+				std::is_same<Rebind<Mu,Value_type<M_>>,M_>::value
+			>,
+			typename = Requires<Monad<M_>()>
+	>
+	auto operator>>= (M&& m, Mu (M::*memfn)())
+	-> decltype(std::forward<M>(m) >>= std::mem_fn(memfn)) {
+		return std::forward<M>(m) >>= std::mem_fn(memfn);
+	}
+
+	template<
+			typename M,
+			typename Mu,
+			typename F,
+			typename M_ = plain_type<M>,
+			typename = Requires<
+				std::is_same<Rebind<Mu,Value_type<M_>>,M_>::value
+			>,
+			typename = Requires<Monad<M_>()>
+	>
+	auto operator>>= (M&& m, Mu (F::*memfn)() const)
+	-> decltype(std::forward<M>(m) >>= std::mem_fn(memfn)) {
+		return std::forward<M>(m) >>= std::mem_fn(memfn);
 	}
 
 	/**
@@ -676,8 +724,8 @@ namespace ftl {
 			typename = Requires<Monad<M_>()>
 	>
 	auto operator<<= (F&& f, M&& m)
-	-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
-		return monad<M_>::bind(std::forward<M>(m), std::forward<F>(f));
+	-> decltype(std::forward<M>(m) >>= std::forward<F>(f)) {
+		return std::forward<M>(m) >>= std::forward<F>(f);
 	}
 
 	/**
@@ -769,11 +817,11 @@ namespace ftl {
 			>
 	>
 	Mt operator<< (const Mt& m1, Mu m2) {
-		return monad<Mt>::bind(m1, [m2](T t) {
-			return monad<Mu>::bind(m2, [t](const U&) {
+		return m1 >>= [m2](T t) {
+			return m2 >>= [t](const U&) {
 				return monad<Mt>::pure(t);
-			});
-		});
+			};
+		};
 	}
 
 	template<
@@ -787,19 +835,19 @@ namespace ftl {
 			>
 	>
 	Mt operator<< (Mt&& m1, Mu m2) {
-		return monad<Mt>::bind(m1, [m2](T t) {
-			return monad<Mu>::bind(m2, [t](const U&) {
+		return m1 >>= [m2](T t) {
+			return m2 >>= [t](const U&) {
 				return monad<Mt>::pure(t);
-			});
-		});
+			};
+		};
 	}
 
 #ifndef DOCUMENTATION_GENERATOR
 	constexpr struct _mbind : public _dtl::curried_binf<_mbind> {
-		template<typename M, typename F, typename M_ = plain_type<M>>
+		template<typename M, typename F>
 		auto operator() (M&& m, F&& f) const
-		-> decltype(monad<M_>::bind(std::forward<M>(m), std::forward<F>(f))) {
-			return monad<M_>::bind(std::forward<M>(m), std::forward<F>(f));
+		-> decltype(std::forward<M>(m) >>= std::forward<F>(f)) {
+			return std::forward<M>(m) >>= std::forward<F>(f);
 		}
 
 		using curried_binf<_mbind>::operator();
@@ -817,7 +865,10 @@ namespace ftl {
 	 * where `M` is an instance of \ref monadpg.
 	 *
 	 * Makes for much more convenient calling and passing to higher-order
-	 * functions.
+	 * functions than invoking `monad::bind` directly. Also provides the
+	 * same auto-`std::mem_fn` facility as `operator>>=`. Which is to say,
+	 * `mbind` will treat member functions of compatible type as if they
+	 * had been wrapped with `std::mem_fn`.
 	 *
 	 * \par Examples
 	 *

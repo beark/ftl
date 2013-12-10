@@ -96,6 +96,27 @@ test_set concept_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("Monad: >>= [member fn]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				struct foo {
+					explicit foo(int x) : x(x) {}
+
+					maybe<int> bar() const {
+						return value(2*x);
+					}
+
+					int x;
+				};
+
+				auto m = value(foo{3});
+
+				return
+					(m >>= &foo::bar) == value(6);
+			})
+		),
+		std::make_tuple(
 			std::string("Monad: >>"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
