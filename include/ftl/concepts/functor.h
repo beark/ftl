@@ -239,18 +239,77 @@ namespace ftl {
 	 * assuming `a` and `b` are both values of a type implementing the Functor
 	 * concept.
 	 *
+	 * When using `operator%` to map functions, `std::mem_fn` will be
+	 * automatically applied if it's a member function pointer.
+	 *
+	 * \par Examples
+	 *
+	 * Classic list example:
+	 * \code
+	 *   auto f = [](int x){ return x+1; };
+	 *   std::list<int> l = {1,2,3};
+	 *
+	 *   auto r = f % l;
+	 *   // r == {2,3,4]
+	 * \endcode
+	 *
+	 * Mapping a member function:
+	 * \code
+	 *   struct example {
+	 *       maybe<int> foo();
+	 *   };
+	 *
+	 *   maybe<example> m = ...;
+	 *   auto r = &example::foo % m;
+	 * \endcode
+	 *
 	 * \ingroup functor
 	 */
 	template<
 		typename F,
 		typename Fn,
 		typename F_ = plain_type<F>,
-		typename = Requires<Functor<F_>()>>
+		typename = Requires<
+			Functor<F_>()
+#ifndef DOCUMENTATION_GENERATOR
+			&& !std::is_member_function_pointer<Fn>::value
+#endif
+		>
+	>
 	auto operator% (Fn&& fn, F&& f)
 	-> decltype(functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f))) {
 		return functor<F_>::map(std::forward<Fn>(fn), std::forward<F>(f));
 	}
 
+	template<
+		typename F,
+		typename R,
+		typename Fn,
+		typename F_ = plain_type<F>,
+		typename = Requires<
+			Functor<F_>()
+			&& !std::is_member_function_pointer<Fn>::value
+		>
+	>
+	auto operator% (R (Fn::*fn)(), F&& f)
+	-> decltype(functor<F_>::map(std::mem_fn(fn), std::forward<F>(f))) {
+		return functor<F_>::map(std::mem_fn(fn), std::forward<F>(f));
+	}
+
+	template<
+		typename F,
+		typename R,
+		typename Fn,
+		typename F_ = plain_type<F>,
+		typename = Requires<
+			Functor<F_>()
+			&& !std::is_member_function_pointer<Fn>::value
+		>
+	>
+	auto operator% (R (Fn::*fn)() const, F&& f)
+	-> decltype(functor<F_>::map(std::mem_fn(fn), std::forward<F>(f))) {
+		return functor<F_>::map(std::mem_fn(fn), std::forward<F>(f));
+	}
 
 #ifndef DOCUMENTATION_GENERATOR
 	constexpr struct _fmap : public _dtl::curried_binf<_fmap>
@@ -260,7 +319,8 @@ namespace ftl {
 				typename F,
 				typename F_ = plain_type<F>,
 				typename = Requires<
-					!std::is_same<
+					!std::is_member_function_pointer<Fn>::value
+					&& !std::is_same<
 						result_of<Fn(Value_type<F_>)>,
 						void
 					>::value
@@ -279,7 +339,8 @@ namespace ftl {
 				typename F,
 				typename F_ = plain_type<F>,
 				typename = Requires<
-					std::is_same<
+					!std::is_member_function_pointer<Fn>::value
+					&& std::is_same<
 						result_of<Fn(Value_type<F_>)>,
 						void
 					>::value
@@ -289,6 +350,36 @@ namespace ftl {
 			static_assert(Functor<F_>(), "F is not an instance of Functor");
 
 			mapM<F_>::apply(std::forward<Fn>(fn), std::forward<F>(f));
+		}
+
+		template<
+				typename R,
+				typename Fn,
+				typename F,
+				typename F_ = plain_type<F>,
+				typename = Requires<
+					std::is_member_function_pointer<Fn>::value
+				>
+		>
+		void operator() (R (Fn::*fn)(), F&& f) const {
+			static_assert(Functor<F_>(), "F is not an instance of Functor");
+
+			functor<F_>::map(std::mem_fn(fn), std::forward<F>(f));
+		}
+
+		template<
+				typename R,
+				typename Fn,
+				typename F,
+				typename F_ = plain_type<F>,
+				typename = Requires<
+					std::is_member_function_pointer<Fn>::value
+				>
+		>
+		void operator() (R (Fn::*fn)() const, F&& f) const {
+			static_assert(Functor<F_>(), "F is not an instance of Functor");
+
+			functor<F_>::map(std::mem_fn(fn), std::forward<F>(f));
 		}
 
 		using _dtl::curried_binf<_fmap>::operator();

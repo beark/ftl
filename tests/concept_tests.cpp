@@ -55,6 +55,26 @@ test_set concept_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("Functor: fmap [member fn]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				struct test {
+					test(int x) : x(x) {}
+
+					int foo() {
+						return x + 3;
+					}
+
+					int x;
+				};
+
+				auto r = &test::foo % value(test{3});
+
+				return *r == 6;
+			})
+		),
+		std::make_tuple(
 			std::string("Applicative: curried aapply"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
