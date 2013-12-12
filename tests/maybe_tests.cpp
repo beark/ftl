@@ -27,6 +27,38 @@ test_set maybe_tests{
 	std::string("maybe"),
 	{
 		std::make_tuple(
+			std::string("Swap [primitive]"),
+			std::function<bool()>([]() -> bool {
+				using std::swap;
+				auto x = ftl::value(3);
+				auto y = ftl::value(10);
+				ftl::maybe<int> z = ftl::nothing;
+
+				swap(x,y);
+				swap(y,z);
+
+				return x == ftl::value(10)
+					&& y == ftl::nothing
+					&& z == ftl::value(3);
+			})
+		),
+		std::make_tuple(
+			std::string("Swap [resource]"),
+			std::function<bool()>([]() -> bool {
+				using std::swap;
+				std::vector<int> x{1,2,3,4};
+				std::vector<int> y{4,3,2,1};
+				std::vector<int> z{};
+
+				swap(x,y);
+				swap(y,z);
+
+				return x == std::vector<int>{4,3,2,1}
+					&& y == std::vector<int>{}
+					&& z == std::vector<int>{1,2,3,4};
+			})
+		),
+		std::make_tuple(
 			std::string("Preserves Eq"),
 			std::function<bool()>([]() -> bool {
 				auto e1 = ftl::value(10);

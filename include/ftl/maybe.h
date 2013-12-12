@@ -471,6 +471,42 @@ namespace ftl {
 		}
 
 		/**
+		 * Swaps value with another `maybe`.
+		 *
+		 * Swap guarantees the following for all `a` and `b` of applicable
+		 * value type:
+		 * \code
+		 *   auto x = a;
+		 *   auty y = b;
+		 *   swap(a,b)
+		 *
+		 *   a == y && b == x
+		 * \endcode
+		 */
+		template<typename = Requires<std::is_nothrow_move_constructible<T>::value>>
+		void swap(maybe<T>& m) noexcept {
+			if(!isValid && m.isValid)
+			{
+				new (this) maybe{std::move(m)};
+				m.self_destruct();
+			}
+
+			else if(isValid && !m.isValid)
+			{
+				new (&m) maybe{std::move(*this)};
+				self_destruct();
+			}
+
+			else if(isValid && m.isValid)
+			{
+				std::swap(
+						reinterpret_cast<T&>(val),
+						reinterpret_cast<T&>(m.val)
+				);
+			}
+		}
+
+		/**
 		 * Static constructor of Nothing:s.
 		 *
 		 * The only purpose of this static method is to be more explicit than
@@ -495,6 +531,15 @@ namespace ftl {
 
 		bool isValid = false;
 	};
+
+	template<typename T>
+	void swap(maybe<T>& m1, maybe<T>& m2) {
+		static_assert(
+			std::is_nothrow_move_constructible<T>::value,
+			"Cannot swap maybes of a type that is't noexcept move constructible"
+		);
+		m1.swap(m2);
+	}
 
 	/**
 	 * Convenience function to create maybe:s.
