@@ -544,6 +544,20 @@ namespace ftl {
 	}
 
 	namespace _dtl {
+		// Generate curried calling convention for a function, F, of arity N,
+		template<size_t N, typename F>
+		struct make_curried_n {
+			template<
+				typename...Args,
+				size_t n = sizeof...(Args),
+				typename = Requires<(N>n)>,
+				typename Applied =  decltype(part(std::declval<F>(),std::declval<Args>()...))
+			>
+			constexpr curried_fn_n<N-n,Applied> operator()(Args&&...args) {
+				return part(*static_cast<const F*>(this), std::forward<Args>(args)...);
+			}
+		};
+
 		// This struct is used to generate curried calling convention for
 		// arbitrary binary functions
 		template<typename F>
