@@ -259,6 +259,64 @@ namespace ftl {
 				);
 			}
 		};
+
+		template<typename F, typename Arg>
+		class partial_application {
+			F f;
+			Arg arg;
+
+		public:
+			constexpr partial_application(F f, Arg arg) 
+				: f(std::move(f)), arg(std::move(arg)) 
+			{ }
+
+			template<typename...Args>
+			constexpr auto operator()(Args&&...args) 
+			-> typename std::result_of<F(Arg,Args...)>::type {
+				return f(arg, std::forward<Args>(args)...);
+			}
+		};
+
+		template<typename F>
+		constexpr F part( F&& f ) {
+			return std::forward<F>(f);
+		}
+
+		template<
+			typename F, typename Arg1, typename...Args,
+			typename PartOne = partial_application<F,Arg1>
+		>
+		constexpr auto part(F f, Arg1 arg1, Args...args) 
+		-> decltype( part(std::declval<PartOne>(), std::declval<Args>()...) ) {
+			return part(
+				PartOne(std::move(f), std::move(arg1)),
+				std::move(args)...
+			);
+		}
+
+		template<size_t N, typename F>
+		class curried_fn_n {
+			F f;
+
+		public:
+			constexpr curried_fn_n(F f) : f(f) { }
+			
+			template<typename...Args>
+			constexpr auto operator()(Args&&...args) 
+			-> typename std::result_of<F(Args...)>::type {
+				return f(std::forward<Args>(args)...);
+			}
+
+			template<
+				typename...Args,
+				size_t n = sizeof...(Args),
+				typename = Requires<(N>n)>,
+				typename Applied = decltype(part(f,std::declval<Args>()...))
+			>
+			constexpr curried_fn_n<N-n,Applied> operator()(Args&&...args) {
+				return part(f,std::forward<Args>(args)...);
+			}
+		};
 	}
 
 	/**
@@ -323,6 +381,15 @@ namespace ftl {
 #endif
 	curry(F&& f) {
 		return _dtl::curried_fn<plain_type<F>>(std::forward<F>(f));
+	}
+
+	template<
+		size_t N, typename F, 
+		typename Curried = _dtl::curried_fn_n<N,plain_type<F>>,
+		typename = Requires<!is_monomorphic<plain_type<F>>::value>
+	>
+	Curried curry( F&& f ) {
+		return Curried(std::forward<F>(f));
 	}
 
 	/**

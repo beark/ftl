@@ -79,6 +79,17 @@ test_set prelude_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("currying n-ary function"),
+			std::function<bool()>([]() -> bool {
+				auto f = [](int x, int y, int z){ return x+y+z; };
+				auto g = ftl::curry<3>(f);
+
+				return g(2)(2)(2) == g(2,2)(2)
+					&& g(3,3)(3) == g(3,3,3)
+					&& g(2,3,4) == f(2,3,4);
+			})
+		),
+		std::make_tuple(
 			std::string("compose[...,R(*)(Ps...)]"),
 			std::function<bool()>([]() -> bool {
 				auto f = [](int x){ return 2*x; };
