@@ -350,12 +350,29 @@ namespace ftl {
 
 		template<typename R, typename P1, typename P2, typename...Ps>
 		struct curried<R,P1,P2,Ps...> {
-
-			function<R(P2,Ps...)> operator() (P1 p1) const {
+        private:
+            /// Apply one argument.
+            using applied_type = function<R(P2,Ps...)>;
+            applied_type apply_one(P1 p1) const {
 				auto self = *reinterpret_cast<const function<R(P1,P2,Ps...)>*>(this);
 				return [self,p1] (P2 p2, Ps...ps) {
 					return self.operator()(p1, std::forward<P2>(p2), std::forward<Ps>(ps)...);
 				};
+			}
+		public:
+			function<R(P2,Ps...)> operator() (P1 p1) const {
+				return apply_one(std::move(p1));
+			}
+
+			// Apply each argument, return a new function.
+			// If the number of arguments equals the function's arity,
+			// ftl::function::operator() will be called instead.
+			template<typename...Ps2>
+			auto operator()(P1 p1, P2 p2, Ps2...ps2) const
+				-> typename std::result_of<applied_type(P2,Ps2...)>::type
+			{
+				applied_type g = apply_one(std::move(p1));
+				return g(std::move(p2),std::move(ps2)...);
 			}
 		};
 

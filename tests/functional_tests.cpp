@@ -38,7 +38,10 @@ test_set functional_tests{
 				ftl::function<int(int,int,int)> g =
 					[](int x, int y, int z){ return x + y + z; };
 
-				return f(1)(2) == 3 && g(1)(2,3) == 6;
+				return f(1)(2) == 3 
+					&& g(1)(2,3) == g(1,2)(3)
+					&& g(1)(2)(3) == g(1,2,3)
+					&& g(1,2,3) == 6;
 			})
 		),
 		std::make_tuple(
