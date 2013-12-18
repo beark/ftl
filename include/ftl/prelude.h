@@ -543,21 +543,45 @@ namespace ftl {
 		return has_push_back<T,Value_type<T>>::value;
 	}
 
-	namespace _dtl {
-		// Generate curried calling convention for a function, F, of arity N,
-		template<size_t N, typename F>
-		struct make_curried_n {
-			template<
-				typename...Args,
-				size_t n = sizeof...(Args),
-				typename = Requires<(N>n)>,
-				typename Applied =  decltype(part(std::declval<F>(),std::declval<Args>()...))
-			>
-			constexpr curried_fn_n<N-n,Applied> operator()(Args&&...args) {
-				return part(*static_cast<const F*>(this), std::forward<Args>(args)...);
-			}
-		};
+	/**
+	 * Generate curried calling convention for N-ary functions.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 * 	 struct _add3 : public make_curried_n<3,add3> {
+	 *   	int operator()(int,int,int);
+	 *	 } add3;
+	 *
+	 *   // ...
+	 *
+	 *   auto x = add3(1)(2)(3);
+	 *   auto y = add3(1,2)(3);
+	 *   auto z = add3(1)(2,3);
+	 * \endcode
+	 * 
+	 * \ingroup prelude
+	 */
+	template<size_t N, typename F>
+	struct make_curried_n {
+		// When 
+		template<
+			typename...Args,
+			size_t n = sizeof...(Args),
+			typename = Requires<(N>n)>,
+			typename Applied =  decltype(
+				_dtl::part(std::declval<F>(), std::declval<Args>()...)
+			)
+		>
+		constexpr _dtl::curried_fn_n<N-n,Applied> operator()(Args&&...args) {
+			return _dtl::part(
+				*static_cast<const F*>(this),
+				std::forward<Args>(args)...
+			);
+		}
+	};
 
+	namespace _dtl {
 		// This struct is used to generate curried calling convention for
 		// arbitrary binary functions
 		template<typename F>

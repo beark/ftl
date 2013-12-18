@@ -312,7 +312,7 @@ namespace ftl {
 	}
 
 #ifndef DOCUMENTATION_GENERATOR
-	constexpr struct _fmap : public _dtl::make_curried_n<2,_fmap>
+	constexpr struct _fmap : public make_curried_n<2,_fmap>
 	{
 		template<
 				typename Fn,
@@ -382,7 +382,7 @@ namespace ftl {
 			functor<F_>::map(std::mem_fn(fn), std::forward<F>(f));
 		}
 
-		using _dtl::make_curried_n<2,_fmap>::operator();
+		using make_curried_n<2,_fmap>::operator();
 
 	private:
 		template<typename F>
