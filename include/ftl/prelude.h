@@ -259,6 +259,64 @@ namespace ftl {
 				);
 			}
 		};
+
+		template<typename F, typename Arg>
+		class partial_application {
+			F f;
+			Arg arg;
+
+		public:
+			constexpr partial_application(F f, Arg arg) 
+				: f(std::move(f)), arg(std::move(arg)) 
+			{ }
+
+			template<typename...Args>
+			constexpr auto operator()(Args&&...args) 
+			-> typename std::result_of<F(Arg,Args...)>::type {
+				return f(arg, std::forward<Args>(args)...);
+			}
+		};
+
+		template<typename F>
+		constexpr F part( F&& f ) {
+			return std::forward<F>(f);
+		}
+
+		template<
+			typename F, typename Arg1, typename...Args,
+			typename PartOne = partial_application<F,Arg1>
+		>
+		constexpr auto part(F f, Arg1 arg1, Args...args) 
+		-> decltype( part(std::declval<PartOne>(), std::declval<Args>()...) ) {
+			return part(
+				PartOne(std::move(f), std::move(arg1)),
+				std::move(args)...
+			);
+		}
+
+		template<size_t N, typename F>
+		class curried_fn_n {
+			F f;
+
+		public:
+			constexpr curried_fn_n(F f) : f(f) { }
+			
+			template<typename...Args>
+			constexpr auto operator()(Args&&...args) 
+			-> typename std::result_of<F(Args...)>::type {
+				return f(std::forward<Args>(args)...);
+			}
+
+			template<
+				typename...Args,
+				size_t n = sizeof...(Args),
+				typename = Requires<(N>n)>,
+				typename Applied = decltype(part(f,std::declval<Args>()...))
+			>
+			constexpr curried_fn_n<N-n,Applied> operator()(Args&&...args) {
+				return part(f,std::forward<Args>(args)...);
+			}
+		};
 	}
 
 	/**
@@ -323,6 +381,35 @@ namespace ftl {
 #endif
 	curry(F&& f) {
 		return _dtl::curried_fn<plain_type<F>>(std::forward<F>(f));
+	}
+
+	/**
+	 * Curries an N-ary function objects.
+	 *
+	 * Example:
+	 * \code
+	 *   auto f = [](int x, int y, int z){ return x+y-z; };
+	 *
+	 *   auto g = ftl::curry<3>(f);
+	 *
+	 *   // g(1, 2, 3) == g(1, 2)(3) == g(1)(2, 3) == g(1)(2)(3)
+	 * \endcode
+	 *
+	 * \note Because this version of `curry` works on arbitrary function objects
+	 *       with unknown and possibly multiple, overloaded `operator()`s,
+	 *       there is no way to force the result of `curry` to accept only
+	 *       matching types. 
+	 *
+	 * \ingroup prelude
+	 */
+	template<size_t N, typename F>
+#ifndef DOCUMENTATION_GENERATOR
+	_dtl::curried_fn_n<N,plain_type<F>>
+#else
+	ImplementationDefined
+#endif
+	curry( F&& f ) {
+		return std::forward<F>(f);
 	}
 
 	/**
@@ -475,6 +562,58 @@ namespace ftl {
 	constexpr bool BackInsertable() {
 		return has_push_back<T,Value_type<T>>::value;
 	}
+
+	/**
+	 * Generate curried calling convention for N-ary functions.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 * 	 struct _add3 : public make_curried_n<3,_add3> {
+	 *   	int operator()(int x,int y,int z) {
+	 *   		return x+y+z;
+	 *   	}
+	 *
+	 * 		// Import curried overloads.
+	 *   	using ftl::make_curried_n<3,_add3>::operator();
+	 *	 } add3;
+	 *
+	 *   // ...
+	 *
+	 *   auto x = add3(1)(2)(3);
+	 *   auto y = add3(1,2)(3);
+	 *   auto z = add3(1)(2,3);
+	 * \endcode
+	 * 
+	 * \ingroup prelude
+	 */
+	template<size_t N, typename F>
+	struct make_curried_n {
+	private:
+        // Enable currying if supplied too few arguments to call F.
+        // (Otherwise F's operator() is called.)
+        template<typename...Args>
+        using Enable = Requires< (N>sizeof...(Args)) >;
+
+        using curried = decltype(curry<N>(std::declval<F>()));
+        template<typename...Args>
+        using applied = result_of<curried(Args...)>;
+
+	public:
+		template<typename...Args, typename = Enable<Args...>>
+		applied<Args...> operator()(Args&&...args) const & {
+            return curry<N>(*static_cast<const F*>(this))(
+                std::forward<Args>(args)...
+            );
+		}
+
+		template<typename...Args, typename = Enable<Args...>>
+		applied<Args...> operator()(Args&&...args) && {
+            return curry<N>(std::move(*static_cast<const F*>(this)))(
+                std::forward<Args>(args)...
+            );
+		}
+	};
 
 	namespace _dtl {
 		// This struct is used to generate curried calling convention for
