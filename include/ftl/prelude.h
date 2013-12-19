@@ -383,13 +383,36 @@ namespace ftl {
 		return _dtl::curried_fn<plain_type<F>>(std::forward<F>(f));
 	}
 
+	/**
+	 * Curries an N-ary function objects.
+	 *
+	 * Example:
+	 * \code
+	 *   auto f = [](int x, int y, int z){ return x+y-z; };
+	 *
+	 *   auto g = ftl::curry<3>(f);
+	 *
+	 *   // g(1, 2, 3) == g(1, 2)(3) == g(1)(2, 3) == g(1)(2)(3)
+	 * \endcode
+	 *
+	 * \note Because this version of `curry` works on arbitrary function objects
+	 *       with unknown and possibly multiple, overloaded `operator()`s,
+	 *       there is no way to force the result of `curry` to accept only
+	 *       matching types. 
+	 *
+	 * \ingroup prelude
+	 */
 	template<
 		size_t N, typename F, 
-		typename Curried = _dtl::curried_fn_n<N,plain_type<F>>,
 		typename = Requires<!is_monomorphic<plain_type<F>>::value>
 	>
-	Curried curry( F&& f ) {
-		return Curried(std::forward<F>(f));
+#ifndef DOCUMENTATION_GENERATOR
+	_dtl::curried_fn_n<N,plain_type<F>>
+#else
+	ImplementationDefined
+#endif
+	curry( F&& f ) {
+		return std::forward<F>(f);
 	}
 
 	/**
