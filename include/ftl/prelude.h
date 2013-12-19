@@ -549,8 +549,13 @@ namespace ftl {
 	 * \par Examples
 	 *
 	 * \code
-	 * 	 struct _add3 : public make_curried_n<3,add3> {
-	 *   	int operator()(int,int,int);
+	 * 	 struct _add3 : public make_curried_n<3,_add3> {
+	 *   	int operator()(int x,int y,int z) {
+	 *   		return x+y+z;
+	 *   	}
+	 *
+	 * 		// Import curried overloads.
+	 *   	using ftl::make_curried_n<3,_add3>::operator();
 	 *	 } add3;
 	 *
 	 *   // ...
@@ -564,18 +569,31 @@ namespace ftl {
 	 */
 	template<size_t N, typename F>
 	struct make_curried_n {
-		// When 
-		template<
-			typename...Args,
-			size_t n = sizeof...(Args),
-			typename = Requires<(N>n)>,
-			typename Applied =  decltype(
+	private:
+	  	template<typename...Args>
+		using Recurry = _dtl::curried_fn_n<
+			N-sizeof...(Args),
+			decltype(
 				_dtl::part(std::declval<F>(), std::declval<Args>()...)
 			)
-		>
-		constexpr _dtl::curried_fn_n<N-n,Applied> operator()(Args&&...args) {
+		>;
+
+		template<typename...Args>
+		static constexpr bool can_curry() { return N > sizeof...(Args); }
+
+	public:
+		template<typename...Args, typename = Requires<can_curry<Args...>()>>
+		Recurry<Args...> operator()(Args&&...args) const & {
 			return _dtl::part(
 				*static_cast<const F*>(this),
+				std::forward<Args>(args)...
+			);
+		}
+
+		template<typename...Args, typename = Requires<can_curry<Args...>()>>
+		Recurry<Args...> operator()(Args&&...args) && {
+			return _dtl::part(
+				std::move(*static_cast<const F*>(this)),
 				std::forward<Args>(args)...
 			);
 		}

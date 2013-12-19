@@ -28,6 +28,17 @@ int curry_me(int x, int y) {
 	return x+y;
 }
 
+// Test make_curried_n with arbitrarily large function.
+struct _curry5 : public ftl::make_curried_n<5,_curry5> {
+    template<typename P1, typename P2, typename P3, typename P4, typename P5>
+    auto operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) const
+    -> decltype(p1+p2+p3+p4+p5) {
+        return p1+p2+p3+p4+p5;
+    }
+
+    using ftl::make_curried_n<5,_curry5>::operator();
+} curry5;
+
 test_set prelude_tests{
 	std::string("prelude"),
 	{
@@ -87,6 +98,14 @@ test_set prelude_tests{
 				return g(2)(2)(2) == g(2,2)(2)
 					&& g(3,3)(3) == g(3,3,3)
 					&& g(2,3,4) == f(2,3,4);
+			})
+		),
+		std::make_tuple(
+			std::string("curried n-ary function object"),
+			std::function<bool()>([]() -> bool {
+				return curry5(1)(2,3)(4,5)  == curry5(1,2)(3,4)(5)
+					&& curry5(1,2)(3)(4)(5) == curry5(1)(2)(3,4)(5)
+					&& curry5(1,2,3,4,5)    == curry5(1)(2)(3)(4)(5);
 			})
 		),
 		std::make_tuple(
