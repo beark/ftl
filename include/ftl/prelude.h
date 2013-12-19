@@ -402,10 +402,7 @@ namespace ftl {
 	 *
 	 * \ingroup prelude
 	 */
-	template<
-		size_t N, typename F, 
-		typename = Requires<!is_monomorphic<plain_type<F>>::value>
-	>
+	template<size_t N, typename F>
 #ifndef DOCUMENTATION_GENERATOR
 	_dtl::curried_fn_n<N,plain_type<F>>
 #else
