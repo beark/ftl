@@ -301,9 +301,11 @@ namespace ftl {
 		public:
 			constexpr curried_fn_n(F f) : f(f) { }
 			
-			template<typename...Args>
-			constexpr auto operator()(Args&&...args) 
-			-> typename std::result_of<F(Args...)>::type {
+			template<
+                typename...Args,
+                typename = Requires<N==sizeof...(Args)>
+            >
+			constexpr result_of<F(Args...)>  operator()(Args&&...args) {
 				return f(std::forward<Args>(args)...);
 			}
 
