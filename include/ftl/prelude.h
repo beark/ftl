@@ -306,20 +306,27 @@ namespace ftl {
 
 			// The arity of F after applying so many arguments.
 			template<typename...Args>
-			static constexpr size_t left_over() {
-				return N-sizeof...(Args);
-			}
+			struct left_over : 
+				std::integral_constant<size_t, N-sizeof...(Args)>
+			{
+			};
+
+			// TODO: Why does this definition not work with gcc?
+			//template<typename...Args>
+			//static constexpr size_t left_over() {
+			//	return N-sizeof...(Args);
+			//}
 			
 			template<typename...Args>
-			using EnableCall = Requires<left_over<Args...>()==0>;
+			using EnableCall = Requires<left_over<Args...>::value==0>;
 			
 			template<typename...Args>
-			using EnableCurry = Requires<(left_over<Args...>()>0)>;
+			using EnableCurry = Requires<(left_over<Args...>::value>0)>;
 			
 			// The type f after applying Args.
 			template<typename...Args>
 			using applied_type = curried_fn_n<
-				left_over<Args...>(),
+				left_over<Args...>::value,
 				decltype(part(f,std::declval<Args>()...))
 			>;
 		public:
