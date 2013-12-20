@@ -271,9 +271,15 @@ namespace ftl {
 			{ }
 
 			template<typename...Args>
-			constexpr auto operator()(Args&&...args) 
-			-> typename std::result_of<F(Arg,Args...)>::type {
+			constexpr auto operator()(Args&&...args) const &
+			-> result_of<F(Arg,Args...)> {
 				return f(arg, std::forward<Args>(args)...);
+			}
+
+			template<typename...Args>
+			auto operator()(Args&&...args) &&
+			-> result_of<F(Arg,Args...)> {
+				return std::move(f)(arg, std::forward<Args>(args)...);
 			}
 		};
 
@@ -298,22 +304,46 @@ namespace ftl {
 		class curried_fn_n {
 			F f;
 
+			// The arity of F after applying so many arguments.
+			template<typename...Args>
+			static constexpr size_t left_over() {
+				return N-sizeof...(Args);
+			}
+			
+			template<typename...Args>
+			using EnableCall = Requires<left_over<Args...>()==0>;
+			
+			template<typename...Args>
+			using EnableCurry = Requires<(left_over<Args...>()>0)>;
+			
+			// The type f after applying Args.
+			template<typename...Args>
+			using applied_type = curried_fn_n<
+				left_over<Args...>(),
+				decltype(part(f,std::declval<Args>()...))
+			>;
 		public:
 			constexpr curried_fn_n(F f) : f(f) { }
 			
-			template<typename...Args>
-			constexpr auto operator()(Args&&...args) 
-			-> typename std::result_of<F(Args...)>::type {
+			// Call f.
+			template<typename...Args, typename = EnableCall<Args...>>
+			constexpr result_of<F(Args...)>  operator()(Args&&...args) const & {
 				return f(std::forward<Args>(args)...);
 			}
 
-			template<
-				typename...Args,
-				size_t n = sizeof...(Args),
-				typename = Requires<(N>n)>,
-				typename Applied = decltype(part(f,std::declval<Args>()...))
-			>
-			constexpr curried_fn_n<N-n,Applied> operator()(Args&&...args) {
+			template<typename...Args, typename = EnableCall<Args...>>
+			result_of<F(Args...)>  operator()(Args&&...args) && {
+				return std::move(f)(std::forward<Args>(args)...);
+			}
+
+            // Curry f.
+			template<typename...Args, typename = EnableCurry<Args...>>
+			constexpr applied_type<Args...> operator()(Args&&...args) const & {
+				return part(f,std::forward<Args>(args)...);
+			}
+
+			template<typename...Args, typename = EnableCurry<Args...>>
+			applied_type<Args...> operator()(Args&&...args) && {
 				return part(f,std::forward<Args>(args)...);
 			}
 		};
