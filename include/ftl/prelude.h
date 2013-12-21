@@ -259,6 +259,101 @@ namespace ftl {
 				);
 			}
 		};
+
+		template<typename F, typename Arg>
+		class partial_application {
+			F f;
+			Arg arg;
+
+		public:
+			constexpr partial_application(F f, Arg arg) 
+				: f(std::move(f)), arg(std::move(arg)) 
+			{ }
+
+			template<typename...Args>
+			constexpr auto operator()(Args&&...args) const &
+			-> result_of<F(Arg,Args...)> {
+				return f(arg, std::forward<Args>(args)...);
+			}
+
+			template<typename...Args>
+			auto operator()(Args&&...args) &&
+			-> result_of<F(Arg,Args...)> {
+				return std::move(f)(arg, std::forward<Args>(args)...);
+			}
+		};
+
+		template<typename F>
+		constexpr F part( F&& f ) {
+			return std::forward<F>(f);
+		}
+
+		template<
+			typename F, typename Arg1, typename...Args,
+			typename PartOne = partial_application<F,Arg1>
+		>
+		constexpr auto part(F f, Arg1 arg1, Args...args) 
+		-> decltype( part(std::declval<PartOne>(), std::declval<Args>()...) ) {
+			return part(
+				PartOne(std::move(f), std::move(arg1)),
+				std::move(args)...
+			);
+		}
+
+		template<size_t N, typename F>
+		class curried_fn_n {
+			F f;
+
+			// The arity of F after applying so many arguments.
+			template<typename...Args>
+			struct left_over : 
+				std::integral_constant<size_t, N-sizeof...(Args)>
+			{
+			};
+
+			// TODO: Why does this definition not work with gcc?
+			//template<typename...Args>
+			//static constexpr size_t left_over() {
+			//	return N-sizeof...(Args);
+			//}
+			
+			template<typename...Args>
+			using EnableCall = Requires<left_over<Args...>::value==0>;
+			
+			template<typename...Args>
+			using EnableCurry = Requires<(left_over<Args...>::value>0)>;
+			
+			// The type f after applying Args.
+			template<typename...Args>
+			using applied_type = curried_fn_n<
+				left_over<Args...>::value,
+				decltype(part(f,std::declval<Args>()...))
+			>;
+		public:
+			constexpr curried_fn_n(F f) : f(f) { }
+			
+			// Call f.
+			template<typename...Args, typename = EnableCall<Args...>>
+			constexpr result_of<F(Args...)>  operator()(Args&&...args) const & {
+				return f(std::forward<Args>(args)...);
+			}
+
+			template<typename...Args, typename = EnableCall<Args...>>
+			result_of<F(Args...)>  operator()(Args&&...args) && {
+				return std::move(f)(std::forward<Args>(args)...);
+			}
+
+            // Curry f.
+			template<typename...Args, typename = EnableCurry<Args...>>
+			constexpr applied_type<Args...> operator()(Args&&...args) const & {
+				return part(f,std::forward<Args>(args)...);
+			}
+
+			template<typename...Args, typename = EnableCurry<Args...>>
+			applied_type<Args...> operator()(Args&&...args) && {
+				return part(f,std::forward<Args>(args)...);
+			}
+		};
 	}
 
 	/**
@@ -323,6 +418,35 @@ namespace ftl {
 #endif
 	curry(F&& f) {
 		return _dtl::curried_fn<plain_type<F>>(std::forward<F>(f));
+	}
+
+	/**
+	 * Curries an N-ary function objects.
+	 *
+	 * Example:
+	 * \code
+	 *   auto f = [](int x, int y, int z){ return x+y-z; };
+	 *
+	 *   auto g = ftl::curry<3>(f);
+	 *
+	 *   // g(1, 2, 3) == g(1, 2)(3) == g(1)(2, 3) == g(1)(2)(3)
+	 * \endcode
+	 *
+	 * \note Because this version of `curry` works on arbitrary function objects
+	 *       with unknown and possibly multiple, overloaded `operator()`s,
+	 *       there is no way to force the result of `curry` to accept only
+	 *       matching types. 
+	 *
+	 * \ingroup prelude
+	 */
+	template<size_t N, typename F>
+#ifndef DOCUMENTATION_GENERATOR
+	_dtl::curried_fn_n<N,plain_type<F>>
+#else
+	ImplementationDefined
+#endif
+	curry( F&& f ) {
+		return std::forward<F>(f);
 	}
 
 	/**
@@ -475,6 +599,58 @@ namespace ftl {
 	constexpr bool BackInsertable() {
 		return has_push_back<T,Value_type<T>>::value;
 	}
+
+	/**
+	 * Generate curried calling convention for N-ary functions.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 * 	 struct _add3 : public make_curried_n<3,_add3> {
+	 *   	int operator()(int x,int y,int z) {
+	 *   		return x+y+z;
+	 *   	}
+	 *
+	 * 		// Import curried overloads.
+	 *   	using ftl::make_curried_n<3,_add3>::operator();
+	 *	 } add3;
+	 *
+	 *   // ...
+	 *
+	 *   auto x = add3(1)(2)(3);
+	 *   auto y = add3(1,2)(3);
+	 *   auto z = add3(1)(2,3);
+	 * \endcode
+	 * 
+	 * \ingroup prelude
+	 */
+	template<size_t N, typename F>
+	struct make_curried_n {
+	private:
+        // Enable currying if supplied too few arguments to call F.
+        // (Otherwise F's operator() is called.)
+        template<typename...Args>
+        using Enable = Requires< (N>sizeof...(Args)) >;
+
+        using curried = decltype(curry<N>(std::declval<F>()));
+        template<typename...Args>
+        using applied = result_of<curried(Args...)>;
+
+	public:
+		template<typename...Args, typename = Enable<Args...>>
+		applied<Args...> operator()(Args&&...args) const & {
+            return curry<N>(*static_cast<const F*>(this))(
+                std::forward<Args>(args)...
+            );
+		}
+
+		template<typename...Args, typename = Enable<Args...>>
+		applied<Args...> operator()(Args&&...args) && {
+            return curry<N>(std::move(*static_cast<const F*>(this)))(
+                std::forward<Args>(args)...
+            );
+		}
+	};
 
 	namespace _dtl {
 		// This struct is used to generate curried calling convention for
