@@ -63,6 +63,39 @@ test_set prelude_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("tuple_apply[&]"),
+			std::function<bool()>([]() -> bool {
+				auto f = [](int x, int y){ return x+y; };
+				auto t = std::make_tuple(4,4);
+
+				auto r = ftl::tuple_apply(f,t);
+
+				return r == 8;
+			})
+		),
+		std::make_tuple(
+			std::string("curried tuple_apply"),
+			std::function<bool()>([]() -> bool {
+				auto f = [](int x, int y){ return x+y; };
+				auto t = std::make_tuple(4,4);
+
+				auto tup_ap = ftl::tuple_apply(f);
+				auto r = tup_ap(t);
+
+				return r == 8;
+			})
+		),
+		std::make_tuple(
+			std::string("tuple_apply[&&]"),
+			std::function<bool()>([]() -> bool {
+				auto f = [](int x, int y){ return x+y; };
+
+				auto r = ftl::tuple_apply(f,std::make_tuple(4,4));
+
+				return r == 8;
+			})
+		),
+		std::make_tuple(
 			std::string("currying regular functions"),
 			std::function<bool()>([]() -> bool {
 				auto f = ftl::curry(curry_me);

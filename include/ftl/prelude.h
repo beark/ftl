@@ -112,31 +112,319 @@ namespace ftl {
 
 	// A number of helpers for tuple_apply
 	namespace _dtl {
-
-		// Helpers for tuple_apply
 		template<
 			typename F,
 			typename...Ts,
 			size_t...S>
-		auto tup_apply(seq<S...>, const F& f, const std::tuple<Ts...>& t)
+		auto tup_apply(seq<S...>, F&& f, const std::tuple<Ts...>& t)
 		-> typename std::result_of<F(Ts...)>::type {
-			return f(std::get<S>(t)...);
+			return std::forward<F>(f)(std::get<S>(t)...);
 		}
 
 		template<
 			typename F,
 			typename...Ts,
 			size_t...S>
-		auto tup_apply(seq<S...>, const F& f, std::tuple<Ts...>&& t)
+		auto tup_apply(seq<S...>, F&& f, std::tuple<Ts...>&& t)
 		-> typename std::result_of<F(Ts...)>::type {
-			return f(std::get<S>(t)...);
+			return std::forward<F>(f)(std::get<S>(std::move(t))...);
 		}
 	}
 
+	namespace _dtl {
+		// This struct is used to generate curried calling convention for
+		// arbitrary binary functions
+		template<typename F>
+		struct curried_binf {
+		private:
+			template<typename P>
+			struct curried {
+				curried(const F& f, const P& p) : f(f), p(p) {}
+				curried(const F& f, P&& p) : f(f), p(std::move(p)) {}
+				curried(F&& f, const P& p) : f(std::move(f)), p(p) {}
+				curried(F&& f, P&& p) : f(std::move(f)), p(std::move(p)) {}
+
+				F f;
+				P p;
+
+				template<typename T>
+				auto operator() (T&& t) const &
+				-> decltype(f(p, std::forward<T>(t))) {
+					return f(p, std::forward<T>(t));
+				}
+
+				template<typename T>
+				auto operator() (T&& t) &&
+				-> decltype(std::move(f)(std::move(p), std::forward<T>(t))) {
+					return std::move(f)(std::move(p), std::forward<T>(t));
+				}
+			};
+
+		public:
+			template<typename P>
+			curried<plain_type<P>> operator() (P&& p) const & {
+				return curried<plain_type<P>>(
+						*static_cast<const F*>(this),
+						std::forward<P>(p)
+				);
+			}
+
+			template<typename P>
+			curried<plain_type<P>> operator() (P&& p) && {
+				return curried<plain_type<P>>(
+						std::move(*static_cast<F*>(this)),
+						std::forward<P>(p)
+				);
+			}
+		};
+
+		// This struct is used to generate curried calling convention for
+		// arbitrary ternary functions
+		template<typename F>
+		struct curried_ternf {
+		private:
+			template<typename P1>
+			struct curried1 {
+			private:
+				template<typename P2>
+				struct curried {
+					curried(const F& f, const P1& p1, const P2& p2)
+					: f(f), p1(p1), p2(p2) {}
+
+					curried(const F& f, const P1& p1, P2&& p2)
+					: f(f), p1(p1), p2(std::move(p2)) {}
+
+					curried(const F& f, P1&& p1, const P2& p2)
+					: f(f), p1(std::move(p1)), p2(p2) {}
+
+					curried(F&& f, const P1& p1, const P2& p2)
+					: f(std::move(f)), p1(p1), p2(p2) {}
+
+					curried(const F& f, P1&& p1, P2&& p2)
+					: f(f), p1(std::move(p1)), p2(std::move(p2)) {}
+
+					curried(F&& f, const P1& p1, P2&& p2)
+					: f(std::move(f)), p1(p1), p2(std::move(p2)) {}
+
+					curried(F&& f, P1&& p1, const P2& p2)
+					: f(std::move(f)), p1(std::move(p1)), p2(p2) {}
+
+					curried(F&& f, P1&& p1, P2&& p2)
+					: f(std::move(f)), p1(std::move(p1)), p2(std::move(p2)) {}
+
+					F f;
+					P1 p1;
+					P2 p2;
+
+					template<typename P3>
+					auto operator() (P3&& p3) const &
+					-> decltype(f(p1, p2, std::forward<P3>(p3))) {
+						return f(p1, p2, std::forward<P3>(p3));
+					}
+
+					template<typename P3>
+					auto operator() (P3&& p3) &&
+					-> decltype(std::move(f)(
+								std::move(p1), std::move(p2), std::forward<P3>(p3)
+					)) {
+						return std::move(f)(
+								std::move(p1), std::move(p2), std::forward<P3>(p3)
+						);
+					}
+				};
+
+			public:
+				curried1(const F& f, const P1& p) : f(f), p(p) {}
+				curried1(const F& f, P1&& p) : f(f), p(std::move(p)) {}
+				curried1(F&& f, const P1& p) : f(std::move(f)), p(p) {}
+				curried1(F&& f, P1&& p) : f(std::move(f)), p(std::move(p)) {}
+
+				F f;
+				P1 p;
+
+				template<typename P2, typename P3>
+				auto operator() (P2&& p2, P3&& p3) const &
+				-> decltype(f(p, std::forward<P2>(p2), std::forward<P3>(p3))) {
+					return f(p, std::forward<P2>(p2), std::forward<P3>(p3));
+				}
+
+				template<typename P2, typename P3>
+				auto operator() (P2&& p2, P3&& p3) &&
+				-> decltype(std::move(f)(
+							std::move(p), std::forward<P2>(p2), std::forward<P3>(p3))
+				) {
+					return std::move(f)(
+							std::move(p), std::forward<P2>(p2), std::forward<P3>(p3)
+					);
+				}
+
+				template<typename P2>
+				curried<plain_type<P2>> operator() (P2&& p2) const &  {
+					return curried<plain_type<P2>>(f, p, std::forward<P2>(p2));
+				}
+
+				template<typename P2>
+				curried<plain_type<P2>> operator() (P2&& p2) && {
+					return curried<plain_type<P2>>(
+							std::move(f), std::move(p), std::forward<P2>(p2)
+					);
+				}
+			};
+
+			template<typename P1, typename P2>
+			struct curried2 {
+				F f;
+				P1 p1;
+				P2 p2;
+
+				curried2(const F& f, const P1& p1, const P2& p2)
+				noexcept(std::is_nothrow_copy_constructible<F>::value
+						&& std::is_nothrow_copy_constructible<P1>::value
+						&& std::is_nothrow_copy_constructible<P2>::value)
+				: f(f), p1(p1), p2(p2) {}
+
+				curried2(const F& f, const P1& p1, P2&& p2)
+				noexcept(std::is_nothrow_copy_constructible<F>::value
+						&& std::is_nothrow_copy_constructible<P1>::value
+						&& std::is_nothrow_move_constructible<P2>::value)
+				: f(f), p1(p1), p2(std::move(p2)) {}
+
+				curried2(const F& f, P1&& p1, const P2& p2)
+				noexcept(std::is_nothrow_copy_constructible<F>::value
+						&& std::is_nothrow_move_constructible<P1>::value
+						&& std::is_nothrow_copy_constructible<P2>::value)
+				: f(f), p1(std::move(p1)), p2(p2) {}
+
+				curried2(F&& f, const P1& p1, const P2& p2)
+				noexcept(std::is_nothrow_move_constructible<F>::value
+						&& std::is_nothrow_copy_constructible<P1>::value
+						&& std::is_nothrow_copy_constructible<P2>::value)
+				: f(std::move(f)), p1(p1), p2(p2) {}
+
+				curried2(const F& f, P1&& p1, P2&& p2)
+				noexcept(std::is_nothrow_copy_constructible<F>::value
+						&& std::is_nothrow_move_constructible<P1>::value
+						&& std::is_nothrow_move_constructible<P2>::value)
+				: f(f), p1(std::move(p1)), p2(std::move(p2)) {}
+
+				curried2(F&& f, const P1& p1, P2&& p2)
+				noexcept(std::is_nothrow_move_constructible<F>::value
+						&& std::is_nothrow_copy_constructible<P1>::value
+						&& std::is_nothrow_move_constructible<P2>::value)
+				: f(std::move(f)), p1(p1), p2(std::move(p2)) {}
+
+				curried2(F&& f, P1&& p1, const P2& p2)
+				noexcept(std::is_nothrow_move_constructible<F>::value
+						&& std::is_nothrow_move_constructible<P1>::value
+						&& std::is_nothrow_copy_constructible<P2>::value)
+				: f(std::move(f)), p1(std::move(p1)), p2(p2) {}
+
+				curried2(F&& f, P1&& p1, P2&& p2)
+				noexcept(std::is_nothrow_move_constructible<F>::value
+						&& std::is_nothrow_move_constructible<P1>::value
+						&& std::is_nothrow_move_constructible<P2>::value)
+				: f(std::move(f)), p1(std::move(p1)), p2(std::move(p2)) {}
+
+				template<typename P3>
+				auto operator() (P3&& p3) const &
+				-> decltype(f(p1, p2, std::forward<P3>(p3))) {
+					return f(p1, p2, std::forward<P3>(p3));
+				}
+
+				template<typename P3>
+				auto operator() (P3&& p3) &&
+				-> decltype(std::move(f)(
+							std::move(p1), std::move(p2), std::forward<P3>(p3)
+				)) {
+					return std::move(f)(
+							std::move(p1), std::move(p2), std::forward<P3>(p3)
+					);
+				}
+			};
+
+		public:
+			template<typename P>
+			curried1<plain_type<P>> operator() (P&& p) const & {
+				return curried1<plain_type<P>>(
+						*static_cast<const F*>(this),
+						std::forward<P>(p)
+				);
+			}
+
+			template<typename P>
+			curried1<plain_type<P>> operator() (P&& p) && {
+				return curried1<plain_type<P>>(
+						std::move(*static_cast<F*>(this)),
+						std::forward<P>(p)
+				);
+			}
+
+			template<typename P1, typename P2>
+			curried2<plain_type<P1>,plain_type<P2>>
+			operator() (P1&& p1, P2&& p2) const & {
+				return curried2<plain_type<P1>,plain_type<P2>>(
+					*static_cast<const F*>(this),
+					std::forward<P1>(p1), std::forward<P2>(p2)
+				);
+			}
+
+			template<typename P1, typename P2>
+			curried2<plain_type<P1>,plain_type<P2>>
+			operator() (P1&& p1, P2&& p2) && {
+				return curried2<plain_type<P1>,plain_type<P2>>(
+					std::move(*static_cast<F*>(this)),
+					std::forward<P1>(p1), std::forward<P2>(p2)
+				);
+			}
+		};
+	}
+
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct _tuple_apply : _dtl::curried_binf<_tuple_apply> {
+	private:
+		template<typename>
+		struct arity {};
+
+		template<typename...Ts>
+		struct arity<std::tuple<Ts...>> {
+			static constexpr size_t value = sizeof...(Ts)-1;
+		};
+
+		template<size_t Size>
+		using seq_t = typename gen_seq<0,Size>::type;
+
+	public:
+		template<typename F, typename Tuple>
+		auto operator() (F&& f, Tuple&& tuple) const
+		-> decltype(::ftl::_dtl::tup_apply(
+			seq_t<arity<plain_type<Tuple>>::value>{},
+			std::forward<F>(f),
+			std::forward<Tuple>(tuple)
+		)) {
+			return ::ftl::_dtl::tup_apply(
+				seq_t<arity<plain_type<Tuple>>::value>{},
+				std::forward<F>(f),
+				std::forward<Tuple>(tuple)
+			);
+		}
+
+		using _dtl::curried_binf<_tuple_apply>::operator();
+
+	} tuple_apply{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
 	 * Invoke a function using a tuple's fields as parameters.
 	 *
-	 * Example:
+	 * Behaves like a curried function of type:
+	 * \code
+	 *   ((Ts...) -> R, std::tuple<Ts...>) -> R
+	 * \endcode
+	 *
+	 * \par Examples
+	 *
+	 * Simple invocation:
 	 * \code
 	 *   void foo(int, float);
 	 *
@@ -146,24 +434,8 @@ namespace ftl {
 	 *
 	 * \ingroup prelude
 	 */
-	template<typename F, typename...Ts>
-	auto tuple_apply(F&& f, const std::tuple<Ts...>& t)
-	-> typename std::result_of<F(Ts...)>::type {
-		using indices_t = typename gen_seq<0,sizeof...(Ts)-1>::type;
-		return _dtl::tup_apply(indices_t(), std::forward<F>(f), t);
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup prelude
-	 */
-	template<typename F, typename...Ts>
-	auto tuple_apply(F&& f, std::tuple<Ts...>&& t)
-	-> typename std::result_of<F(Ts...)>::type {
-		using indices_t = typename gen_seq<0,sizeof...(Ts)-1>::type;
-		return _dtl::tup_apply(indices_t(), std::forward<F>(f), std::move(t));
-	}
+	tuple_apply;
+#endif
 
 	// Implementation details of currying
 	namespace _dtl {
@@ -652,254 +924,6 @@ namespace ftl {
 		}
 	};
 
-	namespace _dtl {
-		// This struct is used to generate curried calling convention for
-		// arbitrary binary functions
-		template<typename F>
-		struct curried_binf {
-		private:
-			template<typename P>
-			struct curried {
-				curried(const F& f, const P& p) : f(f), p(p) {}
-				curried(const F& f, P&& p) : f(f), p(std::move(p)) {}
-				curried(F&& f, const P& p) : f(std::move(f)), p(p) {}
-				curried(F&& f, P&& p) : f(std::move(f)), p(std::move(p)) {}
-
-				F f;
-				P p;
-
-				template<typename T>
-				auto operator() (T&& t) const &
-				-> decltype(f(p, std::forward<T>(t))) {
-					return f(p, std::forward<T>(t));
-				}
-
-				template<typename T>
-				auto operator() (T&& t) &&
-				-> decltype(std::move(f)(std::move(p), std::forward<T>(t))) {
-					return std::move(f)(std::move(p), std::forward<T>(t));
-				}
-			};
-
-		public:
-			template<typename P>
-			curried<plain_type<P>> operator() (P&& p) const & {
-				return curried<plain_type<P>>(
-						*static_cast<const F*>(this),
-						std::forward<P>(p)
-				);
-			}
-
-			template<typename P>
-			curried<plain_type<P>> operator() (P&& p) && {
-				return curried<plain_type<P>>(
-						std::move(*static_cast<F*>(this)),
-						std::forward<P>(p)
-				);
-			}
-		};
-
-		// This struct is used to generate curried calling convention for
-		// arbitrary ternary functions
-		template<typename F>
-		struct curried_ternf {
-		private:
-			template<typename P1>
-			struct curried1 {
-			private:
-				template<typename P2>
-				struct curried {
-					curried(const F& f, const P1& p1, const P2& p2)
-					: f(f), p1(p1), p2(p2) {}
-
-					curried(const F& f, const P1& p1, P2&& p2)
-					: f(f), p1(p1), p2(std::move(p2)) {}
-
-					curried(const F& f, P1&& p1, const P2& p2)
-					: f(f), p1(std::move(p1)), p2(p2) {}
-
-					curried(F&& f, const P1& p1, const P2& p2)
-					: f(std::move(f)), p1(p1), p2(p2) {}
-
-					curried(const F& f, P1&& p1, P2&& p2)
-					: f(f), p1(std::move(p1)), p2(std::move(p2)) {}
-
-					curried(F&& f, const P1& p1, P2&& p2)
-					: f(std::move(f)), p1(p1), p2(std::move(p2)) {}
-
-					curried(F&& f, P1&& p1, const P2& p2)
-					: f(std::move(f)), p1(std::move(p1)), p2(p2) {}
-
-					curried(F&& f, P1&& p1, P2&& p2)
-					: f(std::move(f)), p1(std::move(p1)), p2(std::move(p2)) {}
-
-					F f;
-					P1 p1;
-					P2 p2;
-
-					template<typename P3>
-					auto operator() (P3&& p3) const &
-					-> decltype(f(p1, p2, std::forward<P3>(p3))) {
-						return f(p1, p2, std::forward<P3>(p3));
-					}
-
-					template<typename P3>
-					auto operator() (P3&& p3) &&
-					-> decltype(std::move(f)(
-								std::move(p1), std::move(p2), std::forward<P3>(p3)
-					)) {
-						return std::move(f)(
-								std::move(p1), std::move(p2), std::forward<P3>(p3)
-						);
-					}
-				};
-
-			public:
-				curried1(const F& f, const P1& p) : f(f), p(p) {}
-				curried1(const F& f, P1&& p) : f(f), p(std::move(p)) {}
-				curried1(F&& f, const P1& p) : f(std::move(f)), p(p) {}
-				curried1(F&& f, P1&& p) : f(std::move(f)), p(std::move(p)) {}
-
-				F f;
-				P1 p;
-
-				template<typename P2, typename P3>
-				auto operator() (P2&& p2, P3&& p3) const &
-				-> decltype(f(p, std::forward<P2>(p2), std::forward<P3>(p3))) {
-					return f(p, std::forward<P2>(p2), std::forward<P3>(p3));
-				}
-
-				template<typename P2, typename P3>
-				auto operator() (P2&& p2, P3&& p3) &&
-				-> decltype(std::move(f)(
-							std::move(p), std::forward<P2>(p2), std::forward<P3>(p3))
-				) {
-					return std::move(f)(
-							std::move(p), std::forward<P2>(p2), std::forward<P3>(p3)
-					);
-				}
-
-				template<typename P2>
-				curried<plain_type<P2>> operator() (P2&& p2) const &  {
-					return curried<plain_type<P2>>(f, p, std::forward<P2>(p2));
-				}
-
-				template<typename P2>
-				curried<plain_type<P2>> operator() (P2&& p2) && {
-					return curried<plain_type<P2>>(
-							std::move(f), std::move(p), std::forward<P2>(p2)
-					);
-				}
-			};
-
-			template<typename P1, typename P2>
-			struct curried2 {
-				F f;
-				P1 p1;
-				P2 p2;
-
-				curried2(const F& f, const P1& p1, const P2& p2)
-				noexcept(std::is_nothrow_copy_constructible<F>::value
-						&& std::is_nothrow_copy_constructible<P1>::value
-						&& std::is_nothrow_copy_constructible<P2>::value)
-				: f(f), p1(p1), p2(p2) {}
-
-				curried2(const F& f, const P1& p1, P2&& p2)
-				noexcept(std::is_nothrow_copy_constructible<F>::value
-						&& std::is_nothrow_copy_constructible<P1>::value
-						&& std::is_nothrow_move_constructible<P2>::value)
-				: f(f), p1(p1), p2(std::move(p2)) {}
-
-				curried2(const F& f, P1&& p1, const P2& p2)
-				noexcept(std::is_nothrow_copy_constructible<F>::value
-						&& std::is_nothrow_move_constructible<P1>::value
-						&& std::is_nothrow_copy_constructible<P2>::value)
-				: f(f), p1(std::move(p1)), p2(p2) {}
-
-				curried2(F&& f, const P1& p1, const P2& p2)
-				noexcept(std::is_nothrow_move_constructible<F>::value
-						&& std::is_nothrow_copy_constructible<P1>::value
-						&& std::is_nothrow_copy_constructible<P2>::value)
-				: f(std::move(f)), p1(p1), p2(p2) {}
-
-				curried2(const F& f, P1&& p1, P2&& p2)
-				noexcept(std::is_nothrow_copy_constructible<F>::value
-						&& std::is_nothrow_move_constructible<P1>::value
-						&& std::is_nothrow_move_constructible<P2>::value)
-				: f(f), p1(std::move(p1)), p2(std::move(p2)) {}
-
-				curried2(F&& f, const P1& p1, P2&& p2)
-				noexcept(std::is_nothrow_move_constructible<F>::value
-						&& std::is_nothrow_copy_constructible<P1>::value
-						&& std::is_nothrow_move_constructible<P2>::value)
-				: f(std::move(f)), p1(p1), p2(std::move(p2)) {}
-
-				curried2(F&& f, P1&& p1, const P2& p2)
-				noexcept(std::is_nothrow_move_constructible<F>::value
-						&& std::is_nothrow_move_constructible<P1>::value
-						&& std::is_nothrow_copy_constructible<P2>::value)
-				: f(std::move(f)), p1(std::move(p1)), p2(p2) {}
-
-				curried2(F&& f, P1&& p1, P2&& p2)
-				noexcept(std::is_nothrow_move_constructible<F>::value
-						&& std::is_nothrow_move_constructible<P1>::value
-						&& std::is_nothrow_move_constructible<P2>::value)
-				: f(std::move(f)), p1(std::move(p1)), p2(std::move(p2)) {}
-
-				template<typename P3>
-				auto operator() (P3&& p3) const &
-				-> decltype(f(p1, p2, std::forward<P3>(p3))) {
-					return f(p1, p2, std::forward<P3>(p3));
-				}
-
-				template<typename P3>
-				auto operator() (P3&& p3) &&
-				-> decltype(std::move(f)(
-							std::move(p1), std::move(p2), std::forward<P3>(p3)
-				)) {
-					return std::move(f)(
-							std::move(p1), std::move(p2), std::forward<P3>(p3)
-					);
-				}
-			};
-
-		public:
-			template<typename P>
-			curried1<plain_type<P>> operator() (P&& p) const & {
-				return curried1<plain_type<P>>(
-						*static_cast<const F*>(this),
-						std::forward<P>(p)
-				);
-			}
-
-			template<typename P>
-			curried1<plain_type<P>> operator() (P&& p) && {
-				return curried1<plain_type<P>>(
-						std::move(*static_cast<F*>(this)),
-						std::forward<P>(p)
-				);
-			}
-
-			template<typename P1, typename P2>
-			curried2<plain_type<P1>,plain_type<P2>>
-			operator() (P1&& p1, P2&& p2) const & {
-				return curried2<plain_type<P1>,plain_type<P2>>(
-					*static_cast<const F*>(this),
-					std::forward<P1>(p1), std::forward<P2>(p2)
-				);
-			}
-
-			template<typename P1, typename P2>
-			curried2<plain_type<P1>,plain_type<P2>>
-			operator() (P1&& p1, P2&& p2) && {
-				return curried2<plain_type<P1>,plain_type<P2>>(
-					std::move(*static_cast<F*>(this)),
-					std::forward<P1>(p1), std::forward<P2>(p2)
-				);
-			}
-		};
-	}
-
 #ifndef DOCUMENTATION_GENERATOR
 	constexpr struct _const : public _dtl::curried_binf<_const> {
 		template<typename T, typename U>
@@ -944,6 +968,7 @@ namespace ftl {
 	 */
 	const_;
 #endif
+
 }
 #endif
 
