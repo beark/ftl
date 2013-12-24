@@ -56,21 +56,22 @@ namespace ftl {
 	/**
 	 * \defgroup functional Functional
 	 *
-	 * A collection of higher order utility functions.
+	 * Concept instances for generalised function types.
 	 *
 	 * \code
 	 *   #include <ftl/functional.h>
 	 * \endcode
 	 *
-	 * The functions herein deal mostly with modifying functions, such as
-	 * composing them, flipping the order of their parameters, and so on.
+	 * In particular, the concepts of \ref functorpg, \ref applicativepg,
+	 * \ref monadpg, and \ref monoidpg are all implemented for both
+	 * `std::function` and `ftl::function` in this module.
 	 *
 	 * \par Dependencies
 	 * - \ref monad
 	 */
 
 	/**
-	 * Monad instance for ftl::functions.
+	 * Monad instance for `ftl::functions`.
 	 *
 	 * \ingroup functional
 	 */
@@ -103,7 +104,7 @@ namespace ftl {
 		 * Monadic bind for functions.
 		 *
 		 * In the context of functions, `bind` will return a function, where the
-		 * result of running is to invoke`f` with the parameters, and pass the
+		 * result of running is to invoke `f` with the parameters, and pass the
 		 * result to `fn`. The latter will in return yield yet another function,
 		 * that is also given the original argument list and its return value is
 		 * what running the result of `bind` gives.
@@ -112,10 +113,10 @@ namespace ftl {
 		 * \code
 		 *   int example() {
 		 *       auto f = [](int x){
-		 *           return ftl::function<int,int>{[x](int y){ return x+y; }};
+		 *           return ftl::function<int(int)>{[x](int y){ return x+y; }};
 		 *       };
 		 *
-		 *       ftl::function<int,int> addTwo{[](int x){ return x+2; }};
+		 *       ftl::function<int(int)> addTwo{[](int x){ return x+2; }};
 		 *
 		 *       // addTwo(2) == 4, which is captured by the function `f`
 		 *       // returns, which is then also given the argument 2, resulting
@@ -142,9 +143,9 @@ namespace ftl {
 	struct monoid;
 
 	/**
-	 * Monoid instance for std::functions returning monoids.
+	 * Monoid instance for any `std::function` returning a monoid.
 	 *
-	 * In essence, the same as ftl::function's implementation.
+	 * Exactly equivalent of the `ftl::function` instance.
 	 *
 	 * \ingroup functional
 	 */
@@ -180,7 +181,7 @@ namespace ftl {
 	};
 
 	/**
-	 * Monoid instance for ftl::functions returning monoids.
+	 * Monoid instance for any `ftl::function` returning a monoid.
 	 *
 	 * The reason this works might not be immediately obvious, but basically,
 	 * any function (regardless of arity) that returns a value that is an
@@ -191,6 +192,17 @@ namespace ftl {
 	 *   append(a,b) <=> A function that forwards its arguments to both a and b,
 	 *                   and then calls monoid<result_type>::append on the two
 	 *                   results.
+	 * \endcode
+	 *
+	 * \par Examples
+	 *
+	 * Simple monoid operation:
+	 * \code
+	 *   function<sum_monoid<int>(int)> f = [](int x) { return sum(x/2); };
+	 *   function<sum_monoid<int>(int)> g = [](int x) { return sum(x*2); };
+	 *
+	 *   auto h = mappend(f, g);
+	 *   h(4) == sum(4/2 + 4*2);
 	 * \endcode
 	 *
 	 * \ingroup functional
@@ -236,7 +248,7 @@ namespace ftl {
 	};
 
 	/**
-	 * Monad instance for std::function.
+	 * Monad instance for `std::function`.
 	 *
 	 * Exactly equivalent of `monad<ftl::function>`.
 	 *
