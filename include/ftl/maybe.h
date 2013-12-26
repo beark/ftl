@@ -120,17 +120,6 @@ namespace ftl {
 			explicit constexpr base_maybe_it(maybe<T>* m) noexcept
 			: ref(m && *m ? m : nullptr) {}
 
-			base_maybe_it& operator++ () noexcept {
-				ref = nullptr;
-				return *this;
-			}
-
-			base_maybe_it operator++ (int) noexcept {
-				auto it = *this;
-				ref = nullptr;
-				return it;
-			}
-
 			constexpr bool operator== (const base_maybe_it& it) const noexcept {
 				return ref == it.ref;
 			}
@@ -153,6 +142,17 @@ namespace ftl {
 
 			explicit constexpr maybe_iterator(maybe<T>* m) noexcept
 			: base_maybe_it<T>{m} {}
+
+			maybe_iterator& operator++ () noexcept {
+				this->ref = nullptr;
+				return *this;
+			}
+
+			maybe_iterator operator++ (int) noexcept {
+				auto it = *this;
+				this->ref = nullptr;
+				return it;
+			}
 
 			constexpr T& operator* () const {
 				return this->ref->operator*();
@@ -177,11 +177,22 @@ namespace ftl {
 			explicit constexpr const_maybe_iterator(maybe<T>* m) noexcept
 			: base_maybe_it<T>{m} {}
 
-			constexpr const T& operator* () const noexcept {
+			const_maybe_iterator& operator++ () noexcept {
+				this->ref = nullptr;
+				return *this;
+			}
+
+			const_maybe_iterator operator++ (int) noexcept {
+				auto it = *this;
+				this->ref = nullptr;
+				return it;
+			}
+
+			constexpr const T& operator* () const {
 				return this->ref->operator*();
 			}
 
-			constexpr const T* operator-> () const noexcept {
+			constexpr const T* operator-> () const {
 				return this->ref->operator->();
 			}
 
