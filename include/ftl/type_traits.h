@@ -29,16 +29,20 @@
 
 #define FTL_GEN_PREUNOP_TEST(op, name)\
 	template<typename T>\
-	auto test_ ## name (decltype(op std::declval<T>())*)\
-	-> decltype(op std::declval<T>());\
+	auto test_ ## name (typename std::remove_reference<\
+			decltype(op std::declval<T&>())\
+	>::type*)\
+	-> decltype(op std::declval<T&>());\
 	\
 	template<typename T>\
 	no test_ ## name (...)
 
 #define FTL_GEN_POSTUNOP_TEST(op, name)\
 	template<typename T>\
-	auto test_ ## name (decltype(std::declval<T>() op)*)\
-	-> decltype(op std::declval<T>());\
+	auto test_ ## name (typename std::remove_reference<\
+			decltype(std::declval<T&>() op)\
+	>::type*)\
+	-> decltype(std::declval<T&>() op);\
 	\
 	template<typename T>\
 	no test_ ## name (...)
@@ -78,6 +82,17 @@
 	\
 	template<typename T, typename U>\
 	no test_ ## name (...)
+
+#define FTL_GEN_TYPEMEM_TEST(name)\
+	template<typename T>\
+	auto test_typemem_ ## name (\
+		typename std::remove_reference<\
+			typename T :: name\
+		>::type *\
+	) -> typename T :: name ;\
+	\
+	template<typename T>\
+	no test_typemem_ ## name (...)
 
 namespace ftl {
 	/**
