@@ -144,6 +144,39 @@ namespace ftl {
 		};
 	}
 
+	template<bool, typename Then, typename>
+	struct if_impl {
+		using type = Then;
+	};
+
+	template<typename Then,typename Else>
+	struct if_impl<false,Then,Else> {
+		using type = Else;
+	};
+
+	/**
+	 * Conditional type alias.
+	 *
+	 * If the compile-time predicate `Pred` evaluates to `true`, then `if_`
+	 * will evaluate to the `Then` type. Otherwise, it will evaluate to the
+	 * `Else` type.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   // type_alias will be an alias of type 'int', as maybe is a monad
+	 *   using type_alias = ftl::if_<
+	 *       ftl::Monad<ftl::maybe<int>>(),
+	 *       int,
+	 *       float
+	 *   >;
+	 * \endcode
+	 *
+	 * \ingroup typelevel
+	 */
+	template<bool Pred, typename Then, typename Else = void>
+	using if_ = typename if_impl<Pred,Then,Else>::type;
+
 	/**
 	 * Get the basic, "undecorated" return type of a function.
 	 *
