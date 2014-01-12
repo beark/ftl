@@ -25,6 +25,7 @@
 
 #include <stdexcept>
 #include <memory>
+#include <string>
 #include "type_functions.h"
 #include "type_traits.h"
 
@@ -42,6 +43,7 @@ namespace ftl {
 	 * \par Dependencies
 	 * - `<stdexcept>`
 	 * - `<memory>`
+	 * - `<string>`
 	 * - \ref typelevel
 	 * - \ref typetraits
 	 */
@@ -388,19 +390,6 @@ namespace ftl {
 			};
 		};
 
-		template<size_t I, typename T, typename...Ts>
-		struct index_of;
-
-		template<size_t I, typename T, typename...Ts>
-		struct index_of<I,T,T,Ts...> {
-			static constexpr size_t value = I;
-		};
-
-		template<size_t I, typename X, typename T, typename...Ts>
-		struct index_of<I,X,T,Ts...> {
-			static constexpr size_t value = index_of<I+1,X,Ts...>::value;
-		};
-
 		template<size_t I, typename...Ts>
 		class get_sum_type_element;
 	}
@@ -450,7 +439,7 @@ namespace ftl {
 			std::is_nothrow_constructible<_dtl::recursive_union<Ts...>,Args...>::value
 		)
 		: data(t, std::forward<Args>(args)...)
-		, cons(_dtl::index_of<0,T,Ts...>::value) {}
+		, cons(index_of<T,Ts...>::value) {}
 
 		~sum_type() noexcept(
 			noexcept(std::declval<_dtl::recursive_union<Ts...>>().destruct(0))
@@ -513,16 +502,26 @@ namespace ftl {
 			// these are possible candidates
 			static auto get(sum_type<Ts...>& u)
 			-> decltype(union_indexer<I,Ts...>::ref(u.data)) {
-				if(u.cons == I)
-					throw invalid_sum_type_access{""};
+				if(u.cons != I)
+					throw invalid_sum_type_access{
+						std::string("Indexing with ")
+						+ std::to_string(I)
+						+ std::string(", but active index is ")
+						+ std::to_string(u.cons)
+					};
 
 				return union_indexer<I,Ts...>::ref(u.data);
 			}
 
 			static auto get(const sum_type<Ts...>& u)
 			-> decltype(union_indexer<I,Ts...>::ref(u.data)) {
-				if(u.cons == I)
-					throw invalid_sum_type_access{""};
+				if(u.cons != I)
+					throw invalid_sum_type_access{
+						std::string("Indexing with ")
+						+ std::to_string(I)
+						+ std::string(", but active index is ")
+						+ std::to_string(u.cons)
+					};
 
 				return union_indexer<I,Ts...>::ref(u.data);
 			}
@@ -550,19 +549,13 @@ namespace ftl {
 	 * \ingroup sum_type
 	 */
 	template<size_t I, typename...Ts>
-	auto get(sum_type<Ts...>& x)
-	-> decltype(::ftl::_dtl::get_sum_type_element<I,Ts...>::get(x))
-	{
-		static_assert(I < sizeof...(Ts), "Index out of range");
+	type_at<I,Ts...>& get(sum_type<Ts...>& x) {
 		return ::ftl::_dtl::get_sum_type_element<I,Ts...>::get(x);
 	}
 
 	/// \overload
 	template<size_t I, typename...Ts>
-	auto get(const sum_type<Ts...>& x)
-	-> decltype(::ftl::_dtl::get_sum_type_element<I,Ts...>::get(x)) {
-
-		static_assert(I < sizeof...(Ts), "Index out of range");
+	const type_at<I,Ts...>& get(const sum_type<Ts...>& x) {
 		return ::ftl::_dtl::get_sum_type_element<I,Ts...>::get(x);
 	}
 }

@@ -206,6 +206,86 @@ namespace ftl {
 	template<typename...Ts>
 	struct type_seq {};
 
+	template<size_t I, typename T, typename...Ts>
+	struct index_of_impl;
+
+	template<size_t I, typename T, typename...Ts>
+	struct index_of_impl<I,T,type_seq<T,Ts...>> {
+		static constexpr size_t value = I;
+	};
+
+	template<size_t I, typename X, typename T, typename...Ts>
+	struct index_of_impl<I,X,type_seq<T,Ts...>> {
+		static constexpr size_t value
+			= index_of_impl<I+1,X,type_seq<Ts...>>::value;
+	};
+
+	template<size_t I, typename T, typename...Ts>
+	struct index_of_impl<I,T,T,Ts...> {
+		static constexpr size_t value = I;
+	};
+
+	template<size_t I, typename X, typename T, typename...Ts>
+	struct index_of_impl<I,X,T,Ts...> {
+		static constexpr size_t value = index_of_impl<I+1,X,Ts...>::value;
+	};
+
+	/**
+	 * Gets the index of a specific type in a pack or sequence.
+	 *
+	 * \tparam T the type to find
+	 * \tparam Ts either a regular variadic pack to search, or a `type_seq` of
+	 *            types to search.
+	 *
+	 * If the type is not among those given, a compile error will be generated.
+	 *
+	 * \par Examples
+	 *
+	 * With a plain variadic list of types
+	 * \code
+	 *   size_t index = ftl::index_of<int, char, float, int, string>::value;
+	 *   // index == 2
+	 * \endcode
+	 *
+	 * Searching a a `type_seq`
+	 * \code
+	 *   size_t index = ftl::index_of<char, type_seq<char,int>>::value;
+	 *   // index == 0
+	 * \endcode
+	 *
+	 * \ingroup typelevel
+	 */
+	template<typename T, typename...Ts>
+	struct index_of {
+		static constexpr size_t value = index_of_impl<0,T,Ts...>::value;
+	};
+
+	template<size_t I, typename T, typename...Ts>
+	struct type_at_impl : type_at_impl<I-1,Ts...> {};
+
+	template<typename T, typename...Ts>
+	struct type_at_impl<0,T,Ts...> {
+		using type = T;
+	};
+
+	/**
+	 * Gets the type in a variadic list at the given index.
+	 *
+	 * \tparam I zero based index
+	 * \tparam Ts a variadic list of types to search
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   using T = type_at<1,int,float,double>;
+	 *   // T is an alias of float
+	 * \endcode
+	 *
+	 * \ingroup typelevel
+	 */
+	template<size_t I, typename...Ts>
+	using type_at = typename type_at_impl<I,Ts...>::type;
+
 	/**
 	 * Concatenates two type_seqs.
 	 *
@@ -430,8 +510,8 @@ namespace ftl {
 	 *
 	 * \ingroup typelevel
 	 */
-	template<typename...>
-	struct inner_type;
+	template<typename>
+	struct inner_type {};
 
 	template<template<typename> class Tt, typename T>
 	struct inner_type<Tt<T>> {
