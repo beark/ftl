@@ -244,5 +244,3 @@ namespace ftl {
 
 #endif
 
-
-

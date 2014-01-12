@@ -83,6 +83,16 @@
 	template<typename T, typename U>\
 	no test_ ## name (...)
 
+#define FTL_GEN_METH2_TEST(name)\
+	template<typename T, typename U, typename V>\
+	auto test_ ## name (\
+		decltype(std::declval<T>() . name (std::declval<U>(), std::declval<V>()))*\
+	)\
+	-> decltype(std::declval<T>() . name (std::declval<U>(), std::declval<V>()));\
+	\
+	template<typename, typename, typename>\
+	no test_ ## name (...)
+
 #define FTL_GEN_TYPEMEM_TEST(name)\
 	template<typename T>\
 	auto test_typemem_ ## name (\
@@ -482,6 +492,9 @@ namespace ftl {
 				_dtl::no,
 				decltype(check(std::declval<F>(), std::declval<Args>()...))
 			>::value;
+
+		using type =
+			decltype(check(std::declval<F>(), std::declval<Args>()...));
 	};
 }
 
