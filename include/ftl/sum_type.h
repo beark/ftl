@@ -323,13 +323,15 @@ namespace ftl {
 
 		template<>
 		struct recursive_union<> {
-			void copy(size_t) noexcept {}
-			void move(size_t) noexcept {}
+			void copy(size_t, const recursive_union&) noexcept {}
+			void move(size_t, recursive_union&&) noexcept {}
 			void destruct(size_t) noexcept {}
 		};
 
 		template<typename T, typename...Ts>
 		struct recursive_union<T,Ts...> {
+			constexpr recursive_union() noexcept {}
+
 			template<typename...Args>
 			explicit constexpr recursive_union(constructor<T>, Args&&...args)
 			noexcept(std::is_nothrow_constructible<T,Args...>::value)
@@ -361,7 +363,9 @@ namespace ftl {
 			void move(size_t i, recursive_union&& u)
 			noexcept(
 				std::is_nothrow_move_constructible<T>::value
-				&& noexcept(std::declval<recursive_union>().r.move(i-1, u.r))
+				&& noexcept(
+					std::declval<recursive_union>().r.move(i-1, std::move(u.r))
+				)
 			)
 			{
 				if(i == 0) {
