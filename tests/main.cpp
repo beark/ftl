@@ -21,6 +21,7 @@
  * distribution.
  */
 #include <iostream>
+#include "sum_type_tests.h"
 #include "either_tests.h"
 #include "maybe_tests.h"
 #include "future_tests.h"
@@ -77,6 +78,7 @@ int main(int, char**) {
 	bool flawless = true;
 
 	flawless &= run_test_set(prelude_tests, std::cout);
+	flawless &= run_test_set(sum_type_tests, std::cout);
 	flawless &= run_test_set(either_tests, std::cout);
 	flawless &= run_test_set(eithert_tests, std::cout);
 	flawless &= run_test_set(maybe_tests, std::cout);

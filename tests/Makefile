@@ -22,7 +22,7 @@ TEST_OBJS=concept_tests.o either_tests.o eithert_tests.o functional_tests.o\
 	  future_tests.o fwdlist_tests.o lazy_tests.o lazyt_tests.o\
 	  list_tests.o map_tests.o maybe_tests.o maybet_tests.o memory_tests.o\
 	  ord_tests.o prelude_tests.o set_tests.o string_tests.o tuple_tests.o\
-	  unordered_map_tests.o vector_tests.o
+	  unordered_map_tests.o vector_tests.o sum_type_tests.o
 
 # NOTE: This Makefile has only been used on the author's personal system, you
 # may well have to tweak the above parameters to get it to work on your own
@@ -43,6 +43,9 @@ main.o: main.cpp base.h
 
 concept_tests.o: concept_tests.cpp concept_tests.h base.h ../include/ftl/maybe.h ../include/ftl/vector.h
 	$(CPP) -c $(CXXFLAGS) $(OLVL) -o concept_tests.o concept_tests.cpp
+
+sum_type_tests.o: sum_type_tests.cpp sum_type_tests.h base.h ../include/ftl/sum_type.h
+	$(CPP) -c $(CXXFLAGS) $(OLVL) -o sum_type_tests.o sum_type_tests.cpp
 
 either_tests.o: either_tests.cpp either_tests.h base.h ../include/ftl/either.h
 	$(CPP) -c $(CXXFLAGS) $(OLVL) -o either_tests.o either_tests.cpp
