@@ -23,6 +23,37 @@
 #include <ftl/sum_type.h>
 #include "sum_type_tests.h"
 
+template<typename T>
+struct Just {
+	explicit constexpr Just(const T& t) noexcept : value(t) {}
+	explicit constexpr Just(T&& t) noexcept : value(std::move(t)) {}
+
+	T& operator*() {
+		return value;
+	}
+
+	constexpr const T& operator*() const {
+		return value;
+	}
+
+private:
+	T value;
+};
+
+struct Nothing {};
+
+template<typename T>
+using maybe = ftl::sum_type<Just<T>,Nothing>;
+
+template<typename T>
+maybe<ftl::plain_type<T>> just(T&& t) {
+	using ftl::plain_type;
+
+	return maybe<plain_type<T>>{
+		ftl::constructor<Just<plain_type<T>>>(), std::forward<T>(t)
+	};
+}
+
 test_set sum_type_tests{
 	std::string("sum_type"),
 	{
@@ -48,9 +79,9 @@ test_set sum_type_tests{
 				sum_type<int,char> y{constructor<char>(), 'b'};
 
 				auto s1 = get<0>(x);
-				//auto s2 = get<1>(y);
+				auto s2 = get<1>(y);
 
-				return s1 == 10;
+				return s1 == 10 && s2 == 'b';
 			})
 		),
 		std::make_tuple(
@@ -108,7 +139,22 @@ test_set sum_type_tests{
 				return s1 == 0 && s2 == 1 && s3 == 2;
 			})
 		),
+		std::make_tuple(
+			std::string("Maybe mockup"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto x = just(12);
+				auto y = maybe<int>{constructor<Nothing>()};
+
+				auto s1 = x.match(
+					[](Just<int> x){ return *x; },
+					[](Nothing){ return 0; }
+				);
+
+				return s1 == 12;
+			})
+		),
 	}
 };
-
 
