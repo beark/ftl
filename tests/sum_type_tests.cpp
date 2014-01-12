@@ -33,8 +33,8 @@ test_set sum_type_tests{
 
 				int x = 1;
 
-				sum_type<int,int*> y{select<int>(), 12};
-				sum_type<int,int*> z{select<int*>(), &x};
+				sum_type<int,int*> y{constructor<int>(), 12};
+				sum_type<int,int*> z{constructor<int*>(), &x};
 
 				return true;
 			})
@@ -44,8 +44,8 @@ test_set sum_type_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				sum_type<int,char> x{select<int>(), 10};
-				sum_type<int,char> y{select<char>(), 'b'};
+				sum_type<int,char> x{constructor<int>(), 10};
+				sum_type<int,char> y{constructor<char>(), 'b'};
 
 				auto s1 = get<0>(x);
 				//auto s2 = get<1>(y);
@@ -58,8 +58,8 @@ test_set sum_type_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				sum_type<int,char> x{select<int>(), 10};
-				sum_type<int,char> y{select<char>(), 'b'};
+				sum_type<int,char> x{constructor<int>(), 10};
+				sum_type<int,char> y{constructor<char>(), 'b'};
 
 				auto s1 = x.match(
 					[](case_<int> x){ return x*2; },
@@ -83,9 +83,9 @@ test_set sum_type_tests{
 				struct B {};
 				struct C {};
 
-				sum_type<A,B,C> x{select<A>()};
-				sum_type<A,B,C> y{select<B>()};
-				sum_type<A,B,C> z{select<C>()};
+				sum_type<A,B,C> x{constructor<A>()};
+				sum_type<A,B,C> y{constructor<B>()};
+				sum_type<A,B,C> z{constructor<C>()};
 
 				auto s1 = x.match(
 					[](A){ return 0; },

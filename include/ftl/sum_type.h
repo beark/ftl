@@ -67,20 +67,20 @@ namespace ftl {
 	};
 
 	/**
-	 * Type tag used to select which constructor to use in a `sum_type`.
+	 * Type tag used to construct which constructor to use in a `sum_type`.
 	 *
 	 * \par Examples
 	 *
 	 * Copy-constructing a sub-type of a `sum_type`
 	 * \code
-	 *   sum_type<int,string> x{select<int>(), 12};
+	 *   sum_type<int,string> x{constructor<int>(), 12};
 	 * \endcode
 	 *
 	 * Calling arbitrary constructor of a sub-type
 	 * \code
 	 *   // B must have a constructor taking an int and a c-string, or something
-	 *   //  they implicitly convert to
-	 *   sum_type<A,B> x{select<B>(), 12, "foo"};
+	 *   // they implicitly convert to
+	 *   sum_type<A,B> x{constructor<B>(), 12, "foo"};
 	 * \endcode
 	 *
 	 * \see sum_type
@@ -88,7 +88,7 @@ namespace ftl {
 	 * \ingroup sum_type
 	 */
 	template<typename>
-	struct select {
+	struct constructor {
 	};
 
 	/**
@@ -309,8 +309,9 @@ namespace ftl {
 					recursive_union<T,Ts...>& u, size_t i, Fs&&...fs
 			) {
 				if(i == I) {
-					return union_visitor<R,T>
-						::visit(overload_tag<T>{}, u.v, std::forward<Fs>(fs)...);
+					return union_visitor<R,T>::visit(
+						overload_tag<T>{}, u.v, std::forward<Fs>(fs)...
+					);
 				}
 				else {
 					return union_visitor<R,seq<Is...>,Ts...>::visit(
@@ -330,14 +331,16 @@ namespace ftl {
 		template<typename T, typename...Ts>
 		struct recursive_union<T,Ts...> {
 			template<typename...Args>
-			explicit constexpr recursive_union(select<T>, Args&&...args)
+			explicit constexpr recursive_union(constructor<T>, Args&&...args)
 			noexcept(std::is_nothrow_constructible<T,Args...>::value)
 			: v(std::forward<Args>(args)...) {}
 
 			template<typename U, typename...Args>
-			explicit constexpr recursive_union(select<U> t, Args&&...args)
+			explicit constexpr recursive_union(constructor<U> t, Args&&...args)
 			noexcept(
-				std::is_nothrow_constructible<recursive_union<Ts...>,Args...>::value
+				std::is_nothrow_constructible<
+					recursive_union<Ts...>,Args...
+				>::value
 			)
 			: r(t, std::forward<Args>(args)...) {}
 
@@ -434,9 +437,11 @@ namespace ftl {
 		}
 
 		template<typename T, typename...Args>
-		explicit constexpr sum_type(select<T> t, Args&&...args)
+		explicit constexpr sum_type(constructor<T> t, Args&&...args)
 		noexcept(
-			std::is_nothrow_constructible<_dtl::recursive_union<Ts...>,Args...>::value
+			std::is_nothrow_constructible<
+				_dtl::recursive_union<Ts...>,Args...
+			>::value
 		)
 		: data(t, std::forward<Args>(args)...)
 		, cons(index_of<T,Ts...>::value) {}
@@ -541,7 +546,7 @@ namespace ftl {
 	 * \par Examples
 	 *
 	 * \code
-	 *   sum_type<int,float> x{select<int>(), 12};
+	 *   sum_type<int,float> x{constructor<int>(), 12};
 	 *   x.get<0>() += 1;
 	 *   // x.get<0>() == 13
 	 * \endcode
