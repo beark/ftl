@@ -67,7 +67,7 @@ namespace ftl {
 	};
 
 	/**
-	 * Type tag used to construct which constructor to use in a `sum_type`.
+	 * Type tag used to select which constructor to use in a `sum_type`.
 	 *
 	 * \par Examples
 	 *
@@ -566,6 +566,37 @@ namespace ftl {
 	template<size_t I, typename...Ts>
 	const type_at<I,Ts...>& get(const sum_type<Ts...>& x) {
 		return ::ftl::_dtl::get_sum_type_element<I,Ts...>::get(x);
+	}
+
+	/**
+	 * Means of accessing a sum type by type.
+	 *
+	 * If the given type does not match the type contained in the sum type at
+	 * run-time, an `invalid_sum_type_access`-exception will be thrown.
+	 *
+	 * \note This is _not_ the recommended way of accessing sum type values. Use
+	 *       `sum_type::match` whenever possible instead, to get compile time
+	 *       guarantees of not accessing the wrong value.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   sum_type<int,float> x{constructor<int>(), 12};
+	 *   x.get<int>() += 1;
+	 *   // x.get<int>() == 13
+	 * \endcode
+	 *
+	 * \ingroup sum_type
+	 */
+	template<typename T, typename...Ts>
+	T& get(sum_type<Ts...>& x) {
+		return get<index_of<T,Ts...>::value>(x);
+	}
+
+	/// \overload
+	template<typename T, typename...Ts>
+	const T& get(const sum_type<Ts...>& x) {
+		return get<index_of<T,Ts...>::value>(x);
 	}
 }
 

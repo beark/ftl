@@ -85,6 +85,20 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("Get by type"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,char> x{constructor<int>(), 10};
+				sum_type<int,char> y{constructor<char>(), 'b'};
+
+				auto s1 = get<int>(x);
+				auto s2 = get<char>(y);
+
+				return s1 == 10 && s2 == 'b';
+			})
+		),
+		std::make_tuple(
 			std::string("Match case_ expressions"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
