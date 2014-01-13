@@ -49,7 +49,14 @@ namespace ftl {
 	 */
 
 	/**
-	 * Exception type signifying an attempt to access an empty maybe object.
+	 * Raised when trying to access a `sum_type` erroneously.
+	 *
+	 * In general, all instances of this exception being raised are preventable
+	 * by simply using an exhaustive pattern match instead of the `get` methods
+	 * and similar. That, or manually making sure the `sum_type` has the right
+	 * run-time type.
+	 *
+	 * \see sum_type
 	 *
 	 * \ingroup sum_type
 	 */
@@ -455,6 +462,22 @@ namespace ftl {
 		)
 		{
 			data.destruct(cons);
+		}
+
+		/**
+		 * Check whether the `sum_type` is currently an instance of `T`.
+		 */
+		template<typename T>
+		constexpr bool is() const noexcept {
+			return cons == index_of<T,Ts...>::value;
+		}
+
+		/**
+		 * Check whether the currently active type is the one at the given index.
+		 */
+		template<size_t I>
+		constexpr bool isTypeAt() const noexcept {
+			return cons == I;
 		}
 
 		/**

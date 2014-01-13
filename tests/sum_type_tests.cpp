@@ -71,6 +71,30 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("is<T>"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,char> x{constructor<int>(), 10};
+				sum_type<int,char> y{constructor<char>(), 'b'};
+
+				return x.is<int>() && !x.is<char>()
+					&& !y.is<int>() && y.is<char>();
+			})
+		),
+		std::make_tuple(
+			std::string("isTypeAt<I>"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,char> x{constructor<int>(), 10};
+				sum_type<int,char> y{constructor<char>(), 'b'};
+
+				return x.isTypeAt<0>() && !x.isTypeAt<1>()
+					&& !y.isTypeAt<0>() && y.isTypeAt<1>();
+			})
+		),
+		std::make_tuple(
 			std::string("Get by index"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
