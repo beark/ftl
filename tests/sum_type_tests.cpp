@@ -20,6 +20,7 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
  */
+#include <vector>
 #include <ftl/sum_type.h>
 #include "sum_type_tests.h"
 
@@ -92,6 +93,82 @@ test_set sum_type_tests{
 
 				return x.isTypeAt<0>() && !x.isTypeAt<1>()
 					&& !y.isTypeAt<0>() && y.isTypeAt<1>();
+			})
+		),
+		std::make_tuple(
+			std::string("Copy assign"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<std::vector<int>,int> x1{
+					constructor<std::vector<int>>(), {1,2,3,4}
+				};
+
+				sum_type<std::vector<int>,int> y1{
+					constructor<std::vector<int>>(), {2,3,4,5}
+				};
+
+				x1 = y1;
+
+				sum_type<int,std::vector<int>> x2{
+					constructor<std::vector<int>>(), {1,2,3,4}
+				};
+
+				sum_type<int,std::vector<int>> y2{
+					constructor<std::vector<int>>(), {2,3,4,5}
+				};
+
+				x2 = y2;
+
+				sum_type<int,std::vector<int>> x3{
+					constructor<std::vector<int>>(), {1,2,3,4}
+				};
+
+				sum_type<int,std::vector<int>> y3{constructor<int>(), 10};
+
+				x3 = y3;
+
+				return get<0>(x1) == std::vector<int>{2,3,4,5}
+					&& get<1>(x2) == std::vector<int>{2,3,4,5}
+					&& get<0>(x3) == 10;
+			})
+		),
+		std::make_tuple(
+			std::string("Move assign"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<std::vector<int>,int> x1{
+					constructor<std::vector<int>>(), {1,2,3,4}
+				};
+
+				sum_type<std::vector<int>,int> y1{
+					constructor<std::vector<int>>(), {2,3,4,5}
+				};
+
+				x1 = std::move(y1);
+
+				sum_type<int,std::vector<int>> x2{
+					constructor<std::vector<int>>(), {1,2,3,4}
+				};
+
+				sum_type<int,std::vector<int>> y2{
+					constructor<std::vector<int>>(), {2,3,4,5}
+				};
+
+				x2 = std::move(y2);
+
+				sum_type<int,std::vector<int>> x3{
+					constructor<std::vector<int>>(), {1,2,3,4}
+				};
+
+				sum_type<int,std::vector<int>> y3{constructor<int>(), 10};
+
+				x3 = std::move(y3);
+
+				return get<0>(x1) == std::vector<int>{2,3,4,5}
+					&& get<1>(x2) == std::vector<int>{2,3,4,5}
+					&& get<0>(x3) == 10;
 			})
 		),
 		std::make_tuple(

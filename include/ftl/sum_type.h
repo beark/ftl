@@ -339,11 +339,13 @@ namespace ftl {
 		struct recursive_union<T,Ts...> {
 			constexpr recursive_union() noexcept {}
 
+			// Construct this element type
 			template<typename...Args>
 			explicit constexpr recursive_union(constructor<T>, Args&&...args)
 			noexcept(std::is_nothrow_constructible<T,Args...>::value)
 			: v(std::forward<Args>(args)...) {}
 
+			// Forward construction to U
 			template<typename U, typename...Args>
 			explicit constexpr recursive_union(constructor<U> t, Args&&...args)
 			noexcept(
@@ -352,6 +354,28 @@ namespace ftl {
 				>::value
 			)
 			: r(t, std::forward<Args>(args)...) {}
+
+			// Construct this element using an initializer_list
+			template<typename U>
+			constexpr recursive_union(constructor<T>, std::initializer_list<U> l)
+			noexcept(
+				std::is_nothrow_constructible<T,std::initializer_list<U>>::value
+			) : v(l) {}
+
+			// Forward construction using initializer_list to U
+			template<typename U, typename V>
+			constexpr recursive_union(
+					constructor<U> t, std::initializer_list<V> l
+			)
+			noexcept(
+				std::is_nothrow_constructible<
+					recursive_union<Ts...>,
+					constructor<U>,
+					std::initializer_list<V>
+				>::value
+			) : r(t, l) {}
+
+			~recursive_union() {}
 
 			void copy(size_t i, const recursive_union& u)
 			noexcept(
@@ -424,6 +448,8 @@ namespace ftl {
 	 * \par Concepts
 	 * - \ref copycons, if all sub-types are
 	 * - \ref movecons, if all sub-types are
+	 * - \ref copyassignable, if all sub-types are CopyConstructible
+	 * - \ref moveassignable, if all sub-types are MoveConstructible
 	 *
 	 * \ingroup sum_type
 	 */
@@ -457,6 +483,20 @@ namespace ftl {
 		: data(t, std::forward<Args>(args)...)
 		, cons(index_of<T,Ts...>::value) {}
 
+		template<typename T, typename U>
+		constexpr sum_type(
+			constructor<T> t, std::initializer_list<U> l
+		)
+		noexcept(
+			std::is_nothrow_constructible<
+				_dtl::recursive_union<Ts...>,
+				constructor<T>,
+				std::initializer_list<U>
+			>::value
+		)
+		: data(t, l), cons(index_of<T,Ts...>::value)
+		{}
+
 		~sum_type() noexcept(
 			noexcept(std::declval<_dtl::recursive_union<Ts...>>().destruct(0))
 		)
@@ -466,6 +506,15 @@ namespace ftl {
 
 		/**
 		 * Check whether the `sum_type` is currently an instance of `T`.
+		 *
+		 * \par Examples
+		 *
+		 * \code
+		 *   sum_type<A,B,C> x{constructor<A>(), ...};
+		 *
+		 *   auto r = x.is<A>() && !x.is<B>() && !x.is<C>();
+		 *   // r == true
+		 * \endcode
 		 */
 		template<typename T>
 		constexpr bool is() const noexcept {
@@ -474,10 +523,45 @@ namespace ftl {
 
 		/**
 		 * Check whether the currently active type is the one at the given index.
+		 *
+		 * \par Examples
+		 *
+		 * \code
+		 *   sum_type<A,B,C> x{constructor<B>(), ...};
+		 *
+		 *   auto r = !x.is<0>() && x.is<1>() && !x.is<2>();
+		 *   // r == true
+		 * \endcode
 		 */
 		template<size_t I>
 		constexpr bool isTypeAt() const noexcept {
 			return cons == I;
+		}
+
+		// TODO: Use assignment instead of construction if cons and s.cons
+		// are equal
+		sum_type& operator= (const sum_type& s) {
+			// Deal with self assignment
+			if(&s == this)
+				return *this;
+
+			data.destruct(cons);
+			cons = s.cons;
+			data.copy(cons, s.data);
+
+			return *this;
+		}
+
+		sum_type& operator= (sum_type&& s) {
+			// Deal with self assignment
+			if(&s == this)
+				return *this;
+
+			data.destruct(cons);
+			cons = s.cons;
+			data.move(cons, std::move(s.data));
+
+			return *this;
 		}
 
 		/**
