@@ -342,6 +342,45 @@ namespace ftl {
 			return value;
 		}
 	};
+
+	/**
+	 * Check that a compile-time predicate holds for an arbitrary list of types.
+	 *
+	 * \tparam Pred must contain a static, compile time member named `value`, of
+	 *              type `bool` or one that is convertible to it.
+	 *
+	 * \par Examples
+	 *
+	 * Statically enforce Eq on a variadic type list:
+	 * \code
+	 *   template<typename...Ts>
+	 *   void example() {
+	 *       static_assert(All<Eq,Ts...>{}, "All types in Ts must satisfy Eq");
+	 *   }
+	 * \endcode
+	 *
+	 * \ingroup concepts_basic
+	 */
+	template<template<typename> class Pred, typename...Ts>
+	struct All;
+
+	template<template<typename> class Pred>
+	struct All<Pred> {
+		static constexpr bool value = true;
+
+		constexpr operator bool() const noexcept {
+			return true;
+		}
+	};
+
+	template<template<typename> class Pred, typename T, typename...Ts>
+	struct All<Pred, T, Ts...> {
+		static constexpr bool value = Pred<T>::value && All<Pred,Ts...>::value;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 }
 
 #endif
