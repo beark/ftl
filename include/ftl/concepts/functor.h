@@ -138,7 +138,7 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *       typename F,
-	 *       typename = Requires<Functor<F>()>
+	 *       typename = Requires<Functor<F>{}>
 	 *   >
 	 *   void myFunc(const F& f);
 	 * \endcode
@@ -146,9 +146,13 @@ namespace ftl {
 	 * \ingroup functor
 	 */
 	template<typename F>
-	constexpr bool Functor() noexcept {
-		return functor<F>::instance;
-	}
+	struct Functor {
+		static constexpr bool value = functor<F>::instance;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	template<typename F>
 	struct deriving_map;

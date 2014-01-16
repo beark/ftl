@@ -177,11 +177,13 @@ namespace ftl {
 	 *
 	 * Can of course be used for similar purposes by way of SFINAE already.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
+	 * Using implicit bool conversion:
 	 * \code
 	 *   template<
 	 *       typename F,
-	 *       typename = Requires<Applicative<F>()>
+	 *       typename = Requires<Applicative<F>{}>
 	 *   >
 	 *   myFunction(const F& f);
 	 * \endcode
@@ -189,9 +191,13 @@ namespace ftl {
 	 * \ingroup applicative
 	 */
 	template<typename F>
-	constexpr bool Applicative() noexcept {
-		return applicative<F>::instance;
-	}
+	struct Applicative {
+		static constexpr bool value = applicative<F>::instance;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * Inheritable default implementation of `applicative::pure`.
@@ -246,7 +252,7 @@ namespace ftl {
 			typename F,
 			typename Fn,
 			typename F_ = plain_type<F>,
-			typename = Requires<Applicative<F_>()>,
+			typename = Requires<Applicative<F_>{}>,
 			typename = Requires<
 				is_same_template<plain_type<Fn>,F_>::value
 			>
@@ -395,14 +401,18 @@ namespace ftl {
 	};
 
 	/**
-	 * Concepts lite-compatible check for monoidA instances.
+	 * Compile time check for `monoidA` instances.
 	 *
 	 * \ingroup applicative
 	 */
 	template<typename Alt>
-	constexpr bool MonoidAlt() {
-		return monoidA<Alt>::instance;
-	}
+	struct MonoidAlt {
+		static constexpr bool value = monoidA<Alt>::instance;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * Convenience operator for monoidA::orDo
@@ -442,7 +452,7 @@ namespace ftl {
 	template<
 			typename F,
 			typename A = Value_type<F>,
-			typename = Requires<MonoidAlt<F>()>
+			typename = Requires<MonoidAlt<F>{}>
 	>
 	Rebind<F,maybe<A>> optional(const F& f) {
 		using Fm = Rebind<F,maybe<A>>;

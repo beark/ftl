@@ -156,7 +156,7 @@ namespace ftl {
 	 */
 	template<
 			typename Ord,
-			typename = Requires<Orderable<Ord>()>
+			typename = Requires<Orderable<Ord>{}>
 	>
 	ord compare(const Ord& lhs, const Ord& rhs) {
 		return lhs < rhs ? ord::Lt : (lhs == rhs ? ord::Eq : ord::Gt);
@@ -237,7 +237,7 @@ namespace ftl {
 	template<
 			typename A,
 			typename R,
-			typename = Requires<Orderable<R>()>
+			typename = Requires<Orderable<R>{}>
 	>
 	function<ord(const A&,const A&)> comparing(R (A::*method)() const) {
 		return [=] (const A& a, const A& b) {
@@ -271,7 +271,7 @@ namespace ftl {
 	template<
 			typename A,
 			typename B,
-			typename = Requires<Orderable<B>()>
+			typename = Requires<Orderable<B>{}>
 	>
 	function<ord(A,A)> comparing(function<B(A)> f) {
 		return [=] (A a, A b) {

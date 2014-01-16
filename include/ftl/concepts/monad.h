@@ -221,7 +221,7 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *       typename M,
-	 *       typename = Requires<Monad<M>()>
+	 *       typename = Requires<Monad<M>{}>
 	 *   >
 	 *   void myFunc(const M& m) {
 	 *       // Use bind, join, apply, etc on m
@@ -231,9 +231,13 @@ namespace ftl {
 	 * \ingroup monad
 	 */
 	template<typename M>
-	constexpr bool Monad() noexcept {
-		return monad<M>::instance;
-	}
+	struct Monad {
+		static constexpr bool value = monad<M>::instance;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * Tag that can be used to specify which concept implementation to derive.
@@ -655,7 +659,7 @@ namespace ftl {
 			typename F,
 			typename M_ = plain_type<M>,
 			typename = Requires<
-				Monad<M_>()
+				Monad<M_>{}
 #ifndef DOCUMENTATION_GENERATOR
 				&& !std::is_member_function_pointer<F>::value
 #endif
@@ -673,7 +677,7 @@ namespace ftl {
 			typename = Requires<
 				std::is_same<Rebind<Mu,Value_type<M_>>,M_>::value
 			>,
-			typename = Requires<Monad<M_>()>
+			typename = Requires<Monad<M_>{}>
 	>
 	auto operator>>= (M&& m, Mu (M::*memfn)())
 	-> decltype(std::forward<M>(m) >>= std::mem_fn(memfn)) {
@@ -688,7 +692,7 @@ namespace ftl {
 			typename = Requires<
 				std::is_same<Rebind<Mu,Value_type<M_>>,M_>::value
 			>,
-			typename = Requires<Monad<M_>()>
+			typename = Requires<Monad<M_>{}>
 	>
 	auto operator>>= (M&& m, Mu (F::*memfn)() const)
 	-> decltype(std::forward<M>(m) >>= std::mem_fn(memfn)) {
@@ -721,7 +725,7 @@ namespace ftl {
 			typename M,
 			typename F,
 			typename M_ = plain_type<M>,
-			typename = Requires<Monad<M_>()>
+			typename = Requires<Monad<M_>{}>
 	>
 	auto operator<<= (F&& f, M&& m)
 	-> decltype(std::forward<M>(m) >>= std::forward<F>(f)) {
@@ -772,7 +776,7 @@ namespace ftl {
 			typename Mt_ = plain_type<Mt>,
 			typename Mu_ = plain_type<Mu>,
 			typename T = Value_type<Mt_>,
-			typename = Requires<Monad<Mt_>()>,
+			typename = Requires<Monad<Mt_>{}>,
 			typename = Requires<
 				std::is_same<Rebind<Mu_,T>, Mt_>::value
 			>
@@ -809,7 +813,7 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mu,
-			typename = Requires<Monad<Mt>()>,
+			typename = Requires<Monad<Mt>{}>,
 			typename T = Value_type<Mt>,
 			typename U = Value_type<Mu>,
 			typename = Requires<
@@ -827,7 +831,7 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mu,
-			typename = Requires<Monad<Mt>()>,
+			typename = Requires<Monad<Mt>{}>,
 			typename T = Value_type<Mt>,
 			typename U = Value_type<Mu>,
 			typename = Requires<
@@ -890,7 +894,7 @@ namespace ftl {
 	constexpr struct _mjoin {
 		template<
 				typename M,
-				typename = Requires<Monad<plain_type<M>>()>
+				typename = Requires<Monad<plain_type<M>>{}>
 		>
 		auto operator() (M&& m) const
 		-> decltype(

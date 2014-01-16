@@ -75,11 +75,11 @@ namespace ftl {
 	 * Examining a couple of types:
 	 * \code
 	 *   std::cout << std::boolalpha
-	 *       << ftl::Iterator<std::vector<int>::iterator>()
+	 *       << ftl::Iterator<std::vector<int>::iterator>{}
 	 *       << ", "
-	 *       << ftl::Iterator<int>()
+	 *       << ftl::Iterator<int>{}
 	 *       << ", "
-	 *       << ftl::Iterator<int*>()
+	 *       << ftl::Iterator<int*>{}
 	 *       << std::endl;
 	 * \endcode
 	 * Output:
@@ -90,13 +90,13 @@ namespace ftl {
 	 * \ingroup concepts_iterator
 	 */
 	template<typename It>
-	constexpr bool Iterator() {
-
+	struct Iterator {
 		using reference_type = decltype(
 			_dtl::test_typemem_reference<std::iterator_traits<It>>(nullptr)
 		);
 
-		return CopyConstructible<It>()
+		static constexpr bool value =
+			CopyConstructible<It>()
 			&& CopyAssignable<It>()
 			&& Destructible<It>()
 			&& !std::is_same<reference_type, _dtl::no>::value
@@ -108,7 +108,11 @@ namespace ftl {
 				decltype(_dtl::test_pre_inc<It>(nullptr)),
 				It&
 			>::value;
-	}
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * Compile time check if a type imlements the InputIterator concept.
@@ -122,11 +126,11 @@ namespace ftl {
 	 * Examining a couple of types:
 	 * \code
 	 *   std::cout << std::boolalpha
-	 *       << ftl::InputIterator<std::vector<int>::iterator>()
+	 *       << ftl::InputIterator<std::vector<int>::iterator>{}
 	 *       << ", "
-	 *       << ftl::InputIterator<int>()
+	 *       << ftl::InputIterator<int>{}
 	 *       << ", "
-	 *       << ftl::InputIterator<int*>()
+	 *       << ftl::InputIterator<int*>{}
 	 *       << std::endl;
 	 * \endcode
 	 * Output:
@@ -137,7 +141,7 @@ namespace ftl {
 	 * \ingroup concepts_iterator
 	 */
 	template<typename It>
-	constexpr bool InputIterator() {
+	struct InputIterator {
 		using value_type = decltype(
 			_dtl::test_typemem_value_type<std::iterator_traits<It>>(nullptr)
 		);
@@ -151,7 +155,8 @@ namespace ftl {
 			  decltype(_dtl::test_pointer<It>(nullptr))
 		>;
 
-		return Iterator<It>()
+		static constexpr bool value =
+			Iterator<It>()
 			&& Eq<It>()
 			&& !std::is_same<value_type, _dtl::no>::value
 			&& std::is_convertible<
@@ -160,7 +165,11 @@ namespace ftl {
 			>::value
 			&& !std::is_same<pointer, _dtl::no>::value
 			&& std::is_convertible<test_ptr,pointer>::value;
-	}
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * Compile time check if a type imlements the ForwardIterator concept.
@@ -174,13 +183,13 @@ namespace ftl {
 	 * Examining a couple of types:
 	 * \code
 	 *   std::cout << std::boolalpha
-	 *       << ftl::ForwardIterator<int>()
+	 *       << ftl::ForwardIterator<int>{}
 	 *       << ", "
-	 *       << ftl::ForwardIterator<std::vector<int>::iterator>()
+	 *       << ftl::ForwardIterator<std::vector<int>::iterator>{}
 	 *       << ", "
-	 *       << ftl::ForwardIterator<int*>()
+	 *       << ftl::ForwardIterator<int*>{}
 	 *       << ", "
-	 *       << ftl::ForwardIterator<ftl::maybe<int>::iterator>()
+	 *       << ftl::ForwardIterator<ftl::maybe<int>::iterator>{}
 	 *       << std::endl;
 	 * \endcode
 	 * Output:
@@ -191,14 +200,19 @@ namespace ftl {
 	 * \ingroup concepts_iterator
 	 */
 	template<typename It>
-	constexpr bool ForwardIterator() {
-		return InputIterator<It>()
+	struct ForwardIterator {
+		static constexpr bool value =
+			InputIterator<It>()
 			&& DefaultConstructible<It>()
 			&& std::is_same<
 				decltype(_dtl::test_post_inc<It>(nullptr)),
 				It
 			>::value;
-	}
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * Compile time check if a type imlements the BidirectionalIterator concept.
@@ -212,13 +226,13 @@ namespace ftl {
 	 * Examining a couple of types:
 	 * \code
 	 *   std::cout << std::boolalpha
-	 *       << ftl::BidirectionalIterator<int>()
+	 *       << ftl::BidirectionalIterator<int>{}
 	 *       << ", "
-	 *       << ftl::BidirectionalIterator<std::vector<int>::iterator>()
+	 *       << ftl::BidirectionalIterator<std::vector<int>::iterator>{}
 	 *       << ", "
-	 *       << ftl::BidirectionalIterator<int*>()
+	 *       << ftl::BidirectionalIterator<int*>{}
 	 *       << ", "
-	 *       << ftl::BidirectionalIterator<ftl::maybe<int>::iterator>()
+	 *       << ftl::BidirectionalIterator<ftl::maybe<int>::iterator>{}
 	 *       << std::endl;
 	 * \endcode
 	 * Output:
@@ -229,8 +243,9 @@ namespace ftl {
 	 * \ingroup concepts_iterator
 	 */
 	template<typename It>
-	constexpr bool BidirectionalIterator() {
-		return ForwardIterator<It>()
+	struct BidirectionalIterator {
+		static constexpr bool value =
+			ForwardIterator<It>()
 			&& std::is_same<
 				decltype(_dtl::test_pre_dec<It>(nullptr)),
 				It&
@@ -239,7 +254,11 @@ namespace ftl {
 				decltype(_dtl::test_post_dec<It>(nullptr)),
 				It
 			>::value;
-	}
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 }
 
 #endif

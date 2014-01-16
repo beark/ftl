@@ -76,11 +76,13 @@ namespace ftl {
 	/**
 	 * Predicate to check for \ref eq instances.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
+	 * Using implicit bool conversion:
 	 * \code
 	 *   template<typename T>
 	 *   void foo() {
-	 *       static_assert(Eq<T>(), "foo: T is not an instance of Eq");
+	 *       static_assert(Eq<T>{}, "foo: T is not an instance of Eq");
 	 *
 	 *       // Do interesting comparisons with Ts
 	 *   }
@@ -89,18 +91,24 @@ namespace ftl {
 	 * \ingroup orderable
 	 */
 	template<typename E>
-	constexpr bool Eq() noexcept {
-		return has_eq<E>::value && has_neq<E>::value;
-	}
+	struct Eq {
+		static constexpr bool value = has_eq<E>::value && has_neq<E>::value;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * Predicate to check for \ref orderablepg instances.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
+	 * Using implicit bool conversion:
 	 * \code
 	 *   template<typename T>
 	 *   void foo() {
-	 *       static_assert(Ord<T>(), "foo: T is not an instance of Ord");
+	 *       static_assert(Ord<T>{}, "foo: T is not an instance of Ord");
 	 *
 	 *       // Order various Ts
 	 *   }
@@ -109,9 +117,14 @@ namespace ftl {
 	 * \ingroup orderable
 	 */
 	template<typename Ord>
-	constexpr bool Orderable() noexcept {
-		return Eq<Ord>() && has_lt<Ord>::value && has_gt<Ord>::value;
-	}
+	struct Orderable {
+		static constexpr bool value =
+			Eq<Ord>() && has_lt<Ord>::value && has_gt<Ord>::value;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 }
 

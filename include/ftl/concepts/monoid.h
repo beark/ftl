@@ -131,7 +131,7 @@ namespace ftl {
 	 *   // non-monoids.
 	 *   template<
 	 *       typename M,
-	 *       typename = Requires<Monoid<M>()>
+	 *       typename = Requires<Monoid<M>{}>
 	 *   >
 	 *   void myFunc(M m1, M m2);
 	 * \endcode
@@ -139,9 +139,13 @@ namespace ftl {
 	 * \ingroup monoid
 	 */
 	template<typename M>
-	constexpr bool Monoid() noexcept {
-		return monoid<M>::instance;
-	}
+	struct Monoid {
+		static constexpr bool value = monoid<M>::instance;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * Convenience operator to ease use of append.
@@ -175,7 +179,7 @@ namespace ftl {
 			typename M2,
 			typename M = plain_type<M1>,
 			typename = Requires<
-				Monoid<M>()
+				Monoid<M>{}
 				&& std::is_same<M,plain_type<M2>>::value
 			>
 	>
@@ -191,7 +195,7 @@ namespace ftl {
 				typename M2,
 				typename M = plain_type<M1>,
 				typename = Requires<
-					Monoid<M>()
+					Monoid<M>{}
 					&& std::is_same<M,plain_type<M2>>::value
 				>
 		>

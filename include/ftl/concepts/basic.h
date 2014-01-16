@@ -62,12 +62,27 @@ namespace ftl {
 	/**
 	 * Predicate to check if a type is \ref defcons.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
+	 * Using explicit `value` check:
 	 * \code
 	 *   template<typename T>
 	 *   void foo() {
 	 *       static_assert(
-	 *           DefaultConstructible<T>(),
+	 *           DefaultConstructible<T>::value,
+	 *           "foo: T is not an instance of DefaultConstructible"
+	 *       );
+	 *
+	 *       // Construct Ts using its default c-tor
+	 *   }
+	 * \endcode
+	 *
+	 * Using implicit bool conversion:
+	 * \code
+	 *   template<typename T>
+	 *   void foo() {
+	 *       static_assert(
+	 *           DefaultConstructible<T>{},
 	 *           "foo: T is not an instance of DefaultConstructible"
 	 *       );
 	 *
@@ -78,9 +93,13 @@ namespace ftl {
 	 * \ingroup concepts_basic
 	 */
 	template<typename T>
-	constexpr bool DefaultConstructible() {
-		return std::is_default_constructible<T>::value;
-	}
+	struct DefaultConstructible {
+		static constexpr bool value = std::is_default_constructible<T>::value;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * \page movecons MoveConstructible
@@ -102,12 +121,22 @@ namespace ftl {
 	/**
 	 * Predicate to check if a type is \ref movecons.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
+	 * Using explicit `value` member and SFINAE:
+	 * \code
+	 *   template<typename T, typename = Requires<MoveConstructible<T>::value>>
+	 *   void foo() {
+	 *       // Consturct Ts using the move c-tor
+	 *   }
+	 * \endcode
+	 *
+	 * Using implicit bool conversion:
 	 * \code
 	 *   template<typename T>
 	 *   void foo() {
 	 *       static_assert(
-	 *           MoveConstructible<T>(),
+	 *           MoveConstructible<T>{},
 	 *           "foo: T is not an instance of MoveConstructible"
 	 *       );
 	 *
@@ -118,9 +147,13 @@ namespace ftl {
 	 * \ingroup concepts_basic
 	 */
 	template<typename T>
-	constexpr bool MoveConstructible() {
-		return std::is_move_constructible<T>::value;
-	}
+	struct MoveConstructible {
+		static constexpr bool value = std::is_move_constructible<T>::value;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * \page copycons CopyConstructible
@@ -142,12 +175,22 @@ namespace ftl {
 	/**
 	 * Predicate to check if a type is \ref copycons.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
+	 * Using explicit `value` member and SFINAE:
+	 * \code
+	 *   template<typename T, typename = Requires<CopyConstructible<T>::value>>
+	 *   void foo() {
+	 *       // Consturct Ts using the copy c-tor
+	 *   }
+	 * \endcode
+	 *
+	 * Using implicit bool conversion:
 	 * \code
 	 *   template<typename T>
 	 *   void foo() {
 	 *       static_assert(
-	 *           CopyConstructible<T>(),
+	 *           CopyConstructible<T>{},
 	 *           "foo: T is not an instance of CopyConstructible"
 	 *       );
 	 *
@@ -155,12 +198,17 @@ namespace ftl {
 	 *   }
 	 * \endcode
 	 *
+	 *
 	 * \ingroup concepts_basic
 	 */
 	template<typename T>
-	constexpr bool CopyConstructible() {
-		return std::is_copy_constructible<T>::value;
-	}
+	struct CopyConstructible {
+		static constexpr bool value = std::is_copy_constructible<T>::value;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * \page moveassignable MoveAssignable
@@ -178,12 +226,27 @@ namespace ftl {
 	/**
 	 * Predicate to check if a type is \ref moveassignable.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
+	 * Using implicit bool conversion:
 	 * \code
 	 *   template<typename T>
 	 *   void foo() {
 	 *       static_assert(
-	 *           MoveAssignable<T>(),
+	 *           MoveAssignable<T>{},
+	 *           "foo: T is not an instance of MoveAssignable"
+	 *       );
+	 *
+	 *       // Assign rvalues to Ts
+	 *   }
+	 * \endcode
+	 *
+	 * Using explicit `value`:
+	 * \code
+	 *   template<typename T>
+	 *   void foo() {
+	 *       static_assert(
+	 *           MoveAssignable<T>::value,
 	 *           "foo: T is not an instance of MoveAssignable"
 	 *       );
 	 *
@@ -194,9 +257,13 @@ namespace ftl {
 	 * \ingroup concepts_basic
 	 */
 	template<typename T>
-	constexpr bool MoveAssignable() {
-		return std::is_move_assignable<T>::value;
-	}
+	struct MoveAssignable {
+		static constexpr bool value = std::is_move_assignable<T>::value;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * \page copyassignable CopyAssignable
@@ -214,12 +281,22 @@ namespace ftl {
 	/**
 	 * Predicate to check if a type is \ref copyassignable.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
+	 * Using explicit `value` and SFINAE
+	 * \code
+	 *   template<typename T, Requires<CopyAssignable<T>::value>
+	 *   void foo() {
+	 *       // Assign lvalues to Ts
+	 *   }
+	 * \endcode
+	 *
+	 * Using implicit bool conversion:
 	 * \code
 	 *   template<typename T>
 	 *   void foo() {
 	 *       static_assert(
-	 *           CopyAssignable<T>(),
+	 *           CopyAssignable<T>{},
 	 *           "foo: T is not an instance of CopyAssignable"
 	 *       );
 	 *
@@ -230,9 +307,13 @@ namespace ftl {
 	 * \ingroup concepts_basic
 	 */
 	template<typename T>
-	constexpr bool CopyAssignable() {
-		return std::is_copy_assignable<T>::value;
-	}
+	struct CopyAssignable {
+		static constexpr bool value = std::is_copy_assignable<T>::value;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	/**
 	 * \page destructible Destructible
@@ -254,9 +335,13 @@ namespace ftl {
 	 * \ingroup concepts_basic
 	 */
 	template<typename T>
-	constexpr bool Destructible() {
-		return std::is_destructible<T>::value;
-	}
+	struct Destructible {
+		static constexpr bool value = std::is_destructible<T>::value;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 }
 
 #endif

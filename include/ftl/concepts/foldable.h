@@ -176,11 +176,13 @@ namespace ftl {
 	 *
 	 * Can also be used with SFINAE, for much the same purposes.
 	 *
-	 * Example:
+	 * \par Examples
+	 *
+	 * Using implicit bool conversion:
 	 * \code
 	 *   template<
 	 *       typename F,
-	 *       typename = Requires<Foldable<F>()>
+	 *       typename = Requires<Foldable<F>{}>
 	 *   >
 	 *   void foo(const F& f) {
 	 *       // Perform folds on f
@@ -190,9 +192,13 @@ namespace ftl {
 	 * \ingroup foldable
 	 */
 	template<typename F>
-	constexpr bool Foldable() noexcept {
-		return foldable<F>::instance;
-	}
+	struct Foldable {
+		static constexpr bool value = foldable<F>::instance;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	template<typename>
 	struct deriving_foldable {};
@@ -453,7 +459,7 @@ namespace ftl {
 				typename F,
 				typename T = Value_type<F>,
 				typename Fn,
-				typename = Requires<Foldable<F>()>
+				typename = Requires<Foldable<F>{}>
 		>
 		auto operator() (Fn&& fn, const F& f) const
 		-> decltype(foldable<F>::foldMap(std::forward<Fn>(fn), f)) {
@@ -497,7 +503,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename T = Value_type<F>,
-				typename = Requires<Foldable<F>()>,
+				typename = Requires<Foldable<F>{}>,
 				typename = Requires<
 					std::is_same<plain_type<U>, result_of<Fn(T,U)>>::value
 				>
@@ -549,7 +555,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename T = Value_type<F>,
-				typename = Requires<Foldable<F>()>,
+				typename = Requires<Foldable<F>{}>,
 				typename = Requires<
 					std::is_same<plain_type<U>, result_of<Fn(U,T)>>::value
 				>

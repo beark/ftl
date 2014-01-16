@@ -118,7 +118,7 @@ namespace ftl {
 	 * \code
 	 *   template<
 	 *       typename Z,
-	 *       typename = Requires<Zippable<Z>()>
+	 *       typename = Requires<Zippable<Z>{}>
 	 *   >
 	 *   void foo(const Z& z) {
 	 *       // Perform zips on z
@@ -128,9 +128,13 @@ namespace ftl {
 	 * \ingroup zippable
 	 */
 	template<typename Z>
-	constexpr bool Zippable() noexcept {
-		return zippable<Z>::instance;
-	}
+	struct Zippable {
+		static constexpr bool value = zippable<Z>::instance;
+
+		constexpr operator bool() const noexcept {
+			return value;
+		}
+	};
 
 	template<typename>
 	struct deriving_zippable {};
@@ -200,7 +204,7 @@ namespace ftl {
 	{
 		template<
 				typename F, typename Z, typename I,
-				typename = Requires<Zippable<Z>()>
+				typename = Requires<Zippable<Z>{}>
 		>
 		auto operator() (F&& f, const Z& z, const I& i) const
 		-> decltype(zippable<Z>::zipWith(std::forward<F>(f), z, i)) {
@@ -258,7 +262,7 @@ namespace ftl {
 	public:
 		template<
 				typename Z, typename I,
-				typename = Requires<Zippable<Z>()>
+				typename = Requires<Zippable<Z>{}>
 		>
 		auto operator() (const Z& z, const I& i) const
 		-> decltype(zippable<Z>::zipWith(mktup<Value_type<Z>,Value_type<I>>{}, z, i)) {
