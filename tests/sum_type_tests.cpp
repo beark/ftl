@@ -96,6 +96,19 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("Eq"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,char> w{constructor<int>(), 12};
+				sum_type<int,char> x{constructor<int>(), 10};
+				sum_type<int,char> y{constructor<char>(), 'b'};
+				sum_type<int,char> z{constructor<int>(), 10};
+
+				return w != x && x != y && x == z && w != y;
+			})
+		),
+		std::make_tuple(
 			std::string("Copy assign"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;

@@ -27,7 +27,8 @@
 #include <memory>
 #include <string>
 #include "type_functions.h"
-#include "type_traits.h"
+#include "concepts/basic.h"
+#include "concepts/orderable.h"
 
 namespace ftl {
 
@@ -45,7 +46,8 @@ namespace ftl {
 	 * - `<memory>`
 	 * - `<string>`
 	 * - \ref typelevel
-	 * - \ref typetraits
+	 * - \ref concepts_basic
+	 * - \ref orderablepg
 	 */
 
 	/**
@@ -333,6 +335,9 @@ namespace ftl {
 			void copy(size_t, const recursive_union&) noexcept {}
 			void move(size_t, recursive_union&&) noexcept {}
 			void destruct(size_t) noexcept {}
+
+			constexpr bool compare( size_t,const recursive_union&) const noexcept
+			{ return false; }
 		};
 
 		template<typename T, typename...Ts>
@@ -422,6 +427,11 @@ namespace ftl {
 				}
 			}
 
+			constexpr bool compare(size_t i, const recursive_union& rhs) const
+			noexcept {
+				return i == 0 ? v == rhs.v : r.compare(i-1, rhs.r);
+			}
+
 			union {
 				T v;
 				recursive_union<Ts...> r;
@@ -430,6 +440,8 @@ namespace ftl {
 
 		template<size_t I, typename...Ts>
 		class get_sum_type_element;
+
+		class sum_type_accessor;
 	}
 
 	/**
@@ -462,6 +474,8 @@ namespace ftl {
 
 		template<size_t I, typename...Us>
 		friend class ::ftl::_dtl::get_sum_type_element;
+
+		friend class ::ftl::_dtl::sum_type_accessor;
 
 	public:
 		sum_type() = delete;
@@ -611,6 +625,23 @@ namespace ftl {
 	};
 
 	namespace _dtl {
+		class sum_type_accessor {
+		public:
+			template<typename...Ts>
+			static constexpr size_t activeIndex(const sum_type<Ts...>& u)
+			noexcept {
+				return u.cons;
+			}
+
+			template<typename...Ts>
+			static constexpr bool compareAt(size_t i,
+					const sum_type<Ts...>& a, const sum_type<Ts...>& b
+			) noexcept
+			{
+				return a.data.compare(i, b.data);
+			}
+		};
+
 		template<size_t I, typename...Ts>
 		class get_sum_type_element {
 		public:
@@ -665,13 +696,13 @@ namespace ftl {
 	 * \ingroup sum_type
 	 */
 	template<size_t I, typename...Ts>
-	type_at<I,Ts...>& get(sum_type<Ts...>& x) {
+	constexpr type_at<I,Ts...>& get(sum_type<Ts...>& x) {
 		return ::ftl::_dtl::get_sum_type_element<I,Ts...>::get(x);
 	}
 
 	/// \overload
 	template<size_t I, typename...Ts>
-	const type_at<I,Ts...>& get(const sum_type<Ts...>& x) {
+	constexpr const type_at<I,Ts...>& get(const sum_type<Ts...>& x) {
 		return ::ftl::_dtl::get_sum_type_element<I,Ts...>::get(x);
 	}
 
@@ -696,14 +727,30 @@ namespace ftl {
 	 * \ingroup sum_type
 	 */
 	template<typename T, typename...Ts>
-	T& get(sum_type<Ts...>& x) {
+	constexpr T& get(sum_type<Ts...>& x) {
 		return get<index_of<T,Ts...>::value>(x);
 	}
 
 	/// \overload
 	template<typename T, typename...Ts>
-	const T& get(const sum_type<Ts...>& x) {
+	constexpr const T& get(const sum_type<Ts...>& x) {
 		return get<index_of<T,Ts...>::value>(x);
+	}
+
+	template<
+			typename...Ts,
+			typename = typename std::enable_if<All<Eq,Ts...>{}>::type
+	>
+	bool operator== (const sum_type<Ts...>& a, const sum_type<Ts...>& b) {
+		size_t i1 = ::ftl::_dtl::sum_type_accessor::activeIndex(a);
+		size_t i2 = ::ftl::_dtl::sum_type_accessor::activeIndex(b);
+
+		return i1 == i2 && ::ftl::_dtl::sum_type_accessor::compareAt(i1, a, b);
+	}
+
+	template<typename...Ts>
+	bool operator!= (const sum_type<Ts...>& a, const sum_type<Ts...>& b) {
+		return !(a == b);
 	}
 }
 
