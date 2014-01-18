@@ -72,6 +72,11 @@ bool run_test_set(test_set& ts, std::ostream& os) {
 	return nfail == 0;
 }
 
+bool fequal(float x, float y) {
+	constexpr float PRECISION = 10000000000;
+	return int(x*PRECISION) == int(y*PRECISION);
+}
+
 int main(int, char**) {
 
 	bool flawless = true;
