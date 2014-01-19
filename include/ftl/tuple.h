@@ -114,10 +114,7 @@ namespace ftl {
 		std::tuple<B,Ts...> applicative_implementation(
 				const std::tuple<F,Ts...>& t1,
 				const std::tuple<A,Ts...>& t2) {
-			return apply_on_first(
-					t1,
-					t2,
-					typename gen_seq<1,sizeof...(Ts)>::type());
+			return apply_on_first(t1, t2, gen_seq<1,sizeof...(Ts)>{});
 		}
 
 		template<typename...>

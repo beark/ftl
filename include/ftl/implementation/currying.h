@@ -302,7 +302,7 @@ namespace ftl {
 			>
 			auto operator() (Args2&&...args2) const
 			-> typename std::result_of<F(Args1...,Args2...)>::type {
-				return tuple_apply(
+				return tup_apply(
 					f,
 					std::tuple_cat(
 						args1,

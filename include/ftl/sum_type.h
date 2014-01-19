@@ -610,7 +610,7 @@ namespace ftl {
 				"Match statements must be exhaustive"
 			);
 
-			using indices = typename gen_seq<0,sizeof...(Ts)-1>::type;
+			using indices = gen_seq<0,sizeof...(Ts)-1>;
 			using return_type = typename _dtl::common_return_type<
 				type_seq<Ts...>,type_seq<Fs...>
 			>::type;

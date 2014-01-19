@@ -44,13 +44,13 @@ namespace ftl {
 		template<typename F, typename Tuple>
 		constexpr auto tup_apply(F&& f, Tuple&& tuple)
 		-> decltype(
-				tup_apply(
+				tup_apply_helper(
 					gen_seq<0,std::tuple_size<plain_type<Tuple>>::value-1>{},
 					std::forward<F>(f),
 					std::forward<Tuple>(tuple)
 				)
 		) {
-			return tup_apply(
+			return tup_apply_helper(
 				gen_seq<0,std::tuple_size<plain_type<Tuple>>::value-1>{},
 				std::forward<F>(f),
 				std::forward<Tuple>(tuple)
