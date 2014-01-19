@@ -107,6 +107,72 @@ namespace ftl {
 #endif
 
 	/**
+	 * Identity type transformer.
+	 *
+	 * Just as the identity function can be useful with higher-order functions,
+	 * the identity type transformer can come in handy with parametric type
+	 * aliases and transformers.
+	 *
+	 * \par Concepts
+	 *
+	 * - \ref defaultcons, if `T` is.
+	 * - \ref copycons, if `T` is.
+	 * - \ref movecons, if `T` is.
+	 * - \ref deref to `T`
+	 * - \ref eq, if `T` is
+	 *
+	 * \ingroup prelude
+	 */
+	template<typename T>
+	struct Identity {
+		using value_type = T;
+
+		explicit constexpr Identity(const T& t)
+		noexcept(std::is_nothrow_copy_constructible<T>::value)
+		: val(t) {}
+
+		explicit constexpr Identity(T&& t)
+		noexcept(std::is_nothrow_move_constructible<T>::value)
+		: val(std::move(t)) {}
+
+		constexpr operator T() const noexcept {
+			return val;
+		}
+
+		T& operator*() noexcept {
+			return val;
+		}
+
+		constexpr const T& operator*() const noexcept {
+			return val;
+		}
+
+		T* operator->() noexcept {
+			return std::addressof(val);
+		}
+
+		constexpr const T* operator->() const noexcept {
+			return std::addressof(val);
+		}
+
+		T val;
+	};
+
+	// ## Operators for Identity type transformer
+
+	template<typename T, typename = Requires<Eq<T>{}>>
+	constexpr bool operator== (const Identity<T>& a, const Identity<T>& b)
+	noexcept {
+		return a.val == b.val;
+	}
+
+	template<typename T, typename = Requires<Eq<T>{}>>
+	constexpr bool operator!= (const Identity<T>& a, const Identity<T>& b)
+	noexcept {
+		return !(a == b);
+	}
+
+	/**
 	 * Used to distinguish in-place constructors from others.
 	 *
 	 * Used by e.g. `ftl::maybe` and `ftl::either` to make perfect forwarding
