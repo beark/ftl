@@ -97,7 +97,7 @@ test_set map_tests{
 				auto f = [](float x, float y){ return x/y; };
 
 
-				return foldr(f, 16.f, s) == .15625f;
+				return fequal(foldr(f, 16.f, s), .15625f);
 			})
 		),
 		std::make_tuple(

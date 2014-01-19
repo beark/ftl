@@ -54,9 +54,9 @@ test_set functional_tests{
 
 				auto f = [](int x){ return float(x)/3.f; };
 
-				return (f % unary)(2) == 4.f/3.f
-					&& (f % binary)(2,2) == 4.f/3.f
-					&& (unary % binary)(2,2) == 8;
+				return fequal((f % unary)(2), 4.f/3.f)
+					&& fequal((f % binary)(2,2), 4.f/3.f)
+					&& fequal((unary % binary)(2,2), 8);
 				;
 			})
 		),
@@ -125,8 +125,8 @@ test_set functional_tests{
 
 				auto f = [](int x){ return float(x)/3.f; };
 
-				return (f % unary)(2) == 4.f/3.f
-					&& (f % binary)(2,2) == 4.f/3.f;
+				return fequal((f % unary)(2), 4.f/3.f)
+					&& fequal((f % binary)(2,2), 4.f/3.f);
 				;
 			})
 		),
