@@ -472,6 +472,16 @@ namespace ftl {
 	 */
 	template<size_t...> struct seq {};
 
+	namespace _dtl {
+		template<size_t Z, size_t N, size_t...S>
+		struct gen_seq_impl : gen_seq_impl<Z,N-1,N,S...> {};
+
+		template<size_t Z, size_t...S>
+		struct gen_seq_impl<Z,Z,S...> {
+			using type = seq<Z,S...>;
+		};
+	}
+
 	/**
 	 * Generate a sequence of numbers.
 	 *
@@ -481,16 +491,13 @@ namespace ftl {
 	 * Example:
 	 * \code
 	 *   // S is of type seq<0,1,2,3,4,5>
-	 *   typename gen_seq<0,5>::type S;
+	 *   gen_seq<0,5> S{};
 	 * \endcode
 	 *
 	 * \ingroup typelevel
 	 */
-	template<size_t Z, size_t N, size_t...S> struct gen_seq : gen_seq<Z,N-1,N,S...> {};
-
-	template<size_t Z, size_t...S> struct gen_seq<Z,Z,S...> {
-		using type = seq<Z,S...>;
-	};
+	template<size_t Z, size_t N>
+	using gen_seq = typename ::ftl::_dtl::gen_seq_impl<Z,N>::type;
 
 	/**
 	 * Find the first contained type of some parametrised type.
