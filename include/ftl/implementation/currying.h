@@ -361,8 +361,8 @@ namespace ftl {
 					>::type
 			>
 			auto operator() (Args&&...args) const
-			-> curried_fn<F,Args...> {
-				return curried_fn<F,Args...>(
+			-> curried_fn<F,plain_type<Args>...> {
+				return curried_fn<F,plain_type<Args>...>(
 					f,
 					std::make_tuple(std::forward<Args>(args)...)
 				);
