@@ -517,8 +517,8 @@ namespace ftl {
 	 *
 	 * \ingroup typelevel
 	 */
-	template<typename>
-	struct inner_type {};
+	template<typename T>
+	struct inner_type { using type = T; };
 
 	template<template<typename> class Tt, typename T>
 	struct inner_type<Tt<T>> {
