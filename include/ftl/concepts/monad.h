@@ -300,11 +300,11 @@ namespace ftl {
 		template<typename U>
 		using M_ = Rebind<M,U>;
 
-		static M_<T> join(const M_<M_<T>>& m) {
+		static constexpr M_<T> join(const M_<M_<T>>& m) {
 			return monad<M_<M_<T>>>::bind(m, id);
 		}
 
-		static M_<T> join(M_<M_<T>>&& m) {
+		static constexpr M_<T> join(M_<M_<T>>&& m) {
 			return monad<M_<M_<T>>>::bind(std::move(m), id);
 		}
 	};
