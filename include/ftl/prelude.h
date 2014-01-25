@@ -58,9 +58,9 @@ namespace ftl {
 	 * similar becomes readily available. As soon as that comes to pass, this
 	 * construct will be considered deprecated.
 	 *
-	 * Example:
+	 * \par Examples
 	 * \code
-	 *   template<typename M, typename = Requires<Monad<M>()>>
+	 *   template<typename M, typename = Requires<Monad<M>{}>>
 	 *   void foo(const M& m) {
 	 *       // Safely perform monadic operations on m
 	 *   }
@@ -113,13 +113,28 @@ namespace ftl {
 	 * the identity type transformer can come in handy with parametric type
 	 * aliases and transformers.
 	 *
+	 * In particular, the fact that `Identity` often implements many of the
+	 * concepts of FTL can be useful. For example, it is perhaps elegant
+	 * to define a particular monad in terms of its corresponding monad
+	 * transformer and `Identity`, as in:
+	 *
+	 * \code
+	 *   template<typename T>
+	 *   using some_monad = some_monadT<Identity<T>>;
+	 * \endcode
+	 *
+	 * Since `Identity` is a very thin wrapper, the operations of which are
+	 * usually one line constexpr functions, little if any performance should
+	 * be lost by doing it that way.
+	 *
 	 * \par Concepts
 	 *
-	 * - \ref defaultcons, if `T` is.
-	 * - \ref copycons, if `T` is.
-	 * - \ref movecons, if `T` is.
+	 * - \ref defaultcons, if `T` is
+	 * - \ref copycons, if `T` is
+	 * - \ref movecons, if `T` is
 	 * - \ref deref to `T`
 	 * - \ref eq, if `T` is
+	 * - \ref orderable, if `T` is
 	 *
 	 * \ingroup prelude
 	 */
@@ -161,15 +176,39 @@ namespace ftl {
 	// ## Operators for Identity type transformer
 
 	template<typename T, typename = Requires<Eq<T>{}>>
-	constexpr bool operator== (const Identity<T>& a, const Identity<T>& b)
-	noexcept {
+	constexpr auto operator== (const Identity<T>& a, const Identity<T>& b)
+	noexcept -> decltype(std::declval<T>() == std::declval<T>()) {
 		return a.val == b.val;
 	}
 
 	template<typename T, typename = Requires<Eq<T>{}>>
-	constexpr bool operator!= (const Identity<T>& a, const Identity<T>& b)
-	noexcept {
-		return !(a == b);
+	constexpr auto operator!= (const Identity<T>& a, const Identity<T>& b)
+	noexcept -> decltype(std::declval<T>() != std::declval<T>()) {
+		return a.val != b.val;
+	}
+
+	template<typename T, typename = Requires<Orderable<T>{}>>
+	constexpr auto operator< (const Identity<T>& a, const Identity<T>& b)
+	noexcept -> decltype(std::declval<T>() < std::declval<T>()) {
+		return a.val < b.val;
+	}
+
+	template<typename T, typename = Requires<Orderable<T>{}>>
+	constexpr auto operator<= (const Identity<T>& a, const Identity<T>& b)
+	noexcept -> decltype(std::declval<T>() <= std::declval<T>()) {
+		return a.val <= b.val;
+	}
+
+	template<typename T, typename = Requires<Orderable<T>{}>>
+	constexpr auto operator>= (const Identity<T>& a, const Identity<T>& b)
+	noexcept -> decltype(std::declval<T>() >= std::declval<T>()) {
+		return a.val >= b.val;
+	}
+
+	template<typename T, typename = Requires<Orderable<T>{}>>
+	constexpr auto operator> (const Identity<T>& a, const Identity<T>& b)
+	noexcept -> decltype(std::declval<T>() > std::declval<T>()) {
+		return a.val > b.val;
 	}
 
 	/**
