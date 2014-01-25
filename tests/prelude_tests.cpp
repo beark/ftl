@@ -63,6 +63,27 @@ test_set prelude_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("Eq<Identity>"),
+			std::function<bool()>([]() -> bool {
+
+				ftl::Identity<int> x{10};
+				ftl::Identity<int> y{12};
+
+				return x == x && x != y;
+			})
+		),
+		std::make_tuple(
+			std::string("Orderable<Identity>"),
+			std::function<bool()>([]() -> bool {
+
+				ftl::Identity<int> x{10};
+				ftl::Identity<int> y{12};
+				ftl::Identity<int> z{4};
+
+				return x > z && x < y && x >= x && x <= x;
+			})
+		),
+		std::make_tuple(
 			std::string("tuple_apply[&]"),
 			std::function<bool()>([]() -> bool {
 				auto f = [](int x, int y){ return x+y; };
