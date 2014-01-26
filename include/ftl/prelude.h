@@ -132,6 +132,9 @@ namespace ftl {
 	 * - \ref deref to `T`
 	 * - \ref eq, if `T` is
 	 * - \ref orderable, if `T` is
+	 * - \ref functorpg (instance defined in \ref monad)
+	 * - \ref applicativepg (instance defined in \ref monad)
+	 * - \ref monadpg (instance defined in \ref monad)
 	 *
 	 * \ingroup prelude
 	 */

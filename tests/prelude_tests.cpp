@@ -84,6 +84,53 @@ test_set prelude_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("Functor<Identity>"),
+			std::function<bool()>([]() -> bool {
+
+				ftl::Identity<int> x{10};
+
+				auto y = ftl::fmap([](int x){ return x/2; }, x);
+
+				return y.val == 5;
+			})
+		),
+		std::make_tuple(
+			std::string("Applicative<Identity>"),
+			std::function<bool()>([]() -> bool {
+
+				ftl::Identity<int> x{10};
+				auto f = [](int x, int y){ return x+y; };
+
+				auto y = ftl::fmap(ftl::curry<2>(f), x);
+				auto z = ftl::aapply(y, x);
+
+				return z.val == 20;
+			})
+		),
+		std::make_tuple(
+			std::string("Monad<Identity>::join"),
+			std::function<bool()>([]() -> bool {
+				using ftl::Identity;
+
+				Identity<int> x{10};
+				auto y = Identity<Identity<int>>{x};
+				auto z = ftl::monad<Identity<int>>::join(y);
+
+				return x == z;
+			})
+		),
+		std::make_tuple(
+			std::string("Monad<Identity>::bind"),
+			std::function<bool()>([]() -> bool {
+				using ftl::Identity;
+
+				Identity<int> x{10};
+				auto f = [](int x){ return Identity<int>{x/2}; };
+
+				return (x >>= f).val == 5;
+			})
+		),
+		std::make_tuple(
 			std::string("tuple_apply[&]"),
 			std::function<bool()>([]() -> bool {
 				auto f = [](int x, int y){ return x+y; };

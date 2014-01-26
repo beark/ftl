@@ -240,6 +240,78 @@ namespace ftl {
 	};
 
 	/**
+	 * Monad implementation for the `Identity` type transformer.
+	 *
+	 * Can be thought of as treating `Identity` like a container containing
+	 * exactly one element.
+	 *
+	 * \ingroup monad
+	 */
+	template<typename T>
+	struct monad<Identity<T>> : deriving_pure<Identity<T>> {
+
+		/// Applies `f` to the value in `i`
+		template<typename F, typename U = result_of<F(T)>>
+		static constexpr Identity<U> map(F&& f, const Identity<T>& i) {
+			return Identity<U>{std::forward<F>(f)(i.val)};
+		}
+
+		template<typename F, typename U = result_of<F(T)>>
+		static constexpr Identity<U> map(F&& f, Identity<T>&& i) {
+			return Identity<U>{std::forward<F>(f)(std::move(i.val))};
+		}
+
+		/// Applies the function in `f` to the value in `i`
+		template<typename F, typename U = result_of<F(T)>>
+		static constexpr
+		Identity<U> apply(const Identity<F>& f, const Identity<T>& i) {
+			return Identity<U>{f.val(i.val)};
+		}
+
+		template<typename F, typename U = result_of<F(T)>>
+		static constexpr
+		Identity<U> apply(const Identity<F>& f, Identity<T>&& i) {
+			return Identity<U>{f.val(std::move(i.val))};
+		}
+
+		template<typename F, typename U = result_of<F(T)>>
+		static constexpr
+		Identity<U> apply(Identity<F>&& f, const Identity<T>& i) {
+			return Identity<U>{std::move(f.val)(i.val)};
+		}
+
+		template<typename F, typename U = result_of<F(T)>>
+		static constexpr
+		Identity<U> apply(Identity<F>&& f, Identity<T>&& i) {
+			return Identity<U>{std::move(f.val)(std::move(i.val))};
+		}
+
+		/// Flattens nested Identities
+		static constexpr Identity<T> join(const Identity<Identity<T>>& i)
+		noexcept(std::is_nothrow_copy_constructible<T>::value) {
+			return i.val;
+		}
+
+		static constexpr Identity<T> join(Identity<Identity<T>>&& i)
+		noexcept(std::is_nothrow_move_constructible<T>::value) {
+			return std::move(i.val);
+		}
+
+		/// Applies `f` to the value contained in `i`
+		template<typename F, typename U = Value_type<result_of<F(T)>>>
+		static constexpr Identity<U> bind(const Identity<T>& i, F&& f) {
+			return std::forward<F>(f)(i.val);
+		}
+
+		template<typename F, typename U = Value_type<result_of<F(T)>>>
+		static constexpr Identity<U> bind(Identity<T>&& i, F&& f) {
+			return std::forward<F>(f)(std::move(i.val));
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
 	 * Tag that can be used to specify which concept implementation to derive.
 	 *
 	 * This particular tag is used to specify that some monad method should be
