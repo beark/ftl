@@ -27,9 +27,6 @@ parser<std::string> whitespace() {
 	return many1(oneOf(" \t\r\n"));
 }
 
-// TODO: Move into main library at apropriate spot!
-// This is not supposed to be part of the tutorial, it's supposed to be part
-// of the library :/
 std::vector<int> cons(int n, std::vector<int> v) {
 	v.insert(v.begin(), n);
 	return v;
@@ -50,7 +47,7 @@ parser<std::vector<int>> parseLispList() {
 	return parseChar('(') >> parseList() << parseChar(')');
 }
 
-int main(int arc, char** argv) {
+int main(int, char**) {
 
 	using std::string;
 
