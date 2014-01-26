@@ -115,9 +115,16 @@ namespace ftl {
 	 * \code
 	 *   sum_type<int,char> x = ...;
 	 *   bool isInt = x.match(
-	 *       [](case_<int> x){ return true; },
-	 *       [](case_<char> x){ return false; }
+	 *       [](case_<int>){ return true; },
+	 *       [](case_<char>){ return false; }
 	 *   );
+	 *   
+	 *   // Compare to this legal, but probably unexpected usage:
+	 *   bool isChar = x.match(
+	 *       [](char){ return true; },
+	 *       [](int){ return false; }
+	 *   );
+	 *   // isInt == true, and perhaps unexpectedly, isChar == true
 	 * \endcode
 	 *
 	 * \see sum_type::match
@@ -487,6 +494,11 @@ namespace ftl {
 			data.move(cons, std::move(st.data));
 		}
 
+		/**
+		 * Construct the sum type as an instance of `T`.
+		 *
+		 * All the arguments are forwarded to `T`'s constructor.
+		 */
 		template<typename T, typename...Args>
 		explicit constexpr sum_type(constructor<T> t, Args&&...args)
 		noexcept(
@@ -497,6 +509,15 @@ namespace ftl {
 		: data(t, std::forward<Args>(args)...)
 		, cons(index_of<T,Ts...>::value) {}
 
+		/**
+		 * Construct as an instance of `T`, using an initializer_list.
+		 *
+		 * \par Examples
+		 *
+		 * \code
+		 *   auto x = sum_type<T,U>{constructor<T>(), {1,2,3}};
+		 * \endcode
+		 */
 		template<typename T, typename U>
 		constexpr sum_type(
 			constructor<T> t, std::initializer_list<U> l
@@ -556,7 +577,7 @@ namespace ftl {
 		// are equal
 		sum_type& operator= (const sum_type& s) {
 			// Deal with self assignment
-			if(&s == this)
+			if(std::addressof(s) == this)
 				return *this;
 
 			data.destruct(cons);
@@ -568,7 +589,7 @@ namespace ftl {
 
 		sum_type& operator= (sum_type&& s) {
 			// Deal with self assignment
-			if(&s == this)
+			if(std::addressof(s) == this)
 				return *this;
 
 			data.destruct(cons);
@@ -755,5 +776,4 @@ namespace ftl {
 }
 
 #endif
-
 
