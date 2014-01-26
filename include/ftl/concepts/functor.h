@@ -23,8 +23,6 @@
 #ifndef FTL_FUNCTOR_H
 #define FTL_FUNCTOR_H
 
-#include "../type_functions.h"
-#include "../function.h"
 #include "../prelude.h"
 #include "common.h"
 
@@ -76,7 +74,6 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * - \ref typelevel
 	 * - \ref prelude
 	 */
 

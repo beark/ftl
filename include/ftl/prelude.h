@@ -42,11 +42,8 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * - `<memory>`
 	 * - `<tuple>`
-	 * - `<stdexcept>`
-	 * - `<functional>`
-	 * - \ref typelevel
+	 * - \ref function
 	 * - \ref concepts_basic
 	 * - \ref orderable
 	 */
