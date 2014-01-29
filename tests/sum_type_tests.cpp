@@ -213,27 +213,6 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("Match case_ expressions"),
-			std::function<bool()>([]() -> bool {
-				using namespace ftl;
-
-				sum_type<int,char> x{constructor<int>(), 10};
-				sum_type<int,char> y{constructor<char>(), 'b'};
-
-				auto s1 = x.match(
-					[](case_<int> x){ return x*2; },
-					[](case_<char>){ return 0; }
-				);
-
-				auto s2 = y.match(
-					[](case_<int> x){ return x*2; },
-					[](case_<char>){ return 0; }
-				);
-
-				return s1 == 20 && s2 == 0;
-			})
-		),
-		std::make_tuple(
 			std::string("Match expressions"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
@@ -253,9 +232,9 @@ test_set sum_type_tests{
 				);
 
 				auto s2 = y.match(
-					[](A){ return 0; },
-					[](B){ return 1; },
-					[](C){ return 2; }
+					[](const A&){ return 0; },
+					[](const B&){ return 1; },
+					[](const C&){ return 2; }
 				);
 
 				auto s3 = z.match(
@@ -265,6 +244,23 @@ test_set sum_type_tests{
 				);
 
 				return s1 == 0 && s2 == 1 && s3 == 2;
+			})
+		),
+		std::make_tuple(
+			std::string("Match expressions [&]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				struct A {};
+
+				sum_type<A,int> x{constructor<int>(), 5};
+
+				auto r = x.match(
+					[](A&){ return 0; },
+					[](int& i){ ++i; return i; }
+				);
+
+				return r == get<int>(x);
 			})
 		),
 		std::make_tuple(

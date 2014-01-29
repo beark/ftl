@@ -100,50 +100,6 @@ namespace ftl {
 	struct constructor {
 	};
 
-	/**
-	 * Thin type wrapper used to distinguish match cases of convertible types
-	 *
-	 * The `case_` type is explicitly constructible from `T` and implicitly
-	 * converts back to it. As `sum_type::match` always passes values by first
-	 * wrapping them in a `case_`, this allows match functions to enforce strong
-	 * typing when passing the value along, while allowing the user to rely on
-	 * implicit conversion to get the actual value out.
-	 *
-	 * \par Examples
-	 *
-	 * Matching two implicitly converting sub-types
-	 * \code
-	 *   sum_type<int,char> x = ...;
-	 *   bool isInt = x.match(
-	 *       [](case_<int>){ return true; },
-	 *       [](case_<char>){ return false; }
-	 *   );
-	 *   
-	 *   // Compare to this legal, but probably unexpected usage:
-	 *   bool isChar = x.match(
-	 *       [](char){ return true; },
-	 *       [](int){ return false; }
-	 *   );
-	 *   // isInt == true, and perhaps unexpectedly, isChar == true
-	 * \endcode
-	 *
-	 * \see sum_type::match
-	 *
-	 * \ingroup sum_type
-	 */
-	template<typename T>
-	struct case_ {
-		explicit constexpr case_(T t)
-		noexcept(std::is_nothrow_copy_constructible<T>::value)
-		: t(t) {}
-
-		constexpr operator T() const noexcept {
-			return t;
-		}
-
-		T t;
-	};
-
 	namespace _dtl {
 
 		template<typename, typename...>
@@ -191,7 +147,7 @@ namespace ftl {
 		struct all_return_types<type_seq<T,Ts...>,type_seq<Fs...>> {
 			using types =
 				typename concat_type_seqs<
-					type_seq<typename find_call_match<case_<T>,Fs...>::type>,
+					type_seq<typename find_call_match<T,Fs...>::type>,
 					typename all_return_types<
 						type_seq<Ts...>,
 						type_seq<Fs...>
@@ -225,7 +181,7 @@ namespace ftl {
 		// A match is exhaustive if the final function accepts the final type
 		template<typename F, typename T>
 		struct exhaustive_match<type_seq<F>,type_seq<T>> {
-			static constexpr bool value = is_callable<F,case_<T>>::value;
+			static constexpr bool value = is_callable<F,T>::value;
 		};
 
 		// A match is NOT exhaustive if there are left-over types
@@ -238,7 +194,7 @@ namespace ftl {
 		struct exhaustive_match<type_seq<F,Fs...>,type_seq<T,Ts...>> {
 			static constexpr bool value =
 				(
-					is_callable<F,case_<T>>::value
+					is_callable<F,T>::value
 					&& exhaustive_match<type_seq<Fs...>,type_seq<Ts...>>::value
 				)
 				||
@@ -292,17 +248,37 @@ namespace ftl {
 			template<
 				typename O, typename F, typename...Fs,
 				typename = typename std::enable_if<
-					is_callable<F,case_<T>>::value
+					is_callable<F,T>::value
+				>::type
+			>
+			static R visit(overload_tag<O>, const T& t, F&& f, Fs&&...) {
+				return std::forward<F>(f)(t);
+			}
+
+			template<
+				typename O, typename F, typename...Fs,
+				typename = typename std::enable_if<
+					is_callable<F,T>::value
 				>::type
 			>
 			static R visit(overload_tag<O>, T& t, F&& f, Fs&&...) {
-				return std::forward<F>(f)(case_<T>{t});
+				return std::forward<F>(f)(t);
 			}
 
 			template<
 				typename F, typename O, typename...Fs,
 				typename = typename std::enable_if<
-					!is_callable<F,case_<T>>::value
+					!is_callable<F,T>::value
+				>::type
+			>
+			static R visit(overload_tag<O> o, const T& t, F&&, Fs&&...fs) {
+				return union_visitor::visit(o, t, std::forward<Fs>(fs)...);
+			}
+
+			template<
+				typename F, typename O, typename...Fs,
+				typename = typename std::enable_if<
+					!is_callable<F,T>::value
 				>::type
 			>
 			static R visit(overload_tag<O> o, T& t, F&&, Fs&&...fs) {
@@ -313,6 +289,11 @@ namespace ftl {
 		template<typename R, typename...Ts>
 		struct union_visitor<R,seq<>,Ts...> {
 			template<typename...Fs>
+			static R visit(const recursive_union<Ts...>&, size_t, Fs&&...) {
+				throw invalid_sum_type_access{""};
+			}
+
+			template<typename...Fs>
 			static R visit(recursive_union<Ts...>&, size_t, Fs&&...) {
 				throw invalid_sum_type_access{""};
 			}
@@ -320,6 +301,22 @@ namespace ftl {
 
 		template<typename R, size_t I, size_t...Is, typename T, typename...Ts>
 		struct union_visitor<R,seq<I,Is...>,T,Ts...> {
+			template<typename...Fs>
+			static R visit(
+					const recursive_union<T,Ts...>& u, size_t i, Fs&&...fs
+			) {
+				if(i == I) {
+					return union_visitor<R,T>::visit(
+						overload_tag<T>{}, u.v, std::forward<Fs>(fs)...
+					);
+				}
+				else {
+					return union_visitor<R,seq<Is...>,Ts...>::visit(
+						u.r, i, std::forward<Fs>(fs)...
+					);
+				}
+			}
+
 			template<typename...Fs>
 			static R visit(
 					recursive_union<T,Ts...>& u, size_t i, Fs&&...fs
@@ -611,16 +608,63 @@ namespace ftl {
 		 *
 		 * \par Examples
 		 *
-		 * Matching values whose type cannot be implicitly converted
+		 * Matching on a number of types:
 		 * \code
-		 *   sum_type<A,B,C> value = ...;
+		 *   auto value = sum_type<A,B,C>{constructor<B>(), ...};
 		 *   auto str = value.match(
 		 *       [](A a){ return std::string("A"); },
 		 *       [](B b){ return std::string("B"); },
 		 *       [](C c){ return std::string("C"); }
 		 *   );
+		 *
+		 *   // str == "B"
 		 * \endcode
+		 *
+		 * Match by reference:
+		 * \code
+		 *   sum_type<int,string> value = ...;
+		 *   value.match(
+		 *       [](int& x){ return ++x; },
+		 *       [](string& s){ s += " modified"; return s.size(); }
+		 *   );
+		 * \endcode
+		 *
+		 * \note Matching on a `sum_type` with element types that are
+		 *       implicitly convertible between each other can lead to
+		 *       unexpected behaviour. For example, matching a
+		 *       `sum_type<int,char>` like so:
+		 *
+		 *       \code
+		 *         value.match(
+		 *             [](int x){ ... },
+		 *             [](char x){ ... }
+		 *         );
+		 *       \endcode
+		 *
+		 *       will never trigger the `char` case. Use explicit "constructor
+		 *       types" if there is a chance of encountering this.
+		 *
 		 */
+		template<typename...Fs>
+		auto match(Fs&&...fs) const -> typename ::ftl::_dtl::common_return_type<
+			type_seq<Ts...>,type_seq<Fs...>
+		>::type {
+
+			static_assert(
+				_dtl::exhaustive_match<type_seq<Fs...>,type_seq<Ts...>>::value,
+				"Match statements must be exhaustive"
+			);
+
+			using indices = gen_seq<0,sizeof...(Ts)-1>;
+			using return_type = typename _dtl::common_return_type<
+				type_seq<Ts...>,type_seq<Fs...>
+			>::type;
+
+			return _dtl::union_visitor<return_type,indices,Ts...>
+				::visit(data, cons, std::forward<Fs>(fs)...);
+		}
+
+		/// \overload
 		template<typename...Fs>
 		auto match(Fs&&...fs) -> typename ::ftl::_dtl::common_return_type<
 			type_seq<Ts...>,type_seq<Fs...>
@@ -639,6 +683,7 @@ namespace ftl {
 			return _dtl::union_visitor<return_type,indices,Ts...>
 				::visit(data, cons, std::forward<Fs>(fs)...);
 		}
+
 
 	private:
 		_dtl::recursive_union<Ts...> data;
