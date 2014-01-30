@@ -286,6 +286,49 @@ namespace ftl {
 			}
 		};
 
+		template<typename T, typename...Ts>
+		struct union_visitor<void,T,Ts...> {
+			template<
+				typename O, typename F, typename...Fs,
+				typename = typename std::enable_if<
+					is_callable<F,T>::value
+				>::type
+			>
+			static void visit(overload_tag<O>, const T& t, F&& f, Fs&&...) {
+				std::forward<F>(f)(t);
+			}
+
+			template<
+				typename O, typename F, typename...Fs,
+				typename = typename std::enable_if<
+					is_callable<F,T>::value
+				>::type
+			>
+			static void visit(overload_tag<O>, T& t, F&& f, Fs&&...) {
+				std::forward<F>(f)(t);
+			}
+
+			template<
+				typename F, typename O, typename...Fs,
+				typename = typename std::enable_if<
+					!is_callable<F,T>::value
+				>::type
+			>
+			static void visit(overload_tag<O> o, const T& t, F&&, Fs&&...fs) {
+				union_visitor::visit(o, t, std::forward<Fs>(fs)...);
+			}
+
+			template<
+				typename F, typename O, typename...Fs,
+				typename = typename std::enable_if<
+					!is_callable<F,T>::value
+				>::type
+			>
+			static void visit(overload_tag<O> o, T& t, F&&, Fs&&...fs) {
+				union_visitor::visit(o, t, std::forward<Fs>(fs)...);
+			}
+		};
+
 		template<typename R, typename...Ts>
 		struct union_visitor<R,seq<>,Ts...> {
 			template<typename...Fs>
@@ -295,6 +338,19 @@ namespace ftl {
 
 			template<typename...Fs>
 			static R visit(recursive_union<Ts...>&, size_t, Fs&&...) {
+				throw invalid_sum_type_access{""};
+			}
+		};
+
+		template<typename...Ts>
+		struct union_visitor<void,seq<>,Ts...> {
+			template<typename...Fs>
+			static void visit(const recursive_union<Ts...>&, size_t, Fs&&...) {
+				throw invalid_sum_type_access{""};
+			}
+
+			template<typename...Fs>
+			static void visit(recursive_union<Ts...>&, size_t, Fs&&...) {
 				throw invalid_sum_type_access{""};
 			}
 		};
@@ -328,6 +384,41 @@ namespace ftl {
 				}
 				else {
 					return union_visitor<R,seq<Is...>,Ts...>::visit(
+						u.r, i, std::forward<Fs>(fs)...
+					);
+				}
+			}
+		};
+
+		template<size_t I, size_t...Is, typename T, typename...Ts>
+		struct union_visitor<void,seq<I,Is...>,T,Ts...> {
+			template<typename...Fs>
+			static void visit(
+					const recursive_union<T,Ts...>& u, size_t i, Fs&&...fs
+			) {
+				if(i == I) {
+					union_visitor<void,T>::visit(
+						overload_tag<T>{}, u.v, std::forward<Fs>(fs)...
+					);
+				}
+				else {
+					union_visitor<void,seq<Is...>,Ts...>::visit(
+						u.r, i, std::forward<Fs>(fs)...
+					);
+				}
+			}
+
+			template<typename...Fs>
+			static void visit(
+					recursive_union<T,Ts...>& u, size_t i, Fs&&...fs
+			) {
+				if(i == I) {
+					union_visitor<void,T>::visit(
+						overload_tag<T>{}, u.v, std::forward<Fs>(fs)...
+					);
+				}
+				else {
+					return union_visitor<void,seq<Is...>,Ts...>::visit(
 						u.r, i, std::forward<Fs>(fs)...
 					);
 				}
@@ -684,6 +775,86 @@ namespace ftl {
 				::visit(data, cons, std::forward<Fs>(fs)...);
 		}
 
+		/**
+		 * Effectful pattern match method.
+		 *
+		 * Allows a pattern match-like syntax for working with sum type values.
+		 * The case clauses are statically enforced to cover all the types that
+		 * may be held by the sum type.
+		 *
+		 * Invoking this match function means explicitly wanting side effects,
+		 * since nothing is returned.
+		 *
+		 * \par Examples
+		 *
+		 * Matching on a number of types:
+		 * \code
+		 *   auto value = sum_type<A,B,C>{constructor<B>(), ...};
+		 *   value.matchE(
+		 *       [](A a){ std::cout << "A"; },
+		 *       [](B b){ std::cout << "B"; },
+		 *       [](C c){ std::cout << "C"; }
+		 *   );
+		 * \endcode
+		 *
+		 * Output:
+		 * \code
+		 *   B
+		 * \endcode
+		 *
+		 * Match by reference:
+		 * \code
+		 *   sum_type<int,string> value = ...;
+		 *   value.matchE(
+		 *       [](int& x){ ++x; },
+		 *       [](string& s){ s += " modified"; }
+		 *   );
+		 * \endcode
+		 *
+		 * \note Matching on a `sum_type` with element types that are
+		 *       implicitly convertible between each other can lead to
+		 *       unexpected behaviour. For example, matching a
+		 *       `sum_type<int,char>` like so:
+		 *
+		 *       \code
+		 *         value.match(
+		 *             [](int x){ ... },
+		 *             [](char x){ ... }
+		 *         );
+		 *       \endcode
+		 *
+		 *       will never trigger the `char` case. Use explicit "constructor
+		 *       types" if there is a chance of encountering this.
+		 *
+		 */
+		template<typename...Fs>
+		void matchE(Fs&&...fs) {
+
+			static_assert(
+				_dtl::exhaustive_match<type_seq<Fs...>,type_seq<Ts...>>::value,
+				"Match statements must be exhaustive"
+			);
+
+			using indices = gen_seq<0,sizeof...(Ts)-1>;
+
+			::ftl::_dtl::union_visitor<void,indices,Ts...>
+				::visit(data, cons, std::forward<Fs>(fs)...);
+		}
+
+		/// \overload
+		template<typename...Fs>
+		void matchE(Fs&&...fs) const {
+
+			static_assert(
+				_dtl::exhaustive_match<type_seq<Fs...>,type_seq<Ts...>>::value,
+				"Match statements must be exhaustive"
+			);
+
+			using indices = gen_seq<0,sizeof...(Ts)-1>;
+
+			::ftl::_dtl::union_visitor<void,indices,Ts...>
+				::visit(data, cons, std::forward<Fs>(fs)...);
+		}
 
 	private:
 		_dtl::recursive_union<Ts...> data;

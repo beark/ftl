@@ -264,6 +264,31 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("Match expressions [void]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				struct A {};
+
+				int i1 = 5, i2 = 10;
+
+				sum_type<A,int> x{constructor<int>(), 5};
+				const sum_type<A,int> y{constructor<A>()};
+
+				x.matchE(
+					[&](A&){ ++i1; },
+					[&](int&){ ++i2; }
+				);
+
+				y.matchE(
+					[&](const A&){ ++i1; },
+					[&](const int&){ ++i2; }
+				);
+
+				return i1 == 6 && i2 == 11;
+			})
+		),
+		std::make_tuple(
 			std::string("Maybe mockup"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
