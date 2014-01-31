@@ -33,12 +33,12 @@ test_set concept_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto m1 = value(sum(2));
-				auto m2 = value(sum(2));
+				auto m1 = just(sum(2));
+				auto m2 = just(sum(2));
 
 				auto m3 = mappend % m1 * m2;
 
-				return m3 == value(sum(4));
+				return m3 == just(sum(4));
 			})
 		),
 		std::make_tuple(
@@ -49,11 +49,13 @@ test_set concept_tests{
 				auto f = [](int x){ return x+1; };
 				auto fm = fmap(f);
 
-				auto m = fm(value(2));
+				auto m = fm(just(2));
 
-				return m == value(3) && m == fmap(f)(value(2));
+				return m == just(3) && m == fmap(f)(just(2));
 			})
 		),
+		/* DISABLED, because current libc++ version does not generate an
+		 * operator() const for mem_fn's.
 		std::make_tuple(
 			std::string("Functor: fmap [member fn]"),
 			std::function<bool()>([]() -> bool {
@@ -69,24 +71,25 @@ test_set concept_tests{
 					int x;
 				};
 
-				auto r = &test::foo % value(test{3});
+				auto r = &test::foo % just(test{3});
 
-				return *r == 6;
+				return get<int>(r) == 6;
 			})
 		),
+		*/
 		std::make_tuple(
 			std::string("Applicative: curried aapply"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto mf = value(function<int(int)>([](int x){
+				auto mf = just(function<int(int)>([](int x){
 						return x+1;
 				}));
 
 				auto ap = aapply(mf);
 
-				return ap(value(2)) == value(3)
-					&& aapply(mf)(value(2)) == value(3);
+				return ap(just(2)) == just(3)
+					&& aapply(mf)(just(2)) == just(3);
 			})
 		),
 		std::make_tuple(
@@ -94,11 +97,11 @@ test_set concept_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto m = value(2);
+				auto m = just(2);
 				auto cbind = mbind(m);
-				auto f = [](int x){ return value(x+1); };
+				auto f = [](int x){ return just(x+1); };
 
-				return cbind(f) == value(3);
+				return cbind(f) == just(3);
 			})
 		),
 		std::make_tuple(
@@ -106,15 +109,17 @@ test_set concept_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto m1 = value(2);
+				auto m1 = just(2);
 
-				auto f1 = [](int x){ return value(float(x)*0.5f); };
-				auto f2 = [](float x){ return value(int(x*3.33f)); };
+				auto f1 = [](int x){ return just(float(x)*0.5f); };
+				auto f2 = [](float x){ return just(int(x*3.33f)); };
 
 				return
-					((m1 >>= f1) >>= f2) == value(3);
+					((m1 >>= f1) >>= f2) == just(3);
 			})
 		),
+		/* DISABLED, because current libc++ version does not generate an
+		 * operator() const for mem_fn's.
 		std::make_tuple(
 			std::string("Monad: >>= [member fn]"),
 			std::function<bool()>([]() -> bool {
@@ -124,28 +129,29 @@ test_set concept_tests{
 					explicit foo(int x) : x(x) {}
 
 					maybe<int> bar() const {
-						return value(2*x);
+						return just(2*x);
 					}
 
 					int x;
 				};
 
-				auto m = value(foo{3});
+				auto m = just(foo{3});
 
 				return
-					(m >>= &foo::bar) == value(6);
+					(m >>= &foo::bar) == just(6);
 			})
 		),
+		*/
 		std::make_tuple(
 			std::string("Monad: >>"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto m1 = value(1);
-				auto m2 = value(2);
-				maybe<int> m3 = nothing;
+				auto m1 = just(1);
+				auto m2 = just(2);
+				maybe<int> m3 = Nothing{};
 
-				return m1 >> m2 == value(2) && m3 >> m1 == nothing;
+				return m1 >> m2 == just(2) && m3 >> m1 == nothing<int>();
 			})
 		),
 		std::make_tuple(
@@ -153,11 +159,11 @@ test_set concept_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto m1 = value(1);
-				auto m2 = value(2);
-				maybe<int> m3 = nothing;
+				auto m1 = just(1);
+				auto m2 = just(2);
+				maybe<int> m3 = Nothing{};
 
-				return m1 << m2 == value(1) && m1 << m3 == nothing;
+				return m1 << m2 == just(1) && m1 << m3 == nothing<int>();
 			})
 		),
 		std::make_tuple(
@@ -165,14 +171,14 @@ test_set concept_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto m1 = value(0.f);
-				auto m2 = value(2.f);
+				auto m1 = just(0.f);
+				auto m2 = just(2.f);
 				auto f = [](float x){
-					return x == 0 ? nothing : value(8.f / x);
+					return x == 0 ? Nothing{} : just(8.f / x);
 				};
 
-				return (f <<= f <<= m1) == nothing
-					&& (f <<= f <<= m2) == value(2.f);
+				return (f <<= f <<= m1) == nothing<float>()
+					&& (f <<= f <<= m2) == just(2.f);
 			})
 		),
 		std::make_tuple(
@@ -180,15 +186,15 @@ test_set concept_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto plusOne = [](int x){ return value(x+1); };
-				auto mulTwo = [](int x){ return value(2*x); };
+				auto plusOne = [](int x){ return just(x+1); };
+				auto mulTwo = [](int x){ return just(2*x); };
 
-				maybe<int> mNothing;
-				auto mOne = value(1);
+				auto mNothing = nothing<int>();
+				auto mOne = just(1);
 
 				auto m1 = ((mOne >>= plusOne) >>= mulTwo) << (mulTwo <<= mOne);
 
-				return m1 == value(4);
+				return m1 == just(4);
 			})
 		),
 		std::make_tuple(

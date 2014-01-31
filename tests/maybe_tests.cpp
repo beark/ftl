@@ -27,52 +27,31 @@ test_set maybe_tests{
 	std::string("maybe"),
 	{
 		std::make_tuple(
-			std::string("Swap [primitive]"),
-			std::function<bool()>([]() -> bool {
-				using std::swap;
-				auto x = ftl::value(3);
-				auto y = ftl::value(10);
-				ftl::maybe<int> z = ftl::nothing;
-
-				swap(x,y);
-				swap(y,z);
-
-				return x == ftl::value(10)
-					&& y == ftl::nothing
-					&& z == ftl::value(3);
-			})
-		),
-		std::make_tuple(
-			std::string("Swap [resource]"),
-			std::function<bool()>([]() -> bool {
-				using std::swap;
-				std::vector<int> x{1,2,3,4};
-				std::vector<int> y{4,3,2,1};
-				std::vector<int> z{};
-
-				swap(x,y);
-				swap(y,z);
-
-				return x == std::vector<int>{4,3,2,1}
-					&& y == std::vector<int>{}
-					&& z == std::vector<int>{1,2,3,4};
-			})
-		),
-		std::make_tuple(
 			std::string("Preserves Eq"),
 			std::function<bool()>([]() -> bool {
-				auto e1 = ftl::value(10);
-				auto e2 = ftl::value(10);
+				auto e1 = ftl::just(10);
+				auto e2 = ftl::just(10);
 
 				return e1 == e2;
 			})
 		),
 		std::make_tuple(
+			std::string("Preserves Orderable"),
+			std::function<bool()>([]() -> bool {
+				auto e1 = ftl::just(10);
+				auto e2 = ftl::just(12);
+				auto e3 = ftl::nothing<int>();
+
+				return e1 < e2 && e3 < e1
+					&& e2 > e1 && e1 > e3;
+			})
+		),
+		std::make_tuple(
 			std::string("Copy assignable back and forth"),
 			std::function<bool()>([]() -> bool {
-				auto m1 = ftl::value(10);
-				auto m2 = ftl::maybe<int>{};
-				auto m3 = ftl::value(15);
+				auto m1 = ftl::just(10);
+				auto m2 = ftl::nothing<int>();
+				auto m3 = ftl::just(15);
 
 				ftl::maybe<int> mx(m1);
 
@@ -87,287 +66,87 @@ test_set maybe_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("Method access works"),
+			std::string("Pattern matching"),
 			std::function<bool()>([]() -> bool {
-				auto m = ftl::value(std::string("test"));
-				std::string s("test");
+				auto m1 = ftl::just(10);
+				auto m2 = ftl::nothing<int>();
 
-				return m->size() == s.size();
+				auto r1 = m1.match(
+					[](int x) { return x; },
+					[](ftl::Nothing) { return -1; }
+				);
+
+				auto r2 = m2.match(
+					[](int x) { return x; },
+					[](ftl::Nothing) { return -1; }
+				);
+
+				return r1 == 10 && r2 == -1;
 			})
 		),
 		std::make_tuple(
-			std::string("Contextual bool cast works"),
+			std::string("Functor<maybe>"),
 			std::function<bool()>([]() -> bool {
-				auto m = ftl::value(std::string("test"));
-				if(!m)
-					return false;
+				auto m1 = ftl::just(10);
+				auto m2 = ftl::nothing<int>();
 
-					ftl::maybe<int> m2;
+				auto r1 = ftl::fmap([](int x){ return x+1; }, m1);
+				auto r2 = ftl::fmap([](int x){ return x+1; }, m2);
 
-				return m && !m2;
+				return r1.is<int>() && ftl::get<int>(r1) == 11
+					&& r2.is<ftl::Nothing>();
 			})
 		),
 		std::make_tuple(
-			std::string("ForwardIterable works"),
+			std::string("Applicative<maybe>::pure"),
 			std::function<bool()>([]() -> bool {
-				auto m = ftl::value(std::string("test"));
-				bool working = false;
-				for(auto& e : m) {
-					working = true && e == std::string("test");
-				}
+				auto m1 = ftl::aPure<ftl::maybe<int>>()(4);
+				auto m2 = ftl::aPure<ftl::maybe<int>>()(8);
 
-				ftl::maybe<int> m2;
-				for(auto& e : m2) {
-					++e;
-					working = false;
-				}
-
-				for(auto it = m.cbegin(); it != m.cend(); ++it) {
-					return working;
-				}
-
-				return false;
+				return ftl::get<int>(m1) == 4 && ftl::get<int>(m2) == 8;
 			})
 		),
 		std::make_tuple(
-			std::string("Method access throws on `nothing'"),
+			std::string("Applicative<maybe>::apply"),
 			std::function<bool()>([]() -> bool {
-				auto m = ftl::maybe<std::string>{};
-				try {
-					m->size();
-				}
-				catch(ftl::invalid_maybe_access&) {
-					return true;
-				}
 
-				return false;
+				auto f = [](int x, int y){ return x+y; };
+
+				auto m1 = ftl::just(12);
+				auto m2 = ftl::just(5);
+				auto m3 = ftl::nothing<int>();
+
+				auto mf = ftl::fmap(ftl::curry(f), m1);
+
+				auto r1 = ftl::aapply(mf, m2);
+				auto r2 = ftl::aapply(mf, m3);
+
+				return r1.is<int>() && ftl::get<int>(r1) == 17
+					&& r2.is<ftl::Nothing>();
 			})
 		),
 		std::make_tuple(
-			std::string("monoid::id"),
+			std::string("Monad<maybe>::bind"),
 			std::function<bool()>([]() -> bool {
-				using namespace ftl;
+				using ftl::operator<<=;
 
-				return monoid<maybe<sum_monoid<int>>>::id() == nothing;
+				auto f1 = [](int x){ return ftl::just(x/2); };
+				auto f2 = [](int){ return ftl::nothing<int>(); };
+
+				auto m1 = ftl::just(10);
+				auto m2 = ftl::nothing<int>();
+
+				auto r1 = f1 <<= m1;
+				auto r2 = f1 <<= m2;
+				auto r3 = f2 <<= m1;
+				auto r4 = f2 <<= m2;
+
+				return r1.is<int>() && ftl::get<int>(r1) == 5
+					&& r2.is<ftl::Nothing>()
+					&& r3.is<ftl::Nothing>()
+					&& r4.is<ftl::Nothing>();
 			})
 		),
-		std::make_tuple(
-			std::string("monoid::append[value,value]"),
-			std::function<bool()>([]() -> bool {
-				using namespace ftl;
-
-				auto m1 = value(sum(2));
-				auto m2 = value(sum(3));
-
-				return (m1 ^ m2) == value(sum(5));
-			})
-		),
-		std::make_tuple(
-			std::string("monoid::append[value,nothing]"),
-			std::function<bool()>([]() -> bool {
-				using namespace ftl;
-
-				auto m1 = value(sum(2));
-				maybe<sum_monoid<int>> m2;
-
-				return (m1 ^ m2) == m1;
-			})
-		),
-		std::make_tuple(
-			std::string("monoid::append[nothing,value]"),
-			std::function<bool()>([]() -> bool {
-				using namespace ftl;
-
-				maybe<sum_monoid<int>> m1;
-				auto m2 = value(sum(3));
-
-				return (m1 ^ m2) == m2;
-			})
-		),
-		std::make_tuple(
-			std::string("monoid::append[nothing,nothing]"),
-			std::function<bool()>([]() -> bool {
-				using namespace ftl;
-
-				maybe<sum_monoid<int>> m1;
-				maybe<sum_monoid<int>> m2;
-
-				return (m1 ^ m2) == nothing;
-			})
-		),
-		std::make_tuple(
-			std::string("functor::map[value] on lvalues"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator%;
-
-				auto m = ftl::value(10);
-				ftl::maybe<std::string> m2 = [](int){ return std::string("test"); } % m;
-
-				return *m2 == std::string("test");
-			})
-		),
-		std::make_tuple(
-			std::string("functor::map[->void,&]"),
-			std::function<bool()>([]() -> bool {
-				int x;
-				auto m = ftl::value(10);
-				ftl::fmap([&x](int y){ x = y-1; }, m);
-
-				return x == 9;
-			})
-		),
-		std::make_tuple(
-			std::string("functor::map[->void,&&]"),
-			std::function<bool()>([]() -> bool {
-				int x;
-				ftl::fmap([&x](int y){ x = y-1; }, ftl::value(10));
-
-				return x == 9;
-			})
-		),
-		std::make_tuple(
-			std::string("applicative::pure"),
-			std::function<bool()>([]() -> bool {
-				auto m = ftl::applicative<ftl::maybe<float>>::pure(12.f);
-
-				return *m == 12.f;
-			})
-		),
-		std::make_tuple(
-			std::string("applicative::apply[value,value]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
-				auto fn = [](int x){ return [x](int y){ return x+y; }; };
-				auto m = fn % ftl::value(1) * ftl::value(1);
-
-				return *m == 2;
-			})
-		),
-		std::make_tuple(
-			std::string("applicative::apply[nothing,value]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
-				auto fn = [](int x){ return [x](int y){ return x+y; }; };
-				auto m = fn % ftl::maybe<int>{} * ftl::value(1);
-
-				return m.isNothing();
-			})
-		),
-		std::make_tuple(
-			std::string("applicative::apply[value,nothing]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
-				auto fn = [](int x){ return [x](int y){ return x+y; }; };
-				auto m = fn % ftl::value(1) * ftl::maybe<int>{};
-
-				return m.isNothing();
-			})
-		),
-		std::make_tuple(
-			std::string("applicative::apply[nothing,nothing]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
-				auto fn = [](int x){ return [x](int y){ return x+y; }; };
-				auto m = fn % ftl::maybe<int>{} * ftl::maybe<int>{};
-
-				return m.isNothing();
-			})
-		),
-		std::make_tuple(
-			std::string("monad::bind[value,->value]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
-
-				auto fn = [](int x){ return ftl::value(x+1); };
-
-				auto m = ftl::value(1) >>= fn;
-
-				return *m == 2;
-			})
-		),
-		std::make_tuple(
-			std::string("monad::bind[nothing,->value]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
-
-				auto fn = [](int x){ return ftl::value(x+1); };
-
-				auto m = ftl::maybe<int>{} >>= fn;
-
-				return m.isNothing();
-			})
-		),
-		std::make_tuple(
-			std::string("monad::bind[value,->nothing]"),
-			std::function<bool()>([]() -> bool {
-				using ftl::operator %;
-				using ftl::operator *;
-
-				auto fn = [](int){ return ftl::maybe<int>{}; };
-
-				auto m = ftl::value(1) >>= fn;
-
-				return m.isNothing();
-			})
-		),
-		std::make_tuple(
-			std::string("monoidA::fail"),
-			std::function<bool()>([]() -> bool {
-				using namespace ftl;
-
-				return monoidA<maybe<int>>::fail() == nothing;
-			})
-		),
-		std::make_tuple(
-			std::string("monoidA::orDo[value,value]"),
-			std::function<bool()>([]() -> bool {
-				using namespace ftl;
-
-				auto a = value(1);
-				auto b = value(2);
-
-				return (a | b) == value(1);
-			})
-		),
-		std::make_tuple(
-			std::string("monoidA::orDo[value,nothing]"),
-			std::function<bool()>([]() -> bool {
-				using namespace ftl;
-
-				auto a = value(1);
-				maybe<int> b;
-
-				return (a | b) == value(1);
-			})
-		),
-		std::make_tuple(
-			std::string("monoidA::orDo[nothing,value]"),
-			std::function<bool()>([]() -> bool {
-				using namespace ftl;
-
-				maybe<int> a;
-				auto b = value(2);
-
-				return (a | b) == value(2);
-			})
-		),
-		std::make_tuple(
-			std::string("monoidA::orDo[nothing,nothing]"),
-			std::function<bool()>([]() -> bool {
-				using namespace ftl;
-
-				maybe<int> a;
-				maybe<int> b;
-
-				return (a | b) == nothing;
-			})
-		)
 	}
 };
 

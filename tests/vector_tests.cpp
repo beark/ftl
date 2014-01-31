@@ -21,7 +21,7 @@
  * distribution.
  */
 #include <ftl/vector.h>
-#include <ftl/maybe.h>
+#include <list>
 #include "vector_tests.h"
 
 test_set vector_tests{
@@ -179,14 +179,14 @@ test_set vector_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("monad::bind[&,->maybe]"),
+			std::string("monad::bind[&,->list]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator>>=;
 
 				std::vector<int> v{1,2,3,4};
 
 				auto f = [](int x){
-					return x % 2 == 0 ? ftl::value(x) : ftl::maybe<int>{};
+					return x % 2 == 0 ? std::list<int>{x} : std::list<int>{};
 				};
 
 				return (v >>= f) == std::vector<int>{2,4};
@@ -198,7 +198,7 @@ test_set vector_tests{
 				using ftl::operator>>=;
 
 				auto f = [](int x){
-					return x % 2 == 0 ? ftl::value(x) : ftl::maybe<int>{};
+					return x % 2 == 0 ? std::list<int>{x} : std::list<int>{};
 				};
 
 				return

@@ -23,8 +23,7 @@
 #ifndef FTL_MAYBE_H
 #define FTL_MAYBE_H
 
-#include <stdexcept>
-#include <type_traits>
+#include "sum_type.h"
 #include "prelude.h"
 #include "concepts/monoid.h"
 #include "concepts/monad.h"
@@ -42,8 +41,7 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
-	 * - <stdexcept>
-	 * - <type_traits>
+	 * - \ref sum_type
 	 * - \ref prelude
 	 * - \ref monoid
 	 * - \ref monad
@@ -51,861 +49,249 @@ namespace ftl {
 	 */
 
 	/**
-	 * Exception type signifying an attempt to access an empty maybe object.
+	 * A type used to indicate the absence of a value in `maybe`s.
+	 *
+	 * Note that the presence of this type is the one thing that uniquely
+	 * identifies a particular instance of `sum_type` as a `maybe`. Hence,
+	 * any sum type of a form equivalent to `sum_type<Nothing,T>`, for any type
+	 * `T`, will behave as if it were a `maybe<T>`.
+	 *
+	 * \par Concepts
+	 * - \ref fullycons
+	 * - \ref eq
 	 *
 	 * \ingroup maybe
 	 */
-	class invalid_maybe_access : public std::logic_error {
-	public:
-		explicit invalid_maybe_access(const std::string& what)
-		: logic_error(what) {}
+	struct Nothing;
 
-		explicit invalid_maybe_access(std::string&& what)
-		: logic_error(std::move(what)) {}
+	/**
+	 * A data type that may hold a value, or nothing.
+	 *
+	 * Note that only the presence of `Nothing` distinguishes `maybe` from
+	 * other aliases of `sum_type`. In other words, if you were to create
+	 * additional aliases parameterised equivalently, they will be treated
+	 * identically to `maybe` with regards to concepts, and similar.
+	 *
+	 * \par Concepts
+	 * - \ref copycons, if `T` is
+	 * - \ref movecons, if `T` is
+	 * - \ref assignable, if `T` is
+	 * - \ref eq, if `T` is
+	 * - \ref orderable, if `T` is
+	 *
+	 * \see sum_type
+	 *
+	 * \ingroup maybe
+	 */
+	template<typename T>
+	using maybe = sum_type<T,Nothing>;
 
-		explicit invalid_maybe_access(const char* what)
-		: logic_error(what) {}
-
+	/**
+	 * Empty sub-type of maybe.
+	 *
+	 * Can be implicitly casted to any maybe type.
+	 *
+	 * \par Concepts
+	 * - \ref fullycons
+	 * - \ref eq
+	 */
+	struct Nothing {
+		template<typename T>
+		constexpr operator maybe<T>() const noexcept {
+			return maybe<T>{constructor<Nothing>()};
+		}
 	};
 
+
+	constexpr bool operator== (Nothing, Nothing) noexcept {
+		return true;
+	}
+
+	constexpr bool operator!= (Nothing, Nothing) noexcept {
+		return false;
+	}
+
+	template<typename T, typename = Requires<Orderable<T>{}>>
+	bool operator< (const maybe<T>& m1, const maybe<T>& m2) noexcept {
+		if(m1.template is<T>()) {
+			if(m2.template is<T>()) {
+				return get<T>(m1) < get<T>(m2);
+			}
+		}
+		else {
+			if(m2.template is<T>()) {
+				return true;
+			}
+
+		}
+
+		return false;
+	}
+
+	template<typename T, typename = Requires<Orderable<T>{}>>
+	bool operator<= (const maybe<T>& m1, const maybe<T>& m2) noexcept {
+		return !(m1 > m2);
+	}
+
+	template<typename T, typename = Requires<Orderable<T>{}>>
+	bool operator> (const maybe<T>& m1, const maybe<T>& m2) noexcept {
+		if(m1.template is<T>()) {
+			if(m2.template is<T>()) {
+				return get<T>(m1) > get<T>(m2);
+			}
+		}
+		else {
+			return false;
+		}
+
+		return true;
+	}
+
+	template<typename T, typename = Requires<Orderable<T>{}>>
+	bool operator>= (const maybe<T>& m1, const maybe<T>& m2) noexcept {
+		return !(m1 < m2);
+	}
+
+
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct just_ {
+		template<typename T, typename T0 = plain_type<T>>
+		constexpr maybe<T0> operator()(T&& t) const
+		noexcept(std::is_nothrow_constructible<T0,T>::value) {
+			return maybe<T0>{constructor<T0>(), std::forward<T>(t)};
+		}
+	} just{};
+#else
+	struct ImplementationDefined {
+	}
 	/**
-	 * Type that can be used to compare any maybe to `nothing`.
+	 * Convenience constructor for a `maybe` containing a value.
+	 *
+	 * Acts like a function of type
+	 * \code
+	 *   (T) -> maybe<T>
+	 * \endcode
+	 *
+	 * Perfectly forwards the argument to `maybe<T>`'s, and therefore `T`'s
+	 * constructor.
 	 *
 	 * \ingroup maybe
 	 */
-	constexpr struct nothing_t {
-	}
+	just;
+#endif
+
+	// TODO: C++14: change to a constexpr template variable
 	/**
-	 * Convenience instance value of `nothing_t`.
+	 * Convenience function to create an empty `maybe` value.
 	 *
-	 * Useful when one wants to be more explicit than just using the bool cast
-	 * of `maybe`.
+	 * \ingroup maybe
+	 */
+	template<typename T>
+	constexpr maybe<T> nothing() noexcept {
+		return maybe<T>{constructor<Nothing>()};
+	}
+
+	template<typename T>
+	struct parametric_type_traits<maybe<T>> {
+		using value_type = T;
+
+		template<typename U>
+		using rebind = maybe<U>;
+	};
+
+	// TODO: Documentation
+	template<typename T>
+	struct monad<maybe<T>> {
+		static constexpr maybe<T> pure(const T& t)
+		noexcept(std::is_nothrow_copy_constructible<T>::value) {
+			return just(t);
+		}
+
+		static constexpr maybe<T> pure(T&& t)
+		noexcept(std::is_nothrow_move_constructible<T>::value) {
+			return just(std::move(t));
+		}
+
+		// TODO: C++14: capture f with forwarding instead of copy
+		template<typename F, typename U = result_of<F(T)>>
+		static constexpr maybe<U> map(F f, const maybe<T>& m) {
+			return m.match(
+				[f](const T& t){ return just(f(t)); },
+				[](Nothing){ return Nothing{}; }
+			);
+		}
+
+		// TODO: when sum_type has r-value overload on match, move stuff
+		template<typename F, typename U = result_of<F(T)>>
+		static constexpr maybe<U> map(F f, maybe<T>&& m) {
+			return m.match(
+				[f](T& t){ return just(f(t)); },
+				[](Nothing){ return Nothing{}; }
+			);
+		}
+
+		// TODO: Move version for mf when sum_type has r-value match
+		// TODO: C++14: capture m by copy/move as appropriate
+		template<typename F, typename U = result_of<F(T)>>
+		static constexpr maybe<U> apply(const maybe<F>& mf, maybe<T> m) {
+			return mf.match(
+				[m](const F& f){ return fmap(f, m); },
+				[](Nothing){ return Nothing{}; }
+			);
+		}
+
+		// TODO: C++14: capture f by forwarding
+		template<typename F, typename U = Value_type<result_of<F(T)>>>
+		static constexpr maybe<U> bind(const maybe<T>& m, F f) {
+			return m.match(
+				[f](const T& t){ return f(t); },
+				[](Nothing){ return Nothing{}; }
+			);
+		}
+
+		template<typename F, typename U = Value_type<result_of<F(T)>>>
+		static constexpr maybe<U> bind(maybe<T>&& m, F f) {
+			return m.match(
+				[f](T& t){ return f(std::move(t)); },
+				[](Nothing){ return Nothing{}; }
+			);
+		}
+
+		// TODO: Move version for m when sum_type has r-value match
+		static constexpr maybe<T> join(const maybe<maybe<T>>& m) {
+			return m.match(
+				[](maybe<T> m){ return m; },
+				[](Nothing) { return Nothing{}; }
+			);
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	// TODO: Foldable, Monoid
+
+	/**
+	 * An optional computation.
+	 *
+	 * If `f` fails, the `optional` computation as a whole "succeeds" but yields
+	 * `Nothing`, whereas it otherwise yields `just(x)` where `x` is the
+	 * computed result of `f`.
+	 *
+	 * \tparam F must be an instance of `ftl::monoidA`
 	 *
 	 * \par Examples
 	 *
-	 * Checking validity:
-	 * \code
-	 *   ftl::maybe<T> m = ...;
-	 *   if(m != ftl::nothing)
-	 *       do_something();
-	 * \endcode
-	 *
-	 * Assigning nothing:
-	 * \code
-	 *   ftl::maybe<int> x = ftl::nothing;
-	 * \endcode
-	 *
 	 * \ingroup maybe
 	 */
-	nothing{};
-
-	template<typename T>
-	class maybe;
-
-	namespace _dtl {
-
-		template<typename T>
-		class base_maybe_it
-		: public std::iterator<std::forward_iterator_tag,T> {
-
-		protected:
-			maybe<T>* ref = nullptr;
-
-		public:
-			base_maybe_it() = default;
-			base_maybe_it(const base_maybe_it&) = default;
-			base_maybe_it(base_maybe_it&&) = default;
-			~base_maybe_it() = default;
-
-			explicit constexpr base_maybe_it(maybe<T>* m) noexcept
-			: ref(m && *m ? m : nullptr) {}
-
-			constexpr bool operator== (const base_maybe_it& it) const noexcept {
-				return ref == it.ref;
-			}
-
-			constexpr bool operator!= (const base_maybe_it& it) const noexcept {
-				return ref != it.ref;
-			}
-
-			base_maybe_it& operator= (const base_maybe_it&) = default;
-			base_maybe_it& operator= (base_maybe_it&&) = default;
-		};
-
-		template<typename T>
-		class maybe_iterator : public base_maybe_it<T> {
-		public:
-			maybe_iterator() = default;
-			maybe_iterator(const maybe_iterator&) = default;
-			maybe_iterator(maybe_iterator&&) = default;
-			~maybe_iterator() = default;
-
-			explicit constexpr maybe_iterator(maybe<T>* m) noexcept
-			: base_maybe_it<T>{m} {}
-
-			maybe_iterator& operator++ () noexcept {
-				this->ref = nullptr;
-				return *this;
-			}
-
-			maybe_iterator operator++ (int) noexcept {
-				auto it = *this;
-				this->ref = nullptr;
-				return it;
-			}
-
-			constexpr T& operator* () const {
-				return this->ref->operator*();
-			}
-
-			constexpr T* operator-> () const {
-				return this->ref->operator->();
-			}
-
-			maybe_iterator& operator= (const maybe_iterator&) = default;
-			maybe_iterator& operator= (maybe_iterator&&) = default;
-		};
-
-		template<typename T>
-		class const_maybe_iterator : public base_maybe_it<T> {
-		public:
-			const_maybe_iterator() = default;
-			const_maybe_iterator(const const_maybe_iterator&) = default;
-			const_maybe_iterator(const_maybe_iterator&&) = default;
-			~const_maybe_iterator() = default;
-
-			explicit constexpr const_maybe_iterator(maybe<T>* m) noexcept
-			: base_maybe_it<T>{m} {}
-
-			const_maybe_iterator& operator++ () noexcept {
-				this->ref = nullptr;
-				return *this;
-			}
-
-			const_maybe_iterator operator++ (int) noexcept {
-				auto it = *this;
-				this->ref = nullptr;
-				return it;
-			}
-
-			constexpr const T& operator* () const {
-				return this->ref->operator*();
-			}
-
-			constexpr const T* operator-> () const {
-				return this->ref->operator->();
-			}
-
-			const_maybe_iterator& operator= (const const_maybe_iterator&)
-			   	= default;
-			const_maybe_iterator& operator= (const_maybe_iterator&&) = default;
-		};
-	}
-
-	/**
-	 * Abstracts the concept of optional arguments and similar.
-	 *
-	 * \tparam T Must be a completely "plain" type, as in, it must not be
-	 *           a reference, nor have `const`, `volatile`, or similar
-	 *           qualifiers. It _may_ be of pointer type (incl. function
-	 *           and method pointer).
-	 *
-	 * In essence, an instance of maybe is either a value, or nothing.
-	 * 
-	 * \par Concepts
-	 * Maybe is an instance of the following concepts:
-	 * - \ref fullycons
-	 * - \ref assignable, if `T` is
-	 * - \ref deref
-	 * - \ref empty (the empty state is, of course, when the maybe is
-	 *                `nothing`)
-	 * - \ref eq, if, and only if, `A` is EqComparable
-	 * - \ref orderable, if, and only if, `T` is Orderable
-	 * - \ref functor (in `T`)
-	 * - \ref applicative (in `T`)
-	 * - \ref monad (in `T`)
-	 * - \ref monoid, if, and only if, `T` is a Monoid
-	 * - \ref foldable, as if it were a container of zero or one element
-	 * - \ref fwditerable, as above
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename T>
-	class maybe {
-	public:
-		/**
-		 * Necessary to fulfill the ForwardIterable concept.
-		 */
-		using value_type = T;
-
-		using iterator = _dtl::maybe_iterator<T>;
-		using const_iterator = _dtl::const_maybe_iterator<T>;
-
-		/**
-		 * Default c-tor, equivalent to `nothing`.
-		 *
-		 * Memory for the contained type is reserved on the stack, but no
-		 * initialisation is done. In other words, `T`'s constructor is _not_
-		 * called.
-		 */
-		constexpr maybe() noexcept {}
-
-		/// Copy c-tor
-		maybe(const maybe& m)
-		noexcept(std::is_nothrow_copy_constructible<T>::value)
-	    : isValid(m.isValid) {
-			if(isValid) {
-				new (&val) value_type(reinterpret_cast<const T&>(m.val));
-			}
-		}
-
-		/// Move c-tor
-		maybe(maybe&& m)
-		noexcept(std::is_nothrow_move_constructible<T>::value)
-		: isValid(m.isValid) {
-			if(isValid) {
-				new (&val) value_type(std::move(reinterpret_cast<T&>(m.val)));
-			}
-		}
-
-		/**
-		 * Construct a value by copy.
-		 */
-		explicit maybe(const value_type& v)
-		noexcept(std::is_nothrow_copy_constructible<T>::value)
-		: isValid(true) {
-			 new (&val) value_type(v);
-		}
-
-		/// Construct a value by move.
-		explicit maybe(value_type&& v)
-		noexcept(std::is_nothrow_move_constructible<T>::value)
-		: isValid(true) {
-			new (&val) value_type(std::move(v));
-		}
-
-		/// Nothings should cast implicitly to maybes
-		constexpr maybe(nothing_t) noexcept {}
-
-		/// Constructing from nullptr is the same as nothing
-		constexpr maybe(std::nullptr_t) noexcept {}
-
-		/**
-		 * In-place value construction constructor.
-		 *
-		 * Constructs a value in the internal storage, forwarding the parameters
-		 * to `T`'s constructor.
-		 */
-		template<typename...Ts>
-		maybe(inplace_tag, Ts&&...ts)
-		noexcept(std::is_nothrow_constructible<T,Ts...>::value)
-		: isValid(true) {
-			new (&val) value_type(std::forward<Ts>(ts)...);
-		}
-
-		~maybe() {
-			self_destruct();
-		}
-
-		/**
-		 * Check if the maybe is nothing.
-		 */
-		constexpr bool isNothing() const noexcept {
-			return !isValid;
-		}
-
-		/**
-		 * Check if the maybe is a value.
-		 */
-		constexpr bool isValue() const noexcept {
-			return isValid;
-		}
-
-		/// Copy assignment
-		maybe& operator= (const maybe& m)
-		noexcept(std::is_nothrow_copy_assignable<T>::value) {
-			// Check for self-assignment
-			if(this == &m)
-				return *this;
-
-			if(isValid && m.isValid) {
-				reinterpret_cast<T&>(val) = reinterpret_cast<const T&>(m.val);
-			}
-			else if (m.isValid) {
-				new (&val) T(reinterpret_cast<const T&>(m.val));
-				isValid = true;
-			}
-			else
-				self_destruct();
-
-			return *this;
-		}
-
-		/// Move assignment
-		maybe& operator= (maybe&& m)
-		noexcept(std::is_nothrow_move_assignable<T>::value) {
-			// Check for self-assignment
-			if(this == &m)
-				return *this;
-
-			if(isValid && m.isValid) {
-				reinterpret_cast<T&>(val)
-					= std::move(reinterpret_cast<T&>(m.val));
-			}
-			else if (m.isValid) {
-				new (&val) T(std::move(reinterpret_cast<T&>(m.val)));
-				isValid = true;
-			}
-			else
-				self_destruct();
-
-			return *this;
-		}
-
-		/**
-		 * Convenience copy assignment operator.
-		 */
-		maybe& operator= (const T& v)
-		noexcept(std::is_nothrow_copy_assignable<T>::value) {
-			if(isValid)
-				reinterpret_cast<T&>(val) = v;
-
-			else {
-				new (&val) T{v};
-				isValid = true;
-			}
-
-			return *this;
-		}
-
-		/**
-		 * Convenience move assignment operator.
-		 */
-		maybe& operator= (T&& v)
-		noexcept(std::is_nothrow_move_assignable<T>::value) {
-			if(isValid)
-				reinterpret_cast<T&>(val) = std::move(v);
-
-			else {
-				new (&val) T{std::move(v)};
-				isValid = true;
-			}
-
-			return *this;
-		}
-
-		/**
-		 * Bool conversion operator.
-		 *
-		 * Provided for convenience, to allow syntax such as
-		 * \code
-		 *   maybe<T> m = ...;
-		 *   if(m) {
-		 *       doStuff(m);
-		 *   }
-		 * \endcode
-		 */
-		explicit constexpr operator bool() const noexcept {
-			return isValue();
-		}
-
-		/**
-		 * Dereference operator.
-		 * 
-		 * \throws `invalid_maybe_access` if `this` is not a value.
-		 */
-		value_type& operator* () {
-			if(!isValid)
-				throw invalid_maybe_access{
-					"Attempting to read the value of Nothing."
-				};
-
-			return reinterpret_cast<T&>(val);
-		}
-
-		/// \overload
-		const value_type& operator* () const {
-			if(!isValid)
-				throw invalid_maybe_access{
-					"Attempting to read the value of Nothing."
-				};
-
-			return reinterpret_cast<const T&>(val);
-		}
-
-		/**
-		 * Member access operator.
-		 * 
-		 * \throws std::logic_error if `this` is `nothing`.
-		 */
-		value_type* operator-> () {
-			if(!isValid)
-				throw invalid_maybe_access{
-					"Attempting to read the value of Nothing."
-				};
-
-			return reinterpret_cast<T*>(&val);
-		}
-
-		/// \overload
-		const value_type* operator-> () const {
-			if(!isValid)
-				throw invalid_maybe_access{
-					"Attempting to read the value of Nothing."
-				};
-
-			return reinterpret_cast<const T*>(&val);
-		}
-
-		iterator begin() noexcept {
-			return iterator(this);
-		}
-
-		const_iterator begin() const noexcept {
-			return const_iterator(const_cast<maybe*>(this));
-		}
-
-		constexpr const_iterator cbegin() const noexcept {
-			return const_iterator(const_cast<maybe*>(this));
-		}
-
-		iterator end() noexcept {
-			return iterator();
-		}
-
-		const_iterator end() const noexcept {
-			return const_iterator();
-		}
-
-		constexpr const_iterator cend() const noexcept {
-			return const_iterator();
-		}
-
-		/**
-		 * Swaps value with another `maybe`.
-		 *
-		 * Swap guarantees the following for all `a` and `b` of applicable
-		 * value type:
-		 * \code
-		 *   auto x = a;
-		 *   auty y = b;
-		 *   swap(a,b)
-		 *
-		 *   a == y && b == x
-		 * \endcode
-		 */
-		template<typename = Requires<std::is_nothrow_move_constructible<T>::value>>
-		void swap(maybe<T>& m) noexcept {
-			if(!isValid && m.isValid)
-			{
-				new (this) maybe{std::move(m)};
-				m.self_destruct();
-			}
-
-			else if(isValid && !m.isValid)
-			{
-				new (&m) maybe{std::move(*this)};
-				self_destruct();
-			}
-
-			else if(isValid && m.isValid)
-			{
-				std::swap(
-						reinterpret_cast<T&>(val),
-						reinterpret_cast<T&>(m.val)
-				);
-			}
-		}
-
-		/**
-		 * Static constructor of Nothing:s.
-		 *
-		 * The only purpose of this static method is to be more explicit than
-		 * relying on maybe's default constructor. The end result is exactly
-		 * equivalent.
-		 */
-		static constexpr maybe<T> nothing() noexcept {
-			return maybe();
-		}
-
-	private:
-		void self_destruct() {
-			if(isValid) {
-				reinterpret_cast<T&>(val).~T();
-				isValid = false;
-			}
-		}
-
-		typename std::aligned_storage<
-			sizeof(T),
-			std::alignment_of<T>::value>::type val;
-
-		bool isValid = false;
-	};
-
-	template<typename T>
-	void swap(maybe<T>& m1, maybe<T>& m2) {
-		static_assert(
-			std::is_nothrow_move_constructible<T>::value,
-			"Cannot swap maybes of a type that is't noexcept move constructible"
-		);
-		m1.swap(m2);
-	}
-
-	/**
-	 * Convenience function to create maybe:s.
-	 *
-	 * Creates a maybe, the exact type of which is automatically inferred from
-	 * the parameter type.
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename A>
-	constexpr maybe<plain_type<A>> value(A&& a)
-	noexcept(std::is_nothrow_constructible<plain_type<A>,A>::value) {
-		return maybe<plain_type<A>>(std::forward<A>(a));
-	}
-
-	/**
-	 * Equality comparison for maybe.
-	 *
-	 * \note Instantiating this operator for `A`s that have no equality operator
-	 *       of their own will result in compilation error.
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename A>
-	bool operator== (const maybe<A>& m1, const maybe<A>& m2) {
-		if(m1 && m2) {
-			return *m1 == *m2;
-		}
-		else if(!m1 && !m2) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename T>
-	bool operator== (const maybe<T>& m, nothing_t) noexcept {
-		return !static_cast<bool>(m);
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename T>
-	bool operator== (nothing_t, const maybe<T>& m) noexcept {
-		return !static_cast<bool>(m);
-	}
-
-	/**
-	 * Not equal to operator for maybe.
-	 *
-	 * \note Instantiating this operator for `A`s that have no `operator!=`
-	 *       of their own will result in compilation error.
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename A>
-	bool operator!= (const maybe<A>& m1, const maybe<A>& m2) {
-		return !(m1 == m2);
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename T>
-	bool operator!= (const maybe<T>& m, nothing_t) noexcept {
-		return static_cast<bool>(m);
-	}
-
-	/**
-	 * \overload
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename T>
-	bool operator!= (nothing_t, const maybe<T>& m) noexcept {
-		return static_cast<bool>(m);
-	}
-
-	/**
-	 * Less than operator.
-	 *
-	 * \note Will result in compilation error if `A` is not Orderable.
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename A>
-	bool operator< (const maybe<A>& m1, const maybe<A>& m2) {
-		if(m1) {
-			if(m2) {
-				return *m1 < *m2;
-			}
-			else {
-				return false;
-			}
-		}
-		else if(m2) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * Greater than operator.
-	 *
-	 * \note Will result in compilation error if `A` is not Orderable.
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename A>
-	bool operator> (const maybe<A>& m1, const maybe<A>& m2) {
-		if(m1) {
-			if(m2) {
-				return *m1 > *m2;
-			}
-			else {
-				return true;
-			}
-		}
-
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * Monoid implementation for maybe.
-	 *
-	 * Semantics are:
-	 * \code
-	 *   id() <=> maybe::nothing() <=> maybe()
-	 *   append(value(x), value(y)) <=> value(append(x, y))
-	 *   append(value(x), maybe::nothing()) <=> value(x)
-	 *   append(maybe::nothing, value(y)) <=> value(y)
-	 *   append(maybe::nothing, maybe::nothing) <=> maybe::nothing
-	 * \endcode
-	 *
-	 * In other words, the append operation is simply lifted into the
-	 * `value_type` of the maybe and all nothings are ignored (unless
-	 * everything is nothing).
-	 *
-	 * \tparam A must be a \ref monoid
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename A>
-	struct monoid<maybe<A>> {
-		static constexpr maybe<A> id() {
-			return maybe<A>();
-		}
-
-		static maybe<A> append(const maybe<A>& m1, const maybe<A>& m2) {
-			if(m1) {
-				if(m2) {
-					return maybe<A>(monoid<A>::append(*m1, *m2));
-				}
-
-				else {
-					return m1;
-				}
-			}
-			else if(m2) {
-				return m2;
-			}
-
-			else {
-				return maybe<A>();
-			}
-		}
-
-		static constexpr bool instance = monoid<A>::instance;
-	};
-
-	/**
-	 * Implementation of monad for maybe.
-	 *
-	 * The `maybe` monad's main win is that it allows a user to postpone the
-	 * need to check for value or nothing. This can result in much more compact
-	 * code, that is nevertheless just as robust&mdash;if not more so.
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename T>
-	struct monad<maybe<T>>
-	: deriving_pure<maybe<T>>
-	, deriving_apply<in_terms_of_bind<maybe<T>>>
-	, deriving_join<in_terms_of_bind<maybe<T>>> {
-
-#ifdef DOCUMENTATION_GENERATOR
-		/**
-		 * Embed a pure value in a `maybe`.
-		 *
-		 * The same as constructing with `value(t)`.
-		 */
-		static constexpr maybe<T> pure(const T& t)
-		noexcept(std::is_nothrow_copy_constructible<T>::value);
-
-		/// \overload
-		static constexpr maybe<T> pure(T&& t)
-		noexcept(std::is_nothrow_move_constructible<T>::value);
-#endif
-
-		/**
-		 * Apply `f` if `m` is a value.
-		 *
-		 * Example:
-		 * \code
-		 *   int foo(int x) {
-		 *       return 2*x;
-		 *   }
-		 *
-		 *   maybe<int> bar(maybe<int> x) {
-		 *       return ftl::fmap(foo, x);
-		 *   }
-		 *
-		 *   bar(ftl::value(5)); // Results in value(10)
-		 *   bar(ftl::nothing);  // Results in nothing
-		 * \endcode
-		 */
-		template<typename F, typename U = result_of<F(T)>>
-		static maybe<U> map(F&& f, const maybe<T>& m) {
-			return m ? value(std::forward<F>(f)(*m)) : maybe<U>();
-		}
-		
-		/**
-		 * \overload
-		 */
-		template<typename F, typename U = result_of<F(T)>>
-		static maybe<U> map(F&& f, maybe<T>&& m) {
-			return m ? value(std::forward<F>(f)(std::move(*m))) : maybe<U>();
-		}
-
-		/**
-		 * Applies a function to unwrapped maybe value.
-		 *
-		 * This allows users to sequence an arbitrary number of computations
-		 * that might result in `nothing`, without having to explicitly check
-		 * for `nothing` until the very end&mdash;if then, the result may well
-		 * be further composed.
-		 *
-		 * Example:
-		 * \code
-		 *   maybe<float> foo(int);
-		 *   maybe<string> bar(float);
-		 *   maybe<int> baz(string);
-		 *
-		 *   maybe<int> run(maybe<int> m) {
-		 *       return ((m >>= foo) >>= bar) >>= baz;
-		 *   }
-		 *
-		 *   // Once again, without using bind
-		 *   maybe<int> run2(maybe<int> m) {
-		 *       if(m) {
-		 *           auto m2 = foo(*m);
-		 *           if(m2) {
-		 *               auto m3 = bar(*m2);
-		 *               if(m3) {
-		 *                   return baz(*m3);
-		 *               }
-		 *           }
-		 *       }
-		 *
-		 *       return nothing;
-		 *   }
-		 * \endcode
-		 *
-		 * \tparam F must satisfy \ref fn`<maybe<U>(T)>`
-		 */
-		template<
+	template<
 			typename F,
-			typename U = typename result_of<F(T)>::value_type>
-		static maybe<U> bind(const maybe<T>& m, F&& f) {
-			return m ? std::forward<F>(f)(*m) : maybe<U>();
-		}
-
-		/// \overload
-		template<
-			typename F,
-			typename U = typename result_of<F(T)>::value_type>
-		static maybe<U> bind(maybe<T>&& m, F&& f) {
-			return m ? std::forward<F>(f)(std::move(*m)) : maybe<U>();
-		}
-
-		static constexpr bool instance = true;
-	};
-
-	/**
-	 * Implementation of ftl::monoidA concept.
-	 *
-	 * Semantics are simple:
-	 * \code
-	 *   value(x)            | maybeValue = value(x)
-	 *   maybe<T>::nothing() | maybeValue = maybeValue
-	 * \endcode
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename T>
-	struct monoidA<maybe<T>> {
-		static constexpr maybe<T> fail() noexcept {
-			return maybe<T>{};
-		}
-
-		static maybe<T> orDo(const maybe<T>& m1, const maybe<T>& m2) {
-			return m1 ? m1 : m2;
-		}
-
-		static constexpr bool instance = true;
-	};
-
-	/**
-	 * Foldable instance for maybe
-	 *
-	 * Folds as if maybe was a container like any other. Naturally, a particular
-	 * maybe instance will only ever contain zero or one elements ("nothing" or
-	 * "value").
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename T>
-	struct foldable<maybe<T>>
-	: deriving_foldl<maybe<T>>
-	, deriving_foldMap<maybe<T>>, deriving_fold<maybe<T>> {
-
-		template<
-				typename Fn,
-				typename U,
-				typename = Requires<
-					std::is_convertible<
-						typename std::result_of<Fn(T,U)>::type,U
-					>::value
-				>
-		>
-		static U foldr(Fn&& fn, U&& z, const maybe<T>& m) {
-			if(m) {
-				return fn(std::forward<U>(z), *m);
-			}
-
-			return z;
-		}
-
-		static constexpr bool instance = true;
-	};
+			typename T = Value_type<F>,
+			typename = Requires<MonoidAlt<F>{}>
+	>
+	Rebind<F,maybe<T>> optional(const F& f) {
+		using Fm = Rebind<F,maybe<T>>;
+		return just % f | applicative<Fm>::pure(nothing<T>());
+	}
 }
 
 #endif

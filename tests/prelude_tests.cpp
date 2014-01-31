@@ -47,9 +47,12 @@ test_set prelude_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 
-				auto m = ftl::id % ftl::value(10);
+				auto m = ftl::id % ftl::just(10);
 
-				return m && *m == 10;
+				return m.match(
+					[](int x){ return x == 10; },
+					[](ftl::Nothing){ return false; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -57,9 +60,12 @@ test_set prelude_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 
-				auto m = ftl::const_(42) % ftl::value(3);
+				auto m = ftl::const_(42) % ftl::just(3);
 
-				return m && *m == 42;
+				return m.match(
+					[](int x){ return x == 42; },
+					[](ftl::Nothing){ return false; }
+				);
 			})
 		),
 		std::make_tuple(

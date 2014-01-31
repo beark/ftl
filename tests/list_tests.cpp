@@ -21,7 +21,7 @@
  * distribution.
  */
 #include <ftl/list.h>
-#include <ftl/maybe.h>
+#include <vector>
 #include "list_tests.h"
 
 test_set list_tests{
@@ -197,7 +197,7 @@ test_set list_tests{
 				std::list<int> l{1,2,3,4};
 
 				auto f = [](int x){
-					return x > 2 ? ftl::value(x) : ftl::maybe<int>{};
+					return x > 2 ? std::vector<int>{x} : std::vector<int>{};
 				};
 
 				return (l >>= f) == std::list<int>{3,4};

@@ -431,33 +431,6 @@ namespace ftl {
 	F operator| (F1&& f1, F2&& f2) {
 		return monoidA<F>::orDo(std::forward<F1>(f1), std::forward<F2>(f2));
 	}
-
-	// Forward declarations
-	template<typename T>
-	class maybe;
-
-	template<typename A>
-	constexpr maybe<plain_type<A>> value(A&& a)
-	noexcept(std::is_nothrow_constructible<plain_type<A>,A>::value);
-
-	/**
-	 * An optional computation.
-	 *
-	 * If `f` fails, the `optional` computation as a whole "succeeds" but yields
-	 * `nothing`, whereas it otherwise yields `value(x)` where `x` is the
-	 * computed result of `f`.
-	 *
-	 * \tparam F must be an instance of ftl::monoidA
-	 */
-	template<
-			typename F,
-			typename A = Value_type<F>,
-			typename = Requires<MonoidAlt<F>{}>
-	>
-	Rebind<F,maybe<A>> optional(const F& f) {
-		using Fm = Rebind<F,maybe<A>>;
-		return value<A> % f | applicative<Fm>::pure(maybe<A>{});
-	}
 }
 
 #endif

@@ -69,7 +69,7 @@ namespace ftl {
 		 *
 		 * Initialises the wrapped value with monad::pure(nothing).
 		 */
-		maybeT() : mMaybe(monad<Mmt>::pure(maybe<T>{})) {}
+		maybeT() : mMaybe(monad<Mmt>::pure(nothing<T>())) {}
 
 		maybeT(const maybeT&)
 		noexcept(std::is_nothrow_copy_constructible<Mmt>::value) = default;
@@ -147,7 +147,7 @@ namespace ftl {
 
 		/// Uses `M`'s pure to create a value (as opposed to `nothing`)
 		static mT<T> pure(T&& t) {
-			return mT<T>{monad<M_<maybe<T>>>::pure(value(std::forward<T>(t)))};
+			return mT<T>{monad<M_<maybe<T>>>::pure(just(std::forward<T>(t)))};
 		}
 
 		/// Composition of `M`'s and maybe's map
@@ -220,10 +220,10 @@ namespace ftl {
 			static mT<U> bind(const mT<T>& m, F f) {
 				return mT<U>{
 					*m >>= [f](const maybe<T>& m) {
-						if(m)
-							return aPure<maybe<U>>() % f(*m);
+						if(m.template is<T>())
+							return aPure<maybe<U>>() % f(get<T>(m));
 						else
-							return monad<M_<maybe<U>>>::pure(maybe<U>{});
+							return monad<M_<maybe<U>>>::pure(nothing<U>());
 					}
 				};
 			}
@@ -235,10 +235,10 @@ namespace ftl {
 			static mT<U> bind(mT<T>&& m, F f) {
 				return mT<U>{
 					std::move(*m) >>= [f](maybe<T>&& m) {
-						if(m)
-							return aPure<maybe<U>>() % f(std::move(*m));
+						if(m.template is<T>())
+							return aPure<maybe<U>>() % f(std::move(get<T>(m)));
 						else
-							return monad<M_<maybe<U>>>::pure(maybe<U>{});
+							return monad<M_<maybe<U>>>::pure(nothing<U>());
 					}
 				};
 			}
@@ -252,10 +252,10 @@ namespace ftl {
 			static mT<U> bind(const mT<T>& m, F f) {
 				return mT<U>{
 					*m >>= [f](const maybe<T>& m) {
-						if(m)
-							return *f(*m);
+						if(m.template is<T>())
+							return *f(get<T>(m));
 						else
-							return monad<M_<maybe<U>>>::pure(maybe<U>{});
+							return monad<M_<maybe<U>>>::pure(nothing<U>());
 					}
 				};
 			}
@@ -264,10 +264,10 @@ namespace ftl {
 			static mT<U> bind(mT<T>&& m, F f) {
 				return mT<U>{
 					std::move(*m) >>= [f](maybe<T>&& m) {
-						if(m)
-							return *f(std::move(*m));
+						if(m.template is<T>())
+							return *f(std::move(get<T>(m)));
 						else
-							return monad<M_<maybe<U>>>::pure(maybe<U>{});
+							return monad<M_<maybe<U>>>::pure(nothing<U>());
 					}
 				};
 			}
@@ -302,7 +302,7 @@ namespace ftl {
 
 			return maybeT<M> {
 				*mm1 >>= [mm2](const maybe<T>& m) -> Mmt {
-					if(m)
+					if(!m.template is<Nothing>())
 						return monad<Mmt>::pure(m);
 
 					else
@@ -342,8 +342,8 @@ namespace ftl {
 		static U foldl(F f, U z, const maybeT<M>& mT) {
 			return foldable<Mmt>::foldl(
 				[f](U z, const maybe<T>& m) {
-					if(m)
-						return f(z, *m);
+					if(m.template is<T>())
+						return f(z, get<T>(m));
 
 					return z;
 				},
@@ -360,8 +360,8 @@ namespace ftl {
 		static U foldr(F f, U z, const maybeT<M>& mT) {
 			return foldable<Mmt>::foldr(
 				[f](const maybe<T>& m, U z){
-					if(m)
-						return f(*m, z);
+					if(m.template is<T>())
+						return f(get<T>(m), z);
 
 					else
 						return z;

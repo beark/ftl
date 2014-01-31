@@ -33,13 +33,13 @@ test_set maybet_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 				using ftl::function;
-				using ftl::value;
+				using ftl::just;
 				using mf = ftl::maybeT<function<int(int)>>;
 
 				auto f = ftl::applicative<mf>::pure(1);
 				auto g = [](int x){ return float(x)/4.f; } % f;
 
-				return (*g)(3) == value(0.25f);
+				return (*g)(3) == just(0.25f);
 			})
 		),
 		std::make_tuple(
@@ -47,13 +47,12 @@ test_set maybet_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 				using ftl::function;
-				using ftl::value;
 				using mf = ftl::maybeT<function<int(int)>>;
 
-				mf f{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
+				mf f{ftl::inplace_tag(), [](int){ return ftl::nothing<int>(); }};
 				auto g = [](int x){ return float(x)/4.f; } % f;
 
-				return (*g)(3) == ftl::maybe<float>{};
+				return (*g)(3) == ftl::nothing<float>();
 			})
 		),
 		std::make_tuple(
@@ -64,7 +63,7 @@ test_set maybet_tests{
 
 				auto f = ftl::applicative<mf>::pure(10);
 
-				return (*f)(50) == ftl::value(10);
+				return (*f)(50) == ftl::just(10);
 			})
 		),
 		std::make_tuple(
@@ -76,12 +75,12 @@ test_set maybet_tests{
 				using ftl::operator*;
 
 				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
-				mf x{ftl::inplace_tag(), [](int x){ return ftl::value(2*x); }};
-				mf y{ftl::inplace_tag(), [](int x){ return ftl::value(x/2); }};
+				mf x{ftl::inplace_tag(), [](int x){ return ftl::just(2*x); }};
+				mf y{ftl::inplace_tag(), [](int x){ return ftl::just(x/2); }};
 
 				auto z = f % x * y;
 
-				return (*z)(6) == ftl::value(15);
+				return (*z)(6) == ftl::just(15);
 			})
 		),
 		std::make_tuple(
@@ -93,12 +92,12 @@ test_set maybet_tests{
 				using ftl::operator*;
 
 				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
-				mf x{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
-				mf y{ftl::inplace_tag(), [](int x){ return ftl::value(x/2); }};
+				mf x{ftl::inplace_tag(), [](int){ return ftl::nothing<int>(); }};
+				mf y{ftl::inplace_tag(), [](int x){ return ftl::just(x/2); }};
 
 				auto z = f % x * y;
 
-				return (*z)(6) == ftl::nothing;
+				return (*z)(6) == ftl::nothing<int>();
 			})
 		),
 		std::make_tuple(
@@ -110,12 +109,12 @@ test_set maybet_tests{
 				using ftl::operator*;
 
 				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
-				mf x{ftl::inplace_tag(), [](int x){ return ftl::value(2*x); }};
-				mf y{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
+				mf x{ftl::inplace_tag(), [](int x){ return ftl::just(2*x); }};
+				mf y{ftl::inplace_tag(), [](int){ return ftl::nothing<int>(); }};
 
 				auto z = f % x * y;
 
-				return (*z)(6) == ftl::nothing;
+				return (*z)(6) == ftl::nothing<int>();
 			})
 		),
 		std::make_tuple(
@@ -127,12 +126,12 @@ test_set maybet_tests{
 				using ftl::operator*;
 
 				ftl::function<int(int,int)> f = [](int x, int y){ return x+y; };
-				mf x{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
-				mf y{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
+				mf x{ftl::inplace_tag(), [](int){ return ftl::nothing<int>(); }};
+				mf y{ftl::inplace_tag(), [](int){ return ftl::nothing<int>(); }};
 
 				auto z = f % x * y;
 
-				return (*z)(6) == ftl::nothing;
+				return (*z)(6) == ftl::nothing<int>();
 			})
 		),
 		std::make_tuple(
@@ -142,14 +141,14 @@ test_set maybet_tests{
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
-				mf f{ftl::inplace_tag(), [](int x){ return ftl::value(x); }};
+				mf f{ftl::inplace_tag(), [](int x){ return ftl::just(x); }};
 				auto g = f >>= [](int x){
 					return ftl::maybeT<function<float(int)>>{
 						ftl::inplace_tag(),
-						[x](int y){ return ftl::value(float(x+y)/4.f); }
+						[x](int y){ return ftl::just(float(x+y)/4.f); }
 					};
 				};
-				return (*g)(2) == ftl::value(1.f);
+				return (*g)(2) == ftl::just(1.f);
 			})
 		),
 		std::make_tuple(
@@ -159,14 +158,14 @@ test_set maybet_tests{
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
-				mf f{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
+				mf f{ftl::inplace_tag(), [](int){ return ftl::nothing<int>(); }};
 				auto g = f >>= [](int x){
 					return ftl::maybeT<function<float(int)>>{
 						ftl::inplace_tag(),
-						[x](int y){ return ftl::value(float(x+y)/4.f); }
+						[x](int y){ return ftl::just(float(x+y)/4.f); }
 					};
 				};
-				return (*g)(2) == ftl::nothing;
+				return (*g)(2) == ftl::nothing<float>();
 			})
 		),
 		std::make_tuple(
@@ -176,14 +175,14 @@ test_set maybet_tests{
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
-				mf f{ftl::inplace_tag(), [](int x){ return ftl::value(x); }};
+				mf f{ftl::inplace_tag(), [](int x){ return ftl::just(x); }};
 				auto g = f >>= [](int){
 					return ftl::maybeT<function<float(int)>>{
 						ftl::inplace_tag(),
-						[](int){ return ftl::maybe<float>{}; }
+						[](int){ return ftl::nothing<float>(); }
 					};
 				};
-				return (*g)(2) == ftl::nothing;
+				return (*g)(2) == ftl::nothing<float>();
 			})
 		),
 		std::make_tuple(
@@ -193,14 +192,14 @@ test_set maybet_tests{
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
-				mf f{ftl::inplace_tag(), [](int){ return ftl::maybe<int>{}; }};
+				mf f{ftl::inplace_tag(), [](int){ return ftl::nothing<int>(); }};
 				auto g = f >>= [](int){
 					return ftl::maybeT<function<float(int)>>{
 						ftl::inplace_tag(),
-						[](int){ return ftl::maybe<float>{}; }
+						[](int){ return ftl::nothing<float>(); }
 					};
 				};
-				return (*g)(2) == ftl::nothing;
+				return (*g)(2) == ftl::nothing<float>();
 			})
 		),
 		std::make_tuple(
@@ -210,13 +209,13 @@ test_set maybet_tests{
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
-				mf f{ftl::inplace_tag(), [](int x){ return ftl::value(x); }};
+				mf f{ftl::inplace_tag(), [](int x){ return ftl::just(x); }};
 				auto g = f >>= [](int x){
 					return function<float(int)>{
 						[x](int y){ return float(x+y)/4.f; }
 					};
 				};
-				return (*g)(2) == ftl::value(1.f);
+				return (*g)(2) == ftl::just(1.f);
 			})
 		),
 		std::make_tuple(
@@ -226,13 +225,13 @@ test_set maybet_tests{
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
 
-				mf f{ftl::inplace_tag(), [](int x){ return ftl::value(x); }};
+				mf f{ftl::inplace_tag(), [](int x){ return ftl::just(x); }};
 				auto g = std::move(f) >>= [](int x){
 					return function<float(int)>{
 						[x](int y){ return float(x+y)/4.f; }
 					};
 				};
-				return (*g)(2) == ftl::value(1.f);
+				return (*g)(2) == ftl::just(1.f);
 			})
 		),
 		std::make_tuple(
@@ -294,10 +293,10 @@ test_set maybet_tests{
 
 				maybeT<std::vector<int>> m1{
 					inplace_tag(),
-					value(1),
-					value(2),
-					maybe<int>{},
-					value(4)
+					just(1),
+					just(2),
+					nothing<int>(),
+					just(4)
 				};
 
 				auto r = foldl([](int x, int y){ return x+y; }, 0, m1);
@@ -312,10 +311,10 @@ test_set maybet_tests{
 
 				maybeT<std::vector<float>> m1{
 					inplace_tag(),
-					value(4.f),
-					value(4.f),
-					maybe<float>{},
-					value(2.f)
+					just(4.f),
+					just(4.f),
+					nothing<float>(),
+					just(2.f)
 				};
 
 				auto r = foldr([](float x, float y){ return x/y; }, 16.f, m1);
@@ -330,10 +329,10 @@ test_set maybet_tests{
 
 				maybeT<std::vector<sum_monoid<int>>> m1{
 					inplace_tag(),
-					value(sum(1)),
-					value(sum(2)),
-					maybe<sum_monoid<int>>{},
-					value(sum(4))
+					just(sum(1)),
+					just(sum(2)),
+					nothing<sum_monoid<int>>(),
+					just(sum(4))
 				};
 
 				return fold(m1) == 7;
