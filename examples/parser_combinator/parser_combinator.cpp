@@ -1,6 +1,8 @@
 #include "parser_combinator.h" 
 #include <sstream>
 
+using namespace ftl;
+
 parser<char> anyChar() {
 	return parser<char>([](std::istream& s) {
 		char ch;
@@ -66,8 +68,8 @@ parser<std::string> many(parser<char> p) {
 	return parser<std::string>([p](std::istream& s) {
 		auto r = (*p)(s);
 		std::ostringstream oss;
-		while(r) {
-			oss << *r;
+		while(r.template is<Right<char>>()) {
+			oss << *get<Right<char>>(r);
 			r = (*p)(s);
 		}
 
@@ -75,23 +77,12 @@ parser<std::string> many(parser<char> p) {
 	});
 }
 
-parser<std::string> many1(parser<char> p) {
-	using ftl::operator>>=;
+std::string prepend(char c, std::string s) {
+	s.insert(s.begin(), c);
+	return s;
+}
 
-	// Run p once normally, bind with what's essentially "many"
-	return p >>= [p](char t) {
-		return parser<std::string>([p,t](std::istream& strm) {
-			auto r = (*many(p))(strm);
-			if(r) {
-				r->insert(r->begin(), t);
-				return r;
-			}
-			else {
-				std::string s;
-				s.insert(s.begin(), t);
-				return yield(s);
-			}
-		});
-	};
+parser<std::string> many1(parser<char> p) {
+	return curry(prepend) % p * many(p);
 }
 

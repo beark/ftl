@@ -54,15 +54,15 @@ int main(int, char**) {
 	auto parser = parseLispList();
 	auto res = run(parser, std::cin);
 
-	while(!res) {
-		std::cout << "expected " << res.left().message() << std::endl;
+	while(res.isTypeAt<0>()) {
+		std::cout << "expected " << ftl::get<0>(res)->message() << std::endl;
 
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 		res = run(parser, std::cin);
 	}
 
-	for(auto e : *res) {
+	for(auto e : *ftl::get<1>(res)) {
 		std::cout << e << ", ";
 	}
 
