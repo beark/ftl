@@ -313,7 +313,10 @@ test_set eithert_tests{
 
 				auto e = (*f)(10);
 
-				return e.isLeft() && e.left() == std::string("");
+				return e.match(
+					[](Left<std::string> l){ return *l == std::string(""); },
+					[](Right<int>){ return false; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -336,7 +339,13 @@ test_set eithert_tests{
 				auto x = (*h)(4);
 				auto y = (*i)(4);
 
-				return x && x.right() == 8 && y && y.right() == 8;
+				return x.match(
+					[](Left<std::string>){ return false; },
+					[](Right<int> r) { return r == 8; }
+				) && y.match(
+					[](Left<std::string>){ return false; },
+					[](Right<int> r) { return r == 8; }
+				);
 			})
 		)
 	}

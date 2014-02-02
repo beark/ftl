@@ -241,14 +241,12 @@ namespace ftl {
 			static eT<U> bind(const eT<T>& e, F f) {
 				return eT<U>{
 					*e >>= [f](const either<L,T>& e) {
-						if(e) {
-							return aPure<either<L,U>>() % f(*e);
-						}
-						else {
-							return monad<M_<either<L,U>>>::pure(
-								make_left<U>(e.left())
-							);
-						}
+						return e.match(
+							[](Left<L> l){ return aPure<M_<either<L,U>>>()(l); },
+							[f](const Right<T>& r){
+								return aPure<either<L,U>>() % f(*r);
+							}
+						);
 					}
 				};
 			}
@@ -260,13 +258,12 @@ namespace ftl {
 			static eT<U> bind(eT<T>&& e, F f) {
 				return eT<U>{
 					std::move(*e) >>= [f](either<L,T>&& e) {
-						if(e)
-							return aPure<either<L,U>>() % f(std::move(*e));
-						else {
-							return monad<M_<either<L,U>>>::pure(
-								make_left<U>(e.left())
-							);
-						}
+						return e.match(
+							[](Left<L> l){ return aPure<M_<either<L,U>>>()(l); },
+							[f](Right<T>& r){
+								return aPure<either<L,U>>() % f(std::move(*r));
+							}
+						);
 					}
 				};
 			}
@@ -281,14 +278,10 @@ namespace ftl {
 			static eT<U> bind(const eT<T>& e, F f) {
 				return eT<U>{
 					*e >>= [f](const either<L,T>& e) {
-						if(e)
-							return *f(*e);
-
-						else {
-							return monad<M_<either<L,U>>>::pure(
-								make_left<U>(e.left())
-							);
-						}
+						return e.match(
+							[](Left<L> l){ return aPure<M_<either<L,U>>>()(l); },
+							[f](const Right<T>& r){ return *f(*r); }
+						);
 					}
 				};
 			}
@@ -297,14 +290,10 @@ namespace ftl {
 			static eT<U> bind(eT<T>&& e, F f) {
 				return eT<U>{
 					std::move(*e) >>= [f](either<L,T>&& e) -> M_<either<L,U>> {
-						if(e)
-							return *f(std::move(*e));
-
-						else {
-							return monad<M_<either<L,U>>>::pure(
-								make_left<U>(e.left())
-							);
-						}
+						return e.match(
+							[](Left<L> l){ return aPure<M_<either<L,U>>>()(l); },
+							[f](Right<T>& r){ return *f(std::move(*r)); }
+						);
 					}
 				};
 			}
@@ -365,11 +354,10 @@ namespace ftl {
 		static U foldl(F f, U z, const eitherT<L,M>& me) {
 			return foldable<Met>::foldl(
 				[f](U z, const either<L,T>& e){
-					if(e)
-						return f(z, *e);
-
-					else
-						return z;
+					return e.match(
+						[z](Left<L>){ return z; },
+						[f,z](const Right<T>& r){ return f(z, *r); }
+					); 
 				},
 				z,
 				*me
@@ -386,11 +374,10 @@ namespace ftl {
 		static U foldr(F f, U z, const eitherT<L,M>& me) {
 			return foldable<Met>::foldr(
 				[f](const either<L,T>& e, U z){
-					if(e)
-						return f(*e, z);
-
-					else
-						return z;
+					return e.match(
+						[z](Left<L>){ return z; },
+						[f,z](const Right<T>& r){ return f(*r, z); }
+					); 
 				},
 				z,
 				*me
@@ -435,16 +422,20 @@ namespace ftl {
 		static eitherT<L,M> orDo(const eitherT<L,M>& e1, eitherT<L,M> e2) {
 			return eitherT<L,M> {
 				*e1 >>= [e2](const either<L,T>& e) -> Met {
-					if(e) {
+					if(e.template is<Right<T>>()) {
 						return monad<Met>::pure(e);
 					}
 					else {
 						return fmap(
 							[e](const either<L,T>& e2) -> either<L,T> {
-								if(e2)
+								if(e2.template is<Right<T>>())
 									return e2;
-								else
-									return make_left<T>(e.left() ^ e2.left());
+
+								else {
+									return make_left<T>(
+										*get<Left<L>>(e) ^ *get<Left<L>>(e2)
+									);
+								}
 							},
 							*e2
 						);

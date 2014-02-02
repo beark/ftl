@@ -64,25 +64,15 @@ test_set either_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("Method access works on R values"),
+			std::string("Basic pattern matching"),
 			std::function<bool()>([]() -> bool {
 				auto e = ftl::make_right<int>(std::string("test"));
 				std::string s("test");
-				return e->size() == s.size();
-			})
-		),
-		std::make_tuple(
-			std::string("Method access throws on L values"),
-			std::function<bool()>([]() -> bool {
-				auto e = ftl::make_left<std::string>(10);
-				try {
-					e->size();
-				}
-				catch(std::logic_error& e) {
-					return true;
-				}
 
-				return false;
+				return e.match(
+					[s](ftl::Right<std::string> x) { return *x == s; },
+					[](ftl::Left<int>){ return false; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -90,9 +80,15 @@ test_set either_tests{
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 				auto e = ftl::make_right<int>(10);
-				ftl::either<int,std::string> e2 = [](int){ return std::string("test"); } % e;
+				ftl::either<int,std::string> e2 =
+					[](int){ return std::string("test"); } % e;
 
-				return *e2 == std::string("test");
+				return e2.match(
+					[](ftl::Right<std::string> r){
+						return *r == std::string("test"); 
+					},
+					[](ftl::Left<int>){ return false; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -103,17 +99,24 @@ test_set either_tests{
 
 				auto e = f % make_right<char>(NoCopy(2));
 
-				return *e == 2;
+				return e.match(
+					[](Right<int> x){ return *x == 2; },
+					[](Left<char>){ return false; }
+				);
 			})
 		),
 		std::make_tuple(
-			std::string("functor::map[L&]"),
+			std::string("functor::map[a->b,L&]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;
 				auto e = ftl::make_left<int>(10);
-				ftl::either<int,std::string> e2 = [](int){ return std::string("test"); } % e;
+				ftl::either<int,std::string> e2 =
+					[](int){ return std::string("test"); } % e;
 
-				return e2.left() == 10;
+				return e2.match(
+					[](ftl::Right<std::string>){ return false; },
+					[](ftl::Left<int> l){ return l == 10; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -124,7 +127,10 @@ test_set either_tests{
 
 				auto e = f % make_left<NoCopy>('a');
 
-				return e.left() == 'a';
+				return e.match(
+					[](Right<int>){ return false; },
+					[](Left<char> c){ return c.val == 'a'; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -132,7 +138,10 @@ test_set either_tests{
 			std::function<bool()>([]() -> bool {
 				auto e = ftl::applicative<ftl::either<std::string,float>>::pure(12.f);
 
-				return *e == 12.f;
+				return e.match(
+					[](ftl::Left<std::string>){ return false; },
+					[](ftl::Right<float> x){ return x.val == 12.f; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -143,7 +152,10 @@ test_set either_tests{
 				auto fn = [](int x){ return [x](int y){ return x+y; }; };
 				auto e = fn % ftl::make_right<int>(1) * ftl::make_right<int>(1);
 
-				return *e == 2;
+				return e.match(
+					[](ftl::Left<int>){ return false; },
+					[](ftl::Right<int> r) { return *r == 2; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -154,7 +166,10 @@ test_set either_tests{
 				auto fn = [](int x){ return [x](int y){ return x+y; }; };
 				auto e = fn % ftl::make_left<int>(1) * ftl::make_right<int>(1);
 
-				return e.isLeft() && e.left() == 1;
+				return e.match(
+					[](ftl::Left<int> l){ return l == 1; },
+					[](ftl::Right<int>){ return false; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -165,7 +180,10 @@ test_set either_tests{
 				auto fn = [](int x){ return [x](int y){ return x+y; }; };
 				auto e = fn % ftl::make_right<int>(1) * ftl::make_left<int>(1);
 
-				return e.isLeft() && e.left() == 1;
+				return e.match(
+					[](ftl::Left<int> l){ return l == 1; },
+					[](ftl::Right<int>){ return false; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -176,7 +194,10 @@ test_set either_tests{
 				auto fn = [](int x){ return [x](int y){ return x+y; }; };
 				auto e = fn % ftl::make_left<int>(1) * ftl::make_left<int>(1);
 
-				return e.isLeft() && e.left() == 1;
+				return e.match(
+					[](ftl::Left<int> l){ return l == 1; },
+					[](ftl::Right<int>){ return false; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -188,7 +209,10 @@ test_set either_tests{
 
 				auto e = ftl::make_right<int>(1) >>= fn;
 
-				return *e == 2;
+				return e.match(
+					[](ftl::Left<int>){ return false; },
+					[](ftl::Right<int> r){ return r == 2; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -200,7 +224,10 @@ test_set either_tests{
 
 				auto e = ftl::make_left<int>(1) >>= fn;
 
-				return e.isLeft() && e.left() == 1;
+				return e.match(
+					[](ftl::Left<int> l){ return l == 1; },
+					[](ftl::Right<int>){ return false; }
+				);
 			})
 		),
 		std::make_tuple(
@@ -212,7 +239,10 @@ test_set either_tests{
 
 				auto e = ftl::make_right<int>(1) >>= fn;
 
-				return e.isLeft() && e.left() == 2;
+				return e.match(
+					[](ftl::Left<int> l){ return l == 2; },
+					[](ftl::Right<int>){ return false; }
+				);
 			})
 		),
 		std::make_tuple(

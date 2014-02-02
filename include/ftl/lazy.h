@@ -125,7 +125,7 @@ namespace ftl {
 		 */
 		const T& operator*() const {
 			force();
-			return **val;
+			return *get<1>(*val);
 		}
 
 		/**
@@ -134,11 +134,11 @@ namespace ftl {
 		 * This method forces evaluation.
 		 */
 		const T* operator->() const {
-			if(*val)
-				return &(**val);
+			if(val->template is<Right<T>>())
+				return std::addressof(*get<1>(*val));
 
 			force();
-			return &(**val);
+			return std::addressof(*get<1>(*val));
 		}
 
 		lazy& operator= (const lazy&) = default;
@@ -151,7 +151,7 @@ namespace ftl {
 		 *         and value_status::ready if it has.
 		 */
 		value_status status() const {
-			if(*val)
+			if(val->template is<Right<T>>())
 				return value_status::ready;
 
 			return value_status::deferred;
@@ -159,10 +159,10 @@ namespace ftl {
 
 	private:
 		void force() const {
-			if(*val)
+			if(val->template is<Right<T>>())
 				return;
 
-			*val = make_right<function<T()>>(val->left()());
+			*val = make_right<function<T()>>((*get<0>(*val))());
 		}
 
 		mutable std::shared_ptr<either<function<T()>,T>> val;
@@ -183,15 +183,7 @@ namespace ftl {
 
 		const bool& operator*() const {
 			force();
-			return **val;
-		}
-
-		const bool* operator->() const {
-			if(*val)
-				return &(**val);
-
-			force();
-			return &(**val);
+			return *get<Right<bool>>(*val);
 		}
 
 		lazy& operator= (const lazy&) = default;
@@ -199,11 +191,11 @@ namespace ftl {
 
 		explicit operator bool() {
 			force();
-			return **val;
+			return *get<Right<bool>>(*val);
 		}
 
 		value_status status() const {
-			if(*val)
+			if(val->is<Right<bool>>())
 				return value_status::ready;
 
 			return value_status::deferred;
@@ -211,10 +203,10 @@ namespace ftl {
 
 	private:
 		void force() const {
-			if(*val)
+			if(val->is<Right<bool>>())
 				return;
 
-			*val = make_right<function<bool()>>(val->left()());
+			*val = make_right<function<bool()>>((*get<0>(*val))());
 		}
 
 		mutable std::shared_ptr<either<function<bool()>,bool>> val;
