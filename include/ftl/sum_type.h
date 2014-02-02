@@ -591,7 +591,7 @@ namespace ftl {
 		explicit constexpr sum_type(constructor<T> t, Args&&...args)
 		noexcept(
 			std::is_nothrow_constructible<
-				_dtl::recursive_union<Ts...>,Args...
+				_dtl::recursive_union<Ts...>,constructor<T>,Args...
 			>::value
 		)
 		: data(t, std::forward<Args>(args)...)

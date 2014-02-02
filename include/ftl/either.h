@@ -99,7 +99,7 @@ namespace ftl {
 
 		template<typename R>
 		constexpr operator either<T,R>() const noexcept {
-			return either<T,R>{constructor<Left<T>>{}};
+			return either<T,R>{constructor<Left<T>>{}, val};
 		}
 
 		constexpr operator T() const noexcept {
