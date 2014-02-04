@@ -136,6 +136,10 @@ namespace ftl {
 	 * - \ref applicativepg (instance defined in \ref monad)
 	 * - \ref monadpg (instance defined in \ref monad)
 	 *
+	 * In addition, `Identity<T>` is implicitly convertible to `T`, `T&`, and
+	 * `T const&`. However, it is only _explicitly_ constructible from `T&&` and
+	 * `T const&`.
+	 *
 	 * \ingroup prelude
 	 */
 	template<typename T>
@@ -151,6 +155,14 @@ namespace ftl {
 		: val(std::move(t)) {}
 
 		constexpr operator T() const noexcept {
+			return val;
+		}
+
+		constexpr operator const T& () const noexcept {
+			return val;
+		}
+
+		operator T& () noexcept {
 			return val;
 		}
 
