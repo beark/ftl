@@ -48,6 +48,13 @@ namespace ftl {
 	template<typename T>
 	struct Left;
 
+	/**
+	 * One of the inner types of an either instance.
+	 *
+	 * \see Identity
+	 *
+	 * \ingroup either
+	 */
 	template<typename T>
 	using Right = Identity<T>;
 
@@ -57,22 +64,57 @@ namespace ftl {
 	 * Put simply, an instance of `either<L,R>` can store a value of
 	 * either type L, or type R, but not both at the same time.
 	 *
+	 * Perhaps most commonly, `either` is used as a means of error handling,
+	 * sometimes even as a substitute for exceptions (using the monadic
+	 * combinators). Simply put, a function that can somehow fail may choose
+	 * to return `either< ErrorType, ResultType >`. It is de facto standard that
+	 * `Right` values are returned on success and `Left` values on failure, and
+	 * either's monad instance reflects this.
+	 *
+	 * While `Left` is strongly typed and does not allow neither implicit casts
+	 * from, nor to its inner type, `Right` does implicitly cast _to_ its
+	 * inner type. It is also implicitly convertible to both `R&` and
+	 * `R const&`. The reasoning behind this is that it allows much more concise
+	 * pattern matching (see examples below).
+	 *
+	 * \par Concepts
+	 *
 	 * Either fulfills the following concepts if, and only if,
 	 * _both_ of its sub-types also do:
 	 *  
 	 * - \ref eq
-	 * - \ref orderablepg (compares left to right)
 	 *
 	 * Either fulfills the following concepts regardless of its sub-types:
 	 *
+	 * - \ref copycons
+	 * - \ref movecons
 	 * - \ref functor (in R)
 	 * - \ref applicative (in R)
 	 * - \ref monad (in R)
 	 *
-	 * \note Either is _not_ \ref defcons.
+	 * \par Examples
 	 *
-	 * \tparam L The "left" type
-	 * \tparam R The "right" type
+	 * Basic pattern matching:
+	 * \code
+	 *   either<int,int> e = make_right<int>(10);
+	 *
+	 *   int x = e.match(
+	 *       [](int r){ return 2*r; },
+	 *       [](Left<int> l){ return *l; }
+	 *   );
+	 *   // x == 20
+	 * \endcode
+	 *
+	 * Effectful pattern matching:
+	 * \code
+	 *   either<int,int> e = make_right<int>(10);
+	 *
+	 *   e.matchE(
+	 *       [](int& r){ r *= 2; },
+	 *       [](Left<int>& l){ ++(*l); }
+	 *   );
+	 *   // e == make_right<int>(20)
+	 * \endcode
 	 *
 	 * \ingroup either
 	 */
@@ -87,6 +129,40 @@ namespace ftl {
 		using rebind = either<L,S>;
 	};
 
+	/**
+	 * One of the inner types of an either instance.
+	 *
+	 * In particular, this is the _defining_ subtype of either. Any `sum_type`
+	 * instance that is equivalent of `sum_type<Left<T>,Identity<U>>` is exactly
+	 * equivalent of `either` and will behave like it, use its concept
+	 * instances, and so on.
+	 *
+	 * For any type `U`, `Left<T>` is implicitly convertible to `either<T,U>`.
+	 *
+	 * Note that `Left` is not implicitly convertible to `T`, meaning that in a
+	 * match expression you must use the fully qualified `Left<T>` clause. This
+	 * is of course because otherwise, matching on an `either<T,T>`, e.g. like
+	 * so:
+	 *
+	 * \code
+	 *   either<int,int> x = ...;
+	 *   auto y = x.match(
+	 *       [](int x){ ... },
+	 *       [](Left<int> x){ ... }
+	 *   );
+	 * \endcode
+	 *
+	 * would evaluate the first match clause, regardless of whether it should
+	 * have matched `Left` instead.
+	 *
+	 * \par Concepts
+	 *
+	 * - \ref fullycons
+	 * - \ref deref, to `T`
+	 * - \ref eq, if `T` is
+	 *
+	 * \ingroup either
+	 */
 	template<typename T>
 	struct Left {
 		Left() = default;
@@ -100,10 +176,6 @@ namespace ftl {
 		template<typename R>
 		constexpr operator either<T,R>() const noexcept {
 			return either<T,R>{constructor<Left<T>>{}, val};
-		}
-
-		constexpr operator T() const noexcept {
-			return val;
 		}
 
 		T& operator* () noexcept {
