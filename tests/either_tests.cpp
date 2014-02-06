@@ -108,6 +108,52 @@ test_set either_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("fromLeft"),
+			std::function<bool()>([]() -> bool {
+				auto e = ftl::make_left<int>(std::string("test"));
+
+				return ftl::fromLeft(e) == std::string("test");
+			})
+		),
+		std::make_tuple(
+			std::string("fromLeft[throws]"),
+			std::function<bool()>([]() -> bool {
+				auto e = ftl::make_right<int>(std::string("test"));
+
+				try {
+					ftl::fromLeft(e);
+				}
+				catch(ftl::invalid_sum_type_access) {
+					return true;
+				}
+
+				return false;
+			})
+		),
+		std::make_tuple(
+			std::string("fromRight"),
+			std::function<bool()>([]() -> bool {
+				auto e = ftl::make_right<int>(std::string("test"));
+
+				return ftl::fromRight(e) == std::string("test");
+			})
+		),
+		std::make_tuple(
+			std::string("fromRight[throws]"),
+			std::function<bool()>([]() -> bool {
+				auto e = ftl::make_left<int>(std::string("test"));
+
+				try {
+					ftl::fromRight(e);
+				}
+				catch(ftl::invalid_sum_type_access) {
+					return true;
+				}
+
+				return false;
+			})
+		),
+		std::make_tuple(
 			std::string("functor::map[R&]"),
 			std::function<bool()>([]() -> bool {
 				using ftl::operator%;

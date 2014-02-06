@@ -235,6 +235,94 @@ namespace ftl {
 		return either<L0,R>{constructor<Left<L0>>{}, std::forward<L>(l)};
 	}
 
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct fromLeft_ {
+
+		template<typename L, typename R>
+		L& operator()(either<L,R>& e) const {
+			return *get<0>(e);
+		}
+
+		template<typename L, typename R>
+		const L& operator()(const either<L,R>& e) const {
+			return *get<0>(e);
+		}
+
+	} fromLeft{};
+#else
+	struct ImplementationDefined {
+	}
+
+	/**
+	 * Covenience function to irrefutably interpret an either as its Left type.
+	 *
+	 * Behaves as an overloaded function of types
+	 * \code
+	 *   (either<L,R>&) -> L&
+	 *   (const either<L,R>&) -> const L&
+	 * \endcode
+	 *
+	 * Invoking this on a `Right' value will throw an `invalid_sum_type_access`
+	 * exception.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   void unsafeMutateLeft(either<A,B>& e) {
+	 *       // May throw
+	 *       fromLeft(e) = A{...};
+	 *   }
+	 * \endcode
+	 *
+	 * \ingroup either
+	 */
+	fromLeft;
+#endif
+
+#ifndef DOCUMENTATION_GENERATOR
+	constexpr struct fromRight_ {
+
+		template<typename L, typename R>
+		R& operator()(either<L,R>& e) const {
+			return *get<1>(e);
+		}
+
+		template<typename L, typename R>
+		const R& operator()(const either<L,R>& e) const {
+			return *get<1>(e);
+		}
+
+	} fromRight{};
+#else
+	struct ImplementationDefined {
+	}
+
+	/**
+	 * Covenience function to irrefutably interpret an either as its Right type.
+	 *
+	 * Behaves as an overloaded function of types
+	 * \code
+	 *   (either<L,R>&) -> R&
+	 *   (const either<L,R>&) -> const R&
+	 * \endcode
+	 *
+	 * Invoking this on a `Left' value will throw an `invalid_sum_type_access`
+	 * exception.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   void unsafeMutateRight(either<A,B>& e) {
+	 *       // May throw
+	 *       fromRight(e) = B{...};
+	 *   }
+	 * \endcode
+	 *
+	 * \ingroup either
+	 */
+	fromRight;
+#endif
+
 	/**
 	 * Smart constructor of right values.
 	 *
