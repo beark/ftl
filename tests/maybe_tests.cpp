@@ -147,6 +147,59 @@ test_set maybe_tests{
 					&& r4.is<ftl::Nothing>();
 			})
 		),
+		std::make_tuple(
+			std::string("foldable::foldl"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto m1 = just(10);
+				auto m2 = nothing<int>();
+				auto f = [](int x, int y){ return x+y; };
+
+				return foldl(f, 4, m1) == 14
+					&& foldl(f, 4, m2) == 4;
+			})
+		),
+		std::make_tuple(
+			std::string("foldable::foldr"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto m1 = just(10);
+				auto m2 = nothing<int>();
+				auto f = [](int x, int y){ return x+y; };
+
+				return foldr(f, 4, m1) == 14
+					&& foldr(f, 4, m2) == 4;
+			})
+		),
+		// GCC: internal compiler error: in nothrow_spec_p at cp/except.c:1263
+		/*
+		std::make_tuple(
+			std::string("foldable::foldMap"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto m1 = just(2);
+				auto m2 = nothing<int>();
+
+
+				return foldMap(prod<int>, m1) == 2 && foldMap(prod<int>, m2) == 1;
+			})
+		),
+		*/
+		std::make_tuple(
+			std::string("foldable::fold"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto m1 = just(prod(2));
+				auto m2 = nothing<prod_monoid<int>>();
+
+
+				return fold(m1) == 2 && fold(m2) == 1;
+			})
+		)
 	}
 };
 

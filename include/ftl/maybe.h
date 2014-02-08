@@ -357,7 +357,53 @@ namespace ftl {
 		static constexpr bool instance = true;
 	};
 
-	// TODO: Foldable, Monoid
+	/**
+	 * Foldable implementation for `maybe`.
+	 *
+	 * Behaves as if `maybe` was a container of 0 or 1 elements. In other words,
+	 * folding `Nothing` is exactly the same as folding an empty list, and
+	 * folding on `just(something)` is the same as folding a list with one
+	 * element.
+	 *
+	 * \ingroup maybe
+	 */
+	template<typename T>
+	struct foldable<maybe<T>>
+	: deriving_foldMap<maybe<T>>, deriving_fold<maybe<T>> {
+		template<typename F, typename U>
+		static constexpr plain_type<U> foldl(F&& f, U&& z, const maybe<T>& m)
+		noexcept(noexcept(f(std::declval<plain_type<U>>(), std::declval<T>())))
+		{
+			static_assert(
+				std::is_convertible<
+					typename std::result_of<F(U,T)>::type,U
+				>::value,
+				"The result of F(U,T) must be convertible to U"
+			);
+
+			return m.template is<Nothing>()
+				? z
+				: std::forward<F>(f)(std::forward<U>(z), get<T>(m));
+		}
+
+		template<typename F, typename U>
+		static constexpr plain_type<U> foldr(F&& f, U&& z, const maybe<T>& m)
+		noexcept(noexcept(f(std::declval<plain_type<U>>(), std::declval<T>())))
+		{
+			static_assert(
+				std::is_convertible<
+					typename std::result_of<F(T,U)>::type,U
+				>::value,
+				"The result of F(T,U) must be convertible to U"
+			);
+
+			return m.template is<Nothing>()
+				? z
+				: std::forward<F>(f)(get<T>(m), std::forward<U>(z));
+		}
+
+		static constexpr bool instance = true;
+	};
 
 	/**
 	 * An optional computation.
