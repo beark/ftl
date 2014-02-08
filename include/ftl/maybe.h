@@ -77,7 +77,8 @@ namespace ftl {
 	 * - \ref movecons, if `T` is
 	 * - \ref assignable, if `T` is
 	 * - \ref eq, if `T` is
-	 * - \ref orderable, if `T` is
+	 * - \ref orderable, if `T` is (`Nothing` always compares less than anything
+	 *        else)
 	 *
 	 * \see sum_type
 	 *
@@ -199,20 +200,60 @@ namespace ftl {
 		using rebind = maybe<U>;
 	};
 
-	// TODO: Documentation
+	/**
+	 * Maybe's monad instance.
+	 *
+	 * An intuitive way to reason about `maybe`'s monad implementation is that
+	 * it behaves as if it were a regular container, such as `list` or `vector`,
+	 * except it can at most hold one value. The monadic operations then become
+	 * easier to remember.
+	 *
+	 * \ingroup maybe
+	 */
 	template<typename T>
 	struct monad<maybe<T>> {
+		/**
+		 * Embeds a value in the `maybe` context/container.
+		 *
+		 * Exactly equivalent to invoking `just` on the value.
+		 */
 		static constexpr maybe<T> pure(const T& t)
 		noexcept(std::is_nothrow_copy_constructible<T>::value) {
 			return just(t);
 		}
 
+		/// \overload
 		static constexpr maybe<T> pure(T&& t)
 		noexcept(std::is_nothrow_move_constructible<T>::value) {
 			return just(std::move(t));
 		}
 
 		// TODO: C++14: capture f with forwarding instead of copy
+		/**
+		 * Maybe maps a function to a contained value.
+		 *
+		 * From the perspective of considering maybe a 0 or 1 element container,
+		 * behaves exactly as expected: if "empty" (`Nothing`), the function is
+		 * never called and the result is another "empty" container; if there is
+		 * an element, `f` is applied on it and the result is embedded as if by
+		 * `pure`.
+		 *
+		 * \par Examples
+		 *
+		 * Successful computation:
+		 * \code
+		 *   auto x = just(12);
+		 *   auto y = fmap([](int x){ return std::to_string(x); }, x);
+		 *   // y == just(std::string("12"))
+		 * \endcode
+		 *
+		 * Computation with failure:
+		 * \code
+		 *   auto x = nothing<int>();
+		 *   auto r = fmap([](int x){ return std::to_string(x); }, x);
+		 *   // y == nothing<std::string>()
+		 * \endcode
+		 */
 		template<typename F, typename U = result_of<F(T)>>
 		static constexpr maybe<U> map(F f, const maybe<T>& m) {
 			return m.match(
@@ -222,6 +263,7 @@ namespace ftl {
 		}
 
 		// TODO: when sum_type has r-value overload on match, move stuff
+		/// \overload
 		template<typename F, typename U = result_of<F(T)>>
 		static constexpr maybe<U> map(F f, maybe<T>&& m) {
 			return m.match(
@@ -232,6 +274,30 @@ namespace ftl {
 
 		// TODO: Move version for mf when sum_type has r-value match
 		// TODO: C++14: capture m by copy/move as appropriate
+		/**
+		 * Apply a contained function to a contained value and embed the result.
+		 *
+		 * Very similar to `map`, except this time the function is embedded in a
+		 * `maybe` as well.
+		 *
+		 * \par Examples
+		 *
+		 * Successful computation:
+		 * \code
+		 *   auto f = just([](int x){ return 2*x; });
+		 *   auto m = just(10);
+		 *   auto r = aapply(f, m);
+		 *   // r == just(20)
+		 * \endcode
+		 *
+		 * Computation with failure:
+		 * \code
+		 *   auto f = just([](int x){ return 2*x; });
+		 *   auto m = nothing<int>();
+		 *   auto r = aapply(f, m);
+		 *   // r == nothing<int>()
+		 * \endcode
+		 */
 		template<typename F, typename U = result_of<F(T)>>
 		static constexpr maybe<U> apply(const maybe<F>& mf, maybe<T> m) {
 			return mf.match(
@@ -241,6 +307,7 @@ namespace ftl {
 		}
 
 		// TODO: C++14: capture f by forwarding
+		/// \overload
 		template<typename F, typename U = Value_type<result_of<F(T)>>>
 		static constexpr maybe<U> bind(const maybe<T>& m, F f) {
 			return m.match(
@@ -249,6 +316,27 @@ namespace ftl {
 			);
 		}
 
+		/**
+		 * Extract `m`'s value and forward to `f` if non-`Nothing`.
+		 *
+		 * \par Examples
+		 *
+		 * Successful computation:
+		 * \code
+		 *   auto f = [](int x){ return std::to_string(x); };
+		 *   auto m = just(10);
+		 *   auto r = mbind(m, f);
+		 *   // r == just(std::string("10"))
+		 * \endcode
+		 *
+		 * Computation with failure:
+		 * \code
+		 *   auto f = [](int x){ return nothing<std::string>(); };
+		 *   auto m = just(10);
+		 *   auto r = mbind(m, f);
+		 *   // r == nothing<std::string>()
+		 * \endcode
+		 */
 		template<typename F, typename U = Value_type<result_of<F(T)>>>
 		static constexpr maybe<U> bind(maybe<T>&& m, F f) {
 			return m.match(
@@ -258,6 +346,7 @@ namespace ftl {
 		}
 
 		// TODO: Move version for m when sum_type has r-value match
+		/// \overload
 		static constexpr maybe<T> join(const maybe<maybe<T>>& m) {
 			return m.match(
 				[](maybe<T> m){ return m; },
