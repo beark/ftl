@@ -12,7 +12,7 @@ install:
   # install libc++ if tests are run with clang++
   - if [ "`echo $CXX`" == "clang++" ]; then cwd=$(pwd); fi
   - if [ "`echo $CXX`" == "clang++" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk@181765 libcxx; fi
-  - if [ "`echo $CXX`" == "clang++" ]; then cd libcxx/lib && ./buildit; fi
+  - if [ "`echo $CXX`" == "clang++" ]; then cd libcxx/lib && bash buildit; fi
   - if [ "`echo $CXX`" == "clang++" ]; then sudo cp ./libc++.so.1.0 /usr/lib/; fi
   - if [ "`echo $CXX`" == "clang++" ]; then sudo mkdir /usr/include/c++/v1; fi
   - if [ "`echo $CXX`" == "clang++" ]; then cd .. && sudo cp -r include/* /usr/include/c++/v1/; fi
