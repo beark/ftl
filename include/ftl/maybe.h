@@ -406,6 +406,80 @@ namespace ftl {
 	};
 
 	/**
+	 * Monoid implementation for maybe.
+	 *
+	 * Semantics are:
+	 * \code
+	 *   id() <=> maybe::nothing() <=> maybe()
+	 *   append(value(x), value(y)) <=> value(append(x, y))
+	 *   append(value(x), maybe::nothing()) <=> value(x)
+	 *   append(maybe::nothing, value(y)) <=> value(y)
+	 *   append(maybe::nothing, maybe::nothing) <=> maybe::nothing
+	 * \endcode
+	 *
+	 * In other words, the append operation is simply lifted into the
+	 * `value_type` of the maybe and all nothings are ignored (unless
+	 * everything is nothing).
+	 *
+	 * \tparam T must be a \ref monoidpg
+	 *
+	 * \ingroup maybe
+	 */
+	template<typename T>
+	struct monoid<maybe<T>> {
+		static_assert(Monoid<T>{}, "T must be an instance of Monoid");
+
+		static constexpr maybe<T> id() noexcept {
+			return Nothing{};
+		}
+
+		static constexpr maybe<T> append(const maybe<T>& m1, const maybe<T>& m2)
+		noexcept {
+			return m1.template is<T>()
+				? (m2.template is<T>()
+					? maybe<T>{constructor<T>(), get<T>(m1) ^ get<T>(m2)}
+					: m1)
+				: m2;
+		}
+
+		static constexpr maybe<T> append(const maybe<T>& m1, maybe<T>&& m2)
+		noexcept {
+			return m1.template is<T>()
+				? (m2.template is<T>()
+					? maybe<T>{
+						constructor<T>(), get<T>(m1) ^ std::move(get<T>(m2))
+					}
+					: m1)
+				: std::move(m2);
+		}
+
+		static constexpr maybe<T> append(maybe<T>&& m1, const maybe<T>& m2)
+		noexcept {
+			return m1.template is<T>()
+				? (m2.template is<T>()
+					? maybe<T>{
+						constructor<T>(), std::move(get<T>(m1)) ^ get<T>(m2)
+					}
+					: std::move(m1))
+				: m2;
+		}
+
+		static constexpr maybe<T> append(maybe<T>&& m1, maybe<T>&& m2)
+		noexcept {
+			return m1.template is<T>()
+				? (m2.template is<T>()
+					? maybe<T>{
+						constructor<T>(),
+						std::move(get<T>(m1)) ^ std::move(get<T>(m2))
+					}
+					: std::move(m1))
+				: std::move(m2);
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
 	 * An optional computation.
 	 *
 	 * If `f` fails, the `optional` computation as a whole "succeeds" but yields

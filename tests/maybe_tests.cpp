@@ -148,6 +148,34 @@ test_set maybe_tests{
 			})
 		),
 		std::make_tuple(
+			std::string("monoid::mappend[id]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto m1 = just(sum(10));
+				auto m2 = nothing<sum_monoid<int>>();
+
+				auto r1 = m1 ^ m2;
+				auto r2 = m2 ^ m1;
+
+				return r1 == m1 && r2 == m1;
+			})
+		),
+		std::make_tuple(
+			std::string("monoid::mappend"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				auto m1 = just(sum(10));
+				auto m2 = just(sum(5));
+
+				auto r1 = m1 ^ m2;
+				auto r2 = m2 ^ m1;
+
+				return r1 == just(sum(15)) && r2 == just(sum(15));
+			})
+		),
+		std::make_tuple(
 			std::string("foldable::foldl"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
