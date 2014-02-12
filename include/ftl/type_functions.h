@@ -598,7 +598,16 @@ namespace ftl {
 		 * \endcode
 		 */
 		template<typename U>
-		using rebind = typename _dtl::default_rebind<T,U>::type;
+		using rebind = typename ::ftl::_dtl::default_rebind<T,U>::type;
+	};
+
+	template<typename T>
+	struct parametric_type_traits<const T> {
+		using value_type = typename parametric_type_traits<T>::value_type;
+
+		template<typename U>
+		using rebind =
+			const typename parametric_type_traits<T>::template rebind<U>;
 	};
 
 	/**
