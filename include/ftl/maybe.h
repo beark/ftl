@@ -23,6 +23,7 @@
 #ifndef FTL_MAYBE_H
 #define FTL_MAYBE_H
 
+#include "implementation/maybe_iterator.h"
 #include "sum_type.h"
 #include "prelude.h"
 #include "concepts/monoid.h"
@@ -76,9 +77,14 @@ namespace ftl {
 	 * - \ref copycons, if `T` is
 	 * - \ref movecons, if `T` is
 	 * - \ref assignable, if `T` is
+	 * - \ref fwditerable
 	 * - \ref eq, if `T` is
 	 * - \ref orderable, if `T` is (`Nothing` always compares less than anything
 	 *        else)
+	 *
+	 *
+	 * Note that all iterators referencing a `just` instance of `maybe` are
+	 * rendered invalid if it is changed to `Nothing`.
 	 *
 	 * \see sum_type
 	 *
@@ -102,7 +108,6 @@ namespace ftl {
 			return maybe<T>{constructor<Nothing>()};
 		}
 	};
-
 
 	constexpr bool operator== (Nothing, Nothing) noexcept {
 		return true;
@@ -153,6 +158,25 @@ namespace ftl {
 		return !(m1 < m2);
 	}
 
+	template<typename T>
+	constexpr ::ftl::_dtl::maybe_iterator<T> begin(maybe<T>& m) noexcept {
+		return ::ftl::_dtl::maybe_iterator<T>{&m};
+	}
+
+	template<typename T>
+	constexpr ::ftl::_dtl::maybe_iterator<T> end(maybe<T>&) noexcept {
+		return ::ftl::_dtl::maybe_iterator<T>{};
+	}
+
+	template<typename T>
+	constexpr ::ftl::_dtl::const_maybe_iterator<T> begin(const maybe<T>& m) noexcept {
+		return ::ftl::_dtl::const_maybe_iterator<T>{&m};
+	}
+
+	template<typename T>
+	constexpr ::ftl::_dtl::const_maybe_iterator<T> end(const maybe<T>&) noexcept {
+		return ::ftl::_dtl::const_maybe_iterator<T>{};
+	}
 
 #ifndef DOCUMENTATION_GENERATOR
 	constexpr struct just_ {

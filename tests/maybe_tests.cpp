@@ -21,6 +21,7 @@
  * distribution.
  */
 #include <ftl/maybe.h>
+#include <ftl/type_functions.h>
 #include "maybe_tests.h"
 
 test_set maybe_tests{
@@ -63,6 +64,49 @@ test_set maybe_tests{
 				mx = m3;
 
 				return mx == m3 && my == m2;
+			})
+		),
+		std::make_tuple(
+			std::string("ForwardIterable"),
+			std::function<bool()>([]() -> bool {
+				static_assert(ftl::ForwardIterable<ftl::maybe<int>>(), "");
+
+				auto m1 = ftl::just(10);
+				auto m2 = ftl::nothing<int>();
+
+				for(auto& x : m1) {
+					x += 2;
+				}
+
+				for(auto& x : m2) {
+					x += 2;
+				}
+
+				return m1 == ftl::just(12) && m2 == ftl::nothing<int>();
+			})
+		),
+		std::make_tuple(
+			std::string("ForwardIterable[const]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				static_assert(ftl::ForwardIterable<const ftl::maybe<int>>(), "");
+
+				const auto m1 = ftl::just(10);
+				const auto m2 = ftl::nothing<int>();
+
+				bool success = false;
+
+				for(auto& x : m1) {
+					success = (x == 10);
+				}
+
+				for(auto& x : m2) {
+					// Using x to silence unused variable warnings
+					success = false && x > 0;
+				}
+
+				return success;
 			})
 		),
 		std::make_tuple(
