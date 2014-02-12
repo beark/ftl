@@ -132,9 +132,9 @@ namespace ftl {
 		FTL_GEN_BINOP_TEST(<, lt);
 		FTL_GEN_BINOP_TEST(<, gt);
 
-		FTL_GEN_UNFN_TEST(std::begin, begin);
+		FTL_GEN_UNFN_TEST(begin, begin);
 		FTL_GEN_METH0_TEST(rbegin);
-		FTL_GEN_UNFN_TEST(std::end, end);
+		FTL_GEN_UNFN_TEST(end, end);
 		FTL_GEN_METH0_TEST(rend);
 
 		FTL_GEN_METH1_TEST(push_back);

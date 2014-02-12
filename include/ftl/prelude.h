@@ -494,11 +494,11 @@ namespace ftl {
 	constexpr bool ForwardIterable() {
 		return has_begin<T>::value &&
 			has_end<T>::value &&
-			has_pre_inc<decltype(std::begin(std::declval<T>()))>::value &&
-			has_post_inc<decltype(std::begin(std::declval<T>()))>::value &&
+			has_pre_inc<decltype(begin(std::declval<T>()))>::value &&
+			has_post_inc<decltype(begin(std::declval<T>()))>::value &&
 			std::is_same<
 				Value_type<T>,
-				plain_type<decltype(*std::begin(std::declval<T>()))>
+				plain_type<decltype(*begin(std::declval<T>()))>
 			>::value;
 	}
 
