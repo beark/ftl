@@ -21,7 +21,8 @@
  * distribution.
  */
 #include <ftl/list.h>
-#include <vector>
+#include <ftl/vector.h>
+#include <ftl/maybe.h>
 #include "list_tests.h"
 
 test_set list_tests{
@@ -54,6 +55,34 @@ test_set list_tests{
 				);
 
 				return l == std::list<int>{4,3,6,5,8,7};
+			})
+		),
+		std::make_tuple(
+			std::string("to_list[vector]"),
+			std::function<bool()>([]() -> bool {
+
+				auto v1 = std::vector<int>{1,2,3,4};
+				std::vector<int> v2;
+
+				auto r1 = ftl::to_list(v1);
+				auto r2 = ftl::to_list(v2);
+
+				return r1 == std::list<int>{1,2,3,4}
+					&& r2 == std::list<int>{};
+			})
+		),
+		std::make_tuple(
+			std::string("to_list[maybe]"),
+			std::function<bool()>([]() -> bool {
+
+				auto m1 = ftl::just(1);
+				auto m2 = ftl::nothing<int>();
+
+				auto r1 = ftl::to_list(m1);
+				auto r2 = ftl::to_list(m2);
+
+				return r1 == std::list<int>{1}
+					&& r2 == std::list<int>{};
 			})
 		),
 		std::make_tuple(

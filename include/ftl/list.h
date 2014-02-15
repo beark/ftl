@@ -293,6 +293,34 @@ namespace ftl {
 	struct zippable<std::list<T,A>>
 	: deriving_zippable<back_insertable_container<std::list<T,A>>> {};
 
+	/**
+	 * Convert any \ref foldablepg to a list.
+	 *
+	 * This is equivalent to right folding with a function that prepends
+	 * elements, using the empty list as starting point.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   std::vector<int> v{1,2,3,4};
+	 *   auto l = to_list(v);
+	 *   // l = std::list<int>{1,2,3,4}
+	 * \endcode
+	 *
+	 * \ingroup list
+	 */
+	template<
+			typename F, typename T = Value_type<plain_type<F>>,
+			typename = Requires<Foldable<plain_type<F>>{}>
+	>
+	std::list<T> to_list(F&& f) {
+		return foldr(
+			[](T t, std::list<T> l) { l.push_front(t); return l; },
+			std::list<T>{},
+			std::forward<F>(f)
+		);
+	}
+
 }
 
 #endif
