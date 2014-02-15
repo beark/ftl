@@ -431,7 +431,7 @@ namespace ftl {
 
 		template<typename F, typename U>
 		static constexpr plain_type<U> foldr(F&& f, U&& z, const maybe<T>& m)
-		noexcept(noexcept(f(std::declval<plain_type<U>>(), std::declval<T>())))
+		noexcept(noexcept(f(std::declval<T>(), std::declval<plain_type<U>>())))
 		{
 			static_assert(
 				std::is_convertible<
