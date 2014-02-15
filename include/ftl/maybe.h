@@ -286,17 +286,15 @@ namespace ftl {
 			);
 		}
 
-		// TODO: when sum_type has r-value overload on match, move stuff
 		/// \overload
 		template<typename F, typename U = result_of<F(T)>>
 		static constexpr maybe<U> map(F f, maybe<T>&& m) {
 			return m.match(
-				[f](T& t){ return just(f(t)); },
+				[f](T& t){ return just(f(std::move(t))); },
 				[](Nothing){ return Nothing{}; }
 			);
 		}
 
-		// TODO: Move version for mf when sum_type has r-value match
 		// TODO: C++14: capture m by copy/move as appropriate
 		/**
 		 * Apply a contained function to a contained value and embed the result.
@@ -330,16 +328,16 @@ namespace ftl {
 			);
 		}
 
-		// TODO: C++14: capture f by forwarding
 		/// \overload
-		template<typename F, typename U = Value_type<result_of<F(T)>>>
-		static constexpr maybe<U> bind(const maybe<T>& m, F f) {
-			return m.match(
-				[f](const T& t){ return f(t); },
+		template<typename F, typename U = result_of<F(T)>>
+		static constexpr maybe<U> apply(maybe<F>&& mf, maybe<T> m) {
+			return mf.match(
+				[m](F& f){ return fmap(std::move(f), m); },
 				[](Nothing){ return Nothing{}; }
 			);
 		}
 
+		// TODO: C++14: capture f by forwarding
 		/**
 		 * Extract `m`'s value and forward to `f` if non-`Nothing`.
 		 *
@@ -362,6 +360,15 @@ namespace ftl {
 		 * \endcode
 		 */
 		template<typename F, typename U = Value_type<result_of<F(T)>>>
+		static constexpr maybe<U> bind(const maybe<T>& m, F f) {
+			return m.match(
+				[f](const T& t){ return f(t); },
+				[](Nothing){ return Nothing{}; }
+			);
+		}
+
+		/// \overload
+		template<typename F, typename U = Value_type<result_of<F(T)>>>
 		static constexpr maybe<U> bind(maybe<T>&& m, F f) {
 			return m.match(
 				[f](T& t){ return f(std::move(t)); },
@@ -369,11 +376,23 @@ namespace ftl {
 			);
 		}
 
-		// TODO: Move version for m when sum_type has r-value match
-		/// \overload
+		/**
+		 * Flatten a nested maybe.
+		 *
+		 * Works in the obvious way: if an inner maybe exists, it is returned;
+		 * otherwise `Nothing` is returned.
+		 */
 		static constexpr maybe<T> join(const maybe<maybe<T>>& m) {
 			return m.match(
 				[](maybe<T> m){ return m; },
+				[](Nothing) { return Nothing{}; }
+			);
+		}
+
+		/// \overload
+		static constexpr maybe<T> join(maybe<maybe<T>>&& m) {
+			return m.match(
+				[](maybe<T>& m){ return std::move(m); },
 				[](Nothing) { return Nothing{}; }
 			);
 		}
