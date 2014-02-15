@@ -133,7 +133,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = Requires<
-					std::is_same<U, result_of<Fn(T,U)>>::value
+					std::is_convertible<U, result_of<Fn(T,U)>>::value
 				>
 		>
 		static U foldr(Fn&& fn, U&& z, const F& f);
@@ -160,7 +160,7 @@ namespace ftl {
 				typename Fn,
 				typename U,
 				typename = Requires<
-					std::is_same<U, result_of<Fn(U,T)>>::value
+					std::is_convertible<U, result_of<Fn(U,T)>>::value
 				>
 		>
 		static U foldl(Fn&& fn, U&& z, const F& f);
