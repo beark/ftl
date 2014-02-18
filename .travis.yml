@@ -11,7 +11,7 @@ env:
 # Setup repos etc before installation
 before_install:
   - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
-  - if [ "$CXX" == "clang++" -a "$CPP14" == "1" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm
+  - if [ "$CXX" == "clang++" -a "$CPP14" == "1" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
   - sudo apt-get update -qq
 
 # Install dependencies
