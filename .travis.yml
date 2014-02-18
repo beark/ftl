@@ -36,7 +36,7 @@ install:
   - if [ "$CXX" == "clang++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
   - if [ "$CXX" == "clang++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
 
-  - if ["$CXX" == "clang++" -a "$CPP14" == "1" ]; then CXX=clang++-3.4; fi
+  - if [ "$CXX" == "clang++" -a "$CPP14" == "1" ]; then CXX=clang++-3.4; fi
 
 # command to run tests
 script: 
