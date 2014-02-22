@@ -546,29 +546,52 @@ namespace ftl {
 	 */
 	template<size_t N, typename F>
 	struct make_curried_n {
-	private:
-        // Enable currying if supplied too few arguments to call F.
-        // (Otherwise F's operator() is called.)
-        template<typename...Args>
-        using Enable = Requires< (N>sizeof...(Args)) >;
+		template<typename...Args>
+		using partial_move = decltype( 
+			_dtl::part(std::declval<F&&>(), std::declval<Args>()...)
+		);
 
-        using curried = decltype(curry<N>(std::declval<F>()));
-        template<typename...Args>
-        using applied = result_of<curried(Args...)>;
+		template<typename...Args>
+		using curry_move = decltype(
+			curry<N-sizeof...(Args)>(std::declval<partial_move<Args...>>())
+		);
 
-	public:
-		template<typename...Args, typename = Enable<Args...>>
-		applied<Args...> operator()(Args&&...args) const & {
-            return curry<N>(*static_cast<const F*>(this))(
-                std::forward<Args>(args)...
-            );
+		template<typename...Args>
+		using partial_const = decltype( 
+			_dtl::part(std::declval<const F&>(), std::declval<Args>()...)
+		);
+
+		template<typename...Args>
+		using curry_const = decltype(
+			curry<N-sizeof...(Args)>(std::declval<partial_const<Args...>>())
+		);
+
+		template<
+			typename...Args, 
+			size_t M = sizeof...(Args),
+			typename = Requires< (N > M) >
+		>
+		curry_const<Args...> operator()(Args&&...args) const & {
+            return curry<N-M>(
+				_dtl::part(
+					*static_cast<const F*>(this),
+					std::forward<Args>(args)...
+				)
+			);
 		}
 
-		template<typename...Args, typename = Enable<Args...>>
-		applied<Args...> operator()(Args&&...args) && {
-            return curry<N>(std::move(*static_cast<const F*>(this)))(
-                std::forward<Args>(args)...
-            );
+		template<
+			typename...Args, 
+			size_t M = sizeof...(Args),
+			typename = Requires< (N > M) >
+		>
+		curry_move<Args...> operator()(Args&&...args) && {
+            return curry<N-M>(
+				_dtl::part(
+					std::move(*static_cast<F*>(this)),
+					std::forward<Args>(args)...
+				)
+			);
 		}
 	};
 
