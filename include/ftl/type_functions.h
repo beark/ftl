@@ -206,6 +206,34 @@ namespace ftl {
 	template<typename...Ts>
 	struct type_seq {};
 
+	namespace _dtl {
+		template<typename T, typename TSeq>
+		struct prepend_type_impl;
+
+		template<typename T, typename...Ts>
+		struct prepend_type_impl<T,type_seq<Ts...>> {
+			using type = type_seq<T,Ts...>;
+		};
+	}
+
+	/**
+	 * Prepends a single type to a `type_seq`.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   using bc = ftl::type_seq<B,C>;
+	 *
+	 *   using abc = prepend_type<A,bc>;
+	 *
+	 *   // std::is_same<ftl::type_seq<A,B,C>, abc>::value == true
+	 * \endcode
+	 *
+	 * \ingroup typelevel
+	 */
+	template<typename T, typename TSeq>
+	using prepend_type = typename _dtl::prepend_type_impl<T,TSeq>::type;
+
 	template<size_t I, typename T, typename...Ts>
 	struct index_of_impl;
 
@@ -247,7 +275,7 @@ namespace ftl {
 	 *   // index == 2
 	 * \endcode
 	 *
-	 * Searching a a `type_seq`
+	 * Searching a `type_seq`
 	 * \code
 	 *   size_t index = ftl::index_of<char, type_seq<char,int>>::value;
 	 *   // index == 0
