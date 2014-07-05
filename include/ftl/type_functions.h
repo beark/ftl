@@ -234,6 +234,124 @@ namespace ftl {
 	template<typename T, typename TSeq>
 	using prepend_type = typename _dtl::prepend_type_impl<T,TSeq>::type;
 
+	namespace _dtl {
+		template<template<typename> class F, typename...Ts>
+		struct map_types_impl;
+
+		template<template<typename> class F>
+		struct map_types_impl<F> {
+			using type = type_seq<>;
+		};
+
+		template<template<typename> class F, typename T, typename...Ts>
+		struct map_types_impl<F,T,Ts...> {
+			using type =
+				prepend_type<
+					typename F<T>::type,
+					typename map_types_impl<F,Ts...>::type
+				>;
+		};
+
+		template<template<typename> class F, typename...Ts>
+		struct map_types_impl<F,type_seq<Ts...>> {
+			using type = typename map_types_impl<F,Ts...>::type;
+		};
+
+		template<template<typename,typename> class F, typename L1, typename L2>
+		struct zip_types_impl;
+
+		template<template<typename,typename> class F, typename U, typename...Us>
+		struct zip_types_impl<F,type_seq<>,type_seq<U,Us...>> {
+			using type = type_seq<>;
+		};
+
+		template<template<typename,typename> class F, typename T, typename...Ts>
+		struct zip_types_impl<F,type_seq<T,Ts...>,type_seq<>> {
+			using type = type_seq<>;
+		};
+
+		template<
+				template<typename,typename> class F,
+				typename T, typename U,
+				typename...Ts, typename...Us
+		>
+		struct zip_types_impl<F,type_seq<T,Ts...>,type_seq<U,Us...>> {
+			using type = prepend_type<
+				typename F<T,U>::type,
+				typename zip_types_impl<F,type_seq<Ts...>,type_seq<Us...>>::type
+			>;
+		};
+	}
+
+	/**
+	 * Maps a unary type level function to a variadic pack of types.
+	 *
+	 * The type level function `F` is assumed to follow the convention of using
+	 * a member typedef `type` as result. I.e., `map_types` will "call" `F`
+	 * like this:
+	 *
+	 * \code
+	 *   typename F<T>::type
+	 * \endcode
+	 *
+	 * The result type of `map_types` is a `type_seq` containing the transformed
+	 * types in the order they originally appeared.
+	 *
+	 * Can also be called on a `type_seq` for the same result on the types
+	 * contained within.
+	 *
+	 * \par Examples
+	 *
+	 * Using on variadic type pack
+	 * \code
+	 *   using type = map_types<std::remove_const, bool, const int, std::string>;
+	 *   // type is:
+	 *   // type_seq<bool,int,std::string>
+	 * \endcode
+	 *
+	 * Using on a type_seq
+	 * \code
+	 *   using type = map_types<std::add_ptr, type_seq<int,bool,char>>;
+	 *   // type is:
+	 *   // type_seq<int*,bool*,char*>
+	 * \endcode
+	 *
+	 * \ingroup typelevel
+	 */
+	template<template<typename> class F, typename...Ts>
+	using map_types = typename _dtl::map_types_impl<F,Ts...>::type;
+
+	/**
+	 * Zips two type sequences using a binary type level function.
+	 *
+	 * The type level function `F` is assumed to follow the convention of using
+	 * a member typedef `type` as result. I.e., `zip_types` will "call" `F`
+	 * like this:
+	 *
+	 * \code
+	 *   typename F<T,U>::type
+	 * \endcode
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   using type = zip_types<
+	 *       is_same,
+	 *       type_seq<int,bool,float>,
+	 *       type_seq<char,bool>
+	 *   >;
+	 *   // type is:
+	 *   // type_seq<integral_constant<bool,false>,integral_constant<bool,true>>
+	 * \endcode
+	 *
+	 * \note Can not be called directly on variadic packs&mdash;they must be
+	 *       encapsulated in `type_seq`s.
+	 *
+	 * \ingroup typelevel
+	 */
+	template<template<typename,typename> class F, typename Ts1, typename Ts2>
+	using zip_types = typename _dtl::zip_types_impl<F,Ts1,Ts2>::type;
+
 	template<size_t I, typename T, typename...Ts>
 	struct index_of_impl;
 
