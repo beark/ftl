@@ -70,6 +70,55 @@ Monadic code may perhaps often look strange if you're not used to all the operat
 
 Other types that have been similarly endowed with new powers include: `std::future`, `std::list`, `std::vector`, `std::forward_list`, `std::map`, `std::unordered_map`, `std::set`, and more.
 
+### Sum/Union Types With Pattern Matching
+For those not familiar with sum types, they can be viewed as tagged unions. In other words, they are defined at compile time by a set of possible types, and at run-time their value will be of exactly one of those types at any particular instance. A quick example:
+```cpp
+ftl::sum_type<std::string,int> x{ftl::constructor<int>(), 3};
+```
+Here, `x`, can take on any value that is either of type `std::string` or `int` and we've initialised it to be the integer value `3`. It is necessary to use the `constructor<T>` tag to specify what type to initialise to, because some types may have constructors accepting similar or even the same arguments.
+
+Once we have our sum type, we can now pattern match&mdash;or `switch` on its type, if you prefer&mdash;to get a guaranteed safe way of accessing its value:
+```cpp
+int y = x.match(
+    [](int x){ return x+1; },           // This function will be invoked, with
+                                        // 3 as parameter
+
+    [](const std::string&){ return 0; } // This function would have been invoked
+                                        // if x was a string
+);
+```
+Unlike in a language with first class support for pattern matching, in FTL we are unfortunately forced to use functions as match clauses, as you can see above. This makes it slightly less compelling, but we do get the same static guarantees at least: FTL checks at compile time that you've covered every possible type the matched sum type could take on.
+
+Note that `match` must return a value by default, to encourage the functional way where everything is an expression and therefore returns a value. This means, of course, that all match clauses must return values such that `std::common_type` can find a common type they are all implicitly convertible to.
+
+If the above expression-semantic of `match` is not actually desirable, there is also `matchE`, which does "effectful" matches:
+```cpp
+x.matchE(
+    [](int& x){ ++x; },
+    [](const std::string& x){ std::cout << x; }
+);
+```
+
+Another possible point of inconvenience is if we have a complicated sum type of many sub-types. It can be quite a bother to write out every match case explicitly then, especially if we're only interested in one or a couple. Enter `otherwise`:
+```cpp
+ftl::sum_type<A,B,C,D> x{...};
+auto r = x.match(
+    [](const B& b){ return f(b); }, // This function will be invoked only if
+                                    // x's value is of type B
+
+    [](otherwise){ return g(); }    // This function will be invoked if x's
+                                    // value is of any type except B
+);
+```
+It is of course possible to have several specific match clauses before the otherwise-clause, but make sure to always put `otherwise` last&mdash;or else any clause appearing below it will never actually be executed. Simply put, matching is done in the order the expressions appear.
+
+The true usefullness of `sum_type` isn't so much the case where you use it directly. It's when you use it to quickly and cleanly create new data types. For example, did you know both `ftl::maybe` and `ftl::either` are really just simple type aliases of `sum_type`? It's true, `maybe` is defined simply as:
+```cpp
+template<typename T>
+using maybe = sum_type<T,Nothing>;
+```
+That takes care of the vast majority of the logic required for `maybe`, though there is a number of convenience functions and definitions in addition.
+
 ### Applying Applicatives
 Adding a bit of the Applicative concept to the mix, we can do some quite concise calculations. Now, if we are given:
 ```cpp
@@ -99,8 +148,8 @@ In other words, without Functor's `fmap` and Applicative's `aapply`, it would ha
 ```cpp
 ftl::maybe<int> result;
 auto x = maybeGetAValue(), y = maybeGetAnother(), z = maybeGetAThird();
-if(x && y && z) {
-    result = ftl::value(algorithm(*x, *y, *z));
+if(x.is<int>() && y.is<int>() && z.is<int>()) {
+    result = ftl::value(algorithm(ftl::get<int>(x), ftl::get<int>(y), ftl::get<int>(z)));
 }
 ```
 If `algorithm` had happened to be wrapped in an `ftl::function`, or else be one of the built-in, curried-by-default function objects of FTL, then the `curry` call could have been elided for even cleaner code.
@@ -130,10 +179,10 @@ listM<int> ms{ftl::inplace_tag(), ftl::value(1), ftl::maybe<int>{}, ftl::value(2
 
 // Kind of useless, but demonstrates what's going on
 for(auto m : *ms) {
-    if(m)
-        std::cout << *m << ", ";
-    else
-        std::cout << "nothing, ";
+    m.matchE(
+        [](int x){ std::cout << x << ", "; },
+        [](ftl::Nothing){ std::cout << "nothing, "; }
+    );
 }
 std::cout << std::endl;
 ```
@@ -151,7 +200,12 @@ print(ns);
 ``` 
 Same deal, but if `ms` was a regular, untransformed list of `maybe`:
 ```cpp
-auto ns = [](maybe<int> x){ return x ? maybe<int>((*x)-1) : return x; } % ms;
+auto ns = [](maybe<int> x){
+    return x.match(
+        [](int x){ return ftl::value(x-1); },
+        [](otherwise){ return ftl::nothing<int>(); }
+    );
+} % ms;
 
 print(ns);
 ``` 
@@ -159,7 +213,7 @@ Output (in both cases):
 ```
 0, nothing, 1, 
 ```
-So, basically, this saves us the trouble of having to check for nothingness in the elements of `ns` (coincidentally&mdash;or not&mdash;exactly what the maybe monad does: allow us to elide lots of ifs). 
+So, basically, this saves us the trouble of having to check for nothingness in the elements of `ns` (coincidentally&mdash;or not&mdash;exactly what the maybe monad does: allow us to elide lots of ifs or pattern matches). 
 
 Right, this is kinda neat, but not really all that exciting yet. The excitement comes when we stop to think a bit before we just arbitrarily throw together a couple of monads. For instance, check out the magic of the `either`-transformer on top of the `function` monad in the parser generator tutorial [part 2](docs/Parsec-II.md).
 
