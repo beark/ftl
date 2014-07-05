@@ -27,6 +27,7 @@ install:
 
   # Install libc++ if tests are run with clang++
   - if [ "$CXX" == "clang++" -a "$CPP14" == "0" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk@181765 libcxx; fi
+  - if [ "$CXX" == "clang++" -a "$CPP14" == "1" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk@201601 libcxx; fi
 
   - if [ "$CXX" == "clang++" ]; then cd libcxx/lib && bash buildit; fi
   - if [ "$CXX" == "clang++" ]; then sudo cp ./libc++.so.1.0 /usr/lib/; fi
