@@ -59,7 +59,7 @@ test_set sum_type_tests{
 	std::string("sum_type"),
 	{
 		std::make_tuple(
-			std::string("Construct using select"),
+			std::string("Construct using constructor tag"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
@@ -244,6 +244,37 @@ test_set sum_type_tests{
 				);
 
 				return s1 == 0 && s2 == 1 && s3 == 2;
+			})
+		),
+		std::make_tuple(
+			std::string("Match with otherwise"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				struct A {};
+				struct B {};
+				struct C {};
+
+				sum_type<A,B,C> x{constructor<A>()};
+				sum_type<A,B,C> y{constructor<B>()};
+				sum_type<A,B,C> z{constructor<C>()};
+
+				auto s1 = x.match(
+					[](A){ return 0; },
+					[](otherwise){ return 1; }
+				);
+
+				auto s2 = y.match(
+					[](const A&){ return 0; },
+					[](otherwise){ return 1; }
+				);
+
+				auto s3 = z.match(
+					[](A){ return 0; },
+					[](otherwise){ return 1; }
+				);
+
+				return s1 == 0 && s2 == 1 && s3 == 1;
 			})
 		),
 		std::make_tuple(

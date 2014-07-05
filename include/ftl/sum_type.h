@@ -100,6 +100,28 @@ namespace ftl {
 	struct constructor {
 	};
 
+	/**
+	 * A type that can be used as default match clause in a pattern match.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   sum_type<A,B,C> x = ...;
+	 *   x.match(
+	 *       [](A a){ return f(a); },
+	 *       [](otherwise){ return g(); }
+	 *   );
+	 * \endcode
+	 *
+	 * \note If present, this match clause should always be the final one. If
+	 *       there are additional match clauses after `otherwise`, they will
+	 *       never be called.
+	 */
+	struct otherwise {
+		template<typename T>
+		constexpr otherwise(T&&) noexcept {}
+	};
+
 	namespace _dtl {
 
 		template<typename, typename...>
@@ -158,6 +180,9 @@ namespace ftl {
 		template<typename>
 		struct find_common_type;
 
+		template<typename,typename>
+		struct exhaustive_match;
+
 		template<typename...Ts>
 		struct find_common_type<type_seq<Ts...>> {
 			using type = typename std::common_type<Ts...>::type;
@@ -165,12 +190,15 @@ namespace ftl {
 
 		template<typename Ts,typename Fs>
 		struct common_return_type {
+
+			static_assert(
+				exhaustive_match<Fs,Ts>::value,
+				"Match expressions must be exhaustive"
+			);
+
 			using types = typename all_return_types<Ts,Fs>::types;
 			using type = typename find_common_type<types>::type;
 		};
-
-		template<typename,typename>
-		struct exhaustive_match;
 
 		// A match is exhaustive if we've functions to spare
 		template<typename...Fs>
@@ -741,11 +769,6 @@ namespace ftl {
 			type_seq<Ts...>,type_seq<Fs...>
 		>::type {
 
-			static_assert(
-				_dtl::exhaustive_match<type_seq<Fs...>,type_seq<Ts...>>::value,
-				"Match statements must be exhaustive"
-			);
-
 			using indices = gen_seq<0,sizeof...(Ts)-1>;
 			using return_type = typename _dtl::common_return_type<
 				type_seq<Ts...>,type_seq<Fs...>
@@ -760,11 +783,6 @@ namespace ftl {
 		auto match(Fs&&...fs) -> typename ::ftl::_dtl::common_return_type<
 			type_seq<Ts...>,type_seq<Fs...>
 		>::type {
-
-			static_assert(
-				_dtl::exhaustive_match<type_seq<Fs...>,type_seq<Ts...>>::value,
-				"Match statements must be exhaustive"
-			);
 
 			using indices = gen_seq<0,sizeof...(Ts)-1>;
 			using return_type = typename _dtl::common_return_type<
@@ -830,11 +848,6 @@ namespace ftl {
 		template<typename...Fs>
 		void matchE(Fs&&...fs) {
 
-			static_assert(
-				_dtl::exhaustive_match<type_seq<Fs...>,type_seq<Ts...>>::value,
-				"Match statements must be exhaustive"
-			);
-
 			using indices = gen_seq<0,sizeof...(Ts)-1>;
 
 			::ftl::_dtl::union_visitor<void,indices,Ts...>
@@ -844,11 +857,6 @@ namespace ftl {
 		/// \overload
 		template<typename...Fs>
 		void matchE(Fs&&...fs) const {
-
-			static_assert(
-				_dtl::exhaustive_match<type_seq<Fs...>,type_seq<Ts...>>::value,
-				"Match statements must be exhaustive"
-			);
 
 			using indices = gen_seq<0,sizeof...(Ts)-1>;
 
