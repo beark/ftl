@@ -450,7 +450,7 @@ namespace ftl {
 			explicit constexpr recursive_union(constructor<U> t, Args&&...args)
 			noexcept(
 				std::is_nothrow_constructible<
-					recursive_union<Ts...>,Args...
+					recursive_union<Ts...>,constructor<U>,Args...
 				>::value
 			)
 			: r(t, std::forward<Args>(args)...) {}
