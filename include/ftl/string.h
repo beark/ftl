@@ -75,7 +75,7 @@ namespace ftl {
 				const std::basic_string<Ts...>& s2) {
 
 			s1 += s2;
-			return s1;
+			return std::move(s1);
 		}
 
 		static std::basic_string<Ts...> append(
@@ -83,7 +83,7 @@ namespace ftl {
 				std::basic_string<Ts...>&& s2) {
 
 			s2.insert(s2.begin(), s1.begin(), s1.end());
-			return s2;
+			return std::move(s2);
 		}
 
 		static std::basic_string<Ts...> append(
@@ -91,7 +91,7 @@ namespace ftl {
 				std::basic_string<Ts...>&& s2) {
 
 			std::move(s2.begin(), s2.end(), std::back_inserter(s1));
-			return s1;
+			return std::move(s1);
 		}
 
 		static constexpr bool instance = true;
