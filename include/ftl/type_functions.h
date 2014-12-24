@@ -260,6 +260,11 @@ namespace ftl {
 		template<template<typename,typename> class F, typename L1, typename L2>
 		struct zip_types_impl;
 
+		template<template<typename,typename> class F>
+		struct zip_types_impl<F,type_seq<>,type_seq<>> {
+			using type = type_seq<>;
+		};
+
 		template<template<typename,typename> class F, typename U, typename...Us>
 		struct zip_types_impl<F,type_seq<>,type_seq<U,Us...>> {
 			using type = type_seq<>;
