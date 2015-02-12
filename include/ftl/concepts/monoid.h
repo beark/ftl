@@ -409,9 +409,10 @@ namespace ftl {
 	 */
 	template<typename N>
 	constexpr sum_monoid<N> sum(N num)
-	noexcept(noexcept(sum_monoid<N>(num))) {
+	noexcept /*(noexcept(sum_monoid<N>(num)))*/ {
 		return sum_monoid<N>(num);
 	}
+	// TODO: Re-add noexcept once gcc-4.9 or higher is required.
 
 	/*
 	 * Actual implementation of \ref monoidpg for sums.
