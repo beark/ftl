@@ -952,7 +952,7 @@ namespace ftl {
 	 * \code
 	 *   ftl::maybe<int> foo(string s);
 	 *
-	 *   ftl::maybe<int> exampe(ftl::maybe<string> ms) {
+	 *   ftl::maybe<int> example(ftl::maybe<string> ms) {
 	 *       return ftl::mbind(ms, foo);
 	 *   }
 	 * \endcode
