@@ -243,6 +243,81 @@ namespace ftl {
 #endif
 
 	/**
+	 * Tag that can be used to specify which concept implementation to derive.
+	 *
+	 * This particular tag is used to specify that e.g. some monoid instance
+	 * is derived in terms of expected `operator+` behaviour (including
+	 * the common mathematical laws for said operator).
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   template<>
+	 *   struct monoid<AType>
+	 *   : deriving_monoid<in_terms_of_plus<AType> {};
+	 * \endcode
+	 *
+	 * \ingroup monad
+	 */
+	template<typename>
+	struct in_terms_of_plus {};
+
+	template<typename>
+	struct deriving_monoid;
+
+	/**
+	 * Inheritable implementation of the \ref monoidpg concept.
+	 *
+	 * This particular strategy of implementing `monoid` requires the existance
+	 * of an `operator+ (M, M) -> M`, and that the default constructor of `M`
+	 * is the identity element with regards to this operation.
+	 *
+	 * More formally, the monoid laws specialise into:
+	 *
+	 * - **Right Identity law**
+	 *   \code
+	 *       M{} + m == m
+	 *   \endcode
+	 * - **Left identity law**
+	 *   \code
+	 *       m + M{} == m
+	 *   \endcode
+	 * - **Law of associativity**
+	 *   \code
+	 *       a + (b + c) == (a + b) + c
+	 *   \endcode
+	 *
+	 * where `m`, `a`, `b`, and `c` are all values of type `M`, and `==` implies
+	 * strict equality (there must be no means of discovering any difference
+	 * between the evaluated result of either side of the sign for an external
+	 * observer), not necessarily that the type `M` is comparable.
+	 *
+	 * \tparam M the template specialisation that is to derive the concept.
+	 *
+	 * \par Examples
+	 *
+	 * \code
+	 *   template<>
+	 *   struct monoid<MyMonoid>
+	 *   : deriving_monoid<in_terms_of_plus<MyMonoid>> {};
+	 * \endcode
+	 *
+	 * \ingroup monoid
+	 */
+	template<typename M>
+	struct deriving_monoid<in_terms_of_plus<M>> {
+		static constexpr M id() noexcept(noexcept(M(0))) {
+			return M();
+		}
+
+		static constexpr M append(M a, M b) noexcept(noexcept(a+b)) {
+			return a + b;
+		}
+
+		static constexpr bool instance = true;
+	};
+
+	/**
 	 * Implementation of monoid for numbers, interpreted as sums.
 	 *
 	 * The reason for wrapping numbers in this struct when using the monoid
@@ -294,6 +369,11 @@ namespace ftl {
 	struct sum_monoid {
 
 		/**
+		 * Initialises the number as `0`.
+		 */
+		constexpr sum_monoid() noexcept : n(0) {}
+
+		/**
 		 * Construct from `N`.
 		 *
 		 * Allows implicit casts from `N` to `sum_monoid`. While this is
@@ -329,35 +409,20 @@ namespace ftl {
 	 */
 	template<typename N>
 	constexpr sum_monoid<N> sum(N num)
-	noexcept /*(std::is_nothrow_constructible<sum_monoid<N>,N>::value)*/ {
+	noexcept(noexcept(sum_monoid<N>(num))) {
 		return sum_monoid<N>(num);
 	}
-	// TODO: Re-add noexcept condition once it's been figured out why gcc
-	// choked on it in concept_tests: "Foldable: curried foldMap"
 
 	/*
 	 * Actual implementation of \ref monoidpg for sums.
 	 *
-	 * The identity is 0 and the combining operation is +.
+	 * The identity is `0` and the combining operation is `+`.
 	 *
 	 * \ingroup monoid
 	 */
 	template<typename N>
-	struct monoid<sum_monoid<N>> {
-		static constexpr sum_monoid<N> id()
-		noexcept(std::is_nothrow_constructible<sum_monoid<N>,N>::value) {
-			return sum(N(0));
-		}
-
-		static constexpr sum_monoid<N> append(
-				const sum_monoid<N>& n1,
-				const sum_monoid<N>& n2) {
-
-			return n1 + n2;
-		}
-
-		static constexpr bool instance = true;
-	};
+	struct monoid<sum_monoid<N>>
+	: deriving_monoid<in_terms_of_plus<sum_monoid<N>>> {};
 
 	/**
 	 * Implementation of monoid for numbers, when interpreted as products.
