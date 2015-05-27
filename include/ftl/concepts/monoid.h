@@ -306,7 +306,7 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct deriving_monoid<in_terms_of_plus<M>> {
-		static constexpr M id() noexcept(noexcept(M(0))) {
+		static constexpr M id() noexcept(noexcept(M())) {
 			return M();
 		}
 
