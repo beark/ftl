@@ -7,8 +7,6 @@ C++ template library for fans of functional programming. The goal of this projec
 
 To use the FTL, you need a compiler that implements at least as much of C++11 as gcc-4.8. As of this time, known compatible compilers include&mdash;obviously&mdash;gcc 4.8 and clang 3.2 with libc++. Unfortunately clang with libstdc++ does not appear to work. While it would be a lovely thing, MSVC is not currently compatible, including the recent 2013 CTP.
 
-The full API reference can be found [here](http://libftl.org/api/).
-
 Tutorials
 ---------
 * [Parser Combinator Part I: Simple Parser](docs/Parsec-I.md)
