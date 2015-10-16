@@ -110,7 +110,7 @@ auto r = x.match(
 ```
 It is of course possible to have several specific match clauses before the otherwise-clause, but make sure to always put `otherwise` last&mdash;or else any clause appearing below it will never actually be executed. Simply put, matching is done in the order the expressions appear.
 
-The true usefullness of `sum_type` isn't so much the case where you use it directly. It's when you use it to quickly and cleanly create new data types. For example, did you know both `ftl::maybe` and `ftl::either` are really just simple type aliases of `sum_type`? It's true, `maybe` is defined simply as:
+The true usefulness of `sum_type` isn't so much the case where you use it directly. It's when you use it to quickly and cleanly create new data types. For example, did you know both `ftl::maybe` and `ftl::either` are really just simple type aliases of `sum_type`? It's true, `maybe` is defined simply as:
 ```cpp
 template<typename T>
 using maybe = sum_type<T,Nothing>;
