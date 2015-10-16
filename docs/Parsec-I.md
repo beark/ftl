@@ -105,7 +105,7 @@ At this point, we have a library to build parsers and the knowledge to use it, s
 We can give it a go using a top-down approach. A list in lisp has an opening parenthesis, then a space separated list of elements, and then a closing parenthesis. Starting from that, we intuitively get:
 ```cpp
 parser<std::vector<int>> parseLispList() {
-    using namesapce ftl;
+    using namespace ftl;
     return parseChar('(')
         >> parseList()
         << parseChar(')');
