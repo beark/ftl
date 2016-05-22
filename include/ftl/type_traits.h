@@ -496,6 +496,42 @@ namespace ftl {
 		using type =
 			decltype(check(std::declval<F>(), std::declval<Args>()...));
 	};
+
+	template<class F>
+	struct fn_traits : fn_traits<decltype(&F::operator())> {};
+
+	template<class R, class...Args>
+	struct fn_traits<R(Args...)>
+	{
+		typedef R (type) (Args...);
+
+		using return_type = R;
+
+		template<size_t I>
+		using argument_type = ::std::tuple_element_t<I, ::std::tuple<Args...>>;
+	};
+
+	template<class R, class...Args>
+	struct fn_traits<R(*)(Args...)> : fn_traits<R(Args...)> {};
+
+	template<class R, class...Args>
+	struct fn_traits<R(&)(Args...)> : fn_traits<R(Args...)> {};
+
+	template<class C, class R, class...Args>
+	struct fn_traits<R(C::*)(Args...)> : fn_traits<R(Args...)> {};
+
+	template<class C, class R, class...Args>
+	struct fn_traits<R(C::*)(Args...) const> : fn_traits<R(Args...)> {};
+
+	template<class C, class R, class...Args>
+	struct fn_traits<R(C::*)(Args...) volatile> : fn_traits<R(Args...)> {};
+
+	template<class C, class R, class...Args>
+	struct fn_traits<R(C::*)(Args...) const volatile> : fn_traits<R(Args...)> {};
+
+	template<class F>
+	using fn_type = typename fn_traits<::std::remove_reference_t<F>>::type;
+
 }
 
 #endif
