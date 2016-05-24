@@ -55,7 +55,7 @@ void dummy()
 	static_assert(test_usage<int(int)>(fun_ob{}), "Failed deducing correct type of rvalue function object.");
 	static_assert(test_usage<int(int)>(bar), "Failed deducing correct type of lvalue function object.");
 	
-	const fun_ob baz;
+	const fun_ob baz{};
 	
 	static_assert(test_usage<int(int)>(baz), "Failed deducing correct type of const function object.");
 	static_assert(test_usage<int(int)>(foo), "Failed deducing correct type of free function");
@@ -70,7 +70,7 @@ void dummy()
 	
 	static_assert(test_usage<int(int)>(capture), "Failed deducing correct type of lvalue lambda with capture");
 	
-	static_assert(test_usage<int(int)>([](int){ return 0; }), "Failed deducing correct type of inline lambda without capture");
-	
-	// Currently, the use of a capturing lambda version of the above will fail to compile, as they cannot be constexpr
+	// TODO: With c++17, lambdas can be constexpr and the below should work
+	// static_assert(test_usage<int(int)>([](int){ return 0; }), "Failed deducing correct type of inline lambda without capture");
+	// static_assert(test_usage<int(int)>([x](int){ return x; }), "Failed deducing correct type of inline lambda with capture");
 }
