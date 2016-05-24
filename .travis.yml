@@ -1,47 +1,39 @@
 language: cpp
-compiler:
-  - clang
-  - gcc
+sudo: required
+dist: trusty
 
-# Setup different environments to test
-env:
-  - CPP14=0
-  - CPP14=1
-
-# Setup repos etc before installation
-before_install:
-  - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
-  - if [ "$CXX" == "clang++" -a "$CPP14" == "0" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
-  - sudo apt-get update -qq
-
-# Install dependencies
-install:
-  # install g++ 4.8, if tests are run with g++
-  - if [ "$CXX" == "g++" ]; then sudo apt-get install -qq g++-4.8; fi
-  - if [ "$CXX" == "g++" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50; fi
-
-  # install clang-3.4 if CPP14==1
-  - if [ "$CXX" == "clang++" -a "$CPP14" == "0" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.3; fi
-
-  - if [ "$CXX" == "clang++" ]; then cwd=$(pwd); fi
-
-  # Install libc++ if tests are run with clang++
-  - if [ "$CXX" == "clang++" -a "$CPP14" == "0" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk@181765 libcxx; fi
-  - if [ "$CXX" == "clang++" -a "$CPP14" == "1" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk@201601 libcxx; fi
-
-  - if [ "$CXX" == "clang++" ]; then cd libcxx/lib && bash buildit; fi
-  - if [ "$CXX" == "clang++" ]; then sudo cp ./libc++.so.1.0 /usr/lib/; fi
-  - if [ "$CXX" == "clang++" ]; then sudo mkdir /usr/include/c++/v1; fi
-  - if [ "$CXX" == "clang++" ]; then cd .. && sudo cp -r include/* /usr/include/c++/v1/; fi
-  - if [ "$CXX" == "clang++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
-  - if [ "$CXX" == "clang++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
-
-  - if [ "$CXX" == "clang++" -a "$CPP14" == "0" ]; then CXX=clang++-3.3; fi
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+          env: COMPILER=g++-4.9
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+          env: COMPILER=g++-5
+    - compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.8
+          packages:
+            - clang-3.8
+          env: COMPILER=clang++-3.8
 
 # command to run tests
 script: 
   - cd tests
-  - cmake ./
-  - make
-  - if [ "`echo $CXX`" == "g++" ]; then ./ftl_tests; fi
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER ./
+  - make -j 2
+  - if [[ "`echo $COMPILER`" == g++* ]]; then ./ftl_tests; fi
 
