@@ -33,7 +33,8 @@ matrix:
 # command to run tests
 script: 
   - cd tests
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER ./
+  - export CXX=$COMPILER
+  - cmake ./
   - make -j 2
   - if [[ "`echo $COMPILER`" == g++* ]]; then ./ftl_tests; fi
 
