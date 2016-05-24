@@ -453,29 +453,19 @@ namespace ftl {
 	 * \ingroup typetraits
 	 */
 	template<typename>
-	struct is_monomorphic {
-		static constexpr bool value = false;
-	};
+	struct is_monomorphic : std::false_type {};
 
 	template<typename R, typename...Args>
-	struct is_monomorphic<std::function<R(Args...)>> {
-		static constexpr bool value = true;
-	};
+	struct is_monomorphic<std::function<R(Args...)>> : std::true_type {};
 
 	template<typename R, typename...Args>
-	struct is_monomorphic<ftl::function<R(Args...)>> {
-		static constexpr bool value = true;
-	};
+	struct is_monomorphic<ftl::function<R(Args...)>> : std::true_type {};
 
 	template<typename R, typename...Args>
-	struct is_monomorphic<R(*)(Args...)> {
-		static constexpr bool value = true;
-	};
+	struct is_monomorphic<R(*)(Args...)> : std::true_type {};
 
 	template<typename C, typename R, typename...Args>
-	struct is_monomorphic<R (C::*)(Args...)> {
-		static constexpr bool value = true;
-	};
+	struct is_monomorphic<R (C::*)(Args...)> : std::true_type {};
 
 	template<typename F, typename...Args>
 	struct is_callable {
@@ -497,6 +487,24 @@ namespace ftl {
 			decltype(check(std::declval<F>(), std::declval<Args>()...));
 	};
 
+	/**
+	 * Determine various traits of functions and function objects.
+	 *
+	 * By default, tries to check the type of the function call operator in `F`,
+	 * if such is defined. Also specialized for function pointers, references,
+	 * and all relevant FTL function objects.
+	 *
+	 * Example:
+	 * \code
+	 *   void foo(int, char);
+	 *
+	 *   is_same<typename fn_traits<foo>::type, void(int,char)>::value == true
+	 *   is_same<typename fn_traits<foo>::return_type, void>::value == true
+	 *   is_same<typename fn_traits<foo>::argument_type<0>, int>::value == true
+	 * \endcode
+	 *
+	 * \ingroup typetraits
+	 **/
 	template<class F>
 	struct fn_traits : fn_traits<decltype(&F::operator())> {};
 
@@ -529,6 +537,11 @@ namespace ftl {
 	template<class C, class R, class...Args>
 	struct fn_traits<R(C::*)(Args...) const volatile> : fn_traits<R(Args...)> {};
 
+	/**
+	 * Convenience type alias for `fn_traits<F>::type`.
+	 *
+	 * \ingroup typetraits
+	 **/
 	template<class F>
 	using fn_type = typename fn_traits<::std::remove_reference_t<F>>::type;
 
