@@ -94,15 +94,15 @@ namespace ftl {
 		std::tuple<B,Ts...> apply_on_first(
 				const std::tuple<F,Ts...>& t1,
 				const std::tuple<A,Ts...>& t2,
-				seq<S...>) {
+				std::index_sequence<S...>) {
 
 			auto f = std::get<0>(t1);
 			return std::tuple<B,Ts...>(
 					f(std::get<0>(t2)),
 					monoid<
-						typename std::decay<decltype(std::get<S>(t1))>::type
+						typename std::decay<decltype(std::get<S+1>(t1))>::type
 					>::append(
-						std::get<S>(t1), std::get<S>(t2))...
+						std::get<S+1>(t1), std::get<S+1>(t2))...
 					);
 		}
 
@@ -113,8 +113,9 @@ namespace ftl {
 			typename...Ts>
 		std::tuple<B,Ts...> applicative_implementation(
 				const std::tuple<F,Ts...>& t1,
-				const std::tuple<A,Ts...>& t2) {
-			return apply_on_first(t1, t2, gen_seq<1,sizeof...(Ts)>{});
+				const std::tuple<A,Ts...>& t2)
+		{
+			return apply_on_first(t1, t2, std::make_index_sequence<sizeof...(Ts)>{});
 		}
 
 		template<typename...>

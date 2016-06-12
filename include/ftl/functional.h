@@ -80,26 +80,44 @@ namespace ftl {
 	: deriving_join<in_terms_of_bind<function<R(P,Ps...)>>>
 	, deriving_apply<in_terms_of_bind<function<R(P,Ps...)>>> {
 
-		// TODO: C++14 - Create version that lambda captures a by move
 		/// Creates a function that returns `a`, regardless of its parameters.
-		static function<R(P,Ps...)> pure(R a) {
+		static function<R(P,Ps...)> pure(const R& a)
+		{
 			return [a](P,Ps...) { return a; };
 		}
 
+		static function<R(P,Ps...)> pure(R&& a)
+		{
+			return [a = ::std::move(a)](P,Ps...) { return a; };
+		}
 
-		// TODO: C++14 - Create version that lambda captures f and fn by move
 		/// Equivalent of function composition
 		template<
 				typename F,
 				typename S = typename std::result_of<F(R)>::type
 		>
-		static function<S(P,Ps...)> map(F f, function<R(P,Ps...)> fn) {
-			return [f,fn] (P&& p, Ps&&...ps) {
-				return f(fn(std::forward<P>(p), std::forward<Ps>(ps)...));
-			};
+		static function<S(P,Ps...)> map(F&& f, const function<R(P,Ps...)>& fn)
+		{
+			return
+				[f = ::std::forward<F>(f),fn] (P&& p, Ps&&...ps)
+				{
+					return f(fn(::std::forward<P>(p), ::std::forward<Ps>(ps)...));
+				};
 		}
 
-		// TODO: C++14 - Create version that lambda captures f and fn by move
+		template<
+				typename F,
+				typename S = typename std::result_of<F(R)>::type
+		>
+		static function<S(P,Ps...)> map(F&& f, function<R(P,Ps...)>&& fn)
+		{
+			return
+				[f = ::std::forward<F>(f),fn = ::std::move(fn)] (P&& p, Ps&&...ps)
+				{
+					return f(fn(::std::forward<P>(p), ::std::forward<Ps>(ps)...));
+				};
+		}
+
 		/**
 		 * Monadic bind for functions.
 		 *
@@ -126,14 +144,31 @@ namespace ftl {
 		 * \endcode
 		 */
 		template<
-				typename Fn,
-				typename Fs = typename std::result_of<Fn(R)>::type,
-				typename S = typename std::result_of<Fs(P,Ps...)>::type
+				class Fn,
+				class Fs = typename std::result_of<Fn(R)>::type,
+				class S = typename std::result_of<Fs(P,Ps...)>::type
 		>
-		static function<S(P,Ps...)> bind(function<R(P,Ps...)> f, Fn fn) {
-			return [=](P p, Ps...ps) {
-				return fn(f(p, ps...))(p, ps...);
-			};
+		static function<S(P,Ps...)> bind(const function<R(P,Ps...)>& f, Fn&& fn)
+		{
+			return
+				[fn = ::std::forward<Fn>(fn), f](P p, Ps...ps)
+				{
+					return fn(f(p, ps...))(p, ps...);
+				};
+		}
+
+		template<
+				class Fn,
+				class Fs = typename std::result_of<Fn(R)>::type,
+				class S = typename std::result_of<Fs(P,Ps...)>::type
+		>
+		static function<S(P,Ps...)> bind(function<R(P,Ps...)>&& f, Fn&& fn)
+		{
+			return
+				[fn = ::std::forward<Fn>(fn), f = ::std::move(f)](P p, Ps...ps)
+				{
+					return fn(::std::move(f)(p, ps...))(p, ps...);
+				};
 		}
 
 		static constexpr bool instance = true;

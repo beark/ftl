@@ -131,10 +131,10 @@ namespace ftl {
 	 * - <cstddef>
 	 */
 
-	template<typename T>
-	using plain_type = typename std::decay<T>::type;
+	template<class T>
+	using plain_type = ::std::remove_cv_t<::std::remove_reference_t<T>>;
 
-	namespace _dtl {
+	namespace dtl_ {
 		template<typename>
 		struct decayed_result;
 
@@ -196,7 +196,7 @@ namespace ftl {
 	 * \ingroup typelevel
 	 */
 	template<typename F>
-	using result_of = typename _dtl::decayed_result<F>::type;
+	using result_of = typename dtl_::decayed_result<F>::type;
 
 	/**
 	 * Meta type used to store a variadic type sequence.
@@ -206,7 +206,7 @@ namespace ftl {
 	template<typename...Ts>
 	struct type_seq {};
 
-	namespace _dtl {
+	namespace dtl_ {
 		template<typename T, typename TSeq>
 		struct prepend_type_impl;
 
@@ -231,19 +231,19 @@ namespace ftl {
 	 *
 	 * \ingroup typelevel
 	 */
-	template<typename T, typename TSeq>
-	using prepend_type = typename _dtl::prepend_type_impl<T,TSeq>::type;
+	template<class T, class TSeq>
+	using prepend_type = typename dtl_::prepend_type_impl<T,TSeq>::type;
 
-	namespace _dtl {
-		template<template<typename> class F, typename...Ts>
+	namespace dtl_ {
+		template<template<class> class F, class...Ts>
 		struct map_types_impl;
 
-		template<template<typename> class F>
+		template<template<class> class F>
 		struct map_types_impl<F> {
 			using type = type_seq<>;
 		};
 
-		template<template<typename> class F, typename T, typename...Ts>
+		template<template<class> class F, class T, class...Ts>
 		struct map_types_impl<F,T,Ts...> {
 			using type =
 				prepend_type<
@@ -324,7 +324,7 @@ namespace ftl {
 	 * \ingroup typelevel
 	 */
 	template<template<typename> class F, typename...Ts>
-	using map_types = typename _dtl::map_types_impl<F,Ts...>::type;
+	using map_types = typename dtl_::map_types_impl<F,Ts...>::type;
 
 	/**
 	 * Zips two type sequences using a binary type level function.
@@ -355,7 +355,19 @@ namespace ftl {
 	 * \ingroup typelevel
 	 */
 	template<template<typename,typename> class F, typename Ts1, typename Ts2>
-	using zip_types = typename _dtl::zip_types_impl<F,Ts1,Ts2>::type;
+	using zip_types = typename dtl_::zip_types_impl<F,Ts1,Ts2>::type;
+
+  template<class T, class...Ts>
+    struct type_is_in : ::std::false_type {};
+
+  template<class T, class...Ts>
+  struct type_is_in<T, T, Ts...> : ::std::true_type {};
+
+  template<class T, class U, class...Ts>
+  struct type_is_in<T, U, Ts...> : type_is_in<T,Ts...> {};
+
+  template<class...Ts>
+  constexpr bool type_is_in_v = type_is_in<Ts...>::value;
 
 	template<size_t I, typename T, typename...Ts>
 	struct index_of_impl;
@@ -410,6 +422,9 @@ namespace ftl {
 	struct index_of {
 		static constexpr size_t value = index_of_impl<0,T,Ts...>::value;
 	};
+
+  template<typename T, typename...Ts>
+  constexpr size_t index_of_v = index_of<T,Ts...>::value;
 
 	template<size_t I, typename T, typename...Ts>
 	struct type_at_impl : type_at_impl<I-1,Ts...> {};
@@ -617,40 +632,6 @@ namespace ftl {
 	};
 
 	/**
-	 * A number sequence.
-	 *
-	 * \ingroup typelevel
-	 */
-	template<size_t...> struct seq {};
-
-	namespace _dtl {
-		template<size_t Z, size_t N, size_t...S>
-		struct gen_seq_impl : gen_seq_impl<Z,N-1,N,S...> {};
-
-		template<size_t Z, size_t...S>
-		struct gen_seq_impl<Z,Z,S...> {
-			using type = seq<Z,S...>;
-		};
-	}
-
-	/**
-	 * Generate a sequence of numbers.
-	 *
-	 * \tparam Z The first number in the sequence.
-	 * \tparam N The final number in the sequence.
-	 *
-	 * Example:
-	 * \code
-	 *   // S is of type seq<0,1,2,3,4,5>
-	 *   gen_seq<0,5> S{};
-	 * \endcode
-	 *
-	 * \ingroup typelevel
-	 */
-	template<size_t Z, size_t N>
-	using gen_seq = typename ::ftl::_dtl::gen_seq_impl<Z,N>::type;
-
-	/**
 	 * Find the first contained type of some parametrised type.
 	 *
 	 * Example:
@@ -684,7 +665,7 @@ namespace ftl {
 		using type = T;
 	};
 
-	namespace _dtl {
+	namespace dtl_ {
 		template<typename T, typename>
 		struct default_rebind {
 			using type = T;
@@ -749,7 +730,7 @@ namespace ftl {
 		 * \endcode
 		 */
 		template<typename U>
-		using rebind = typename ::ftl::_dtl::default_rebind<T,U>::type;
+		using rebind = typename ::ftl::dtl_::default_rebind<T,U>::type;
 	};
 
 	template<typename T>
@@ -827,17 +808,26 @@ namespace ftl {
 	 * \ingroup typelevel
 	 */
 	template<typename T, typename U>
-	struct is_same_template;
+	struct is_same_template : std::false_type {};
 
 	template<
 			template<typename...> class T,
-	   		template<typename...> class U,
+			template<typename...> class U,
 			typename...Ts,
 			typename...Us
 	>
-	struct is_same_template<T<Ts...>,U<Us...>> {
-		static constexpr bool value = std::is_same<T<Ts...>, U<Ts...>>::value;
-	};
+	struct is_same_template<T<Ts...>,U<Us...>>
+		: std::is_same<T<Ts...>, U<Ts...>> {};
+
+	template<
+			bool x, bool y,
+			template<bool, typename...> class T,
+			template<bool, typename...> class U,
+			typename...Ts,
+			typename...Us
+	>
+	struct is_same_template<T<x, Ts...>, U<y, Us...>>
+		: std::is_same<T<x, Ts...>, U<x, Ts...>> {};
 
 }
 

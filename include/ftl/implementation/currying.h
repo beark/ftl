@@ -276,7 +276,7 @@ namespace ftl {
 			}
 		};
 
-		template<typename F, typename...Args1>
+		template<class F, class...Args1>
 		class curried_fn {
 			F f;
 			std::tuple<Args1...> args1;
@@ -295,8 +295,8 @@ namespace ftl {
 			: f(std::move(f)), args1(std::move(args)) {}
 
 			template<
-					typename...Args2,
-					typename = typename std::enable_if<
+					class...Args2,
+					class = typename std::enable_if<
 						is_callable<F,Args1...,Args2...>::value
 					>::type
 			>

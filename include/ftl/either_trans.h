@@ -70,7 +70,8 @@ namespace ftl {
 	 * \ingroup eitherT
 	 */
 	template<typename L, typename M>
-	class eitherT {
+	class eitherT
+	{
 	public:
 		/// Quick reference to the type concepts are implemented on
 		using T = Value_type<M>;
@@ -106,12 +107,14 @@ namespace ftl {
 		 * This can be used to "regain" some functionality of `M` that was
 		 * "hidden" by wrapping it in `eitherT`.
 		 */
-		Met& operator* () noexcept {
+		Met& operator* () noexcept
+		{
 			return mEither;
 		}
 
 		/// \overload
-		const Met& operator* () const noexcept {
+		const Met& operator* () const noexcept
+		{
 			return mEither;
 		}
 
@@ -120,12 +123,14 @@ namespace ftl {
 		 *
 		 * Completes the \ref deref concept.
 		 */
-		Met* operator-> () noexcept {
+		Met* operator-> () noexcept
+		{
 			return &mEither;
 		}
 
 		/// \overload
-		const Met* operator-> () const noexcept {
+		const Met* operator-> () const noexcept
+		{
 			return &mEither;
 		}
 
@@ -135,7 +140,8 @@ namespace ftl {
 
 	// eitherT's parametric traits are non-default.
 	template<typename L, typename M>
-	struct parametric_type_traits<eitherT<L,M>> {
+	struct parametric_type_traits<eitherT<L,M>>
+	{
 		using value_type = Value_type<M>;
 
 		template<typename T>
@@ -152,8 +158,9 @@ namespace ftl {
 	 */
 	template<typename L, typename M>
 	struct monad<eitherT<L,M>>
-	: deriving_join<in_terms_of_bind<eitherT<L,M>>>
-	, deriving_apply<in_terms_of_bind<eitherT<L,M>>> {
+		: deriving_join<in_terms_of_bind<eitherT<L,M>>>
+		, deriving_apply<in_terms_of_bind<eitherT<L,M>>>
+	{
 		using T = typename eitherT<L,M>::T;
 
 		template<typename U>
@@ -169,12 +176,14 @@ namespace ftl {
 		template<typename U>
 		using eT = eitherT<L,M_<U>>;
 
-		static eT<T> pure(const T& t) {
+		static eT<T> pure(const T& t)
+		{
 			return eT<T>{monad<M_<either<L,T>>>::pure(
 					make_right<L>(t))};
 		}
 
-		static eT<T> pure(T&& t) {
+		static eT<T> pure(T&& t)
+		{
 			return eT<T>{monad<M_<either<L,T>>>::pure(
 					make_right<L>(std::move(t)))};
 		}
@@ -191,16 +200,20 @@ namespace ftl {
 		 *           in an `M` _and_ in an `either`.
 		 */
 		template<typename F, typename U = result_of<F(T)>>
-		static eT<U> map(F f, const eT<T>& e) {
-			return eT<U>{
+		static eT<U> map(F f, const eT<T>& e)
+		{
+			return eT<U>
+			{
 				[f](const either<L,T>& e) { return f % e; } % *e
 			};
 		}
 
 		/// \overload
 		template<typename F, typename U = result_of<F(T)>>
-		static eT<U> map(F f, eT<T>&& e) {
-			return eT<U>{
+		static eT<U> map(F f, eT<T>&& e)
+		{
+			return eT<U>
+			{
 				[f](either<L,T>&& e) {return f % std::move(e);} % std::move(*e)
 			};
 		}
@@ -211,7 +224,8 @@ namespace ftl {
 		 * Uses `M`'s bind operation on top of `either`'s. 
 		 */
 		template<typename F, typename U = Value_type<result_of<F(T)>>>
-		static eT<U> bind(const eT<T>& e, F&& f) {
+		static eT<U> bind(const eT<T>& e, F&& f)
+		{
 			using monad_t = result_of<F(T)>;
 
 			return bind_helper<monad_t>::bind(e, std::forward<F>(f));
@@ -219,7 +233,8 @@ namespace ftl {
 
 		/// \overload
 		template<typename F, typename U = typename result_of<F(T)>::T>
-		static eT<U> bind(eT<T>&& e, F&& f) {
+		static eT<U> bind(eT<T>&& e, F&& f)
+		{
 			using monad_t = result_of<F(T)>;
 
 			return bind_helper<monad_t>::bind(std::move(e), std::forward<F>(f));
@@ -230,7 +245,8 @@ namespace ftl {
 	private:
 		// Helper struct required to implement automatic lift and hoist
 		template<typename M2>
-		struct bind_helper {
+		struct bind_helper
+		{
 			using U = Value_type<M2>;
 
 			// Automatic lift when binding to operations in M_
@@ -238,12 +254,16 @@ namespace ftl {
 					typename F,
 					typename = Requires<std::is_same<Rebind<M,U>, M2>::value>
 			>
-			static eT<U> bind(const eT<T>& e, F f) {
-				return eT<U>{
-					*e >>= [f](const either<L,T>& e) {
+			static eT<U> bind(const eT<T>& e, F f)
+			{
+				return eT<U>
+				{
+					*e >>= [f](const either<L,T>& e)
+					{
 						return e.match(
-							[](Left<L> l){ return aPure<M_<either<L,U>>>()(l); },
-							[f](const Right<T>& r){
+							[](Left<L> l) { return aPure<M_<either<L,U>>>()(l); },
+							[f](const Right<T>& r)
+							{
 								return aPure<either<L,U>>() % f(*r);
 							}
 						);
@@ -255,12 +275,16 @@ namespace ftl {
 					typename F,
 					typename = Requires<std::is_same<Rebind<M,U>, M2>::value>
 			>
-			static eT<U> bind(eT<T>&& e, F f) {
-				return eT<U>{
-					std::move(*e) >>= [f](either<L,T>&& e) {
+			static eT<U> bind(eT<T>&& e, F f)
+			{
+				return eT<U>
+				{
+					std::move(*e) >>= [f](either<L,T>&& e)
+					{
 						return e.match(
-							[](Left<L> l){ return aPure<M_<either<L,U>>>()(l); },
-							[f](Right<T>& r){
+							[](Left<L> l) { return aPure<M_<either<L,U>>>()(l); },
+							[f](Right<T>& r)
+							{
 								return aPure<either<L,U>>() % f(std::move(*r));
 							}
 						);
@@ -271,28 +295,35 @@ namespace ftl {
 
 		// Normal case, we're binding with a computation in eitherT
 		template<typename M2>
-		struct bind_helper<eitherT<L,M2>> {
+		struct bind_helper<eitherT<L,M2>>
+		{
 			using U = Value_type<M2>;
 
 			template<typename F>
-			static eT<U> bind(const eT<T>& e, F f) {
-				return eT<U>{
-					*e >>= [f](const either<L,T>& e) {
+			static eT<U> bind(const eT<T>& e, F f)
+			{
+				return eT<U>
+				{
+					*e >>= [f](const either<L,T>& e)
+					{
 						return e.match(
-							[](Left<L> l){ return aPure<M_<either<L,U>>>()(l); },
-							[f](const Right<T>& r){ return *f(*r); }
+							[](Left<L> l) { return aPure<M_<either<L,U>>>()(l); },
+							[f](const Right<T>& r) { return *f(*r); }
 						);
 					}
 				};
 			}
 
 			template<typename F>
-			static eT<U> bind(eT<T>&& e, F f) {
-				return eT<U>{
-					std::move(*e) >>= [f](either<L,T>&& e) -> M_<either<L,U>> {
+			static eT<U> bind(eT<T>&& e, F f)
+			{
+				return eT<U>
+				{
+					std::move(*e) >>= [f](either<L,T>&& e) -> M_<either<L,U>>
+					{
 						return e.match(
-							[](Left<L> l){ return aPure<M_<either<L,U>>>()(l); },
-							[f](Right<T>& r){ return *f(std::move(*r)); }
+							[](Left<L> l) { return aPure<M_<either<L,U>>>()(l); },
+							[f](Right<T>& r) { return *f(std::move(*r)); }
 						);
 					}
 				};
@@ -301,12 +332,15 @@ namespace ftl {
 
 		// Automatic hoisting of plain either
 		template<typename U>
-		struct bind_helper<either<L,U>> {
-
+		struct bind_helper<either<L,U>>
+		{
 			template<typename F>
-			static eT<U> bind(const eT<T>& e, F f) {
-				return e >>= [f](const T& t) {
-					return eT<U>{
+			static eT<U> bind(const eT<T>& e, F f)
+			{
+				return e >>= [f](const T& t)
+				{
+					return eT<U>
+					{
 						monad<M_<either<L,U>>>::pure(
 							make_right<L>(t) >>= f
 						)
@@ -315,9 +349,12 @@ namespace ftl {
 			}
 
 			template<typename F>
-			static eT<U> bind(eT<T>&& e, F f) {
-				return std::move(e) >>= [f](T&& t) {
-					return eT<U>{
+			static eT<U> bind(eT<T>&& e, F f)
+			{
+				return std::move(e) >>= [f](T&& t)
+				{
+					return eT<U>
+					{
 						monad<M_<either<L,U>>>::pure(
 							make_right<L>(std::move(t)) >>= f
 						)
@@ -339,7 +376,8 @@ namespace ftl {
 	 */
 	template<typename L, typename M>
 	struct foldable<eitherT<L,M>>
-	: deriving_foldMap<eitherT<L,M>>, deriving_fold<eitherT<L,M>> {
+	: deriving_foldMap<eitherT<L,M>>, deriving_fold<eitherT<L,M>>
+	{
 
 		using T = Value_type<M>;
 		using Met = typename eitherT<L,M>::Met;
@@ -351,9 +389,11 @@ namespace ftl {
 					std::is_same<U, result_of<F(U,T)>>::value
 				>
 		>
-		static U foldl(F f, U z, const eitherT<L,M>& me) {
+		static U foldl(F f, U z, const eitherT<L,M>& me)
+		{
 			return foldable<Met>::foldl(
-				[f](U z, const either<L,T>& e){
+				[f](U z, const either<L,T>& e)
+				{
 					return e.match(
 						[z](Left<L>){ return z; },
 						[f,z](const Right<T>& r){ return f(z, *r); }
@@ -371,12 +411,14 @@ namespace ftl {
 					std::is_same<U, result_of<F(T,U)>>::value
 				>
 		>
-		static U foldr(F f, U z, const eitherT<L,M>& me) {
+		static U foldr(F f, U z, const eitherT<L,M>& me)
+		{
 			return foldable<Met>::foldr(
-				[f](const either<L,T>& e, U z){
+				[f](const either<L,T>& e, U z)
+				{
 					return e.match(
-						[z](Left<L>){ return z; },
-						[f,z](const Right<T>& r){ return f(*r, z); }
+						[z](Left<L>) { return z; },
+						[f,z](const Right<T>& r) { return f(*r, z); }
 					); 
 				},
 				z,
@@ -395,7 +437,8 @@ namespace ftl {
 	 * \ingroup eitherT
 	 */
 	template<typename L, typename M>
-	struct monoidA<eitherT<L,M>> {
+	struct monoidA<eitherT<L,M>>
+	{
 		using T = Value_type<M>;
 		using Met = typename eitherT<L,M>::Met;
 
@@ -405,8 +448,10 @@ namespace ftl {
 		 * Failing embeds a left value of `monoid<L>`'s identity element with
 		 * `monad<M>::pure`.
 		 */
-		static eitherT<L,M> fail() {
-			return eitherT<L,M>{
+		static eitherT<L,M> fail()
+		{
+			return eitherT<L,M>
+			{
 				monad<Met>::pure(make_left<T>(monoid<L>::id()))
 			};
 		}
@@ -419,21 +464,28 @@ namespace ftl {
 		 * values, they are combined using `monoid<L>::append` and a new left
 		 * value (embedded as if by `monad<M>::pure`) is returned.
 		 */
-		static eitherT<L,M> orDo(const eitherT<L,M>& e1, eitherT<L,M> e2) {
-			return eitherT<L,M> {
-				*e1 >>= [e2](const either<L,T>& e) -> Met {
-					if(e.template is<Right<T>>()) {
+		static eitherT<L,M> orDo(const eitherT<L,M>& e1, eitherT<L,M> e2)
+		{
+			return eitherT<L,M>
+			{
+				*e1 >>= [e2](const either<L,T>& e) -> Met
+				{
+					if(e.template is<Right<T>>())
+					{
 						return monad<Met>::pure(e);
 					}
-					else {
+					else
+					{
 						return fmap(
-							[e](const either<L,T>& e2) -> either<L,T> {
+							[e](const either<L,T>& e2) -> either<L,T>
+							{
 								if(e2.template is<Right<T>>())
 									return e2;
 
-								else {
+								else
+								{
 									return make_left<T>(
-										*get<Left<L>>(e) ^ *get<Left<L>>(e2)
+										*e.template unsafe_get<Left<L>>() ^ *e2.template unsafe_get<Left<L>>()
 									);
 								}
 							},

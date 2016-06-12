@@ -23,6 +23,9 @@
 #include <ftl/either.h>
 #include "either_tests.h"
 
+static_assert(std::is_trivial<ftl::Left<int>>::value, "Left container should be trivial when encapsulating trivial types");
+static_assert(std::is_trivial<ftl::Right<int>>::value, "Right container should be trivial when encapsulating trivial types");
+
 test_set either_tests{
 	std::string("either"),
 	{
@@ -70,7 +73,7 @@ test_set either_tests{
 				std::string s("test");
 
 				return e.match(
-					[s](std::string x) { return x == s; },
+					[s](ftl::Right<std::string> x) { return x.val == s; },
 					[](ftl::Left<int>){ return false; }
 				);
 			})
@@ -80,13 +83,13 @@ test_set either_tests{
 			std::function<bool()>([]() -> bool {
 				auto e = ftl::make_right<std::string>(std::string("test"));
 
-				e.matchE(
-					[](std::string& x) { x += " test"; },
+				e.match(
+					[](ftl::Right<std::string>& x) { *x += " test"; },
 					[](ftl::Left<std::string>&){  }
 				);
 
 				return e.match(
-					[](std::string x) { return x == "test test"; },
+					[](ftl::Right<std::string> x) { return *x == "test test"; },
 					[](ftl::Left<std::string>){ return false; }
 				);
 			})
@@ -96,61 +99,15 @@ test_set either_tests{
 			std::function<bool()>([]() -> bool {
 				auto e = ftl::make_left<std::string>(std::string("test"));
 
-				e.matchE(
-					[](std::string& x) { x += " fail"; },
+				e.match(
+					[](ftl::Right<std::string>& x) { *x += " fail"; },
 					[](ftl::Left<std::string>& l){ *l += " test";  }
 				);
 
 				return e.match(
-					[](std::string) { return false; },
+					[](ftl::Right<std::string>) { return false; },
 					[](ftl::Left<std::string> l){ return *l == "test test"; }
 				);
-			})
-		),
-		std::make_tuple(
-			std::string("fromLeft"),
-			std::function<bool()>([]() -> bool {
-				auto e = ftl::make_left<int>(std::string("test"));
-
-				return ftl::fromLeft(e) == std::string("test");
-			})
-		),
-		std::make_tuple(
-			std::string("fromLeft[throws]"),
-			std::function<bool()>([]() -> bool {
-				auto e = ftl::make_right<int>(std::string("test"));
-
-				try {
-					ftl::fromLeft(e);
-				}
-				catch(ftl::invalid_sum_type_access) {
-					return true;
-				}
-
-				return false;
-			})
-		),
-		std::make_tuple(
-			std::string("fromRight"),
-			std::function<bool()>([]() -> bool {
-				auto e = ftl::make_right<int>(std::string("test"));
-
-				return ftl::fromRight(e) == std::string("test");
-			})
-		),
-		std::make_tuple(
-			std::string("fromRight[throws]"),
-			std::function<bool()>([]() -> bool {
-				auto e = ftl::make_left<int>(std::string("test"));
-
-				try {
-					ftl::fromRight(e);
-				}
-				catch(ftl::invalid_sum_type_access) {
-					return true;
-				}
-
-				return false;
 			})
 		),
 		std::make_tuple(
@@ -162,7 +119,7 @@ test_set either_tests{
 					[](int){ return std::string("test"); } % e;
 
 				return e2.match(
-					[](std::string r){ return r == std::string("test"); },
+					[](ftl::Right<std::string> r){ return *r == std::string("test"); },
 					[](ftl::Left<int>){ return false; }
 				);
 			})
@@ -176,7 +133,7 @@ test_set either_tests{
 				auto e = f % make_right<char>(NoCopy(2));
 
 				return e.match(
-					[](int x){ return x == 2; },
+					[](ftl::Right<int> x){ return *x == 2; },
 					[](Left<char>){ return false; }
 				);
 			})
@@ -190,7 +147,7 @@ test_set either_tests{
 					[](int){ return std::string("test"); } % e;
 
 				return e2.match(
-					[](std::string){ return false; },
+					[](ftl::Right<std::string>){ return false; },
 					[](ftl::Left<int> l){ return *l == 10; }
 				);
 			})
@@ -204,7 +161,7 @@ test_set either_tests{
 				auto e = f % make_left<NoCopy>('a');
 
 				return e.match(
-					[](int){ return false; },
+					[](Right<int>){ return false; },
 					[](Left<char> c){ return *c == 'a'; }
 				);
 			})
@@ -216,7 +173,7 @@ test_set either_tests{
 
 				return e.match(
 					[](ftl::Left<std::string>){ return false; },
-					[](float x){ return fequal(x, 12.f); }
+					[](ftl::Right<float> x){ return fequal(*x, 12.f); }
 				);
 			})
 		),
@@ -230,7 +187,7 @@ test_set either_tests{
 
 				return e.match(
 					[](ftl::Left<int>){ return false; },
-					[](int r) { return r == 2; }
+					[](ftl::Right<int> r) { return r == 2; }
 				);
 			})
 		),
@@ -243,7 +200,7 @@ test_set either_tests{
 				auto e = fn % ftl::make_left<int>(1) * ftl::make_right<int>(1);
 
 				return e.match(
-					[](int){ return false; },
+					[](ftl::Right<int>){ return false; },
 					[](ftl::Left<int> l){ return *l == 1; }
 				);
 			})
@@ -257,7 +214,7 @@ test_set either_tests{
 				auto e = fn % ftl::make_right<int>(1) * ftl::make_left<int>(1);
 
 				return e.match(
-					[](int){ return false; },
+					[](ftl::Right<int>){ return false; },
 					[](ftl::Left<int> l){ return *l == 1; }
 				);
 			})
@@ -272,7 +229,7 @@ test_set either_tests{
 
 				return e.match(
 					[](ftl::Left<int> l){ return *l == 1; },
-					[](int){ return false; }
+					[](ftl::Right<int>){ return false; }
 				);
 			})
 		),
@@ -287,7 +244,7 @@ test_set either_tests{
 
 				return e.match(
 					[](ftl::Left<int>){ return false; },
-					[](int r){ return r == 2; }
+					[](ftl::Right<int> r){ return *r == 2; }
 				);
 			})
 		),
@@ -302,7 +259,7 @@ test_set either_tests{
 
 				return e.match(
 					[](ftl::Left<int> l){ return *l == 1; },
-					[](int){ return false; }
+					[](ftl::Right<int>){ return false; }
 				);
 			})
 		),
@@ -317,7 +274,7 @@ test_set either_tests{
 
 				return e.match(
 					[](ftl::Left<int> l){ return *l == 2; },
-					[](int){ return false; }
+					[](ftl::Right<int>){ return false; }
 				);
 			})
 		),

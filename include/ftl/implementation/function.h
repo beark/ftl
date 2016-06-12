@@ -48,7 +48,7 @@ namespace ftl {
 	struct force_function_heap_allocation : std::false_type {};
 
 	// Namespace for internal details
-	namespace _dtl {
+	namespace dtl_ {
 		struct manager_storage_type;
 
 		struct functor_padding {
@@ -406,11 +406,11 @@ namespace ftl {
 
 		template<typename R, typename P1, typename P2, typename...Ps>
 		struct curried<R,P1,P2,Ps...> {
-        private:
-            using applied_type = function<R(P2,Ps...)>;
+		private:
+			using applied_type = function<R(P2,Ps...)>;
 
-            // Apply one argument.
-            applied_type apply_one(P1 p1) const {
+			// Apply one argument.
+			applied_type apply_one(P1 p1) const {
 				auto self = *reinterpret_cast<const function<R(P1,P2,Ps...)>*>(this);
 				return [self,p1] (P2 p2, Ps...ps) {
 					return self.operator()(

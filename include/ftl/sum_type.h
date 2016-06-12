@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -23,12 +23,11 @@
 #ifndef FTL_SUM_TYPE_H
 #define FTL_SUM_TYPE_H
 
-#include <stdexcept>
-#include <memory>
-#include <string>
+#include <cassert>
 #include "type_functions.h"
 #include "concepts/basic.h"
 #include "concepts/orderable.h"
+#include "implementation/recursive_union.h"
 
 namespace ftl {
 
@@ -51,56 +50,6 @@ namespace ftl {
 	 */
 
 	/**
-	 * Raised when trying to access a `sum_type` erroneously.
-	 *
-	 * In general, all instances of this exception being raised are preventable
-	 * by simply using an exhaustive pattern match instead of the `get` methods
-	 * and similar. That, or manually making sure the `sum_type` has the right
-	 * run-time type.
-	 *
-	 * \see sum_type
-	 *
-	 * \ingroup sum_type
-	 */
-	class invalid_sum_type_access : public std::logic_error {
-	public:
-		explicit invalid_sum_type_access(const std::string& what)
-		: logic_error(what) {}
-
-		explicit invalid_sum_type_access(std::string&& what)
-		: logic_error(std::move(what)) {}
-
-		explicit invalid_sum_type_access(const char* what)
-		: logic_error(what) {}
-
-	};
-
-	/**
-	 * Type tag used to select which constructor to use in a `sum_type`.
-	 *
-	 * \par Examples
-	 *
-	 * Copy-constructing a sub-type of a `sum_type`
-	 * \code
-	 *   sum_type<int,string> x{constructor<int>(), 12};
-	 * \endcode
-	 *
-	 * Calling arbitrary constructor of a sub-type
-	 * \code
-	 *   // B must have a constructor taking an int and a c-string, or something
-	 *   // they implicitly convert to
-	 *   sum_type<A,B> x{constructor<B>(), 12, "foo"};
-	 * \endcode
-	 *
-	 * \see sum_type
-	 *
-	 * \ingroup sum_type
-	 */
-	template<typename>
-	struct constructor {
-	};
-
-	/**
 	 * A type that can be used as default match clause in a pattern match.
 	 *
 	 * \par Examples
@@ -117,887 +66,569 @@ namespace ftl {
 	 *       there are additional match clauses after `otherwise`, they will
 	 *       never be called.
 	 */
-	struct otherwise {
-		template<typename T>
+	struct otherwise
+	{
+		template<class T>
 		constexpr otherwise(T&&) noexcept {}
 	};
 
-	namespace _dtl {
-
-		template<typename, typename...>
+	namespace dtl_
+	{
+		template<class, class...>
 		struct is_type_set;
 
-		template<typename T>
-		struct is_type_set<T> {
-			static constexpr bool value = true;
-		};
+		template<class T>
+		struct is_type_set<T> : ::std::true_type {};
 
-		template<typename T, typename U, typename...Ts>
-		struct is_type_set<T,U,Ts...> {
+		template<class T, class...Ts>
+		struct is_type_set<T,T,Ts...> : ::std::false_type {};
+
+		template<class T, class U, class...Ts>
+		struct is_type_set<T,U,Ts...>
+		{
 			static constexpr bool value =
 				is_type_set<T,Ts...>::value
 				&& is_type_set<U,Ts...>::value;
 		};
 
-		template<typename T, typename...Ts>
-		struct is_type_set<T,T,Ts...> {
-			static constexpr bool value = false;
-		};
+		template<class T, class U>
+		struct is_match
+			: ::std::is_same<::ftl::plain_type<T>, ::ftl::plain_type<U>> {};
 
-		template<typename,typename...>
-		struct find_call_match {
-			using type = _dtl::no;
-		};
+		template<class T>
+		struct is_match<T,T> : ::std::true_type {};
 
-		template<typename T, typename F, typename...Fs>
-		struct find_call_match<T,F,Fs...> {
-			using type = if_<is_callable<F,T>::value,
-				  typename is_callable<F,T>::type,
-				  typename find_call_match<T,Fs...>::type
-			>;
-		};
+		template<class T>
+		struct is_match<T,::ftl::otherwise> : ::std::true_type {};
 
-		template<typename,typename>
-		struct all_return_types;
-
-		template<typename...Fs>
-		struct all_return_types<type_seq<>,type_seq<Fs...>> {
-			using types = type_seq<>;
-		};
-
-		template<typename T, typename...Ts, typename...Fs>
-		struct all_return_types<type_seq<T,Ts...>,type_seq<Fs...>> {
-			using types =
-				typename concat_type_seqs<
-					type_seq<typename find_call_match<T,Fs...>::type>,
-					typename all_return_types<
-						type_seq<Ts...>,
-						type_seq<Fs...>
-					>::types
-				>::type;
-		};
-
-		template<typename>
-		struct find_common_type;
-
-		template<typename,typename>
-		struct exhaustive_match;
-
-		template<typename...Ts>
-		struct find_common_type<type_seq<Ts...>> {
-			using type = typename std::common_type<Ts...>::type;
-		};
-
-		template<typename Ts,typename Fs>
-		struct common_return_type {
-
-			static_assert(
-				exhaustive_match<Fs,Ts>::value,
-				"Match expressions must be exhaustive"
-			);
-
-			using types = typename all_return_types<Ts,Fs>::types;
-			using type = typename find_common_type<types>::type;
-		};
+		template<class, class>
+		struct is_match_exhaustive : ::std::false_type {};
 
 		// A match is exhaustive if we've functions to spare
 		template<typename...Fs>
-		struct exhaustive_match<type_seq<Fs...>,type_seq<>> {
-			static constexpr bool value = true;
-		};
+		struct is_match_exhaustive<type_seq<Fs...>,type_seq<>>
+			: ::std::true_type {};
 
 		// A match is exhaustive if the final function accepts the final type
 		template<typename F, typename T>
-		struct exhaustive_match<type_seq<F>,type_seq<T>> {
-			static constexpr bool value = is_callable<F,T>::value;
-		};
+		struct is_match_exhaustive<type_seq<F>,type_seq<T>>
+				: is_match<T,argument_type<F,0>> {};
 
-		// A match is NOT exhaustive if there are left-over types
+		//A match is NOT exhaustive if there are left-over types
 		template<typename T, typename...Ts>
-		struct exhaustive_match<type_seq<>,type_seq<T,Ts...>> {
-			static constexpr bool value = false;
-		};
+		struct is_match_exhaustive<type_seq<>,type_seq<T,Ts...>>
+			: ::std::false_type {};
 
 		template<typename F, typename...Fs, typename T, typename...Ts>
-		struct exhaustive_match<type_seq<F,Fs...>,type_seq<T,Ts...>> {
+		struct is_match_exhaustive<type_seq<F,Fs...>,type_seq<T,Ts...>>
+		{
 			static constexpr bool value =
-				(
-					is_callable<F,T>::value
-					&& exhaustive_match<type_seq<Fs...>,type_seq<Ts...>>::value
-				)
+				( is_match<T,argument_type<F,0>>::value
+					&& is_match_exhaustive<type_seq<Fs...>,type_seq<Ts...>>::value)
 				||
-				(
-					exhaustive_match<type_seq<F,Fs...>,type_seq<Ts...>>::value
-					&& exhaustive_match<type_seq<Fs...>,type_seq<T>>::value
+				( is_match_exhaustive<type_seq<F,Fs...>,type_seq<Ts...>>::value
+					&& is_match_exhaustive<type_seq<Fs...>,type_seq<T>>::value);
+		};
+
+		template<class, class...>
+		struct match_cases_are_in_type : ::std::false_type{};
+
+		template<class...Ts>
+		struct match_cases_are_in_type<type_seq<>,Ts...> : ::std::true_type{};
+
+		template<class F, class...Fs, class...Ts>
+		struct match_cases_are_in_type<type_seq<F,Fs...>,Ts...>
+		{
+			static constexpr bool value =
+				type_is_in_v<plain_type<argument_type<F,0>>,Ts...>
+				&& match_cases_are_in_type<type_seq<Fs...>,Ts...>::value;
+		};
+
+		template<bool AllTrivial, typename...Ts>
+		struct sum_type_;
+
+		template<bool, class...>
+		struct match_selector;
+
+		template<bool Trivial>
+		struct match_selector<Trivial>
+		{
+			template<
+				class T, class F, class...Fs,
+				class = typename ::std::enable_if<
+					is_match<::ftl::plain_type<T>,argument_type<F,0>>::value
+				>::type
+			>
+			static constexpr auto invoke(T&& t, F&& f, Fs&&...)
+			{
+				return ::std::forward<F>(f)(::std::forward<T>(t));
+			}
+
+			template<
+				class F, class T, class...Fs,
+				class = typename ::std::enable_if<
+					!is_match<::ftl::plain_type<T>,argument_type<F,0>>::value
+				>::type
+			>
+			static constexpr auto invoke(T&& t, F&&, Fs&&...fs)
+			{
+				return match_selector::invoke(
+					::std::forward<T>(t),
+					::std::forward<Fs>(fs)...);
+			}
+		};
+
+		template<bool Trivial, size_t I, size_t J, size_t...Is, class T, class...Ts>
+		struct match_selector<Trivial,::std::index_sequence<I,J,Is...>,T,Ts...>
+		{
+			template<class...Fs> static constexpr auto
+			invoke(const recursive_union_<Trivial,T,Ts...>& s, size_t i, Fs&&...fs)
+			{
+				return i == I
+					? match_selector<Trivial>::invoke(s.val, ::std::forward<Fs>(fs)...)
+					: match_selector<Trivial,::std::index_sequence<J,Is...>,Ts...>::invoke(
+							s.rem, i, std::forward<Fs>(fs)...
+						);
+			}
+
+			template<class...Fs> static constexpr auto
+			invoke(recursive_union_<Trivial,T,Ts...>& s, size_t i, Fs&&...fs)
+			{
+				return i == I
+					? match_selector<Trivial>::invoke(s.val, ::std::forward<Fs>(fs)...)
+					: match_selector<Trivial,::std::index_sequence<J,Is...>,Ts...>::invoke(
+							s.rem, i, std::forward<Fs>(fs)...
+						);
+			}
+
+			template<class...Fs> static constexpr auto
+			invoke(recursive_union_<Trivial,T,Ts...>&& s, size_t i, Fs&&...fs)
+			{
+				return i == I
+					? match_selector<Trivial>::invoke(
+							::std::move(s.val), ::std::forward<Fs>(fs)...
+						)
+					: match_selector<Trivial,::std::index_sequence<J,Is...>,Ts...>::invoke(
+							::std::move(s.rem), i, std::forward<Fs>(fs)...
+						);
+			}
+		};
+
+		template<bool Trivial, size_t I, typename T, typename...Ts>
+		struct match_selector<Trivial, ::std::index_sequence<I>,T,Ts...>
+		{
+			template<typename...Fs> static constexpr auto
+			invoke(const recursive_union_<Trivial,T,Ts...>& s, size_t i, Fs&&...fs)
+			{
+				assert(i == I);
+
+				return match_selector<Trivial>::invoke(
+					s.val, ::std::forward<Fs>(fs)...
 				);
-		};
-
-		template<typename...>
-		struct recursive_union {};
-
-		template<size_t I, typename T, typename...Ts>
-		struct union_indexer {
-			static constexpr auto ref(recursive_union<T,Ts...>& u)
-			-> decltype(union_indexer<I-1,Ts...>::ref(u.r)) {
-				return union_indexer<I-1,Ts...>::ref(u.r);
 			}
 
-			static constexpr auto ref(const recursive_union<T,Ts...>& u)
-			-> decltype(union_indexer<I-1,Ts...>::ref(u.r)) {
-				return union_indexer<I-1,Ts...>::ref(u.r);
+			template<typename...Fs> static constexpr auto
+			invoke(recursive_union_<Trivial,T,Ts...>& s, size_t i, Fs&&...fs)
+			{
+				assert(i == I);
+
+				return match_selector<Trivial>::invoke(
+					s.val, ::std::forward<Fs>(fs)...
+				);
 			}
 
-			static constexpr auto ptr(recursive_union<T,Ts...>& u)
-			-> decltype(union_indexer<I-1,Ts...>::ptr(u.r)) {
-				return union_indexer<I-1,Ts...>::ptr(u.r);
-			}
-		};
+			template<typename...Fs> static constexpr auto
+			invoke(recursive_union_<Trivial,T,Ts...>&& s, size_t i, Fs&&...fs)
+			{
+				assert(i == I);
 
-		template<typename T, typename...Ts>
-		struct union_indexer<0,T,Ts...> {
-			static constexpr T& ref(recursive_union<T,Ts...>& u) {
-				return u.v;
-			}
-
-			static constexpr const T& ref(const recursive_union<T,Ts...>& u) {
-				return u.v;
-			}
-
-			static constexpr T* ptr(recursive_union<T,Ts...>& u) {
-				return std::addressof(u.v);
-			}
-		};
-
-		template<typename T>
-		struct overload_tag {};
-
-		template<typename R, typename T, typename...>
-		struct union_visitor {
-			template<
-				typename O, typename F, typename...Fs,
-				typename = typename std::enable_if<
-					is_callable<F,T>::value
-				>::type
-			>
-			static R visit(overload_tag<O>, const T& t, F&& f, Fs&&...) {
-				return std::forward<F>(f)(t);
-			}
-
-			template<
-				typename O, typename F, typename...Fs,
-				typename = typename std::enable_if<
-					is_callable<F,T>::value
-				>::type
-			>
-			static R visit(overload_tag<O>, T& t, F&& f, Fs&&...) {
-				return std::forward<F>(f)(t);
-			}
-
-			template<
-				typename F, typename O, typename...Fs,
-				typename = typename std::enable_if<
-					!is_callable<F,T>::value
-				>::type
-			>
-			static R visit(overload_tag<O> o, const T& t, F&&, Fs&&...fs) {
-				return union_visitor::visit(o, t, std::forward<Fs>(fs)...);
-			}
-
-			template<
-				typename F, typename O, typename...Fs,
-				typename = typename std::enable_if<
-					!is_callable<F,T>::value
-				>::type
-			>
-			static R visit(overload_tag<O> o, T& t, F&&, Fs&&...fs) {
-				return union_visitor::visit(o, t, std::forward<Fs>(fs)...);
-			}
-		};
-
-		template<typename T, typename...Ts>
-		struct union_visitor<void,T,Ts...> {
-			template<
-				typename O, typename F, typename...Fs,
-				typename = typename std::enable_if<
-					is_callable<F,T>::value
-				>::type
-			>
-			static void visit(overload_tag<O>, const T& t, F&& f, Fs&&...) {
-				std::forward<F>(f)(t);
-			}
-
-			template<
-				typename O, typename F, typename...Fs,
-				typename = typename std::enable_if<
-					is_callable<F,T>::value
-				>::type
-			>
-			static void visit(overload_tag<O>, T& t, F&& f, Fs&&...) {
-				std::forward<F>(f)(t);
-			}
-
-			template<
-				typename F, typename O, typename...Fs,
-				typename = typename std::enable_if<
-					!is_callable<F,T>::value
-				>::type
-			>
-			static void visit(overload_tag<O> o, const T& t, F&&, Fs&&...fs) {
-				union_visitor::visit(o, t, std::forward<Fs>(fs)...);
-			}
-
-			template<
-				typename F, typename O, typename...Fs,
-				typename = typename std::enable_if<
-					!is_callable<F,T>::value
-				>::type
-			>
-			static void visit(overload_tag<O> o, T& t, F&&, Fs&&...fs) {
-				union_visitor::visit(o, t, std::forward<Fs>(fs)...);
-			}
-		};
-
-		template<typename R, typename...Ts>
-		struct union_visitor<R,seq<>,Ts...> {
-			template<typename...Fs>
-			static R visit(const recursive_union<Ts...>&, size_t, Fs&&...) {
-				throw invalid_sum_type_access{""};
-			}
-
-			template<typename...Fs>
-			static R visit(recursive_union<Ts...>&, size_t, Fs&&...) {
-				throw invalid_sum_type_access{""};
+				return match_selector<Trivial>::invoke(
+					::std::move(s.val), ::std::forward<Fs>(fs)...
+				);
 			}
 		};
 
 		template<typename...Ts>
-		struct union_visitor<void,seq<>,Ts...> {
-			template<typename...Fs>
-			static void visit(const recursive_union<Ts...>&, size_t, Fs&&...) {
-				throw invalid_sum_type_access{""};
-			}
-
-			template<typename...Fs>
-			static void visit(recursive_union<Ts...>&, size_t, Fs&&...) {
-				throw invalid_sum_type_access{""};
-			}
-		};
-
-		template<typename R, size_t I, size_t...Is, typename T, typename...Ts>
-		struct union_visitor<R,seq<I,Is...>,T,Ts...> {
-			template<typename...Fs>
-			static R visit(
-					const recursive_union<T,Ts...>& u, size_t i, Fs&&...fs
-			) {
-				if(i == I) {
-					return union_visitor<R,T>::visit(
-						overload_tag<T>{}, u.v, std::forward<Fs>(fs)...
-					);
-				}
-				else {
-					return union_visitor<R,seq<Is...>,Ts...>::visit(
-						u.r, i, std::forward<Fs>(fs)...
-					);
-				}
-			}
-
-			template<typename...Fs>
-			static R visit(
-					recursive_union<T,Ts...>& u, size_t i, Fs&&...fs
-			) {
-				if(i == I) {
-					return union_visitor<R,T>::visit(
-						overload_tag<T>{}, u.v, std::forward<Fs>(fs)...
-					);
-				}
-				else {
-					return union_visitor<R,seq<Is...>,Ts...>::visit(
-						u.r, i, std::forward<Fs>(fs)...
-					);
-				}
-			}
-		};
-
-		template<size_t I, size_t...Is, typename T, typename...Ts>
-		struct union_visitor<void,seq<I,Is...>,T,Ts...> {
-			template<typename...Fs>
-			static void visit(
-					const recursive_union<T,Ts...>& u, size_t i, Fs&&...fs
-			) {
-				if(i == I) {
-					union_visitor<void,T>::visit(
-						overload_tag<T>{}, u.v, std::forward<Fs>(fs)...
-					);
-				}
-				else {
-					union_visitor<void,seq<Is...>,Ts...>::visit(
-						u.r, i, std::forward<Fs>(fs)...
-					);
-				}
-			}
-
-			template<typename...Fs>
-			static void visit(
-					recursive_union<T,Ts...>& u, size_t i, Fs&&...fs
-			) {
-				if(i == I) {
-					union_visitor<void,T>::visit(
-						overload_tag<T>{}, u.v, std::forward<Fs>(fs)...
-					);
-				}
-				else {
-					return union_visitor<void,seq<Is...>,Ts...>::visit(
-						u.r, i, std::forward<Fs>(fs)...
-					);
-				}
-			}
-		};
-
-		template<>
-		struct recursive_union<> {
-			void copy(size_t, const recursive_union&) noexcept {}
-			void move(size_t, recursive_union&&) noexcept {}
-			void destruct(size_t) noexcept {}
-
-			constexpr bool compare( size_t,const recursive_union&) const noexcept
-			{ return false; }
-		};
-
-		template<typename T, typename...Ts>
-		struct recursive_union<T,Ts...> {
-			constexpr recursive_union() noexcept {}
-
-			// Construct this element type
-			template<typename...Args>
-			explicit constexpr recursive_union(constructor<T>, Args&&...args)
-			noexcept(std::is_nothrow_constructible<T,Args...>::value)
-			: v(std::forward<Args>(args)...) {}
-
-			// Forward construction to U
-			template<typename U, typename...Args>
-			explicit constexpr recursive_union(constructor<U> t, Args&&...args)
-			noexcept(
-				std::is_nothrow_constructible<
-					recursive_union<Ts...>,constructor<U>,Args...
-				>::value
-			)
-			: r(t, std::forward<Args>(args)...) {}
-
-			// Construct this element using an initializer_list
-			template<typename U>
-			constexpr recursive_union(constructor<T>, std::initializer_list<U> l)
-			noexcept(
-				std::is_nothrow_constructible<T,std::initializer_list<U>>::value
-			) : v(l) {}
-
-			// Forward construction using initializer_list to U
-			template<typename U, typename V>
-			constexpr recursive_union(
-					constructor<U> t, std::initializer_list<V> l
-			)
-			noexcept(
-				std::is_nothrow_constructible<
-					recursive_union<Ts...>,
-					constructor<U>,
-					std::initializer_list<V>
-				>::value
-			) : r(t, l) {}
-
-			~recursive_union() {}
-
-			void copy(size_t i, const recursive_union& u)
-			noexcept(
-				std::is_nothrow_copy_constructible<T>::value
-				&& noexcept(std::declval<recursive_union>().r.copy(i-1, u.r))
-			)
-			{
-				if(i == 0) {
-					new (std::addressof(v)) T(u.v);
-				}
-				else {
-					r.copy(i-1, u.r);
-				}
-			}
-
-			void move(size_t i, recursive_union&& u)
-			noexcept(
-				std::is_nothrow_move_constructible<T>::value
-				&& noexcept(
-					std::declval<recursive_union>().r.move(i-1, std::move(u.r))
-				)
-			)
-			{
-				if(i == 0) {
-					new (std::addressof(v)) T(std::move(u.v));
-				}
-				else {
-					r.move(i-1, std::move(u.r));
-				}
-			}
-
-			void destruct(size_t i)
-			noexcept(
-				std::is_nothrow_destructible<T>::value
-				&& noexcept(std::declval<recursive_union>().r.destruct(i))
-			)
-			{
-				if(i == 0)
-				{
-					v.~T();
-				}
-				else {
-					r.destruct(i-1);
-				}
-			}
-
-			constexpr bool compare(size_t i, const recursive_union& rhs) const
-			noexcept {
-				return i == 0 ? v == rhs.v : r.compare(i-1, rhs.r);
-			}
-
-			union {
-				T v;
-				recursive_union<Ts...> r;
-			};
-		};
-
-		template<size_t I, typename...Ts>
-		class get_sum_type_element;
-
-		class sum_type_accessor;
-	}
-
-	/**
-	 * A basic sum type with machinery for pattern matching.
-	 *
-	 * A sum type is essentially a tagged union. It encompasses the idea of a
-	 * value that is either of type `T1`, or `T2`, or, ..., `TN` (for
-	 * the sum type `T1+T2+...+TN`, but it may never have a value of more than
-	 * one of its sub-types at a time.
-	 *
-	 * In FTL, this is enforced as much as is possible at compile time, but for
-	 * many operations that is not really an option. That's why it's
-	 * recommended to stick with operations that can be statically verified,
-	 * e.g. using `match` to access values instead of `get`.
-	 *
-	 * \par Concepts
-	 * - \ref copycons, if all sub-types are
-	 * - \ref movecons, if all sub-types are
-	 * - \ref copyassignable, if all sub-types are CopyConstructible
-	 * - \ref moveassignable, if all sub-types are MoveConstructible
-	 *
-	 * \ingroup sum_type
-	 */
-	template<typename...Ts>
-	class sum_type {
-		static_assert(
-			_dtl::is_type_set<Ts...>::value,
-			"Each sub-type of a sum type must be unique"
-		);
-
-		template<size_t I, typename...Us>
-		friend class ::ftl::_dtl::get_sum_type_element;
-
-		friend class ::ftl::_dtl::sum_type_accessor;
-
-	public:
-		sum_type() = delete;
-		sum_type(const sum_type& st) : cons(st.cons) {
-			data.copy(cons, st.data);
-		}
-
-		sum_type(sum_type&& st) : cons(st.cons) {
-			data.move(cons, std::move(st.data));
-		}
-
-		/**
-		 * Construct the sum type as an instance of `T`.
-		 *
-		 * All the arguments are forwarded to `T`'s constructor.
-		 */
-		template<typename T, typename...Args>
-		explicit constexpr sum_type(constructor<T> t, Args&&...args)
-		noexcept(
-			std::is_nothrow_constructible<
-				_dtl::recursive_union<Ts...>,constructor<T>,Args...
-			>::value
-		)
-		: data(t, std::forward<Args>(args)...)
-		, cons(index_of<T,Ts...>::value) {}
-
-		/**
-		 * Construct as an instance of `T`, using an initializer_list.
-		 *
-		 * \par Examples
-		 *
-		 * \code
-		 *   auto x = sum_type<T,U>{constructor<T>(), {1,2,3}};
-		 * \endcode
-		 */
-		template<typename T, typename U>
-		constexpr sum_type(
-			constructor<T> t, std::initializer_list<U> l
-		)
-		noexcept(
-			std::is_nothrow_constructible<
-				_dtl::recursive_union<Ts...>,
-				constructor<T>,
-				std::initializer_list<U>
-			>::value
-		)
-		: data(t, l), cons(index_of<T,Ts...>::value)
-		{}
-
-		~sum_type() noexcept(
-			noexcept(std::declval<_dtl::recursive_union<Ts...>>().destruct(0))
-		)
+		struct sum_type_<true,Ts...>
 		{
-			data.destruct(cons);
-		}
+			static_assert(
+				dtl_::is_type_set<Ts...>::value,
+				"Each member type of a sum type must be unique"
+			);
 
-		/**
-		 * Check whether the `sum_type` is currently an instance of `T`.
-		 *
-		 * \par Examples
-		 *
-		 * \code
-		 *   sum_type<A,B,C> x{constructor<A>(), ...};
-		 *
-		 *   auto r = x.is<A>() && !x.is<B>() && !x.is<C>();
-		 *   // r == true
-		 * \endcode
-		 */
-		template<typename T>
-		constexpr bool is() const noexcept {
-			return cons == index_of<T,Ts...>::value;
-		}
+			static_assert(sizeof...(Ts) > 0, "Empty sum types are not allowed");
 
-		/**
-		 * Check whether the currently active type is the one at the given index.
-		 *
-		 * \par Examples
-		 *
-		 * \code
-		 *   sum_type<A,B,C> x{constructor<B>(), ...};
-		 *
-		 *   auto r = !x.is<0>() && x.is<1>() && !x.is<2>();
-		 *   // r == true
-		 * \endcode
-		 */
-		template<size_t I>
-		constexpr bool isTypeAt() const noexcept {
-			return cons == I;
-		}
+			sum_type_() = delete;
+			sum_type_(const sum_type_&) = default;
+			sum_type_(sum_type_&&) = default;
 
-		// TODO: Use assignment instead of construction if cons and s.cons
-		// are equal
-		sum_type& operator= (const sum_type& s) {
-			// Deal with self assignment
-			if(std::addressof(s) == this)
-				return *this;
+			template<typename T, typename...Args>
+			explicit constexpr sum_type_(type_t<T> s, Args&&...args)
+			noexcept(::std::is_nothrow_constructible<T,Args...>::value)
+				: data(s, std::forward<Args>(args)...), cons(index_of_v<T,Ts...>)
+			{}
 
-			data.destruct(cons);
-			cons = s.cons;
-			data.copy(cons, s.data);
+			~sum_type_() = default;
 
-			return *this;
-		}
-
-		sum_type& operator= (sum_type&& s) {
-			// Deal with self assignment
-			if(std::addressof(s) == this)
-				return *this;
-
-			data.destruct(cons);
-			cons = s.cons;
-			data.move(cons, std::move(s.data));
-
-			return *this;
-		}
-
-		/**
-		 * Pseudo pattern match method.
-		 *
-		 * Allows a pattern match-like syntax for working with sum type values.
-		 * The case clauses are statically enforced to cover all the types that
-		 * may be held by the sum type.
-		 *
-		 * The match call will return the common type (as found by
-		 * `std::common_type`) of all the given case clauses' return types.
-		 *
-		 * \par Examples
-		 *
-		 * Matching on a number of types:
-		 * \code
-		 *   auto value = sum_type<A,B,C>{constructor<B>(), ...};
-		 *   auto str = value.match(
-		 *       [](A a){ return std::string("A"); },
-		 *       [](B b){ return std::string("B"); },
-		 *       [](C c){ return std::string("C"); }
-		 *   );
-		 *
-		 *   // str == "B"
-		 * \endcode
-		 *
-		 * Match by reference:
-		 * \code
-		 *   sum_type<int,string> value = ...;
-		 *   value.match(
-		 *       [](int& x){ return ++x; },
-		 *       [](string& s){ s += " modified"; return s.size(); }
-		 *   );
-		 * \endcode
-		 *
-		 * \note Matching on a `sum_type` with element types that are
-		 *       implicitly convertible between each other can lead to
-		 *       unexpected behaviour. For example, matching a
-		 *       `sum_type<int,char>` like so:
-		 *
-		 *       \code
-		 *         value.match(
-		 *             [](int x){ ... },
-		 *             [](char x){ ... }
-		 *         );
-		 *       \endcode
-		 *
-		 *       will never trigger the `char` case. Use explicit "constructor
-		 *       types" if there is a chance of encountering this.
-		 *
-		 */
-		template<typename...Fs>
-		auto match(Fs&&...fs) const -> typename ::ftl::_dtl::common_return_type<
-			type_seq<Ts...>,type_seq<Fs...>
-		>::type {
-
-			using indices = gen_seq<0,sizeof...(Ts)-1>;
-			using return_type = typename _dtl::common_return_type<
-				type_seq<Ts...>,type_seq<Fs...>
-			>::type;
-
-			return _dtl::union_visitor<return_type,indices,Ts...>
-				::visit(data, cons, std::forward<Fs>(fs)...);
-		}
-
-		/// \overload
-		template<typename...Fs>
-		auto match(Fs&&...fs) -> typename ::ftl::_dtl::common_return_type<
-			type_seq<Ts...>,type_seq<Fs...>
-		>::type {
-
-			using indices = gen_seq<0,sizeof...(Ts)-1>;
-			using return_type = typename _dtl::common_return_type<
-				type_seq<Ts...>,type_seq<Fs...>
-			>::type;
-
-			return _dtl::union_visitor<return_type,indices,Ts...>
-				::visit(data, cons, std::forward<Fs>(fs)...);
-		}
-
-		/**
-		 * Effectful pattern match method.
-		 *
-		 * Allows a pattern match-like syntax for working with sum type values.
-		 * The case clauses are statically enforced to cover all the types that
-		 * may be held by the sum type.
-		 *
-		 * Invoking this match function means explicitly wanting side effects,
-		 * since nothing is returned.
-		 *
-		 * \par Examples
-		 *
-		 * Matching on a number of types:
-		 * \code
-		 *   auto value = sum_type<A,B,C>{constructor<B>(), ...};
-		 *   value.matchE(
-		 *       [](A a){ std::cout << "A"; },
-		 *       [](B b){ std::cout << "B"; },
-		 *       [](C c){ std::cout << "C"; }
-		 *   );
-		 * \endcode
-		 *
-		 * Output:
-		 * \code
-		 *   B
-		 * \endcode
-		 *
-		 * Match by reference:
-		 * \code
-		 *   sum_type<int,string> value = ...;
-		 *   value.matchE(
-		 *       [](int& x){ ++x; },
-		 *       [](string& s){ s += " modified"; }
-		 *   );
-		 * \endcode
-		 *
-		 * \note Matching on a `sum_type` with element types that are
-		 *       implicitly convertible between each other can lead to
-		 *       unexpected behaviour. For example, matching a
-		 *       `sum_type<int,char>` like so:
-		 *
-		 *       \code
-		 *         value.match(
-		 *             [](int x){ ... },
-		 *             [](char x){ ... }
-		 *         );
-		 *       \endcode
-		 *
-		 *       will never trigger the `char` case. Use explicit "constructor
-		 *       types" if there is a chance of encountering this.
-		 *
-		 */
-		template<typename...Fs>
-		void matchE(Fs&&...fs) {
-
-			using indices = gen_seq<0,sizeof...(Ts)-1>;
-
-			::ftl::_dtl::union_visitor<void,indices,Ts...>
-				::visit(data, cons, std::forward<Fs>(fs)...);
-		}
-
-		/// \overload
-		template<typename...Fs>
-		void matchE(Fs&&...fs) const {
-
-			using indices = gen_seq<0,sizeof...(Ts)-1>;
-
-			::ftl::_dtl::union_visitor<void,indices,Ts...>
-				::visit(data, cons, std::forward<Fs>(fs)...);
-		}
-
-	private:
-		_dtl::recursive_union<Ts...> data;
-		size_t cons;
-	};
-
-	namespace _dtl {
-		class sum_type_accessor {
-		public:
-			template<typename...Ts>
-			static constexpr size_t activeIndex(const sum_type<Ts...>& u)
-			noexcept {
-				return u.cons;
-			}
-
-			template<typename...Ts>
-			static constexpr bool compareAt(size_t i,
-					const sum_type<Ts...>& a, const sum_type<Ts...>& b
-			) noexcept
+			template<class T, class...Args>
+			auto emplace(type_t<T> s, Args&&... args) noexcept
+			-> ::std::enable_if_t<::std::is_nothrow_constructible<T,Args...>::value>
 			{
-				return a.data.compare(i, b.data);
+				// Since we know we're dealing with trivial types, we can just
+				// replace the storage, no need to destruct
+				data = recursive_union<Ts...>(s, std::forward<Args>(args)...);
+				cons = index_of_v<T,Ts...>;
 			}
+
+			template<class T>
+			constexpr const T& unsafe_get() const &
+			{
+				return data.get(type<T>);
+			}
+
+			template<class T>
+			constexpr T& unsafe_get() &
+			{
+				return data.get(type<T>);
+			}
+
+			template<class T>
+			T&& unsafe_get() &&
+			{
+				return ::std::move(data).get(type<T>);
+			}
+
+			template<class...MatchArms>
+			constexpr auto match(MatchArms&&...matchArms) const &
+			{
+				static_assert(
+					::ftl::dtl_::is_match_exhaustive<
+						type_seq<MatchArms...>,type_seq<Ts...>>::value,
+					"All matches must be exhaustive");
+
+				static_assert(
+					::ftl::dtl_::match_cases_are_in_type<
+						type_seq<MatchArms...>,otherwise,Ts...>::value,
+					"Trying to match with a type that is not in the sum");
+
+				return ::ftl::dtl_
+					::match_selector<true,::std::index_sequence_for<Ts...>,Ts...>::invoke(
+						data, cons, ::std::forward<MatchArms>(matchArms)...
+					);
+			}
+
+			template<typename...MatchArms>
+			constexpr auto match(MatchArms&&...matchArms) &
+			{
+				static_assert(
+					::ftl::dtl_::is_match_exhaustive<
+					type_seq<MatchArms...>,type_seq<Ts...>>::value,
+					"All matches must be exhaustive");
+
+				static_assert(
+					::ftl::dtl_::match_cases_are_in_type<
+						type_seq<MatchArms...>,otherwise,Ts...>::value,
+					"Trying to match with a type that is not in the sum");
+
+				return ::ftl::dtl_
+					::match_selector<true,::std::index_sequence_for<Ts...>,Ts...>::invoke(
+						data, cons, ::std::forward<MatchArms>(matchArms)...
+					);
+			}
+
+			template<typename...MatchArms>
+			constexpr auto match(MatchArms&&...matchArms) &&
+			{
+				static_assert(
+					::ftl::dtl_::is_match_exhaustive<
+					type_seq<MatchArms...>,type_seq<Ts...>>::value,
+					"All matches must be exhaustive");
+
+				static_assert(
+					::ftl::dtl_::match_cases_are_in_type<
+						type_seq<MatchArms...>,otherwise,Ts...>::value,
+					"Trying to match with a type that is not in the sum");
+
+				return ::ftl::dtl_
+					::match_selector<true,::std::index_sequence_for<Ts...>,Ts...>::invoke(
+						::std::move(data), cons, ::std::forward<MatchArms>(matchArms)...
+					);
+			}
+
+			template<class T, class = ::std::enable_if_t<type_is_in_v<T,Ts...>>>
+			const sum_type_& operator= (T&& t) noexcept
+			{
+				emplace(type<::std::decay_t<T>>, ::std::forward<T>(t));
+
+				return *this;
+			}
+
+			sum_type_& operator= (const sum_type_& other) = default;
+			sum_type_& operator= (sum_type_&& other) = default;
+
+			template<class T>
+			constexpr bool is() const noexcept
+			{
+				return index_of_v<T,Ts...> == cons;
+			}
+
+			constexpr bool operator== (const sum_type_& rhs) const noexcept
+			{
+				return cons == rhs.cons && data.compare(cons, rhs.data);
+			}
+
+			constexpr bool operator!= (const sum_type_& rhs) const noexcept
+			{
+				return !operator== (rhs);
+			}
+
+		private:
+			recursive_union<Ts...> data;
+			size_t cons;
 		};
 
-		template<size_t I, typename...Ts>
-		class get_sum_type_element {
-		public:
-			// TODO: C++14: With relaxed constexpr requirements,
-			// these are possible candidates
-			static auto get(sum_type<Ts...>& u)
-			-> decltype(union_indexer<I,Ts...>::ref(u.data)) {
-				if(u.cons != I)
-					throw invalid_sum_type_access{
-						std::string("Indexing with ")
-						+ std::to_string(I)
-						+ std::string(", but active index is ")
-						+ std::to_string(u.cons)
-					};
+		template<class...Ts>
+		struct sum_type_<false,Ts...>
+		{
+			static_assert(
+				dtl_::is_type_set<Ts...>::value,
+				"Each element type of a sum type must be unique"
+			);
 
-				return union_indexer<I,Ts...>::ref(u.data);
+			static_assert(sizeof...(Ts) > 0, "Empty sum types are not allowed");
+
+			sum_type_() = delete;
+
+			constexpr sum_type_(const sum_type_& other)
+			noexcept(All<std::is_nothrow_copy_constructible, Ts...>::value)
+			: data(other.data, other.cons), cons(other.cons)
+			{}
+
+			sum_type_(sum_type_&& other)
+			noexcept(All<std::is_nothrow_move_constructible, Ts...>::value)
+			: data(other.data, other.cons), cons(other.cons)
+			{}
+
+			template<class T, class...Args>
+			explicit constexpr sum_type_(type_t<T> s, Args&&...args)
+			noexcept(::std::is_nothrow_constructible<T,Args...>::value)
+				: data(s, std::forward<Args>(args)...), cons(index_of_v<T,Ts...>)
+			{}
+
+			template<class T, class U = typename T::value_type>
+			constexpr sum_type_(type_t<T> s, ::std::initializer_list<U> init)
+			noexcept(::std::is_nothrow_constructible<T,::std::initializer_list<U>>::value)
+				: data(s, init), cons(index_of_v<T,Ts...>)
+			{}
+
+			~sum_type_()
+			{
+				data.destroy(cons);
 			}
 
-			static auto get(const sum_type<Ts...>& u)
-			-> decltype(union_indexer<I,Ts...>::ref(u.data)) {
-				if(u.cons != I)
-					throw invalid_sum_type_access{
-						std::string("Indexing with ")
-						+ std::to_string(I)
-						+ std::string(", but active index is ")
-						+ std::to_string(u.cons)
-					};
-
-				return union_indexer<I,Ts...>::ref(u.data);
+			template<typename T, typename...Args>
+			auto emplace(type_t<T> s, Args&&... args) noexcept
+			-> ::std::enable_if_t<
+				All<::std::is_nothrow_destructible,Ts...>::value
+				&& ::std::is_nothrow_constructible<T,Args...>::value>
+			{
+				data.destroy(cons);
+				new (&data) recursive_union<Ts...> (s, ::std::forward<Args>(args)...);
+				cons = index_of_v<T,Ts...>;
 			}
+
+			template<class T>
+			constexpr const T& unsafe_get() const &
+			{
+				return data.get(type<T>);
+			}
+
+			template<class T>
+			constexpr T& unsafe_get() &
+			{
+				return data.get(type<T>);
+			}
+
+			template<class T>
+			T&& unsafe_get() &&
+			{
+				return ::std::move(data).get(type<T>);
+			}
+
+			template<typename...MatchArms>
+			constexpr auto match(MatchArms&&...matchArms) const &
+			{
+				static_assert(
+					::ftl::dtl_::is_match_exhaustive<
+						type_seq<MatchArms...>,type_seq<Ts...>>::value,
+					"All matches must be exhaustive");
+
+				static_assert(
+					::ftl::dtl_::match_cases_are_in_type<
+						type_seq<MatchArms...>,otherwise,Ts...>::value,
+					"Trying to match with a type that is not in the sum");
+
+				return ::ftl::dtl_
+					::match_selector<false,::std::index_sequence_for<Ts...>,Ts...>::invoke(
+						data, cons, ::std::forward<MatchArms>(matchArms)...
+					);
+			}
+
+			template<typename...MatchArms>
+			constexpr auto match(MatchArms&&...matchArms) &
+			{
+				static_assert(
+					::ftl::dtl_::is_match_exhaustive<
+					type_seq<MatchArms...>,type_seq<Ts...>>::value,
+					"All matches must be exhaustive");
+
+				static_assert(
+					::ftl::dtl_::match_cases_are_in_type<
+						type_seq<MatchArms...>,otherwise,Ts...>::value,
+					"Trying to match with a type that is not in the sum");
+
+				return ::ftl::dtl_
+					::match_selector<false,::std::index_sequence_for<Ts...>,Ts...>::invoke(
+						data, cons, ::std::forward<MatchArms>(matchArms)...
+					);
+			}
+
+			template<typename...MatchArms>
+			constexpr auto match(MatchArms&&...matchArms) &&
+			{
+				static_assert(
+					::ftl::dtl_::is_match_exhaustive<
+					type_seq<MatchArms...>,type_seq<Ts...>>::value,
+					"All matches must be exhaustive");
+
+				static_assert(
+					::ftl::dtl_::match_cases_are_in_type<
+						type_seq<MatchArms...>,otherwise,Ts...>::value,
+					"Trying to match with a type that is not in the sum");
+
+				return ::ftl::dtl_
+					::match_selector<false,::std::index_sequence_for<Ts...>,Ts...>::invoke(
+						::std::move(data), cons, ::std::forward<MatchArms>(matchArms)...
+					);
+			}
+
+			sum_type_& operator= (const sum_type_& other) noexcept
+			{
+				static_assert(
+					All<std::is_nothrow_destructible,Ts...>::value,
+					"Cannot copy assign a sum_type unless all element types are nothrow "
+					"destructible."
+				);
+
+				static_assert(
+					All<std::is_nothrow_copy_constructible,Ts...>::value
+					&& All<std::is_nothrow_copy_assignable,Ts...>::value,
+					"Cannot copy assign a sum_type unless all element types are nothrow "
+					"copyable (constructible & assignable)."
+				);
+
+				if (cons == other.cons)
+				{
+					data.copy(other.data, cons);
+				}
+				else
+				{
+					data.destroy(cons);
+					cons = other.cons;
+					new (&data) recursive_union<Ts...> (other.data, cons);
+				}
+
+				return *this;
+			}
+
+			sum_type_& operator= (sum_type_&& other) noexcept
+			{
+				static_assert(
+					All<::std::is_nothrow_destructible, Ts...>::value,
+					"Cannot move assign sum types unless all element types are nothrow "
+					"destructible."
+				);
+
+				static_assert(
+					All<::std::is_nothrow_move_constructible, Ts...>::value
+					&& All<::std::is_nothrow_move_assignable, Ts...>::value,
+					"Cannot move assign sum_type unless all element types are nothrow "
+					"movable (constructible & assignable)."
+				);
+
+				if (cons == other.cons)
+				{
+					data.move(::std::move(other.data), cons);
+				}
+				else
+				{
+					data.destroy(cons);
+					cons = other.cons;
+					new (&data) recursive_union<Ts...> (::std::move(other.data), cons);
+				}
+
+				return *this;
+			}
+
+			template<
+				class T, class U = ::ftl::plain_type<T>,
+				class = std::enable_if_t<type_is_in_v<U,Ts...>>>
+			const sum_type_& operator= (T&& t) noexcept
+			{
+				static_assert(
+					All<::std::is_nothrow_destructible,Ts...>::value,
+					"Cannot assign to a sum type unless all element types are nothrow "
+					"destructible."
+				);
+
+				static_assert(
+					::std::is_nothrow_copy_assignable<U>::value
+					&& ::std::is_nothrow_copy_constructible<U>::value,
+					"Cannot assign to a sum type unless the target type is nothrow copy "
+					"constructible and assignable."
+				);
+
+				if (cons == index_of_v<U,Ts...>)
+				{
+					data.assign(type<U>, ::std::forward<T>(t));
+				}
+				else
+				{
+					data.destroy(cons);
+					cons = index_of_v<U,Ts...>;
+					new (&data) recursive_union<Ts...> (type<U>, ::std::forward<T>(t));
+				}
+
+				return *this;
+			}
+
+			template<class T>
+			constexpr bool is() const noexcept
+			{
+				return index_of_v<T,Ts...> == cons;
+			}
+
+			constexpr bool operator== (const sum_type_& rhs) const noexcept
+			{
+				return cons == rhs.cons && data.compare(cons, rhs.data);
+			}
+
+			constexpr bool operator!= (const sum_type_& rhs) const noexcept
+			{
+				return !operator== (rhs);
+			}
+
+		private:
+			recursive_union<Ts...> data;
+			size_t cons;
 		};
 	}
 
-	/**
-	 * Means of accessing a sum type by index.
-	 *
-	 * If the given index does not match the type contained in the sum type at
-	 * run-time, an `invalid_sum_type_access`-exception will be thrown.
-	 *
-	 * \note This is _not_ the recommended way of accessing sum type values. Use
-	 *       `sum_type::match` whenever possible instead, to get compile time
-	 *       guarantees of not accessing the wrong value.
-	 *
-	 * \par Examples
-	 *
-	 * \code
-	 *   sum_type<int,float> x{constructor<int>(), 12};
-	 *   x.get<0>() += 1;
-	 *   // x.get<0>() == 13
-	 * \endcode
-	 *
-	 * \ingroup sum_type
-	 */
-	template<size_t I, typename...Ts>
-	constexpr type_at<I,Ts...>& get(sum_type<Ts...>& x) {
-		return ::ftl::_dtl::get_sum_type_element<I,Ts...>::get(x);
-	}
-
-	/// \overload
-	template<size_t I, typename...Ts>
-	constexpr const type_at<I,Ts...>& get(const sum_type<Ts...>& x) {
-		return ::ftl::_dtl::get_sum_type_element<I,Ts...>::get(x);
-	}
-
-	/**
-	 * Means of accessing a sum type by type.
-	 *
-	 * If the given type does not match the type contained in the sum type at
-	 * run-time, an `invalid_sum_type_access`-exception will be thrown.
-	 *
-	 * \note This is _not_ the recommended way of accessing sum type values. Use
-	 *       `sum_type::match` whenever possible instead, to get compile time
-	 *       guarantees of not accessing the wrong value.
-	 *
-	 * \par Examples
-	 *
-	 * \code
-	 *   sum_type<int,float> x{constructor<int>(), 12};
-	 *   x.get<int>() += 1;
-	 *   // x.get<int>() == 13
-	 * \endcode
-	 *
-	 * \ingroup sum_type
-	 */
-	template<typename T, typename...Ts>
-	constexpr T& get(sum_type<Ts...>& x) {
-		return get<index_of<T,Ts...>::value>(x);
-	}
-
-	/// \overload
-	template<typename T, typename...Ts>
-	constexpr const T& get(const sum_type<Ts...>& x) {
-		return get<index_of<T,Ts...>::value>(x);
-	}
-
-	template<
-			typename...Ts,
-			typename = typename std::enable_if<All<Eq,Ts...>{}>::type
-	>
-	bool operator== (const sum_type<Ts...>& a, const sum_type<Ts...>& b) {
-		size_t i1 = ::ftl::_dtl::sum_type_accessor::activeIndex(a);
-		size_t i2 = ::ftl::_dtl::sum_type_accessor::activeIndex(b);
-
-		return i1 == i2 && ::ftl::_dtl::sum_type_accessor::compareAt(i1, a, b);
-	}
-
-	template<typename...Ts>
-	bool operator!= (const sum_type<Ts...>& a, const sum_type<Ts...>& b) {
-		return !(a == b);
-	}
+	template<class...Ts>
+	using sum_type =
+		::ftl::dtl_::sum_type_<All<::std::is_trivial,Ts...>::value, Ts...>;
 }
 
 #endif
+
 

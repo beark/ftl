@@ -221,7 +221,7 @@ namespace ftl {
 				return mT<U>{
 					*m >>= [f](const maybe<T>& m) {
 						if(m.template is<T>())
-							return aPure<maybe<U>>() % f(get<T>(m));
+							return aPure<maybe<U>>() % f(m.template unsafe_get<T>());
 						else
 							return monad<M_<maybe<U>>>::pure(nothing<U>());
 					}
@@ -232,11 +232,14 @@ namespace ftl {
 					typename F,
 					typename = Requires<std::is_same<Rebind<M,U>, M2>::value>
 			>
-			static mT<U> bind(mT<T>&& m, F f) {
-				return mT<U>{
-					std::move(*m) >>= [f](maybe<T>&& m) {
+			static mT<U> bind(mT<T>&& m, F f)
+			{
+				return mT<U>
+				{
+					std::move(*m) >>= [f](maybe<T>&& m)
+					{
 						if(m.template is<T>())
-							return aPure<maybe<U>>() % f(std::move(get<T>(m)));
+							return aPure<maybe<U>>() % f(std::move(m.template unsafe_get<T>()));
 						else
 							return monad<M_<maybe<U>>>::pure(nothing<U>());
 					}
@@ -245,15 +248,19 @@ namespace ftl {
 		};
 
 		template<typename M2>
-		struct bind_helper<maybeT<M2>> {
+		struct bind_helper<maybeT<M2>>
+		{
 			using U = Value_type<M2>;
 
 			template<typename F>
-			static mT<U> bind(const mT<T>& m, F f) {
-				return mT<U>{
-					*m >>= [f](const maybe<T>& m) {
+			static mT<U> bind(const mT<T>& m, F f)
+			{
+				return mT<U>
+				{
+					*m >>= [f](const maybe<T>& m)
+					{
 						if(m.template is<T>())
-							return *f(get<T>(m));
+							return *f(m.template unsafe_get<T>());
 						else
 							return monad<M_<maybe<U>>>::pure(nothing<U>());
 					}
@@ -261,11 +268,14 @@ namespace ftl {
 			}
 
 			template<typename F>
-			static mT<U> bind(mT<T>&& m, F f) {
-				return mT<U>{
-					std::move(*m) >>= [f](maybe<T>&& m) {
+			static mT<U> bind(mT<T>&& m, F f)
+			{
+				return mT<U>
+				{
+					std::move(*m) >>= [f](maybe<T>&& m)
+					{
 						if(m.template is<T>())
-							return *f(std::move(get<T>(m)));
+							return *f(std::move(m.template unsafe_get<T>()));
 						else
 							return monad<M_<maybe<U>>>::pure(nothing<U>());
 					}
@@ -281,8 +291,8 @@ namespace ftl {
 	 * \ingroup maybeT
 	 */
 	template<typename M>
-	struct monoidA<maybeT<M>> {
-
+	struct monoidA<maybeT<M>>
+	{
 		/// Embeds a `nothing` in `M`.
 		static maybeT<M> fail() {
 			using Mmt = typename maybeT<M>::Mmt;
@@ -295,13 +305,15 @@ namespace ftl {
 		 * Performs the monadic computation `mm1`. If it fails, `mm2` is
 		 * returned, otherwise the result is (re-wrapped).
 		 */
-		static maybeT<M> orDo(const maybeT<M>& mm1, maybeT<M> mm2) {
-
+		static maybeT<M> orDo(const maybeT<M>& mm1, maybeT<M> mm2)
+		{
 			using T = Value_type<M>;
 			using Mmt = typename maybeT<M>::Mmt;
 
-			return maybeT<M> {
-				*mm1 >>= [mm2](const maybe<T>& m) -> Mmt {
+			return maybeT<M>
+			{
+				*mm1 >>= [mm2](const maybe<T>& m) -> Mmt
+				{
 					if(!m.template is<Nothing>())
 						return monad<Mmt>::pure(m);
 
@@ -329,8 +341,8 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct foldable<maybeT<M>>
-	: deriving_fold<maybeT<M>>, deriving_foldMap<maybeT<M>> {
-
+	: deriving_fold<maybeT<M>>, deriving_foldMap<maybeT<M>>
+	{
 		using T = Value_type<M>;
 		using Mmt = typename maybeT<M>::Mmt;
 
@@ -339,11 +351,13 @@ namespace ftl {
 				typename U,
 				typename = Requires<std::is_same<U, result_of<F(T,U)>>::value>
 		>
-		static U foldl(F f, U z, const maybeT<M>& mT) {
+		static U foldl(F f, U z, const maybeT<M>& mT)
+		{
 			return foldable<Mmt>::foldl(
-				[f](U z, const maybe<T>& m) {
+				[f](U z, const maybe<T>& m)
+				{
 					if(m.template is<T>())
-						return f(z, get<T>(m));
+						return f(z, m.template unsafe_get<T>());
 
 					return z;
 				},
@@ -357,11 +371,13 @@ namespace ftl {
 				typename U,
 				typename = Requires<std::is_same<U, result_of<F(T,U)>>::value>
 		>
-		static U foldr(F f, U z, const maybeT<M>& mT) {
+		static U foldr(F f, U z, const maybeT<M>& mT)
+		{
 			return foldable<Mmt>::foldr(
-				[f](const maybe<T>& m, U z){
+				[f](const maybe<T>& m, U z)
+				{
 					if(m.template is<T>())
-						return f(get<T>(m), z);
+						return f(m.template unsafe_get<T>(), z);
 
 					else
 						return z;

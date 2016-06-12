@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -24,18 +24,10 @@
 #define FTL_MAYBE_ITERATOR_H
 
 #include <memory>
+#include "../sum_type.h"
 
 namespace ftl {
-	template<typename...Ts>
-	class sum_type;
-
 	struct Nothing;
-
-	template<typename T, typename...Ts>
-	constexpr T& get(sum_type<Ts...>&);
-
-	template<typename T, typename...Ts>
-	constexpr const T& get(const sum_type<Ts...>&);
 
 	namespace _dtl {
 
@@ -63,11 +55,11 @@ namespace ftl {
 			}
 
 			constexpr T& operator* () const {
-				return get<T>(*this->ref);
+				return this->ref->template unsafe_get<T>();
 			}
 
 			constexpr T* operator-> () const {
-				return std::addressof(get<T>(*this->ref));
+				return std::addressof(this->ref->template unsafe_get<T>());
 			}
 
 			maybe_iterator& operator= (const maybe_iterator&) = default;
@@ -110,11 +102,11 @@ namespace ftl {
 			}
 
 			constexpr const T& operator* () const {
-				return get<T>(*this->ref);
+				return this->ref->template unsafe_get<T>();
 			}
 
 			constexpr const T* operator-> () const {
-				return std::addressof(get<T>(*this->ref));
+				return std::addressof(this->ref->template unsafe_get<T>());
 			}
 
 			const_maybe_iterator& operator= (const const_maybe_iterator&)

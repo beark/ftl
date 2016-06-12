@@ -119,7 +119,7 @@ namespace ftl {
 	template<typename Ord>
 	struct Orderable {
 		static constexpr bool value =
-			Eq<Ord>() && has_lt<Ord>::value && has_gt<Ord>::value;
+			Eq<Ord>::value && has_lt<Ord>::value && has_gt<Ord>::value;
 
 		constexpr operator bool() const noexcept {
 			return value;

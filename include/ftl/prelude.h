@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -24,6 +24,7 @@
 #define FTL_PRELUDE_H
 
 #include <tuple>
+#include "static.h"
 #include "function.h"
 #include "concepts/basic.h"
 #include "concepts/orderable.h"
@@ -43,6 +44,7 @@ namespace ftl {
 	 *
 	 * \par Dependencies
 	 * - `<tuple>`
+	 * - \ref static
 	 * - \ref function
 	 * - \ref concepts_basic
 	 * - \ref orderable
@@ -51,34 +53,34 @@ namespace ftl {
 	/**
 	 * A short-hand alias of `std::enable_if`.
 	 *
+	 * Allows multiple predicates to be required in one go.
+	 *
 	 * \note Consider this a temporary solution until concepts lite or something
 	 * similar becomes readily available. As soon as that comes to pass, this
 	 * construct will be considered deprecated.
 	 *
 	 * \par Examples
 	 * \code
-	 *   template<typename M, typename = Requires<Monad<M>{}>>
+	 *   template<typename M, typename = Requires<Monad<M>::value, Eq<M>::value>>
 	 *   void foo(const M& m) {
-	 *       // Safely perform monadic operations on m
+	 *       // Safely perform monadic operations and equality comparisons on m
 	 *   }
 	 * \endcode
 	 *
 	 * \ingroup prelude
 	 */
-	template<bool Pred>
-	using Requires = typename std::enable_if<Pred>::type;
+	template<bool...Preds>
+	using Requires = std::enable_if_t<static_fold<bool,Preds...>::with(std::logical_and<bool>())>;
 
-#ifndef DOCUMENTATION_GENERATOR
-	constexpr struct identity {
-		template<typename T>
-		constexpr auto operator()(T&& t) const noexcept
-		-> decltype(std::forward<T>(t)) {
+	struct identity_t
+	{
+		template<typename T> constexpr auto operator()(T&& t) const noexcept
+		-> decltype(std::forward<T>(t))
+		{
 			return std::forward<T>(t);
 		}
-	} id{};
-#else
-	struct ImplementationDefined {
-	}
+	};
+
 	/**
 	 * Identity function object.
 	 *
@@ -100,8 +102,7 @@ namespace ftl {
 	 *
 	 * \ingroup prelude
 	 */
-	id;
-#endif
+	constexpr identity_t id {};
 
 	/**
 	 * Identity type transformer.
@@ -142,9 +143,13 @@ namespace ftl {
 	 *
 	 * \ingroup prelude
 	 */
-	template<typename T>
+	template<class T>
 	struct Identity {
 		using value_type = T;
+
+		Identity() = default;
+		Identity(const Identity&) = default;
+		Identity(Identity&&) = default;
 
 		explicit constexpr Identity(const T& t)
 		noexcept(std::is_nothrow_copy_constructible<T>::value)
@@ -153,6 +158,8 @@ namespace ftl {
 		explicit constexpr Identity(T&& t)
 		noexcept(std::is_nothrow_move_constructible<T>::value)
 		: val(std::move(t)) {}
+
+		~Identity() = default;
 
 		constexpr operator T() const noexcept {
 			return val;
@@ -182,30 +189,35 @@ namespace ftl {
 			return std::addressof(val);
 		}
 
+		Identity& operator= (const Identity&) = default;
+		Identity& operator= (Identity&&) = default;
+
 		T val;
 	};
 
 	// ## Operators for Identity type transformer
 
-	template<typename T, typename = Requires<Eq<T>{}>>
+	template<typename T, typename = Requires<Eq<T>::value>>
 	constexpr auto operator== (const Identity<T>& a, const Identity<T>& b)
-	noexcept -> decltype(std::declval<T>() == std::declval<T>()) {
+	noexcept
+	{
 		return a.val == b.val;
 	}
 
-	template<typename T, typename = Requires<Eq<T>{}>>
+	template<typename T, typename = Requires<Eq<T>::value>>
 	constexpr auto operator!= (const Identity<T>& a, const Identity<T>& b)
-	noexcept -> decltype(std::declval<T>() != std::declval<T>()) {
+	noexcept
+	{
 		return a.val != b.val;
 	}
 
-	template<typename T, typename = Requires<Orderable<T>{}>>
+	template<typename T, typename = Requires<Orderable<T>::value>>
 	constexpr auto operator< (const Identity<T>& a, const Identity<T>& b)
 	noexcept -> decltype(std::declval<T>() < std::declval<T>()) {
 		return a.val < b.val;
 	}
 
-	template<typename T, typename = Requires<Orderable<T>{}>>
+	template<typename T, typename = Requires<Orderable<T>::value>>
 	constexpr auto operator<= (const Identity<T>& a, const Identity<T>& b)
 	noexcept -> decltype(std::declval<T>() <= std::declval<T>()) {
 		return a.val <= b.val;

@@ -2,12 +2,17 @@ cmake_minimum_required(VERSION 2.8)
 
 project(FTL)
 
+add_subdirectory(should_fail)
+
 include_directories("../include")
+
+set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb3 -DDEBUG")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 
 	execute_process(
@@ -26,7 +31,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb3 -DDEBUG")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
@@ -50,6 +56,7 @@ else()
 endif()
 
 set(SOURCES 
+	static_tests.cpp
 	sum_type_tests.cpp
 	maybe_tests.cpp
 	either_tests.cpp
@@ -71,7 +78,6 @@ set(SOURCES
 	tuple_tests.cpp
 	unordered_map_tests.cpp
 	vector_tests.cpp
-	traits_tests.cpp
 	main.cpp
 )
 

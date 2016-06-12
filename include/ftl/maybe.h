@@ -90,7 +90,7 @@ namespace ftl {
 	 *
 	 * \ingroup maybe
 	 */
-	template<typename T>
+	template<class T>
 	using maybe = sum_type<T,Nothing>;
 
 	/**
@@ -102,36 +102,38 @@ namespace ftl {
 	 * - \ref fullycons
 	 * - \ref eq
 	 */
-	struct Nothing {
-		template<typename T>
-		constexpr operator maybe<T>() const noexcept {
-			return maybe<T>{constructor<Nothing>()};
+	struct Nothing
+	{
+		template<class T>
+		constexpr operator maybe<T>() const noexcept
+		{
+			return maybe<T>{type<Nothing>};
 		}
 	};
 
-	constexpr bool operator== (Nothing, Nothing) noexcept {
+	constexpr bool operator== (Nothing, Nothing) noexcept
+	{
 		return true;
 	}
 
-	constexpr bool operator!= (Nothing, Nothing) noexcept {
+	constexpr bool operator!= (Nothing, Nothing) noexcept
+	{
 		return false;
 	}
 
-	template<typename T, typename = Requires<Orderable<T>{}>>
-	bool operator< (const maybe<T>& m1, const maybe<T>& m2) noexcept {
-		if(m1.template is<T>()) {
-			if(m2.template is<T>()) {
-				return get<T>(m1) < get<T>(m2);
-			}
-		}
-		else {
-			if(m2.template is<T>()) {
-				return true;
-			}
-
-		}
-
-		return false;
+	template<class T, class = Requires<Orderable<T>::value>>
+	bool operator< (sum_type<T,Nothing> m1, sum_type<T,Nothing> m2) noexcept
+	{
+		return m1.match(
+			[m2](T lhs)
+			{
+				return m2.match(
+					[lhs](T rhs){ return lhs < rhs; },
+					[](Nothing){ return false; }
+				);
+			},
+			[m2](Nothing){ return true; }
+		);
 	}
 
 	template<typename T, typename = Requires<Orderable<T>{}>>
@@ -143,7 +145,7 @@ namespace ftl {
 	bool operator> (const maybe<T>& m1, const maybe<T>& m2) noexcept {
 		if(m1.template is<T>()) {
 			if(m2.template is<T>()) {
-				return get<T>(m1) > get<T>(m2);
+				return m1.template unsafe_get<T>() > m2.template unsafe_get<T>();
 			}
 		}
 		else {
@@ -183,7 +185,7 @@ namespace ftl {
 		template<typename T, typename T0 = plain_type<T>>
 		constexpr maybe<T0> operator()(T&& t) const
 		noexcept(std::is_nothrow_constructible<T0,T>::value) {
-			return maybe<T0>{constructor<T0>(), std::forward<T>(t)};
+			return maybe<T0>{type<T0>, std::forward<T>(t)};
 		}
 	} just{};
 #else
@@ -213,7 +215,7 @@ namespace ftl {
 	 */
 	template<typename T>
 	constexpr maybe<T> nothing() noexcept {
-		return maybe<T>{constructor<Nothing>()};
+		return maybe<T>{type<Nothing>};
 	}
 
 	template<typename T>
@@ -426,7 +428,7 @@ namespace ftl {
 
 			return m.template is<Nothing>()
 				? z
-				: std::forward<F>(f)(std::forward<U>(z), get<T>(m));
+				: std::forward<F>(f)(std::forward<U>(z), m.template unsafe_get<T>());
 		}
 
 		template<typename F, typename U>
@@ -442,7 +444,7 @@ namespace ftl {
 
 			return m.template is<Nothing>()
 				? z
-				: std::forward<F>(f)(get<T>(m), std::forward<U>(z));
+				: std::forward<F>(f)(m.template unsafe_get<T>(), std::forward<U>(z));
 		}
 
 		static constexpr bool instance = true;
@@ -480,7 +482,7 @@ namespace ftl {
 		noexcept {
 			return m1.template is<T>()
 				? (m2.template is<T>()
-					? maybe<T>{constructor<T>(), get<T>(m1) ^ get<T>(m2)}
+					? maybe<T>{type<T>, m1.template unsafe_get<T>() ^ m2.template unsafe_get<T>()}
 					: m1)
 				: m2;
 		}
@@ -490,7 +492,7 @@ namespace ftl {
 			return m1.template is<T>()
 				? (m2.template is<T>()
 					? maybe<T>{
-						constructor<T>(), get<T>(m1) ^ std::move(get<T>(m2))
+						type<T>, m1.template unsafe_get<T>() ^ std::move(m2.template unsafe_get<T>())
 					}
 					: m1)
 				: std::move(m2);
@@ -501,7 +503,7 @@ namespace ftl {
 			return m1.template is<T>()
 				? (m2.template is<T>()
 					? maybe<T>{
-						constructor<T>(), std::move(get<T>(m1)) ^ get<T>(m2)
+						type<T>, std::move(m1.template unsafe_get<T>()) ^ m2.template unsafe_get<T>()
 					}
 					: std::move(m1))
 				: m2;
@@ -512,8 +514,8 @@ namespace ftl {
 			return m1.template is<T>()
 				? (m2.template is<T>()
 					? maybe<T>{
-						constructor<T>(),
-						std::move(get<T>(m1)) ^ std::move(get<T>(m2))
+						type<T>,
+						std::move(m1.template unsafe_get<T>()) ^ std::move(m2.template unsafe_get<T>())
 					}
 					: std::move(m1))
 				: std::move(m2);

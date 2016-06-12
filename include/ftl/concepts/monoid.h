@@ -199,9 +199,9 @@ namespace ftl {
 					&& std::is_same<M,plain_type<M2>>::value
 				>
 		>
-		M operator() (M1&& m1, M2&& m2) const {
-			return
-				monoid<M>::append(std::forward<M1>(m1), std::forward<M2>(m2));
+		M operator() (M1&& m1, M2&& m2) const
+		{
+			return monoid<M>::append(std::forward<M1>(m1), std::forward<M2>(m2));
 		}
 
 		using curried_binf<_mappend>::operator();
@@ -305,12 +305,15 @@ namespace ftl {
 	 * \ingroup monoid
 	 */
 	template<typename M>
-	struct deriving_monoid<in_terms_of_plus<M>> {
-		static constexpr M id() noexcept(noexcept(M())) {
+	struct deriving_monoid<in_terms_of_plus<M>>
+	{
+		static constexpr M id() noexcept(noexcept(M()))
+		{
 			return M();
 		}
 
-		static constexpr M append(M a, M b) noexcept(noexcept(a+b)) {
+		static constexpr M append(M a, M b) noexcept(noexcept(a+b))
+		{
 			return a + b;
 		}
 
@@ -366,12 +369,12 @@ namespace ftl {
 	 * \ingroup monoid
 	 */
 	template<typename N>
-	struct sum_monoid {
-
-		/**
-		 * Initialises the number as `0`.
-		 */
-		constexpr sum_monoid() noexcept : n(0) {}
+	struct sum_monoid
+	{
+		sum_monoid() = default;
+		sum_monoid(const sum_monoid&) = default;
+		sum_monoid(sum_monoid&&) = default;
+		~sum_monoid() = default;
 
 		/**
 		 * Construct from `N`.
@@ -395,9 +398,13 @@ namespace ftl {
 		}
 
 		constexpr sum_monoid operator+ (const sum_monoid& n2) const
-		noexcept(std::is_nothrow_move_assignable<N>::value) {
+		noexcept(std::is_nothrow_move_assignable<N>::value)
+		{
 			return sum_monoid(n + n2.n);
 		}
+
+		sum_monoid& operator= (const sum_monoid&) = default;
+		sum_monoid& operator= (sum_monoid&&) = default;
 
 		N n;
 	};
@@ -409,10 +416,10 @@ namespace ftl {
 	 */
 	template<typename N>
 	constexpr sum_monoid<N> sum(N num)
-	noexcept /*(noexcept(sum_monoid<N>(num)))*/ {
+	noexcept (noexcept(sum_monoid<N>(num)))
+	{
 		return sum_monoid<N>(num);
 	}
-	// TODO: Re-add noexcept once gcc-4.9 or higher is required.
 
 	/*
 	 * Actual implementation of \ref monoidpg for sums.
@@ -472,7 +479,13 @@ namespace ftl {
 	 * \ingroup monoid
 	 */
 	template<typename N>
-	struct prod_monoid {
+	struct prod_monoid
+	{
+		prod_monoid() = default;
+		prod_monoid(const prod_monoid&) = default;
+		prod_monoid(prod_monoid&&) = default;
+		~prod_monoid() = default;
+
 		/**
 		 * Construct from `N`.
 		 *
@@ -485,16 +498,21 @@ namespace ftl {
 			: n(num) {}
 
 		constexpr prod_monoid operator* (const prod_monoid& m) const
-		noexcept(std::is_nothrow_move_constructible<prod_monoid>::value) {
+		noexcept(std::is_nothrow_move_constructible<prod_monoid>::value)
+		{
 			return prod_monoid(n*m.n);
 		}
 
 		/**
 		 * Implicit conversion back to `N`.
 		 */
-		constexpr operator N () const noexcept {
+		constexpr operator N () const noexcept
+		{
 			return n;
 		}
+
+		prod_monoid& operator= (const prod_monoid&) = default;
+		prod_monoid& operator= (prod_monoid&&) = default;
 
 		N n;
 	};
@@ -506,7 +524,8 @@ namespace ftl {
 	 */
 	template<typename N>
 	constexpr prod_monoid<N> prod(N n)
-	noexcept(std::is_nothrow_constructible<prod_monoid<N>,N>::value) {
+	noexcept(std::is_nothrow_constructible<prod_monoid<N>,N>::value)
+	{
 		return prod_monoid<N>(n);
 	}
 
@@ -516,15 +535,18 @@ namespace ftl {
 	 * \ingroup monoid
 	 */
 	template<typename N>
-	struct monoid<prod_monoid<N>> {
+	struct monoid<prod_monoid<N>>
+	{
 		static constexpr prod_monoid<N> id()
-		noexcept(std::is_nothrow_constructible<prod_monoid<N>,N>::value) {
+		noexcept(std::is_nothrow_constructible<prod_monoid<N>,N>::value)
+		{
 			return prod(N(1));
 		}
 
 		static constexpr prod_monoid<N> append(
 				const prod_monoid<N>& n1,
-				const prod_monoid<N>& n2) {
+				const prod_monoid<N>& n2)
+		{
 
 			return n1 * n2;
 		}
@@ -568,7 +590,13 @@ namespace ftl {
 	 *
 	 * \ingroup monoid
 	 */
-	struct any {
+	struct any
+	{
+		any() = default;
+		any(const any&) = default;
+		any(any&&) = default;
+		~any() = default;
+
 		/**
 		 * Construct from bool.
 		 *
@@ -582,11 +610,15 @@ namespace ftl {
 		 * This allows a more transparent and convenient way of using the
 		 * `any` monoid.
 		 */
-		constexpr operator bool() const noexcept {
+		constexpr operator bool() const noexcept
+		{
 			return b;
 		}
 
-		bool b = false;
+		any& operator= (const any&) = default;
+		any& operator= (any&&) = default;
+
+		bool b;
 	};
 
 	/*
@@ -595,14 +627,17 @@ namespace ftl {
 	 * \ingroup monoid
 	 */
 	template<>
-	struct monoid<any> {
+	struct monoid<any>
+	{
 		/// Return `false`
-		static constexpr any id() noexcept {
+		static constexpr any id() noexcept
+		{
 			return false;
 		}
 
 		/// Return `a1 || a2`
-		static constexpr any append(any a1, any a2) noexcept {
+		static constexpr any append(any a1, any a2) noexcept
+		{
 			return a1.b || a2.b;
 		}
 
@@ -645,16 +680,26 @@ namespace ftl {
 	 *
 	 * \ingroup monoid
 	 */
-	struct all {
+	struct all
+	{
+		all() = default;
+		all(const all&) = default;
+		all(all&&) = default;
+		~all() = default;
+
 		/// Construct from a bool.
 		constexpr all(bool bl) noexcept : b(bl) {}
 
 		/// Implicit cast back to bool.
-		constexpr operator bool() const noexcept {
+		constexpr operator bool() const noexcept
+		{
 			return b;
 		}
 
-		bool b = true;
+		all& operator= (const all&) = default;
+		all& operator= (all&&) = default;
+
+		bool b;
 	};
 
 	/*
@@ -663,14 +708,17 @@ namespace ftl {
 	 * \ingroup monoid
 	 */
 	template<>
-	struct monoid<all> {
+	struct monoid<all>
+	{
 		/// Returns `true`
-		static constexpr all id() noexcept {
+		static constexpr all id() noexcept
+		{
 			return true;
 		}
 
 		/// Returns `a1 && a2`
-		static constexpr all append(all a1, all a2) noexcept {
+		static constexpr all append(all a1, all a2) noexcept
+		{
 			return a1 && a2;
 		}
 

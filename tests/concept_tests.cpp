@@ -23,7 +23,13 @@
 #include <ftl/maybe.h>
 #include <ftl/vector.h>
 #include <ftl/list.h>
+#include <type_traits>
 #include "concept_tests.h"
+
+static_assert(std::is_trivial<ftl::sum_monoid<int>>::value, "sum_monoid of trivial base type should be trivial");
+static_assert(std::is_trivial<ftl::prod_monoid<int>>::value, "prod_monoid of trivial base type should be trivial");
+static_assert(std::is_trivial<ftl::any>::value, "any should be trivial");
+static_assert(std::is_trivial<ftl::all>::value, "all should be trivial");
 
 test_set concept_tests{
 	std::string("concepts"),
@@ -54,8 +60,6 @@ test_set concept_tests{
 				return m == just(3) && m == fmap(f)(just(2));
 			})
 		),
-		/* DISABLED, because current libc++ version does not generate an
-		 * operator() const for mem_fn's.
 		std::make_tuple(
 			std::string("Functor: fmap [member fn]"),
 			std::function<bool()>([]() -> bool {
@@ -73,10 +77,9 @@ test_set concept_tests{
 
 				auto r = &test::foo % just(test{3});
 
-				return get<int>(r) == 6;
+				return r.template unsafe_get<int>() == 6;
 			})
 		),
-		*/
 		std::make_tuple(
 			std::string("Applicative: curried aapply"),
 			std::function<bool()>([]() -> bool {
@@ -118,8 +121,6 @@ test_set concept_tests{
 					((m1 >>= f1) >>= f2) == just(3);
 			})
 		),
-		/* DISABLED, because current libc++ version does not generate an
-		 * operator() const for mem_fn's.
 		std::make_tuple(
 			std::string("Monad: >>= [member fn]"),
 			std::function<bool()>([]() -> bool {
@@ -141,7 +142,6 @@ test_set concept_tests{
 					(m >>= &foo::bar) == just(6);
 			})
 		),
-		*/
 		std::make_tuple(
 			std::string("Monad: >>"),
 			std::function<bool()>([]() -> bool {
@@ -151,7 +151,7 @@ test_set concept_tests{
 				auto m2 = just(2);
 				maybe<int> m3 = Nothing{};
 
-				return m1 >> m2 == just(2) && m3 >> m1 == nothing<int>();
+				return (m1 >> m2) == just(2) && (m3 >> m1) == nothing<int>();
 			})
 		),
 		std::make_tuple(
@@ -163,7 +163,7 @@ test_set concept_tests{
 				auto m2 = just(2);
 				maybe<int> m3 = Nothing{};
 
-				return m1 << m2 == just(1) && m1 << m3 == nothing<int>();
+				return (m1 << m2) == just(1) && (m1 << m3) == nothing<int>();
 			})
 		),
 		std::make_tuple(
@@ -189,7 +189,6 @@ test_set concept_tests{
 				auto plusOne = [](int x){ return just(x+1); };
 				auto mulTwo = [](int x){ return just(2*x); };
 
-				auto mNothing = nothing<int>();
 				auto mOne = just(1);
 
 				auto m1 = ((mOne >>= plusOne) >>= mulTwo) << (mulTwo <<= mOne);
@@ -202,7 +201,7 @@ test_set concept_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				auto foldmap = foldMap(sum<int>);
+				auto foldmap = foldMap(&sum<int>);
 
 				std::vector<int> v{3,3,4};
 

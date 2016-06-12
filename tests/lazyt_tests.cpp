@@ -38,7 +38,7 @@ test_set lazyt_tests{
 				auto a = ftl::applicative<lazyM>::pure(1);
 				auto b = [](int x){ return float(x)/4.f; } % a;
 
-				return *ftl::get<0>(*b) == .25f;
+				return *b->template unsafe_get<ftl::lazy<float>>() == .25f;
 			})
 		),
 		std::make_tuple(
@@ -48,7 +48,7 @@ test_set lazyt_tests{
 
 				auto x = ftl::applicative<lazyM>::pure(10);
 
-				return *ftl::get<0>(*x) == 10;
+				return *x->template unsafe_get<ftl::lazy<int>>() == 10;
 			})
 		),
 		std::make_tuple(
@@ -83,7 +83,7 @@ test_set lazyt_tests{
 					return aPure<lazyM>()(x*2);
 				};
 
-				return *ftl::get<0>(*b) == 6;
+				return *b->template unsafe_get<lazy<int>>() == 6;
 			})
 		),
 		std::make_tuple(
@@ -97,7 +97,7 @@ test_set lazyt_tests{
 					return aPure<maybe<int>>()(x*2);
 				};
 
-				return *ftl::get<0>(*b) == 6;
+				return *b->template unsafe_get<lazy<int>>() == 6;
 			})
 		),
 		std::make_tuple(
@@ -111,7 +111,7 @@ test_set lazyt_tests{
 					return aPure<maybe<int>>()(x*2);
 				};
 
-				return *ftl::get<0>(*b) == 6;
+				return *b->template unsafe_get<lazy<int>>() == 6;
 			})
 		)
 	}

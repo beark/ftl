@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -544,6 +544,15 @@ namespace ftl {
 	 **/
 	template<class F>
 	using fn_type = typename fn_traits<::std::remove_reference_t<F>>::type;
+
+	/**
+	 * Convenience type alias for `fn_traits<F>::argument_type`.
+	 *
+	 * \ingroup typetraits
+	 **/
+	template<class F, size_t I>
+	using argument_type =
+		typename fn_traits<::std::remove_reference_t<F>>::template argument_type<I>;
 
 }
 

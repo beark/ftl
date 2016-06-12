@@ -23,6 +23,7 @@
 #include <string>
 #include <ftl/lazy.h>
 #include "lazy_tests.h"
+#include <iostream>
 
 test_set lazy_tests{
 	std::string("lazy"),

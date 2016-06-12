@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -252,8 +252,8 @@ namespace ftl {
 			typename F,
 			typename Fn,
 			typename F_ = plain_type<F>,
-			typename = Requires<Applicative<F_>{}>,
 			typename = Requires<
+				Applicative<F_>::value,
 				is_same_template<plain_type<Fn>,F_>::value
 			>
 	>

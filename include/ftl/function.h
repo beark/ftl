@@ -96,7 +96,7 @@ namespace ftl {
 	class function {};
 
 	template<typename R, typename...Ps>
-	class function<R(Ps...)> : private ::ftl::_dtl::curried<R,Ps...> {
+	class function<R(Ps...)> : private ::ftl::dtl_::curried<R,Ps...> {
 	public:
 		/**
 		 * Type sequence representation of the function's parameter list.
@@ -122,8 +122,8 @@ namespace ftl {
 		function(const function& f) : call(f.call) {
 			f.manager_storage.manager(
 					&manager_storage,
-					const_cast<::ftl::_dtl::manager_storage_type*>(&f.manager_storage),
-					::ftl::_dtl::call_copy);
+					const_cast<::ftl::dtl_::manager_storage_type*>(&f.manager_storage),
+					::ftl::dtl_::call_copy);
 		}
 
 		function(function&& f) noexcept {
@@ -141,21 +141,21 @@ namespace ftl {
 		function(
 				F f,
 				typename std::enable_if<
-					::ftl::_dtl::is_valid_function_argument<F, R (Ps...)>::value,
-					::ftl::_dtl::empty_struct>::type = ::ftl::_dtl::empty_struct()
+					::ftl::dtl_::is_valid_function_argument<F, R (Ps...)>::value,
+					::ftl::dtl_::empty_struct>::type = ::ftl::dtl_::empty_struct()
 		)
-		noexcept(::ftl::_dtl::is_inplace_allocated<
+		noexcept(::ftl::dtl_::is_inplace_allocated<
 				F,
-				std::allocator<typename ::ftl::_dtl::functor_type<F>::type>>::value
+				std::allocator<typename ::ftl::dtl_::functor_type<F>::type>>::value
 		)
 		{
-			if(::ftl::_dtl::is_null(f))
+			if(::ftl::dtl_::is_null(f))
 				initialise_empty();
 
 			else {
-				using functor_type = typename ::ftl::_dtl::functor_type<F>::type;
+				using functor_type = typename ::ftl::dtl_::functor_type<F>::type;
 				initialise(
-					::ftl::_dtl::to_functor(
+					::ftl::dtl_::to_functor(
 						std::forward<F>(f)
 					),
 					std::allocator<functor_type>()
@@ -186,15 +186,15 @@ namespace ftl {
 				const Allocator& allocator,
 				F functor,
 				typename std::enable_if<
-					::ftl::_dtl::is_valid_function_argument<F, R (Ps...)>::value,
-					::ftl::_dtl::empty_struct>::type = ::ftl::_dtl::empty_struct())
-		noexcept(::ftl::_dtl::is_inplace_allocated<F, Allocator>::value) {
+					::ftl::dtl_::is_valid_function_argument<F, R (Ps...)>::value,
+					::ftl::dtl_::empty_struct>::type = ::ftl::dtl_::empty_struct())
+		noexcept(::ftl::dtl_::is_inplace_allocated<F, Allocator>::value) {
 
-			if(::ftl::_dtl::is_null(functor))
+			if(::ftl::dtl_::is_null(functor))
 				initialise_empty();
 
 			else {
-				initialise(::ftl::_dtl::to_functor(
+				initialise(::ftl::dtl_::to_functor(
 					std::forward<F>(functor)), Allocator(allocator)
 				);
 			}
@@ -213,14 +213,14 @@ namespace ftl {
 				typename alloc_traits::template rebind_alloc<function>::other;
 
 			// first try to see if the allocator matches the target type
-			::ftl::_dtl::manager_type manager_for_allocator =
-				&::ftl::_dtl::function_manager<
+			::ftl::dtl_::manager_type manager_for_allocator =
+				&::ftl::dtl_::function_manager<
 					typename alloc_traits::value_type, Allocator
 				>;
 
 			if(other.manager_storage.manager == manager_for_allocator) {
 
-				::ftl::_dtl::create_manager<
+				::ftl::dtl_::create_manager<
 					typename alloc_traits::value_type, Allocator
 				> (
 					manager_storage, Allocator(allocator)
@@ -228,10 +228,10 @@ namespace ftl {
 
 				manager_for_allocator(
 					&manager_storage,
-					const_cast<::ftl::_dtl::manager_storage_type*>(
+					const_cast<::ftl::dtl_::manager_storage_type*>(
 						&other.manager_storage
 					),
-					::ftl::_dtl::call_copy_functor_only
+					::ftl::dtl_::call_copy_functor_only
 				);
 			}
 
@@ -239,20 +239,20 @@ namespace ftl {
 			// breaks the recursion of the last case. otherwise repeated copies
 			// would allocate more and more memory
 			else if(other.manager_storage.manager
-					== &::ftl::_dtl::function_manager<function, MyAllocator>
+					== &::ftl::dtl_::function_manager<function, MyAllocator>
 			) {
 
-				::ftl::_dtl::create_manager<function, MyAllocator>(
+				::ftl::dtl_::create_manager<function, MyAllocator>(
 					manager_storage,
 					MyAllocator(allocator)
 				);
 
-				::ftl::_dtl::function_manager<function, MyAllocator>(
+				::ftl::dtl_::function_manager<function, MyAllocator>(
 					&manager_storage,
-					const_cast<::ftl::_dtl::manager_storage_type*>(
+					const_cast<::ftl::dtl_::manager_storage_type*>(
 						&other.manager_storage
 					),
-					::ftl::_dtl::call_copy_functor_only
+					::ftl::dtl_::call_copy_functor_only
 				);
 			}
 
@@ -275,7 +275,7 @@ namespace ftl {
 			manager_storage.manager(
 					&manager_storage,
 					nullptr,
-					::ftl::_dtl::call_destroy);
+					::ftl::dtl_::call_destroy);
 		}
 
 		function& operator= (function other) noexcept {
@@ -284,7 +284,7 @@ namespace ftl {
 		}
 
 		// Inherit the curried function call operator(s)
-		using ::ftl::_dtl::curried<R,Ps...>::operator();
+		using ::ftl::dtl_::curried<R,Ps...>::operator();
 
 		/// Call the wrapped function object
 		R operator()(Ps...ps) const {
@@ -293,51 +293,51 @@ namespace ftl {
 
 		template<typename F, typename Allocator>
 		void assign(F&& f, const Allocator& alloc)
-		noexcept(::ftl::_dtl::is_inplace_allocated<F, Allocator>::value) {
+		noexcept(::ftl::dtl_::is_inplace_allocated<F, Allocator>::value) {
 			function(std::allocator_arg, alloc, f).swap(*this);
 		}
 
 		void swap(function& other) noexcept {
-			::ftl::_dtl::manager_storage_type temp_storage;
+			::ftl::dtl_::manager_storage_type temp_storage;
 
 			other.manager_storage.manager(
 					&temp_storage,
 					&other.manager_storage,
-					::ftl::_dtl::call_move_and_destroy);
+					::ftl::dtl_::call_move_and_destroy);
 
 			manager_storage.manager(
 					&other.manager_storage,
 					&manager_storage,
-					::ftl::_dtl::call_move_and_destroy);
+					::ftl::dtl_::call_move_and_destroy);
 
 			temp_storage.manager(
 					&manager_storage,
 					&temp_storage,
-					::ftl::_dtl::call_move_and_destroy);
+					::ftl::dtl_::call_move_and_destroy);
 
 			std::swap(call, other.call);
 		}
 
 		/// Check if function is nullary
 		constexpr operator bool() const noexcept {
-			return call != &::ftl::_dtl::empty_call<R, Ps...>;
+			return call != &::ftl::dtl_::empty_call<R, Ps...>;
 		}
 
 	private:
-		::ftl::_dtl::manager_storage_type manager_storage;
-		R (*call)(const ::ftl::_dtl::functor_padding&, Ps...);
+		::ftl::dtl_::manager_storage_type manager_storage;
+		R (*call)(const ::ftl::dtl_::functor_padding&, Ps...);
 
 		template<typename F, typename Allocator>
 		void initialise(F f, Allocator&& alloc) {
 
-			call = &::ftl::_dtl::function_manager_inplace_specialisation<F,Allocator>
+			call = &::ftl::dtl_::function_manager_inplace_specialisation<F,Allocator>
 				::template call<R, Ps...>;
 
-			::ftl::_dtl::create_manager<F,Allocator>(
+			::ftl::dtl_::create_manager<F,Allocator>(
 					manager_storage,
 					std::forward<Allocator>(alloc));
 
-			::ftl::_dtl::function_manager_inplace_specialisation<F, Allocator>
+			::ftl::dtl_::function_manager_inplace_specialisation<F, Allocator>
 				::store_functor(manager_storage, std::forward<F>(f));
 		}
 
@@ -347,19 +347,19 @@ namespace ftl {
 			using Allocator = std::allocator<empty_fn_type>;
 
 			static_assert(
-				::ftl::_dtl::is_inplace_allocated<empty_fn_type, Allocator>::value,
+				::ftl::dtl_::is_inplace_allocated<empty_fn_type, Allocator>::value,
 				"The empty function should benefit from small functor optimization");
 
-			::ftl::_dtl::create_manager<empty_fn_type,Allocator>(
+			::ftl::dtl_::create_manager<empty_fn_type,Allocator>(
 					manager_storage,
 					Allocator()
 			);
 
-			::ftl::_dtl
+			::ftl::dtl_
 				::function_manager_inplace_specialisation<empty_fn_type,Allocator>
 					::store_functor(manager_storage, nullptr);
 
-			call = &::ftl::_dtl::empty_call<R, Ps...>;
+			call = &::ftl::dtl_::empty_call<R, Ps...>;
 		}
 	};
 

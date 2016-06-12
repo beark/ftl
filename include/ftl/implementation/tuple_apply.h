@@ -30,13 +30,13 @@ namespace ftl {
 	// A number of helpers for tuple_apply
 	namespace _dtl {
 		template<typename F, typename...Ts, size_t...S>
-		constexpr auto tup_apply_helper(seq<S...>, F&& f, const std::tuple<Ts...>& t)
+		constexpr auto tup_apply_helper(::std::index_sequence<S...>, F&& f, const std::tuple<Ts...>& t)
 		-> typename std::result_of<F(Ts...)>::type {
 			return std::forward<F>(f)(std::get<S>(t)...);
 		}
 
 		template<typename F, typename...Ts, size_t...S>
-		constexpr auto tup_apply_helper(seq<S...>, F&& f, std::tuple<Ts...>&& t)
+		constexpr auto tup_apply_helper(std::index_sequence<S...>, F&& f, std::tuple<Ts...>&& t)
 		-> typename std::result_of<F(Ts...)>::type {
 			return std::forward<F>(f)(std::get<S>(std::move(t))...);
 		}
@@ -45,13 +45,13 @@ namespace ftl {
 		constexpr auto tup_apply(F&& f, Tuple&& tuple)
 		-> decltype(
 				tup_apply_helper(
-					gen_seq<0,std::tuple_size<plain_type<Tuple>>::value-1>{},
+					::std::make_index_sequence<std::tuple_size<plain_type<Tuple>>::value>{},
 					std::forward<F>(f),
 					std::forward<Tuple>(tuple)
 				)
 		) {
 			return tup_apply_helper(
-				gen_seq<0,std::tuple_size<plain_type<Tuple>>::value-1>{},
+				::std::make_index_sequence<std::tuple_size<plain_type<Tuple>>::value>{},
 				std::forward<F>(f),
 				std::forward<Tuple>(tuple)
 			);

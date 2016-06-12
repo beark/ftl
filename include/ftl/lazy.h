@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -123,9 +123,10 @@ namespace ftl {
 		 *
 		 * This method forces evaluation.
 		 */
-		const T& operator*() const {
+		const T& operator*() const
+		{
 			force();
-			return *get<1>(*val);
+			return *val->template unsafe_get<Right<T>>();
 		}
 
 		/**
@@ -133,12 +134,13 @@ namespace ftl {
 		 *
 		 * This method forces evaluation.
 		 */
-		const T* operator->() const {
+		const T* operator->() const
+		{
 			if(val->template is<Right<T>>())
-				return std::addressof(*get<1>(*val));
+				return std::addressof(*val->template unsafe_get<Right<T>>());
 
 			force();
-			return std::addressof(*get<1>(*val));
+			return std::addressof(*val->template unsafe_get<Right<T>>());
 		}
 
 		lazy& operator= (const lazy&) = default;
@@ -150,7 +152,8 @@ namespace ftl {
 		 * \return value_status::deferred if computation has not yet been run,
 		 *         and value_status::ready if it has.
 		 */
-		value_status status() const {
+		value_status status() const
+		{
 			if(val->template is<Right<T>>())
 				return value_status::ready;
 
@@ -158,11 +161,15 @@ namespace ftl {
 		}
 
 	private:
-		void force() const {
-			if(val->template is<Right<T>>())
-				return;
-
-			*val = make_right<function<T()>>((*get<0>(*val))());
+		void force() const
+		{
+			val->match(
+				[val = val](Left<function<T()>>& lf)
+				{
+					val->emplace(type<Right<T>>, (*lf)());
+				},
+				[](otherwise){}
+			);
 		}
 
 		mutable std::shared_ptr<either<function<T()>,T>> val;
@@ -170,7 +177,8 @@ namespace ftl {
 
 	// Bool specialisation to allow contextual conversion
 	template<>
-	class lazy<bool> {
+	class lazy<bool>
+	{
 	public:
 		lazy() = delete;
 		lazy(const lazy&) = default;
@@ -181,20 +189,23 @@ namespace ftl {
 		: val(new either<function<bool()>,bool>(make_left<bool>(f)))
 		{}
 
-		const bool& operator*() const {
+		const bool& operator*() const
+		{
 			force();
-			return *get<Right<bool>>(*val);
+			return *val->template unsafe_get<Right<bool>>();
 		}
 
 		lazy& operator= (const lazy&) = default;
 		lazy& operator= (lazy&&) = default;
 
-		explicit operator bool() {
+		explicit operator bool()
+		{
 			force();
-			return *get<Right<bool>>(*val);
+			return *val->template unsafe_get<Right<bool>>();
 		}
 
-		value_status status() const {
+		value_status status() const
+		{
 			if(val->is<Right<bool>>())
 				return value_status::ready;
 
@@ -202,11 +213,12 @@ namespace ftl {
 		}
 
 	private:
-		void force() const {
+		void force() const
+		{
 			if(val->is<Right<bool>>())
 				return;
 
-			*val = make_right<function<bool()>>((*get<0>(*val))());
+			*val = make_right<function<bool()>>((*val->template unsafe_get<Left<function<bool()>>>())());
 		}
 
 		mutable std::shared_ptr<either<function<bool()>,bool>> val;
@@ -231,11 +243,11 @@ namespace ftl {
 			typename...Args,
 			typename T = result_of<F(Args...)>
 	>
-	lazy<T> defer(F f, Args&&...args) {
-		// TODO: C++14: _move_ tuple of args into lambda
+	lazy<T> defer(F f, Args&&...args)
+	{
 		// TODO: Make this work with zero-argument fs
 		auto t = std::make_tuple(std::forward<Args>(args)...);
-		return lazy<T>{[f,t]() {
+		return lazy<T>{[f,t = std::move(t)]() {
 				return tuple_apply(f, t);
 		}};
 	}
@@ -251,7 +263,8 @@ namespace ftl {
 	 * \ingroup lazy
 	 */
 	template<typename T>
-	lazy<bool> operator==(lazy<T> l1, lazy<T> l2) {
+	lazy<bool> operator==(lazy<T> l1, lazy<T> l2)
+	{
 		return lazy<bool>{[l1,l2]() {
 			return *l1 == *l2;
 		}};
@@ -268,10 +281,9 @@ namespace ftl {
 	 * \ingroup lazy
 	 */
 	template<typename T>
-	lazy<bool> operator!=(lazy<T> l1, lazy<T> l2) {
-		return lazy<bool>{[l1,l2]() {
-			return *l1 != *l2;
-		}};
+	lazy<bool> operator!=(lazy<T> l1, lazy<T> l2)
+	{
+		return lazy<bool> { [l1,l2]() { return *l1 != *l2; } };
 	}
 
 	/**
@@ -285,10 +297,9 @@ namespace ftl {
 	 * \ingroup lazy
 	 */
 	template<typename T>
-	lazy<bool> operator< (lazy<T> lhs, lazy<T> rhs) {
-		return lazy<bool>{[lhs,rhs]() {
-			return *lhs < *rhs;
-		}};
+	lazy<bool> operator< (lazy<T> lhs, lazy<T> rhs)
+	{
+		return lazy<bool>{ [lhs,rhs]() { return *lhs < *rhs; } };
 	}
 
 	/**
@@ -302,10 +313,9 @@ namespace ftl {
 	 * \ingroup lazy
 	 */
 	template<typename T>
-	lazy<bool> operator> (lazy<T> lhs, lazy<T> rhs) {
-		return lazy<bool>{[lhs,rhs]() {
-			return *lhs > *rhs;
-		}};
+	lazy<bool> operator> (lazy<T> lhs, lazy<T> rhs)
+	{
+		return lazy<bool>{ [lhs,rhs]() { return *lhs > *rhs; } };
 	}
 
 	/**
@@ -319,7 +329,8 @@ namespace ftl {
 	template<typename T>
 	struct monad<lazy<T>>
    	: deriving_join<in_terms_of_bind<lazy<T>>>
-	, deriving_apply<in_terms_of_bind<lazy<T>>> {
+	, deriving_apply<in_terms_of_bind<lazy<T>>>
+	{
 		/**
 		 * Create a computation that computes `t`
 		 *
@@ -327,8 +338,9 @@ namespace ftl {
 		 * there are situations when it can be useful (e.g. algorithms
 		 * generalised over any monad).
 		 */
-		static lazy<T> pure(T t) {
-			return lazy<T>{[t](){ return t; }};
+		static lazy<T> pure(T t)
+		{
+			return lazy<T>{ [t](){ return t; } };
 		}
 		// TODO: C++14: Add a pure that captures Ts by move
 
@@ -342,8 +354,9 @@ namespace ftl {
 		 * independant computation ahead of that).
 		 */
 		template<typename F, typename U = result_of<F(T)>>
-		static lazy<U> map(F f, lazy<T> l) {
-			return lazy<U>{function<U()>{[f,l]() { return f(*l); }}};
+		static lazy<U> map(F f, lazy<T> l)
+		{
+			return lazy<U>{ function<U()>{[f,l]() { return f(*l); }} };
 		}
 
 		/**
@@ -361,7 +374,8 @@ namespace ftl {
 				typename F,
 				typename U = Value_type<result_of<F(T)>>
 		>
-		static lazy<U> bind(lazy<T> l, F f) {
+		static lazy<U> bind(lazy<T> l, F f)
+		{
 			return lazy<U>{[f,l]() {
 				return *(f(*l));
 			}};
@@ -382,11 +396,13 @@ namespace ftl {
 	 * \ingroup lazy
 	 */
 	template<typename T>
-	struct monoid<lazy<T>> {
+	struct monoid<lazy<T>>
+	{
 		/**
 		 * Lazily "computes" monoid<T>::id()
 		 */
-		static lazy<T> id() {
+		static lazy<T> id()
+		{
 			return lazy<T>{monoid<T>::id};
 		}
 
@@ -396,7 +412,8 @@ namespace ftl {
 		 * Note that neither `l1` nor `l2` are forced by invoking this function.
 		 * They are, of course, forced when the result of this computation is.
 		 */
-		static lazy<T> append(lazy<T> l1, lazy<T> l2) {
+		static lazy<T> append(lazy<T> l1, lazy<T> l2)
+		{
 			return lazy<T>([l1,l2](){ return monoid<T>::append(*l1, *l2); });
 		}
 
@@ -405,4 +422,3 @@ namespace ftl {
 }
 
 #endif
-
