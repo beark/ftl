@@ -18,14 +18,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 
-	if(GCC_VERSION VERSION_LESS 5)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
-	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-	endif()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
-	if(GCC_VERSION VERSION_LESS 4.9)
-		message(WARNING "${PROJECT_NAME} only supports g++ 4.9 or later, but ${GCC_VERSION} was detected")
+	if(GCC_VERSION VERSION_LESS 5)
+		message(WARNING "${PROJECT_NAME} only supports g++ 5 or later, but ${GCC_VERSION} was detected")
 	endif()
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

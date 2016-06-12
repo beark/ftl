@@ -10,16 +10,16 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-4.9
-      env: COMPILER=g++-4.9
+            - g++-5
+      env: COMPILER=g++-5
     - compiler: gcc
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-5
-      env: COMPILER=g++-5
+            - g++-6
+      env: COMPILER=g++-6
     - compiler: clang
       addons:
         apt:
