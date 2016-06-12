@@ -37,4 +37,6 @@ script:
   - cmake ./
   - make -j 2
   - if [[ "`echo $COMPILER`" == g++* ]]; then ./ftl_tests; fi
+  - cd should_fail
+  - ctest
 
