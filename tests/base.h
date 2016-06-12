@@ -33,7 +33,8 @@
 using test_t = std::tuple<std::string,std::function<bool()>>;
 using test_set = std::tuple<std::string,std::vector<test_t>>;
 
-struct NoCopy {
+struct NoCopy
+{
 	NoCopy() = default;
 	NoCopy(const NoCopy&) = delete;
 	NoCopy(NoCopy&&) = default;
@@ -45,12 +46,9 @@ struct NoCopy {
 bool run_test_set(test_set& ts, std::ostream& os);
 
 /**
- * Test if two floats are equal to the 10th digit.
- * Some tests involving floating point calculations may fail due to subtle 
- * differences between the target answer and the calculation if a regular
- * equality is used.
+ * Test if two floats are equal within `eps` margin of error.
  */
-bool fequal(float x, float y);
+bool fequal(float x, float y, float eps = 0.000001f);
 
 #endif
 

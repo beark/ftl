@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -27,8 +27,8 @@
 #include "concepts/monoid.h"
 #include "concepts/monad.h"
 
-namespace ftl {
-
+namespace ftl
+{
 	/**
 	 * \defgroup tuple Tuple
 	 *
@@ -45,41 +45,49 @@ namespace ftl {
 	 */
 
 	// Private namespace for various tuple helpers
-	namespace _dtl {
-
+	namespace dtl_
+	{
 		template<std::size_t N, typename T>
-		struct tup {
-			static void app(T& ret, const T& t2) {
+		struct tup
+		{
+			static void app(T& ret, const T& t2)
+			{
 				tup<N-1, T>::app(ret, t2);
 				std::get<N>(ret) = std::get<N>(ret) ^ std::get<N>(t2);
 			}
 
 			template<typename F, typename O>
-			static void fmap(F&& f, const T& tupl, O& out) {
+			static void fmap(F&& f, const T& tupl, O& out)
+			{
 				tup<N-1,T>::fmap(std::forward<F>(f), tupl, out);
 				std::get<N>(out) = std::get<N>(tupl);
 			}
 
 			template<typename F, typename O>
-			static void fmap(F&& f, T&& tupl, O& out) {
+			static void fmap(F&& f, T&& tupl, O& out)
+			{
 				tup<N-1,T>::fmap(std::forward<F>(f), std::move(tupl), out);
 				std::get<N>(out) = std::get<N>(std::move(tupl));
 			}
 		};
 
 		template<typename T>
-		struct tup<0, T> {
-			static void app(T& ret, const T& t2) {
+		struct tup<0, T>
+		{
+			static void app(T& ret, const T& t2)
+			{
 				std::get<0>(ret) = std::get<0>(ret) ^ std::get<0>(t2);
 			}
 
 			template<typename F, typename O>
-			static void fmap(F&& f, const T& tupl, O& out) {
+			static void fmap(F&& f, const T& tupl, O& out)
+			{
 				std::get<0>(out) = std::forward<F>(f)(std::get<0>(tupl));
 			}
 
 			template<typename F, typename O>
-			static void fmap(F&& f, T&& tupl, O& out) {
+			static void fmap(F&& f, T&& tupl, O& out)
+			{
 				std::get<0>(out)
 					= std::forward<F>(f)(std::get<0>(std::move(tupl)));
 			}
@@ -94,8 +102,8 @@ namespace ftl {
 		std::tuple<B,Ts...> apply_on_first(
 				const std::tuple<F,Ts...>& t1,
 				const std::tuple<A,Ts...>& t2,
-				std::index_sequence<S...>) {
-
+				std::index_sequence<S...>)
+		{
 			auto f = std::get<0>(t1);
 			return std::tuple<B,Ts...>(
 					f(std::get<0>(t2)),
@@ -119,16 +127,14 @@ namespace ftl {
 		}
 
 		template<typename...>
-		struct allMonoids {
-		};
+		struct allMonoids {};
 
 		template<>
-		struct allMonoids<> {
-			static constexpr bool value = true;
-		};
+		struct allMonoids<> : std::true_type {};
 
 		template<typename T, typename...Ts>
-		struct allMonoids<T,Ts...> {
+		struct allMonoids<T,Ts...>
+		{
 			static constexpr bool value
 				= monoid<T>::instance && allMonoids<Ts...>::value;
 		};
@@ -169,11 +175,13 @@ namespace ftl {
 	 * \ingroup tuple
 	 */
 	template<typename...Ts>
-	struct monoid<std::tuple<Ts...>> {
+	struct monoid<std::tuple<Ts...>>
+	{
 		static auto id()
 		-> typename std::enable_if<
-				_dtl::allMonoids<Ts...>::value,
-				std::tuple<Ts...>>::type {
+				dtl_::allMonoids<Ts...>::value,
+				std::tuple<Ts...>>::type
+		{
 			return std::make_tuple(monoid<Ts>::id()...);
 		}
 
@@ -181,15 +189,15 @@ namespace ftl {
 				const std::tuple<Ts...>& t1,
 				const std::tuple<Ts...>& t2)
 		-> typename std::enable_if<
-				_dtl::allMonoids<Ts...>::value,
-				std::tuple<Ts...>>::type {
-
+				dtl_::allMonoids<Ts...>::value,
+				std::tuple<Ts...>>::type
+		{
 			auto ret = t1;
-			_dtl::tup<sizeof...(Ts)-1, std::tuple<Ts...>>::app(ret, t2);
+			dtl_::tup<sizeof...(Ts)-1, std::tuple<Ts...>>::app(ret, t2);
 			return ret;
 		}
 
-		static constexpr bool instance = _dtl::allMonoids<Ts...>::value;
+		static constexpr bool instance = dtl_::allMonoids<Ts...>::value;
 	};
 
 	/**
@@ -204,22 +212,23 @@ namespace ftl {
 	 * \ingroup tuple
 	 */
 	template<typename T, typename...Ts>
-	struct functor<std::tuple<T,Ts...>> {
+	struct functor<std::tuple<T,Ts...>>
+	{
 		/// Apply `f` to first element in the tuple
 		template<typename F, typename U = result_of<F(T)>>
-		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
-
+		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t)
+		{
 			std::tuple<U,Ts...> ret;
-			_dtl::tup<sizeof...(Ts), std::tuple<T,Ts...>>::fmap(
+			dtl_::tup<sizeof...(Ts), std::tuple<T,Ts...>>::fmap(
 					std::forward<F>(f), t, ret);
 			return ret;
 		}
 
 		template<typename F, typename U = result_of<F(T)>>
-		static std::tuple<U,Ts...> map(F&& f, std::tuple<T,Ts...>&& t) {
-
+		static std::tuple<U,Ts...> map(F&& f, std::tuple<T,Ts...>&& t)
+		{
 			std::tuple<U,Ts...> ret;
-			_dtl::tup<sizeof...(Ts), std::tuple<T,Ts...>>::fmap(
+			dtl_::tup<sizeof...(Ts), std::tuple<T,Ts...>>::fmap(
 					std::forward<F>(f), std::move(t), ret);
 			return ret;
 		}
@@ -236,20 +245,22 @@ namespace ftl {
 	 * \ingroup tuple
 	 */
 	template<typename T, typename...Ts>
-	struct applicative<std::tuple<T,Ts...>> {
-
+	struct applicative<std::tuple<T,Ts...>>
+	{
 		/**
 		 * Creates a tuple with `a` as first element.
 		 *
 		 * All the other fields are initialised with their respective
 		 * `monoid::id()` results.
 		 */
-		static std::tuple<T,Ts...> pure(const T& a) {
+		static std::tuple<T,Ts...> pure(const T& a)
+		{
 			return std::make_tuple(a, monoid<Ts>::id()...);
 		}
 
 		/// \overload
-		static std::tuple<T,Ts...> pure(T&& a) {
+		static std::tuple<T,Ts...> pure(T&& a)
+		{
 			return std::make_tuple(std::move(a), monoid<Ts>::id()...);
 		}
 
@@ -257,12 +268,14 @@ namespace ftl {
 		 * Forwards to functor<std::tuple<T,Ts...>>::map.
 		 */
 		template<typename F, typename U = result_of<F(T)>>
-		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t) {
+		static std::tuple<U,Ts...> map(F&& f, const std::tuple<T,Ts...>& t)
+		{
 			return functor<std::tuple<T,Ts...>>::map(std::forward<F>(f), t);
 		}
 
 		template<typename F, typename U = result_of<F(T)>>
-		static std::tuple<U,Ts...> map(F&& f, std::tuple<T,Ts...>&& t) {
+		static std::tuple<U,Ts...> map(F&& f, std::tuple<T,Ts...>&& t)
+		{
 			return functor<std::tuple<T,Ts...>>::map(
 					std::forward<F>(f),
 					std::move(t)
@@ -277,8 +290,9 @@ namespace ftl {
 		template<typename F, typename U = result_of<F(T)>>
 		static std::tuple<U,Ts...> apply(
 				const std::tuple<F,Ts...>& tfn,
-				const std::tuple<T,Ts...>& t) {
-			return _dtl::applicative_implementation(tfn, t);
+				const std::tuple<T,Ts...>& t)
+		{
+			return dtl_::applicative_implementation(tfn, t);
 		}
 
 		static constexpr bool instance = true;

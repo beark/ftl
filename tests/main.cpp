@@ -21,6 +21,7 @@
  * distribution.
  */
 #include <iostream>
+#include <cmath>
 #include "sum_type_tests.h"
 #include "either_tests.h"
 #include "maybe_tests.h"
@@ -43,14 +44,18 @@
 #include "unordered_map_tests.h"
 #include "concept_tests.h"
 
-bool run_test_set(test_set& ts, std::ostream& os) {
+bool run_test_set(test_set& ts, std::ostream& os)
+{
 	os << "Running test set '" << std::get<0>(ts) << "'...";
 
 	int nsuc = 0, nfail = 0;
 
-	for(const auto& t : std::get<1>(ts)) {
-		try {
-			if(!std::get<1>(t)()) {
+	for(const auto& t : std::get<1>(ts))
+	{
+		try
+		{
+			if(!std::get<1>(t)())
+			{
 				if(nfail == 0)
 					os << std::endl;
 
@@ -60,7 +65,16 @@ bool run_test_set(test_set& ts, std::ostream& os) {
 			else
 				++nsuc;
 		}
-		catch(...) {
+		catch(std::exception e)
+		{
+			if(nfail == 0)
+				os << std::endl;
+
+			os << std::get<0>(t) << ": failed with exception " << e.what() << std::endl;
+			++nfail;
+		}
+		catch(...)
+		{
 			os << "Unexpected exception raised while running '"
 				<< std::get<0>(t) << "'" << std::endl;
 
@@ -73,16 +87,18 @@ bool run_test_set(test_set& ts, std::ostream& os) {
 	return nfail == 0;
 }
 
-bool fequal(float x, float y) {
-	constexpr float PRECISION = 10000000000;
-	return int(x*PRECISION) == int(y*PRECISION);
+// Woefully inadequate way of checking for float equality, but sufficient for
+// our purposes
+bool fequal(float x, float y, float eps)
+{
+	return std::fabs(x - y) < eps;
 }
 
-int main(int, char**) {
-
+int main(int, char**)
+{
 	bool flawless = true;
 
-	//flawless &= run_test_set(prelude_tests, std::cout);
+	flawless &= run_test_set(prelude_tests, std::cout);
 	flawless &= run_test_set(sum_type_tests, std::cout);
 	flawless &= run_test_set(either_tests, std::cout);
 	flawless &= run_test_set(eithert_tests, std::cout);
