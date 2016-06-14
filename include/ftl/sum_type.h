@@ -856,7 +856,7 @@ namespace ftl {
 	 * A sum type is essentially a tagged union. It encompasses the idea of a
 	 * value that is either of type `T1`, or the type `T2`, or, ..., `TN` (for the
 	 * sum type `<T1,T2,...,TN>`), but it may never have a value of more than one
-	 * of its sub type at any given time.
+	 * of its sub types at any given time.
 	 *
 	 * In FTL, this is enforced as much as is possible at compile time. Since the
 	 * actual type of a value cannot be known until runtime, not everything can
@@ -869,7 +869,33 @@ namespace ftl {
 	 * of its component types. Note that this may include, eg, "moved from"
 	 * states.
 	 *
+	 * \par "Pattern Matching"
+	 *
+	 * Sum types in FTL support a very basic version of pattern matching, in the
+	 * form of essentially a simple visitor pattern. This looks a little like
+	 * this:
+	 *
+	 * \code
+	 *   auto x = sum_type<A,B>{type<A>};
+	 *   x.match(
+	 *     [](A a) { do_stuff_with_a(a); },
+	 *     [](B b) { do_stuff_with_b(b); },
+	 *   );
+	 * \endcode
+	 *
+	 * These match calls have some additional static checks to enforce the
+	 * invariants guaranteed by sum types. For example, the matches must be
+	 * exhaustive: every component type must have a matching "visitor" function.
+	 * This can be either by value, reference, or const reference.
+	 *
+	 * One exception is that `match` also allows a visitor with an argument of
+	 * type `otherwise`. This function will act as a catch-all for any types that
+	 * have not been matched earlier in the list.
+	 *
+	 * `match` is a `constexpr` operation if all the given matching functions are.
+	 *
 	 * \par Type Traits & Concepts
+	 *
 	 * - A `sum_type<T1..TN>` is a trivial type, iff all of `T1..TN` are
 	 *   `TriviallyCopyable`
 	 * - A `sum_type<T1..TN>` is literal, iff all of `T1..TN` are
@@ -892,6 +918,8 @@ namespace ftl {
 	 *
 	 * Note that a `sum_type` is never default constructible, since this would
 	 * by necessity entail some kind of empty or invalid state.
+	 *
+	 * \see either, maybe
 	 *
 	 * \ingroup sum_type
 	 */

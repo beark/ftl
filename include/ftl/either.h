@@ -74,23 +74,16 @@ namespace ftl {
 	 * While `Left` is strongly typed and does not allow neither implicit casts
 	 * from, nor to its inner type, `Right` does implicitly cast _to_ its
 	 * inner type. It is also implicitly convertible to both `R&` and
-	 * `R const&`. The reasoning behind this is that it allows much more concise
-	 * pattern matching (see examples below).
+	 * `R const&`.
 	 *
-	 * \par Concepts
+	 * \par Type Traits & Concepts
 	 *
-	 * Either fulfills the following concepts if, and only if,
-	 * _both_ of its sub-types also do:
-	 *  
-	 * - \ref eq
-	 *
-	 * Either fulfills the following concepts regardless of its sub-types:
-	 *
-	 * - \ref copycons
-	 * - \ref movecons
-	 * - \ref functor (in R)
-	 * - \ref applicative (in R)
-	 * - \ref monad (in R)
+	 * Either is technically the same as `sum_type<Left<L>,Right<R>>` and thus
+	 * satisfies all the same basic traits and concepts. In addition, `either`
+	 * satisfies the following concepts:
+	 * - \ref functor (in `R`)
+	 * - \ref applicative (in `R`)
+	 * - \ref monad (in `R`)
 	 *
 	 * \par Examples
 	 *
@@ -99,7 +92,7 @@ namespace ftl {
 	 *   either<int,int> e = make_right<int>(10);
 	 *
 	 *   int x = e.match(
-	 *       [](int r){ return 2*r; },
+	 *       [](Right<int> r){ return 2*r; },
 	 *       [](Left<int> l){ return *l; }
 	 *   );
 	 *   // x == 20
@@ -109,12 +102,14 @@ namespace ftl {
 	 * \code
 	 *   either<int,int> e = make_right<int>(10);
 	 *
-	 *   e.matchE(
-	 *       [](int& r){ r *= 2; },
+	 *   e.match(
+	 *       [](Right<int>& r){ *r *= 2; },
 	 *       [](Left<int>& l){ ++(*l); }
 	 *   );
 	 *   // e == make_right<int>(20)
 	 * \endcode
+	 *
+	 * \see sum_type
 	 *
 	 * \ingroup either
 	 */
@@ -135,34 +130,18 @@ namespace ftl {
 	/**
 	 * One of the inner types of an either instance.
 	 *
-	 * In particular, this is the _defining_ subtype of either. Any `sum_type`
-	 * instance that is equivalent of `sum_type<Left<T>,Identity<U>>` is exactly
-	 * equivalent of `either` and will behave like it, use its concept
-	 * instances, and so on.
-	 *
 	 * For any type `U`, `Left<T>` is implicitly convertible to `either<T,U>`.
+	 * This will copy or move the value out of the containing `Left`
+	 * appropriately.
 	 *
-	 * Note that `Left` is not implicitly convertible to `T`, meaning that in a
-	 * match expression you must use the fully qualified `Left<T>` clause. This
-	 * is of course because otherwise, matching on an `either<T,T>`, e.g. like
-	 * so:
+	 * \par Type Traits & Concepts
 	 *
-	 * \code
-	 *   either<int,int> x = ...;
-	 *   auto y = x.match(
-	 *       [](int x){ ... },
-	 *       [](Left<int> x){ ... }
-	 *   );
-	 * \endcode
-	 *
-	 * would evaluate the first match clause, regardless of whether it should
-	 * have matched `Left` instead.
-	 *
-	 * \par Concepts
-	 *
-	 * - \ref fullycons
+	 * - `Left<T>` has the same storage layout properties as `T`
+	 * - `Left<T>` is a literal type, iff `T` is
+	 * - `Left<T>` is constructible and assignable in the same manners `T` is
+	 * - `Left<T>` has the same destructor properties as `T`
 	 * - \ref deref, to `T`
-	 * - \ref eq, if `T` is
+	 * - \ref eq, iff `T` is
 	 *
 	 * \ingroup either
 	 */
@@ -179,23 +158,34 @@ namespace ftl {
 		~Left() = default;
 
 		template<typename R>
-		constexpr operator either<T,R>() const noexcept {
+		constexpr operator either<T,R>() const& noexcept
+		{
 			return either<T,R>{type<Left<T>>, val};
 		}
 
-		T& operator* () noexcept {
+		template<typename R>
+		constexpr operator either<T,R>() && noexcept
+		{
+			return either<T,R>{type<Left<T>>, std::move(val)};
+		}
+
+		T& operator* () noexcept
+		{
 			return val;
 		}
 
-		constexpr const T& operator* () const noexcept {
+		constexpr const T& operator* () const noexcept
+		{
 			return val;
 		}
 
-		T* operator-> () noexcept {
+		T* operator-> () noexcept
+		{
 			return std::addressof(val);
 		}
 
-		constexpr const T* operator-> () const noexcept {
+		constexpr const T* operator-> () const noexcept
+		{
 			return std::addressof(val);
 		}
 
@@ -207,13 +197,15 @@ namespace ftl {
 
 	template<typename T, typename = Requires<Eq<T>::value>>
 	constexpr auto operator== (const Left<T>& lhs, const Left<T>& rhs) noexcept
-	-> decltype(std::declval<T>() == std::declval<T>()) {
+	-> decltype(std::declval<T>() == std::declval<T>())
+	{
 		return lhs.val == rhs.val;
 	}
 
 	template<typename T, typename = Requires<Eq<T>::value>>
 	constexpr auto operator!= (const Left<T>& lhs, const Left<T>& rhs) noexcept
-	-> decltype(std::declval<T>() != std::declval<T>()) {
+	-> decltype(std::declval<T>() != std::declval<T>())
+	{
 		return lhs.val != rhs.val;
 	}
 
@@ -277,8 +269,8 @@ namespace ftl {
 	template<typename L, typename T>
 	struct monad<either<L,T>>
 	: deriving_join<in_terms_of_bind<either<L,T>>>
-	, deriving_apply<in_terms_of_bind<either<L,T>>> {
-
+	, deriving_apply<in_terms_of_bind<either<L,T>>>
+	{
 		/**
 		 * Embeds a value as a right value.
 		 *
@@ -287,8 +279,8 @@ namespace ftl {
 		 * \code
 		 *   either<int,string> e = monad<either<int,string>>::pure("foo");
 		 *
-		 *  // Exactly equivalent of
-		 *  auto e = make_right<int>(std::string("foo"));
+		 *   // Exactly equivalent of
+		 *   auto e = make_right<int>(std::string("foo"));
 		 * \endcode
 		 */
 		static constexpr either<L,T> pure(const T& t)
@@ -323,7 +315,8 @@ namespace ftl {
 		 * \endcode
 		 */
 		template<typename F, typename U = result_of<F(T)>>
-		static either<L,U> map(F f, const either<L,T>& e) {
+		static either<L,U> map(F f, const either<L,T>& e)
+		{
 			return e.match(
 				[f](const Right<T>& r){ return make_right<L>(f(*r)); },
 				[](const Left<L>& l){ return make_left<U>(*l); }
@@ -332,7 +325,8 @@ namespace ftl {
 
 		/// \overload
 		template<typename F, typename U = result_of<F(T)>>
-		static either<L,U> map(F f, either<L,T>&& e) {
+		static either<L,U> map(F f, either<L,T>&& e)
+		{
 			return e.match(
 				[f](Right<T>& r){ return make_right<L>(f(std::move(*r))); },
 				[](Left<L>& l){ return make_left<U>(std::move(*l)); }
@@ -351,7 +345,8 @@ namespace ftl {
 		 *           type that can be contained in an `either`.
 		 */
 		template<typename F, typename U = Value_type<result_of<F(T)>>>
-		static either<L,U> bind(const either<L,T>& e, F f) {
+		static either<L,U> bind(const either<L,T>& e, F f)
+		{
 			return e.match(
 				[](const Left<L>& l){ return make_left<U>(*l); },
 				[f](const Right<T>& r){ return f(*r); }
@@ -360,7 +355,8 @@ namespace ftl {
 
 		/// \overload
 		template<typename F, typename U = Value_type<result_of<F(T)>>>
-		static either<L,U> bind(either<L,T>&& e, F f) {
+		static either<L,U> bind(either<L,T>&& e, F f)
+		{
 			return e.match(
 				[](Left<L>& l){ return make_left<U>(std::move(*l)); },
 				[f](Right<T>& r){ return f(std::move(*r)); }

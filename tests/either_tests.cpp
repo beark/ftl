@@ -30,6 +30,15 @@ test_set either_tests{
 	std::string("either"),
 	{
 		std::make_tuple(
+			std::string("Left type tests"),
+			std::function<bool()>([]() -> bool {
+				auto e1 = ftl::make_left<int>(10);
+				auto e2 = ftl::make_left<int>(10);
+
+				return e1 == e2 && !(e1 != e2);
+			})
+		),
+		std::make_tuple(
 			std::string("Preserves Eq[L]"),
 			std::function<bool()>([]() -> bool {
 				auto e1 = ftl::make_left<int>(10);
