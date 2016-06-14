@@ -80,15 +80,31 @@ namespace ftl
 
 	namespace dtl_
 	{
-		template<bool AllTrivial, typename...Ts>
+		// Hierarchy of type layouts. Too much maintenance to take into account the
+		// entire matrix of destructor and constructor properties.
+		// Each layout level must satisfy the constraints of the one below, too.
+		enum class type_layout
+		{
+			trivially_copyable,	// Trivially copy/move constructible/assignable
+			trivial_destructor,	// Trivially destructible
+			complex							// No constraints
+		};
+
+		template<class...Ts>
+		constexpr type_layout get_layout()
+		{
+			return All<::std::is_trivially_copyable, Ts...>::value
+				? type_layout::trivially_copyable
+				: (All<::std::is_trivially_destructible, Ts...>::value
+					? type_layout::trivial_destructor
+					: type_layout::complex);
+		}
+
+		template<type_layout, typename...Ts>
 		struct recursive_union_;
 
-		template<typename...Ts>
-		using recursive_union =
-			recursive_union_<All<std::is_trivial, Ts...>::value, Ts...>;
-
 		template<>
-		struct recursive_union_<true>
+		struct recursive_union_<type_layout::trivially_copyable>
 		{
 			constexpr bool compare(size_t, const recursive_union_&) const noexcept
 			{
@@ -97,7 +113,29 @@ namespace ftl
 		};
 
 		template<>
-		struct recursive_union_<false>
+		struct recursive_union_<type_layout::trivial_destructor>
+		{
+			constexpr recursive_union_(const recursive_union_&, size_t) noexcept {}
+			constexpr recursive_union_(recursive_union_&&, size_t) noexcept {}
+
+			constexpr void copy(const recursive_union_&, size_t) noexcept {}
+			constexpr void copy(recursive_union_&&, size_t) noexcept {}
+			constexpr void move(recursive_union_&&, size_t) noexcept {}
+
+			template<class T, class U>
+			constexpr void assign(type_t<T>, U&&)
+			{
+				throw invalid_sum_type_access();
+			}
+
+			constexpr bool compare(size_t, const recursive_union_&) const noexcept
+			{
+				return true;
+			}
+		};
+
+		template<>
+		struct recursive_union_<type_layout::complex>
 		{
 			constexpr recursive_union_(const recursive_union_&, size_t) noexcept {}
 			constexpr recursive_union_(recursive_union_&&, size_t) noexcept {}
@@ -107,15 +145,15 @@ namespace ftl
 			constexpr void copy(recursive_union_&&, size_t) noexcept {}
 			constexpr void move(recursive_union_&&, size_t) noexcept {}
 
-			constexpr bool compare(size_t, const recursive_union_&) const noexcept
-			{
-				return true;
-			}
-
 			template<class T, class U>
 			constexpr void assign(type_t<T>, U&&)
 			{
 				throw invalid_sum_type_access();
+			}
+
+			constexpr bool compare(size_t, const recursive_union_&) const noexcept
+			{
+				return true;
 			}
 
 			template<class U>
@@ -126,7 +164,7 @@ namespace ftl
 		};
 
 		template<typename T, typename...Ts>
-		struct recursive_union_<true, T, Ts...>
+		struct recursive_union_<type_layout::trivially_copyable, T, Ts...>
 		{
 			recursive_union_() = delete;
 			recursive_union_(const recursive_union_&) = default;
@@ -143,7 +181,8 @@ namespace ftl
 			noexcept
 			(
 				::std::is_nothrow_constructible<
-					recursive_union_<true,Ts...>,Args...>::value
+					recursive_union_<
+						type_layout::trivially_copyable,Ts...>,Args...>::value
 			)
 			: rem(s, std::forward<Args>(args)...)
 			{}
@@ -197,12 +236,155 @@ namespace ftl
 			union
 			{
 				T val;
-				recursive_union_<true,Ts...> rem;
+				recursive_union_<type_layout::trivially_copyable,Ts...> rem;
 			};
 		};
 
 		template<typename T, typename...Ts>
-		struct recursive_union_<false, T, Ts...>
+		struct recursive_union_<type_layout::trivial_destructor, T, Ts...>
+		{
+			recursive_union_() = delete;
+			recursive_union_(const recursive_union_&) = delete;
+			recursive_union_(recursive_union_&&) = delete;
+
+			template<typename...Args>
+			constexpr recursive_union_(type_t<T>, Args&&...args)
+			noexcept(::std::is_nothrow_constructible<T,Args...>::value)
+			: val(std::forward<Args>(args)...)
+			{}
+
+			template<typename U, typename...Args>
+			constexpr recursive_union_(type_t<U> s, Args&&...args)
+			noexcept
+			(
+				::std::is_nothrow_constructible<
+					recursive_union_<
+						type_layout::trivially_copyable,Ts...>,Args...>::value
+			)
+			: rem(s, std::forward<Args>(args)...)
+			{}
+
+			recursive_union_(const recursive_union_& other, size_t i)
+			{
+				if (i == 0)
+				{
+					new (&val) T(other.val);
+				}
+				else
+				{
+					assert(sizeof...(Ts) > 0 && "Invalid sum type access");
+					new (&rem) recursive_union_<type_layout::trivial_destructor,Ts...>{other.rem, i - 1};
+				}
+			}
+
+			recursive_union_(recursive_union_&& other, size_t i)
+			{
+				if (i == 0)
+				{
+					new (&val) T(::std::move(other.val));
+				}
+				else
+				{
+					assert(sizeof...(Ts) > 0 && "Invalid sum type access");
+					new (&rem) recursive_union_<type_layout::trivial_destructor,Ts...>(::std::move(other.rem), i - 1);
+				}
+			}
+
+			~recursive_union_() = default;
+
+			void copy(const recursive_union_& u, size_t i)
+			{
+				if (i == 0)
+				{
+					val = u.val;
+				}
+				else
+				{
+					assert(sizeof...(Ts) > 0 && "Invalid sum type access");
+					rem.copy(u.rem, i - 1);
+				}
+			}
+
+			void move(recursive_union_&& u, size_t i)
+			{
+				if (i == 0)
+				{
+					val = ::std::move(u.val);
+				}
+				else
+				{
+					assert(sizeof...(Ts) > 0 && "Invalid sum type access");
+					rem.move(::std::move(u.rem), i - 1);
+				}
+			}
+
+			template<class U, class V>
+			void assign(type_t<U>, V&& v)
+			{
+				assert(sizeof...(Ts) > 0 && "Invalid sum type access");
+				rem.assign(type<U>, ::std::forward<V>(v));
+			}
+
+			void assign(type_t<T>, const T& v)
+			{
+				val = v;
+			}
+
+			void assign(type_t<T>, T&& v)
+			{
+				val = ::std::move(v);
+			}
+
+			template<class U>
+			constexpr const U& get(type_t<U> u) const &
+			{
+				assert(sizeof...(Ts) > 0 && "Invalid sum type access");
+				return rem.get(u);
+			}
+
+			constexpr const T& get(type_t<T>) const &
+			{
+				return val;
+			}
+
+			template<class U>
+			constexpr U& get(type_t<U> u) &
+			{
+				assert(sizeof...(Ts) > 0 && "Invalid sum type access");
+				return rem.get(u);
+			}
+
+			constexpr T& get(type_t<T>) &
+			{
+				return val;
+			}
+
+			template<class U>
+			constexpr U&& get(type_t<U> u) &&
+			{
+				assert(sizeof...(Ts) > 0 && "Invalid sum type access");
+				return ::std::move(rem).get(u);
+			}
+
+			constexpr T&& get(type_t<T>) &&
+			{
+				return ::std::move(val);
+			}
+
+			constexpr bool compare(size_t I, const recursive_union_& rhs) const noexcept
+			{
+				return I == 0 ? val == rhs.val : rem.compare(I - 1, rhs.rem);
+			}
+
+			union
+			{
+				T val;
+				recursive_union_<type_layout::trivial_destructor,Ts...> rem;
+			};
+		};
+
+		template<typename T, typename...Ts>
+		struct recursive_union_<type_layout::complex, T, Ts...>
 		{
 			constexpr recursive_union_() {}
 			recursive_union_(const recursive_union_&) = delete;
@@ -219,7 +401,7 @@ namespace ftl
 			noexcept
 			(
 				::std::is_nothrow_constructible<
-					recursive_union_<false,Ts...>,Args...>::value
+					recursive_union_<type_layout::complex,Ts...>,Args...>::value
 			)
 			: rem(s, std::forward<Args>(args)...)
 			{}
@@ -233,7 +415,7 @@ namespace ftl
 				else
 				{
 					assert(sizeof...(Ts) > 0 && "Invalid sum type access");
-					new (&rem) recursive_union_<false,Ts...>(other.rem, i - 1);
+					new (&rem) recursive_union_<type_layout::complex,Ts...>(other.rem, i - 1);
 				}
 			}
 
@@ -246,7 +428,7 @@ namespace ftl
 				else
 				{
 					assert(sizeof...(Ts) > 0 && "Invalid sum type access");
-					new (&rem) recursive_union_<false,Ts...>(::std::move(other.rem), i - 1);
+					new (&rem) recursive_union_<type_layout::complex,Ts...>(::std::move(other.rem), i - 1);
 				}
 			}
 
@@ -278,11 +460,11 @@ namespace ftl
 				}
 			}
 
-			template<class U>
-			void assign(type_t<U>, U&& v)
+			template<class U, class V>
+			void assign(type_t<U>, V&& v)
 			{
 				assert(sizeof...(Ts) > 0 && "Invalid sum type access");
-				rem.assign(type<U>, ::std::forward<U>(v));
+				rem.assign(type<U>, ::std::forward<V>(v));
 			}
 
 			void assign(type_t<T>, const T& v)
@@ -352,7 +534,7 @@ namespace ftl
 			union
 			{
 				T val;
-				recursive_union_<false,Ts...> rem;
+				recursive_union_<type_layout::complex,Ts...> rem;
 			};
 		};
 	}

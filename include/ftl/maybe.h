@@ -91,7 +91,10 @@ namespace ftl {
 	 * \ingroup maybe
 	 */
 	template<class T>
-	using maybe = sum_type<T,Nothing>;
+	class maybe : public sum_type<T,Nothing>
+	{
+		using sum_type<T,Nothing>::sum_type;
+	};
 
 	/**
 	 * Empty sub-type of maybe.

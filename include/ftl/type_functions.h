@@ -810,25 +810,9 @@ namespace ftl {
 	template<typename T, typename U>
 	struct is_same_template : std::false_type {};
 
-	template<
-			template<typename...> class T,
-			template<typename...> class U,
-			typename...Ts,
-			typename...Us
-	>
-	struct is_same_template<T<Ts...>,U<Us...>>
-		: std::is_same<T<Ts...>, U<Ts...>> {};
-
-	template<
-			bool x, bool y,
-			template<bool, typename...> class T,
-			template<bool, typename...> class U,
-			typename...Ts,
-			typename...Us
-	>
-	struct is_same_template<T<x, Ts...>, U<y, Us...>>
-		: std::is_same<T<x, Ts...>, U<x, Ts...>> {};
-
+	template<template<typename...> class T, typename...Ts, typename...Us>
+	struct is_same_template<T<Ts...>, T<Us...>>
+		: std::true_type {};
 }
 
 #endif

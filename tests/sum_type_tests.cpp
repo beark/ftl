@@ -27,15 +27,18 @@
 #include "sum_type_tests.h"
 
 template<typename T>
-struct Just {
+struct Just
+{
 	explicit constexpr Just(const T& t) noexcept : value(t) {}
 	explicit constexpr Just(T&& t) noexcept : value(std::move(t)) {}
 
-	T& operator*() {
+	T& operator*()
+	{
 		return value;
 	}
 
-	constexpr const T& operator*() const {
+	constexpr const T& operator*() const
+	{
 		return value;
 	}
 
@@ -49,14 +52,18 @@ template<typename T>
 using maybe = ftl::sum_type<Just<T>,Nothing>;
 
 template<typename T>
-maybe<ftl::plain_type<T>> just(T&& t) {
+maybe<ftl::plain_type<T>> just(T&& t)
+{
 	using ftl::plain_type;
 
-	return maybe<plain_type<T>>{
+	return maybe<plain_type<T>>
+	{
 		ftl::type<Just<plain_type<T>>>, std::forward<T>(t)
 	};
 }
 
+// Used to test "complex" sum types, ie ones containing types that are
+// not trivially destructible
 struct NonTrivial
 {
 	constexpr NonTrivial() noexcept : field(0) {}
@@ -87,6 +94,24 @@ struct CopyThrow
 	~CopyThrow() = default;
 };
 
+bool operator== (const CopyThrow&, const CopyThrow&)
+{
+	return true;
+}
+
+// Used to test sum types containing types that are trivially destructible,
+// but not trivially copyable.
+struct TrivialDestructor
+{
+	TrivialDestructor() = default;
+	TrivialDestructor(const TrivialDestructor&) noexcept {}
+	TrivialDestructor(TrivialDestructor&&) noexcept {}
+	~TrivialDestructor() = default;
+
+	TrivialDestructor& operator= (const TrivialDestructor&) = default;
+	TrivialDestructor& operator= (TrivialDestructor&&) = default;
+};
+
 constexpr bool wasInt(int x)
 {
 	return x == 5;
@@ -110,8 +135,12 @@ test_set sum_type_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
+				static_assert(std::is_standard_layout<sum_type<int,char>>::value, "Sum type of trivial types should be guaranteed standard layout");
 				static_assert(std::is_literal_type<sum_type<int,char>>::value, "Sum type of trivial types should be guaranteed literal");
 				static_assert(std::is_trivial<sum_type<int,char>>::value, "Sum type of trivial types should be guaranteed trivial");
+
+				static_assert(std::is_literal_type<sum_type<CopyThrow,int>>::value, "Sum types with trivially destructible types should be guaranteed literal");
+				static_assert(!std::is_trivial<sum_type<CopyThrow,int>>::value, "Sum types with non-trivially copyable types cannot be trivial");
 
 				static_assert(!std::is_literal_type<sum_type<NonTrivial,char>>::value, "Sum types containing non-trivial types should not be literal");
 				static_assert(!std::is_trivial<sum_type<NonTrivial,char>>::value, "Sum types containing non-trivial types should not be trivial");
@@ -145,13 +174,17 @@ test_set sum_type_tests{
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				int x = 1;
+				int i = 1;
 
 				// Trivial sum type
-				sum_type<int,int*> y{type<int>, 12};
-				sum_type<int,int*> z{type<int*>, &x};
+				sum_type<int,int*> x{type<int>, 12};
+				sum_type<int,int*> y{type<int*>, &i};
 
-				// Non-trivial sum type
+				// Trivially destructible sum type
+				sum_type<int,CopyThrow> z{type<int>, 12};
+				sum_type<int,CopyThrow> w{type<CopyThrow>};
+
+				// Complex sum type
 				sum_type<int,NonTrivial> a{type<int>, 12};
 				sum_type<int,NonTrivial> b{type<NonTrivial>, 12};
 
@@ -159,7 +192,7 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("is<T>"),
+			std::string("is<T> [trivial]"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
@@ -171,7 +204,31 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("Eq"),
+			std::string("is<T> [trivial destructor]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,CopyThrow> x{type<int>, 10};
+				sum_type<CopyThrow,char> y{type<CopyThrow>};
+
+				return x.is<int>() && !x.is<CopyThrow>()
+					&& !y.is<char>() && y.is<CopyThrow>();
+			})
+		),
+		std::make_tuple(
+			std::string("is<T> [complex]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,NonTrivial> x{type<int>, 10};
+				sum_type<NonTrivial,char> y{type<NonTrivial>, 1};
+
+				return x.is<int>() && !x.is<NonTrivial>()
+					&& !y.is<char>() && y.is<NonTrivial>();
+			})
+		),
+		std::make_tuple(
+			std::string("Eq [trivial]"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
@@ -184,55 +241,124 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("Copy assign"),
+			std::string("Eq [trivial destructor]"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				// Copy assign trivial sum types
-				sum_type<int,char> x1{type<int>, 1};
-				sum_type<int,char> y1{type<int>, 5};
-				sum_type<int,char> z1{type<char>, 'a'};
+				sum_type<int,CopyThrow> w{type<int>, 12};
+				sum_type<int,CopyThrow> x{type<int>, 10};
+				sum_type<int,CopyThrow> y{type<CopyThrow>};
+				sum_type<int,CopyThrow> z{type<int>, 10};
 
-				x1 = y1;
-				y1 = z1;
-
-				// Copy assign non-trivial sum types
-				sum_type<std::shared_ptr<int>,NonTrivial> x2{type<NonTrivial>, 1};
-				sum_type<std::shared_ptr<int>,NonTrivial> y2{type<NonTrivial>, 10};
-				sum_type<std::shared_ptr<int>,NonTrivial> z2{type<std::shared_ptr<int>>, new int(15)};
-
-				x2 = y2;
-				y2 = z2;
-
-				return x1.unsafe_get<int>() == 5
-					&& y1.unsafe_get<char>() == 'a'
-					&& x2.unsafe_get<NonTrivial>() == NonTrivial(10)
-					&& *y2.unsafe_get<std::shared_ptr<int>>() == 15;
+				return w != x && x != y && x == z && w != y;
 			})
 		),
 		std::make_tuple(
-			std::string("Copy assign element types"),
+			std::string("Eq [complex]"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
-				// Copy assign trivial sum types
-				sum_type<int,char> x1{type<int>, 1};
-				sum_type<int,char> y1{type<int>, 5};
+				sum_type<int,NonTrivial> w{type<int>, 12};
+				sum_type<int,NonTrivial> x{type<int>, 10};
+				sum_type<int,NonTrivial> y{type<NonTrivial>, 1};
+				sum_type<int,NonTrivial> z{type<int>, 10};
 
-				x1 = 5;
-				y1 = 'a';
+				return w != x && x != y && x == z && w != y;
+			})
+		),
+		std::make_tuple(
+			std::string("Copy assign [trivial]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
 
-				// Copy assign non-trivial sum types
-				sum_type<std::shared_ptr<int>,NonTrivial> x2{type<NonTrivial>, 1};
-				sum_type<std::shared_ptr<int>,NonTrivial> y2{type<NonTrivial>, 10};
+				sum_type<int,char> x{type<int>, 1};
+				sum_type<int,char> y{type<int>, 5};
+				sum_type<int,char> z{type<char>, 'a'};
 
-				x2 = NonTrivial{10};
-				y2 = std::shared_ptr<int>(new int(15));
+				x = y;
+				y = z;
 
-				return x1.unsafe_get<int>() == 5
-					&& y1.unsafe_get<char>() == 'a'
-					&& x2.unsafe_get<NonTrivial>() == NonTrivial(10)
-					&& *y2.unsafe_get<std::shared_ptr<int>>() == 15;
+				return x.unsafe_get<int>() == 5
+					&& y.unsafe_get<char>() == 'a';
+			})
+		),
+		std::make_tuple(
+			std::string("Copy assign [trivial destructor]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,TrivialDestructor> x{type<TrivialDestructor>};
+				sum_type<int,TrivialDestructor> y{type<int>, 5};
+				sum_type<int,TrivialDestructor> z{type<int>, 15};
+
+				x = y;
+				y = z;
+
+				return x.unsafe_get<int>() == 5
+					&& y.unsafe_get<int>() == 15;
+			})
+		),
+		std::make_tuple(
+			std::string("Copy assign [complex]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,NonTrivial> x{type<NonTrivial>};
+				sum_type<int,NonTrivial> y{type<int>, 5};
+				sum_type<int,NonTrivial> z{type<int>, 15};
+
+				x = y;
+				y = z;
+
+				return x.unsafe_get<int>() == 5
+					&& y.unsafe_get<int>() == 15;
+			})
+		),
+		std::make_tuple(
+			std::string("Copy assign element types [trivial]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,char> x{type<int>, 1};
+				sum_type<int,char> y{type<int>, 5};
+
+				x = 5;
+				y = 'a';
+
+				return x.unsafe_get<int>() == 5
+					&& y.unsafe_get<char>() == 'a';
+			})
+		),
+		std::make_tuple(
+			std::string("Copy assign element types [trivial destructor]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,TrivialDestructor> x{type<int>, 1};
+				sum_type<int,TrivialDestructor> y{type<int>, 5};
+
+				auto var = TrivialDestructor();
+
+				x = 5;
+				y = var;
+
+				return x.unsafe_get<int>() == 5
+					&& y.is<TrivialDestructor>();
+			})
+		),
+		std::make_tuple(
+			std::string("Copy assign element types [complex]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<std::shared_ptr<int>,NonTrivial> x{type<NonTrivial>, 1};
+				sum_type<std::shared_ptr<int>,NonTrivial> y{type<NonTrivial>, 10};
+
+				x = NonTrivial{10};
+				y = std::shared_ptr<int>(new int(15));
+
+				return x.unsafe_get<NonTrivial>() == NonTrivial(10)
+					&& *y.unsafe_get<std::shared_ptr<int>>() == 15;
 			})
 		),
 		std::make_tuple(
@@ -253,32 +379,55 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("Move assign"),
+			std::string("Move assign [trivial]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
+
+				sum_type<int,char> w{type<int>, 1};
+				sum_type<int,char> x{type<int>, 1};
+				sum_type<int,char> y{type<int>, 5};
+				sum_type<int,char> z{type<char>, 'a'};
+
+				x = std::move(y);
+				w = std::move(z);
+
+				return x.unsafe_get<int>() == 5
+					&& w.unsafe_get<char>() == 'a';
+			})
+		),
+		std::make_tuple(
+			std::string("Move assign [trivial destructor]"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
 				// Move assign trivial sum types
-				sum_type<int,char> w1{type<int>, 1};
-				sum_type<int,char> x1{type<int>, 1};
-				sum_type<int,char> y1{type<int>, 5};
-				sum_type<int,char> z1{type<char>, 'a'};
+				sum_type<int,TrivialDestructor> w{type<int>, 1};
+				sum_type<int,TrivialDestructor> x{type<int>, 1};
+				sum_type<int,TrivialDestructor> y{type<int>, 5};
+				sum_type<int,TrivialDestructor> z{type<TrivialDestructor>};
 
-				x1 = std::move(y1);
-				w1 = std::move(z1);
+				x = std::move(y);
+				w = std::move(z);
 
-				// Move assign non-trivial sum types
-				sum_type<int,NonTrivial> w2{type<NonTrivial>, 1};
-				sum_type<int,NonTrivial> x2{type<NonTrivial>, 1};
-				sum_type<int,NonTrivial> y2{type<NonTrivial>, 10};
-				sum_type<int,NonTrivial> z2{type<int>, 15};
+				return x.unsafe_get<int>() == 5
+					&& w.is<TrivialDestructor>();
+			})
+		),
+		std::make_tuple(
+			std::string("Move assign [complex]"),
+			std::function<bool()>([]() -> bool {
+				using namespace ftl;
 
-				x2 = std::move(y2);
-				w2 = std::move(z2);
+				sum_type<int,NonTrivial> w{type<NonTrivial>, 1};
+				sum_type<int,NonTrivial> x{type<NonTrivial>, 1};
+				sum_type<int,NonTrivial> y{type<NonTrivial>, 10};
+				sum_type<int,NonTrivial> z{type<int>, 15};
 
-				return x1.unsafe_get<int>() == 5
-					&& w1.unsafe_get<char>() == 'a'
-					&& x2.unsafe_get<NonTrivial>() == NonTrivial(10)
-					&& w2.unsafe_get<int>() == 15;
+				x = std::move(y);
+				w = std::move(z);
+
+				return x.unsafe_get<NonTrivial>() == NonTrivial(10)
+					&& w.unsafe_get<int>() == 15;
 			})
 		),
 		std::make_tuple(
@@ -296,7 +445,7 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("Match expressions (trivial types)"),
+			std::string("Match expressions [trivial]"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 

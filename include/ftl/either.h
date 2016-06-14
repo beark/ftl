@@ -119,7 +119,10 @@ namespace ftl {
 	 * \ingroup either
 	 */
 	template<typename L, typename R>
-	using either = sum_type<Left<L>,Right<R>>;
+	class either : public sum_type<Left<L>,Right<R>>
+	{
+		using sum_type<Left<L>,Right<R>>::sum_type;
+	};
 
 	template<typename L, typename R>
 	struct parametric_type_traits<either<L,R>> {
