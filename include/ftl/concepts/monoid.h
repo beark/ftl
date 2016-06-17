@@ -177,10 +177,10 @@ namespace ftl {
 	template<
 			typename M1,
 			typename M2,
-			typename M = plain_type<M1>,
+			typename M = ::std::decay_t<M1>,
 			typename = Requires<
 				Monoid<M>{}
-				&& std::is_same<M,plain_type<M2>>::value
+				&& std::is_same<M,::std::decay_t<M2>>::value
 			>
 	>
 	M operator^ (M1&& m1, M2&& m2) {
@@ -193,10 +193,10 @@ namespace ftl {
 		template<
 				typename M1,
 				typename M2,
-				typename M = plain_type<M1>,
+				typename M = ::std::decay_t<M1>,
 				typename = Requires<
 					Monoid<M>{}
-					&& std::is_same<M,plain_type<M2>>::value
+					&& std::is_same<M,::std::decay_t<M2>>::value
 				>
 		>
 		M operator() (M1&& m1, M2&& m2) const

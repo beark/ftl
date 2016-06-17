@@ -100,7 +100,7 @@ namespace ftl
 					: type_layout::complex);
 		}
 
-		template<type_layout, typename...Ts>
+		template<type_layout, class...Ts>
 		struct recursive_union_;
 
 		template<>

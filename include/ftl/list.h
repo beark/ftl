@@ -310,8 +310,8 @@ namespace ftl {
 	 * \ingroup list
 	 */
 	template<
-			typename F, typename T = Value_type<plain_type<F>>,
-			typename = Requires<Foldable<plain_type<F>>{}>
+			typename F, typename T = Value_type<::std::decay_t<F>>,
+			typename = Requires<Foldable<::std::decay_t<F>>{}>
 	>
 	std::list<T> to_list(F&& f) {
 		return foldr(

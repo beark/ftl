@@ -149,7 +149,7 @@ namespace ftl {
 		 */
 		template<
 				typename Ff,
-				typename Fn = Value_type<plain_type<Ff>>,
+				typename Fn = Value_type<::std::decay_t<Ff>>,
 				typename U = result_of<Fn(T)>>
 		static F<U> apply(Ff&& fn, const F<T>& f) {
 			return monad<F_>::apply(std::forward<Ff>(fn), f);
@@ -158,7 +158,7 @@ namespace ftl {
 		/// \overload
 		template<
 				typename Ff,
-				typename Fn = Value_type<plain_type<Ff>>,
+				typename Fn = Value_type<::std::decay_t<Ff>>,
 				typename U = result_of<Fn(T)>>
 		static F<U> apply(Ff&& fn, F<T>&& f) {
 			return monad<F_>::apply(std::forward<Ff>(fn), std::move(f));
@@ -251,10 +251,10 @@ namespace ftl {
 	template<
 			typename F,
 			typename Fn,
-			typename F_ = plain_type<F>,
+			typename F_ = ::std::decay_t<F>,
 			typename = Requires<
 				Applicative<F_>::value,
-				is_same_template<plain_type<Fn>,F_>::value
+				is_same_template<::std::decay_t<Fn>,F_>::value
 			>
 	>
 	auto operator* (Fn&& u, F&& v)
@@ -307,7 +307,7 @@ namespace ftl {
 
 #ifndef DOCUMENTATION_GENERATOR
 	constexpr struct _aapply : public _dtl::curried_binf<_aapply> {
-		template<typename Fn, typename F, typename F_ = plain_type<F>>
+		template<typename Fn, typename F, typename F_ = ::std::decay_t<F>>
 		auto operator() (Fn&& u, F&& v) const
 		-> decltype(applicative<F_>::apply(
 				std::forward<Fn>(u), std::forward<F>(v))) {
@@ -422,10 +422,10 @@ namespace ftl {
 	template<
 			typename F1,
 			typename F2,
-			typename F = plain_type<F1>,
+			typename F = ::std::decay_t<F1>,
 			typename = Requires<
 				MonoidAlt<F>()
-				&& std::is_same<F,plain_type<F2>>::value
+				&& std::is_same<F,::std::decay_t<F2>>::value
 			>
 	>
 	F operator| (F1&& f1, F2&& f2) {

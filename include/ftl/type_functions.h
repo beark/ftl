@@ -131,16 +131,13 @@ namespace ftl {
 	 * - <cstddef>
 	 */
 
-	template<class T>
-	using plain_type = ::std::remove_cv_t<::std::remove_reference_t<T>>;
-
 	namespace dtl_ {
 		template<typename>
 		struct decayed_result;
 
 		template<typename F, typename...Ps>
 		struct decayed_result<F(Ps...)> {
-			using type = plain_type<typename std::result_of<F(Ps...)>::type>;
+			using type = ::std::decay_t<typename std::result_of<F(Ps...)>::type>;
 		};
 	}
 

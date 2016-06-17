@@ -52,13 +52,13 @@ template<typename T>
 using maybe = ftl::sum_type<Just<T>,Nothing>;
 
 template<typename T>
-maybe<ftl::plain_type<T>> just(T&& t)
+maybe<std::decay_t<T>> just(T&& t)
 {
-	using ftl::plain_type;
+	using std::decay_t;
 
-	return maybe<plain_type<T>>
+	return maybe<decay_t<T>>
 	{
-		ftl::type<Just<plain_type<T>>>, std::forward<T>(t)
+		ftl::type<Just<decay_t<T>>>, std::forward<T>(t)
 	};
 }
 
@@ -372,7 +372,7 @@ test_set sum_type_tests{
 				x =
 					y.match(
 						[](int val) { return val; },
-						[](otherwise) { return 0; }
+						[](match_all) { return 0; }
 					);
 
 				return x.unsafe_get<int>() == 5;
@@ -512,7 +512,7 @@ test_set sum_type_tests{
 			})
 		),
 		std::make_tuple(
-			std::string("Match with otherwise (trivial types)"),
+			std::string("Match with match_all (trivial types)"),
 			std::function<bool()>([]() -> bool {
 				using namespace ftl;
 
@@ -526,17 +526,17 @@ test_set sum_type_tests{
 
 				auto s1 = x.match(
 					[](A){ return 0; },
-					[](otherwise){ return 1; }
+					[](match_all){ return 1; }
 				);
 
 				auto s2 = y.match(
 					[](const A&){ return 0; },
-					[](otherwise){ return 1; }
+					[](match_all){ return 1; }
 				);
 
 				auto s3 = z.match(
 					[](A){ return 0; },
-					[](otherwise){ return 1; }
+					[](match_all){ return 1; }
 				);
 
 				return s1 == 0 && s2 == 1 && s3 == 1;

@@ -341,15 +341,16 @@ namespace ftl {
 	 */
 	template<
 			typename F,
-			typename = Requires<!is_monomorphic<plain_type<F>>::value>
+			typename = Requires<!is_monomorphic<::std::decay_t<F>>::value>
 	>
 #ifndef DOCUMENTATION_GENERATOR
-	_dtl::curried_fn<plain_type<F>>
+	_dtl::curried_fn<::std::decay_t<F>>
 #else
 	ImplementationDefined
 #endif
-	curry(F&& f) {
-		return _dtl::curried_fn<plain_type<F>>(std::forward<F>(f));
+	curry(F&& f)
+	{
+		return _dtl::curried_fn<::std::decay_t<F>>(std::forward<F>(f));
 	}
 
 	/**
@@ -373,7 +374,7 @@ namespace ftl {
 	 */
 	template<size_t N, typename F>
 #ifndef DOCUMENTATION_GENERATOR
-	_dtl::curried_fn_n<N,plain_type<F>>
+	_dtl::curried_fn_n<N,::std::decay_t<F>>
 #else
 	ImplementationDefined
 #endif
@@ -510,7 +511,7 @@ namespace ftl {
 			has_post_inc<decltype(begin(std::declval<T>()))>::value &&
 			std::is_same<
 				Value_type<T>,
-				plain_type<decltype(*begin(std::declval<T>()))>
+				::std::decay_t<decltype(*begin(std::declval<T>()))>
 			>::value;
 	}
 
@@ -523,7 +524,7 @@ namespace ftl {
 			has_post_inc<decltype(std::declval<T>().rbegin())>::value &&
 			std::is_same<
 				Value_type<T>,
-				plain_type<decltype(*std::declval<T>().rbegin())>
+				::std::decay_t<decltype(*std::declval<T>().rbegin())>
 			>::value;
 	}
 

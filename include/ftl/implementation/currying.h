@@ -60,16 +60,16 @@ namespace ftl {
 
 		public:
 			template<typename P>
-			curried<plain_type<P>> operator() (P&& p) const & {
-				return curried<plain_type<P>>(
+			curried<::std::decay_t<P>> operator() (P&& p) const & {
+				return curried<::std::decay_t<P>>(
 						*static_cast<const F*>(this),
 						std::forward<P>(p)
 				);
 			}
 
 			template<typename P>
-			curried<plain_type<P>> operator() (P&& p) && {
-				return curried<plain_type<P>>(
+			curried<::std::decay_t<P>> operator() (P&& p) && {
+				return curried<::std::decay_t<P>>(
 						std::move(*static_cast<F*>(this)),
 						std::forward<P>(p)
 				);
@@ -157,13 +157,13 @@ namespace ftl {
 				}
 
 				template<typename P2>
-				curried<plain_type<P2>> operator() (P2&& p2) const &  {
-					return curried<plain_type<P2>>(f, p, std::forward<P2>(p2));
+				curried<::std::decay_t<P2>> operator() (P2&& p2) const &  {
+					return curried<::std::decay_t<P2>>(f, p, std::forward<P2>(p2));
 				}
 
 				template<typename P2>
-				curried<plain_type<P2>> operator() (P2&& p2) && {
-					return curried<plain_type<P2>>(
+				curried<::std::decay_t<P2>> operator() (P2&& p2) && {
+					return curried<::std::decay_t<P2>>(
 							std::move(f), std::move(p), std::forward<P2>(p2)
 					);
 				}
@@ -242,34 +242,34 @@ namespace ftl {
 
 		public:
 			template<typename P>
-			curried1<plain_type<P>> operator() (P&& p) const & {
-				return curried1<plain_type<P>>(
+			curried1<::std::decay_t<P>> operator() (P&& p) const & {
+				return curried1<::std::decay_t<P>>(
 						*static_cast<const F*>(this),
 						std::forward<P>(p)
 				);
 			}
 
 			template<typename P>
-			curried1<plain_type<P>> operator() (P&& p) && {
-				return curried1<plain_type<P>>(
+			curried1<::std::decay_t<P>> operator() (P&& p) && {
+				return curried1<::std::decay_t<P>>(
 						std::move(*static_cast<F*>(this)),
 						std::forward<P>(p)
 				);
 			}
 
 			template<typename P1, typename P2>
-			curried2<plain_type<P1>,plain_type<P2>>
+			curried2<::std::decay_t<P1>,::std::decay_t<P2>>
 			operator() (P1&& p1, P2&& p2) const & {
-				return curried2<plain_type<P1>,plain_type<P2>>(
+				return curried2<::std::decay_t<P1>,::std::decay_t<P2>>(
 					*static_cast<const F*>(this),
 					std::forward<P1>(p1), std::forward<P2>(p2)
 				);
 			}
 
 			template<typename P1, typename P2>
-			curried2<plain_type<P1>,plain_type<P2>>
+			curried2<::std::decay_t<P1>,::std::decay_t<P2>>
 			operator() (P1&& p1, P2&& p2) && {
-				return curried2<plain_type<P1>,plain_type<P2>>(
+				return curried2<::std::decay_t<P1>,::std::decay_t<P2>>(
 					std::move(*static_cast<F*>(this)),
 					std::forward<P1>(p1), std::forward<P2>(p2)
 				);
@@ -361,8 +361,8 @@ namespace ftl {
 					>::type
 			>
 			auto operator() (Args&&...args) const
-			-> curried_fn<F,plain_type<Args>...> {
-				return curried_fn<F,plain_type<Args>...>(
+			-> curried_fn<F,::std::decay_t<Args>...> {
+				return curried_fn<F,::std::decay_t<Args>...>(
 					f,
 					std::make_tuple(std::forward<Args>(args)...)
 				);

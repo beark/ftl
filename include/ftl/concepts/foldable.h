@@ -505,10 +505,10 @@ namespace ftl {
 				typename T = Value_type<F>,
 				typename = Requires<Foldable<F>{}>,
 				typename = Requires<
-					std::is_same<plain_type<U>, result_of<Fn(T,U)>>::value
+					std::is_same<::std::decay_t<U>, result_of<Fn(T,U)>>::value
 				>
 		>
-		plain_type<U> operator() (Fn&& fn, U&& z, const F& f) const {
+		::std::decay_t<U> operator() (Fn&& fn, U&& z, const F& f) const {
 			return foldable<F>::foldr(std::forward<Fn>(fn), std::forward<U>(z), f);
 		}
 
@@ -557,10 +557,10 @@ namespace ftl {
 				typename T = Value_type<F>,
 				typename = Requires<Foldable<F>{}>,
 				typename = Requires<
-					std::is_same<plain_type<U>, result_of<Fn(U,T)>>::value
+					std::is_same<::std::decay_t<U>, result_of<Fn(U,T)>>::value
 				>
 		>
-		plain_type<U> operator() (Fn&& fn, U&& z, const F& f) const {
+		::std::decay_t<U> operator() (Fn&& fn, U&& z, const F& f) const {
 			return foldable<F>::foldl(std::forward<Fn>(fn), std::forward<U>(z), f);
 		}
 

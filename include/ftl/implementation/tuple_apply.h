@@ -45,13 +45,13 @@ namespace ftl {
 		constexpr auto tup_apply(F&& f, Tuple&& tuple)
 		-> decltype(
 				tup_apply_helper(
-					::std::make_index_sequence<std::tuple_size<plain_type<Tuple>>::value>{},
+					::std::make_index_sequence<std::tuple_size<::std::decay_t<Tuple>>::value>{},
 					std::forward<F>(f),
 					std::forward<Tuple>(tuple)
 				)
 		) {
 			return tup_apply_helper(
-				::std::make_index_sequence<std::tuple_size<plain_type<Tuple>>::value>{},
+				::std::make_index_sequence<std::tuple_size<::std::decay_t<Tuple>>::value>{},
 				std::forward<F>(f),
 				std::forward<Tuple>(tuple)
 			);

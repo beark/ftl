@@ -168,7 +168,7 @@ namespace ftl {
 				{
 					val->emplace(type<Right<T>>, (*lf)());
 				},
-				[](otherwise){}
+				[](match_all){}
 			);
 		}
 

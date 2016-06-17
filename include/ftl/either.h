@@ -229,7 +229,7 @@ namespace ftl {
 	 *
 	 * \ingroup either
 	 */
-	template<typename R, typename L, typename L0 = plain_type<L>>
+	template<typename R, typename L, typename L0 = ::std::decay_t<L>>
 	constexpr either<L0,R> make_left(L&& l)
 	noexcept(std::is_nothrow_constructible<L0,L>::value) {
 		return either<L0,R>{type<Left<L0>>, std::forward<L>(l)};
@@ -255,7 +255,7 @@ namespace ftl {
 	 *
 	 * \ingroup either
 	 */
-	template<typename L, typename R, typename R0 = plain_type<R>>
+	template<typename L, typename R, typename R0 = ::std::decay_t<R>>
 	constexpr either<L,R0> make_right(R&& r)
 	noexcept(std::is_nothrow_constructible<R0,R>::value) {
 		return either<L,R0>{type<Right<R0>>, std::forward<R>(r)};

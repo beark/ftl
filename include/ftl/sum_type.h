@@ -58,20 +58,20 @@ namespace ftl {
 	 *   sum_type<A,B,C> x = ...;
 	 *   x.match(
 	 *       [](A a){ return f(a); },
-	 *       [](otherwise){ return g(); }
+	 *       [](match_all){ return g(); }
 	 *   );
 	 * \endcode
 	 *
 	 * \note If present, this match clause should always be the final one. If
-	 *       there are additional match clauses after `otherwise`, they will
+	 *       there are additional match clauses after `match_all`, they will
 	 *       never be called.
 	 *
 	 * \ingroup sum_type
 	 */
-	struct otherwise
+	struct match_all
 	{
 		template<class T>
-		constexpr otherwise(T&&) noexcept {}
+		constexpr match_all(T&&) noexcept {}
 	};
 
 	namespace dtl_
@@ -93,16 +93,20 @@ namespace ftl {
 				&& is_type_set<U,Ts...>::value;
 		};
 
-		template<class T, class U>
+		// We have a match if the decayed function argument type matches
+		template<class T, class FnArg>
 		struct is_match
-			: ::std::is_same<::ftl::plain_type<T>, ::ftl::plain_type<U>> {};
+			: ::std::is_same<T, ::std::decay_t<FnArg>> {};
 
+		// Or if the actual types are
 		template<class T>
 		struct is_match<T,T> : ::std::true_type {};
 
+		// Or if we're matching against match_all
 		template<class T>
-		struct is_match<T,::ftl::otherwise> : ::std::true_type {};
+		struct is_match<T,::ftl::match_all> : ::std::true_type {};
 
+		// Otherwise, there's no match
 		template<class, class>
 		struct is_match_exhaustive : ::std::false_type {};
 
@@ -142,7 +146,7 @@ namespace ftl {
 		struct match_cases_are_in_type<type_seq<F,Fs...>,Ts...>
 		{
 			static constexpr bool value =
-				type_is_in_v<plain_type<argument_type<F,0>>,Ts...>
+				type_is_in_v<::std::decay_t<argument_type<F,0>>,Ts...>
 				&& match_cases_are_in_type<type_seq<Fs...>,Ts...>::value;
 		};
 
@@ -156,26 +160,23 @@ namespace ftl {
 		struct match_selector<Layout>
 		{
 			template<
-				class T, class F, class...Fs,
-				class = typename ::std::enable_if<
-					is_match<::ftl::plain_type<T>,argument_type<F,0>>::value
-				>::type
+				class T, class U, class F, class...Fs,
+				class = ::std::enable_if_t<is_match<T,argument_type<F,0>>::value>
 			>
-			static constexpr auto invoke(T&& t, F&& f, Fs&&...)
+			static constexpr auto invoke(type_t<T>, U&& val, F&& f, Fs&&...)
 			{
-				return ::std::forward<F>(f)(::std::forward<T>(t));
+				return ::std::forward<F>(f)(::std::forward<U>(val));
 			}
 
 			template<
-				class F, class T, class...Fs,
-				class = typename ::std::enable_if<
-					!is_match<::ftl::plain_type<T>,argument_type<F,0>>::value
-				>::type
+				class F, class T, class U, class...Fs,
+				class = ::std::enable_if_t<!is_match<T,argument_type<F,0>>::value>
 			>
-			static constexpr auto invoke(T&& t, F&&, Fs&&...fs)
+			static constexpr auto invoke(type_t<T>, U&& val, F&&, Fs&&...fs)
 			{
 				return match_selector::invoke(
-					::std::forward<T>(t),
+					type<T>,
+					::std::forward<U>(val),
 					::std::forward<Fs>(fs)...);
 			}
 		};
@@ -187,7 +188,7 @@ namespace ftl {
 			invoke(const recursive_union_<Layout,T,Ts...>& s, size_t i, Fs&&...fs)
 			{
 				return i == I
-					? match_selector<Layout>::invoke(s.val, ::std::forward<Fs>(fs)...)
+					? match_selector<Layout>::invoke(type<T>, s.val, ::std::forward<Fs>(fs)...)
 					: match_selector<Layout,::std::index_sequence<J,Is...>,Ts...>::invoke(
 							s.rem, i, std::forward<Fs>(fs)...
 						);
@@ -197,7 +198,7 @@ namespace ftl {
 			invoke(recursive_union_<Layout,T,Ts...>& s, size_t i, Fs&&...fs)
 			{
 				return i == I
-					? match_selector<Layout>::invoke(s.val, ::std::forward<Fs>(fs)...)
+					? match_selector<Layout>::invoke(type<T>, s.val, ::std::forward<Fs>(fs)...)
 					: match_selector<Layout,::std::index_sequence<J,Is...>,Ts...>::invoke(
 							s.rem, i, std::forward<Fs>(fs)...
 						);
@@ -208,7 +209,7 @@ namespace ftl {
 			{
 				return i == I
 					? match_selector<Layout>::invoke(
-							::std::move(s.val), ::std::forward<Fs>(fs)...
+							type<T>, ::std::move(s.val), ::std::forward<Fs>(fs)...
 						)
 					: match_selector<Layout,::std::index_sequence<J,Is...>,Ts...>::invoke(
 							::std::move(s.rem), i, std::forward<Fs>(fs)...
@@ -225,7 +226,7 @@ namespace ftl {
 				assert(i == I);
 
 				return match_selector<Layout>::invoke(
-					s.val, ::std::forward<Fs>(fs)...
+					type<T>, s.val, ::std::forward<Fs>(fs)...
 				);
 			}
 
@@ -235,7 +236,7 @@ namespace ftl {
 				assert(i == I);
 
 				return match_selector<Layout>::invoke(
-					s.val, ::std::forward<Fs>(fs)...
+					type<T>, s.val, ::std::forward<Fs>(fs)...
 				);
 			}
 
@@ -245,7 +246,7 @@ namespace ftl {
 				assert(i == I);
 
 				return match_selector<Layout>::invoke(
-					::std::move(s.val), ::std::forward<Fs>(fs)...
+					type<T>, ::std::move(s.val), ::std::forward<Fs>(fs)...
 				);
 			}
 		};
@@ -264,10 +265,16 @@ namespace ftl {
 			sum_type_(const sum_type_&) = default;
 			sum_type_(sum_type_&&) = default;
 
-			template<typename T, typename...Args>
-			explicit constexpr sum_type_(type_t<T> s, Args&&...args)
+			template<class T, class...Args>
+			constexpr sum_type_(type_t<T> s, Args&&...args)
 			noexcept(::std::is_nothrow_constructible<T,Args...>::value)
 				: data(s, std::forward<Args>(args)...), cons(index_of_v<T,Ts...>)
+			{}
+
+			template<class T, class U, class...Args>
+			constexpr sum_type_(type_t<T> s, ::std::initializer_list<U> init_list, Args&&...args)
+			noexcept(::std::is_nothrow_constructible<T,::std::initializer_list<U>,Args...>::value)
+				: data(s, init_list, std::forward<Args>(args)...), cons(index_of_v<T,Ts...>)
 			{}
 
 			~sum_type_() = default;
@@ -278,25 +285,37 @@ namespace ftl {
 			{
 				// Since we know we're dealing with trivial types, we can just
 				// replace the storage, no need to destruct
-				data = recursive_union_<type_layout::trivially_copyable, Ts...>(s, std::forward<Args>(args)...);
+				new (&data) recursive_union_<type_layout::trivially_copyable, Ts...>(s, std::forward<Args>(args)...);
 				cons = index_of_v<T,Ts...>;
 			}
 
 			template<class T>
-			constexpr const T& unsafe_get() const &
+			constexpr auto unsafe_get() const &
+			-> ::std::enable_if_t<type_is_in_v<T,Ts...>, const T&>
 			{
+				if (cons != index_of_v<T,Ts...>)
+					throw invalid_sum_type_access();
+
 				return data.get(type<T>);
 			}
 
 			template<class T>
-			constexpr T& unsafe_get() &
+			constexpr auto unsafe_get() &
+			-> ::std::enable_if_t<type_is_in_v<T,Ts...>,T&>
 			{
+				if (cons != index_of_v<T,Ts...>)
+					throw invalid_sum_type_access();
+
 				return data.get(type<T>);
 			}
 
 			template<class T>
-			T&& unsafe_get() &&
+			constexpr auto unsafe_get() &&
+			-> ::std::enable_if_t<type_is_in_v<T,Ts...>,T&&>
 			{
+				if (cons != index_of_v<T,Ts...>)
+					throw invalid_sum_type_access();
+
 				return ::std::move(data).get(type<T>);
 			}
 
@@ -310,7 +329,7 @@ namespace ftl {
 
 				static_assert(
 					::ftl::dtl_::match_cases_are_in_type<
-						type_seq<MatchArms...>,otherwise,Ts...>::value,
+						type_seq<MatchArms...>,match_all,Ts...>::value,
 					"Trying to match with a type that is not in the sum");
 
 				return ::ftl::dtl_
@@ -329,7 +348,7 @@ namespace ftl {
 
 				static_assert(
 					::ftl::dtl_::match_cases_are_in_type<
-						type_seq<MatchArms...>,otherwise,Ts...>::value,
+						type_seq<MatchArms...>,match_all,Ts...>::value,
 					"Trying to match with a type that is not in the sum");
 
 				return ::ftl::dtl_
@@ -348,7 +367,7 @@ namespace ftl {
 
 				static_assert(
 					::ftl::dtl_::match_cases_are_in_type<
-						type_seq<MatchArms...>,otherwise,Ts...>::value,
+						type_seq<MatchArms...>,match_all,Ts...>::value,
 					"Trying to match with a type that is not in the sum");
 
 				return ::ftl::dtl_
@@ -357,10 +376,10 @@ namespace ftl {
 					);
 			}
 
-			template<class T, class = ::std::enable_if_t<type_is_in_v<plain_type<T>,Ts...>>>
-			const sum_type_& operator= (T&& t) noexcept
+			template<class T, class = ::std::enable_if_t<type_is_in_v<::std::decay_t<T>,Ts...>>>
+			sum_type_& operator= (T&& t) noexcept
 			{
-				emplace(type<plain_type<T>>, ::std::forward<T>(t));
+				emplace(type<::std::decay_t<T>>, ::std::forward<T>(t));
 
 				return *this;
 			}
@@ -370,6 +389,10 @@ namespace ftl {
 
 			constexpr void swap(sum_type_& other) noexcept
 			{
+				auto tempCons = other.cons;
+				other.cons = cons;
+				cons = tempCons;
+
 				auto temp = ::std::move(other.data);
 				other.data = ::std::move(data);
 				data = ::std::move(temp);
@@ -430,10 +453,10 @@ namespace ftl {
 				: data(s, std::forward<Args>(args)...), cons(index_of_v<T,Ts...>)
 			{}
 
-			template<class T, class U = typename T::value_type>
-			constexpr sum_type_(type_t<T> s, ::std::initializer_list<U> init)
-			noexcept(::std::is_nothrow_constructible<T,::std::initializer_list<U>>::value)
-				: data(s, init), cons(index_of_v<T,Ts...>)
+			template<class T, class U, class...Args>
+			constexpr sum_type_(type_t<T> s, ::std::initializer_list<U> init_list, Args&&...args)
+			noexcept(::std::is_nothrow_constructible<T,::std::initializer_list<U>,Args...>::value)
+				: data(s, init_list, ::std::forward<Args>(args)...), cons(index_of_v<T,Ts...>)
 			{}
 
 			~sum_type_() = default;
@@ -449,20 +472,32 @@ namespace ftl {
 			}
 
 			template<class T>
-			constexpr const T& unsafe_get() const &
+			constexpr auto unsafe_get() const &
+			-> ::std::enable_if_t<type_is_in_v<T,Ts...>, const T&>
 			{
+				if (cons != index_of_v<T,Ts...>)
+					throw invalid_sum_type_access();
+
 				return data.get(type<T>);
 			}
 
 			template<class T>
-			constexpr T& unsafe_get() &
+			constexpr auto unsafe_get() &
+			-> ::std::enable_if_t<type_is_in_v<T,Ts...>,T&>
 			{
+				if (cons != index_of_v<T,Ts...>)
+					throw invalid_sum_type_access();
+
 				return data.get(type<T>);
 			}
 
 			template<class T>
-			T&& unsafe_get() &&
+			constexpr auto unsafe_get() &&
+			-> ::std::enable_if_t<type_is_in_v<T,Ts...>,T&&>
 			{
+				if (cons != index_of_v<T,Ts...>)
+					throw invalid_sum_type_access();
+
 				return ::std::move(data).get(type<T>);
 			}
 
@@ -476,7 +511,7 @@ namespace ftl {
 
 				static_assert(
 					::ftl::dtl_::match_cases_are_in_type<
-						type_seq<MatchArms...>,otherwise,Ts...>::value,
+						type_seq<MatchArms...>,match_all,Ts...>::value,
 					"Trying to match with a type that is not in the sum");
 
 				return ::ftl::dtl_
@@ -495,7 +530,7 @@ namespace ftl {
 
 				static_assert(
 					::ftl::dtl_::match_cases_are_in_type<
-						type_seq<MatchArms...>,otherwise,Ts...>::value,
+						type_seq<MatchArms...>,match_all,Ts...>::value,
 					"Trying to match with a type that is not in the sum");
 
 				return ::ftl::dtl_
@@ -514,7 +549,7 @@ namespace ftl {
 
 				static_assert(
 					::ftl::dtl_::match_cases_are_in_type<
-						type_seq<MatchArms...>,otherwise,Ts...>::value,
+						type_seq<MatchArms...>,match_all,Ts...>::value,
 					"Trying to match with a type that is not in the sum");
 
 				return ::ftl::dtl_
@@ -568,7 +603,7 @@ namespace ftl {
 			}
 
 			template<
-				class T, class U = ::ftl::plain_type<T>,
+				class T, class U = ::std::decay_t<T>,
 				class = std::enable_if_t<type_is_in_v<U,Ts...>>>
 			const sum_type_& operator= (T&& t) noexcept
 			{
@@ -641,10 +676,10 @@ namespace ftl {
 				: data(s, std::forward<Args>(args)...), cons(index_of_v<T,Ts...>)
 			{}
 
-			template<class T, class U = typename T::value_type>
-			constexpr sum_type_(type_t<T> s, ::std::initializer_list<U> init)
-			noexcept(::std::is_nothrow_constructible<T,::std::initializer_list<U>>::value)
-				: data(s, init), cons(index_of_v<T,Ts...>)
+			template<class T, class U, class...Args>
+			constexpr sum_type_(type_t<T> s, ::std::initializer_list<U> init_list, Args&&...args)
+			noexcept(::std::is_nothrow_constructible<T,::std::initializer_list<U>,Args...>::value)
+				: data(s, init_list, ::std::forward<Args>(args)...), cons(index_of_v<T,Ts...>)
 			{}
 
 			~sum_type_()
@@ -664,20 +699,32 @@ namespace ftl {
 			}
 
 			template<class T>
-			constexpr const T& unsafe_get() const &
+			constexpr auto unsafe_get() const &
+			-> ::std::enable_if_t<type_is_in_v<T,Ts...>, const T&>
 			{
+				if (cons != index_of_v<T,Ts...>)
+					throw invalid_sum_type_access();
+
 				return data.get(type<T>);
 			}
 
 			template<class T>
-			constexpr T& unsafe_get() &
+			constexpr auto unsafe_get() &
+			-> ::std::enable_if_t<type_is_in_v<T,Ts...>, T&>
 			{
+				if (cons != index_of_v<T,Ts...>)
+					throw invalid_sum_type_access();
+
 				return data.get(type<T>);
 			}
 
 			template<class T>
-			T&& unsafe_get() &&
+			constexpr auto unsafe_get() &&
+			-> ::std::enable_if_t<type_is_in_v<T,Ts...>, T&&>
 			{
+				if (cons != index_of_v<T,Ts...>)
+					throw invalid_sum_type_access();
+
 				return ::std::move(data).get(type<T>);
 			}
 
@@ -691,7 +738,7 @@ namespace ftl {
 
 				static_assert(
 					::ftl::dtl_::match_cases_are_in_type<
-						type_seq<MatchArms...>,otherwise,Ts...>::value,
+						type_seq<MatchArms...>,match_all,Ts...>::value,
 					"Trying to match with a type that is not in the sum");
 
 				return ::ftl::dtl_
@@ -710,7 +757,7 @@ namespace ftl {
 
 				static_assert(
 					::ftl::dtl_::match_cases_are_in_type<
-						type_seq<MatchArms...>,otherwise,Ts...>::value,
+						type_seq<MatchArms...>,match_all,Ts...>::value,
 					"Trying to match with a type that is not in the sum");
 
 				return ::ftl::dtl_
@@ -729,7 +776,7 @@ namespace ftl {
 
 				static_assert(
 					::ftl::dtl_::match_cases_are_in_type<
-						type_seq<MatchArms...>,otherwise,Ts...>::value,
+						type_seq<MatchArms...>,match_all,Ts...>::value,
 					"Trying to match with a type that is not in the sum");
 
 				return ::ftl::dtl_
@@ -797,7 +844,7 @@ namespace ftl {
 			}
 
 			template<
-				class T, class U = ::ftl::plain_type<T>,
+				class T, class U = ::std::decay_t<T>,
 				class = std::enable_if_t<type_is_in_v<U,Ts...>>>
 			const sum_type_& operator= (T&& t) noexcept
 			{
@@ -889,7 +936,7 @@ namespace ftl {
 	 * This can be either by value, reference, or const reference.
 	 *
 	 * One exception is that `match` also allows a visitor with an argument of
-	 * type `otherwise`. This function will act as a catch-all for any types that
+	 * type `match_all`. This function will act as a catch-all for any types that
 	 * have not been matched earlier in the list.
 	 *
 	 * `match` is a `constexpr` operation if all the given matching functions are.

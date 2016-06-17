@@ -629,7 +629,7 @@ namespace ftl {
 
 		template<
 				typename Mf,
-				typename Mf_ = plain_type<Mf>,
+				typename Mf_ = ::std::decay_t<Mf>,
 				typename F = Value_type<Mf_>,
 				typename U = result_of<F(T)>
 		>
@@ -729,7 +729,7 @@ namespace ftl {
 	template<
 			typename M,
 			typename F,
-			typename M_ = plain_type<M>,
+			typename M_ = ::std::decay_t<M>,
 			typename = Requires<
 				Monad<M_>{}
 #ifndef DOCUMENTATION_GENERATOR
@@ -745,7 +745,7 @@ namespace ftl {
 	template<
 			typename M,
 			typename Mu,
-			typename M_ = plain_type<M>,
+			typename M_ = ::std::decay_t<M>,
 			typename = Requires<
 				std::is_same<Rebind<Mu,Value_type<M_>>,M_>::value
 			>,
@@ -760,7 +760,7 @@ namespace ftl {
 			typename M,
 			typename Mu,
 			typename F,
-			typename M_ = plain_type<M>,
+			typename M_ = ::std::decay_t<M>,
 			typename = Requires<
 				std::is_same<Rebind<Mu,Value_type<M_>>,M_>::value
 			>,
@@ -796,7 +796,7 @@ namespace ftl {
 	template<
 			typename M,
 			typename F,
-			typename M_ = plain_type<M>,
+			typename M_ = ::std::decay_t<M>,
 			typename = Requires<Monad<M_>{}>
 	>
 	auto operator<<= (F&& f, M&& m)
@@ -845,8 +845,8 @@ namespace ftl {
 	template<
 			typename Mt,
 			typename Mu,
-			typename Mt_ = plain_type<Mt>,
-			typename Mu_ = plain_type<Mu>,
+			typename Mt_ = ::std::decay_t<Mt>,
+			typename Mu_ = ::std::decay_t<Mu>,
 			typename T = Value_type<Mt_>,
 			typename = Requires<Monad<Mt_>{}>,
 			typename = Requires<
@@ -966,13 +966,13 @@ namespace ftl {
 	constexpr struct _mjoin {
 		template<
 				typename M,
-				typename = Requires<Monad<plain_type<M>>{}>
+				typename = Requires<Monad<::std::decay_t<M>>{}>
 		>
 		auto operator() (M&& m) const
 		-> decltype(
-			monad<Value_type<plain_type<M>>>::join(std::forward<M>(m))
+			monad<Value_type<::std::decay_t<M>>>::join(std::forward<M>(m))
 		) {
-			return monad<Value_type<plain_type<M>>>::join(
+			return monad<Value_type<::std::decay_t<M>>>::join(
 				std::forward<M>(m)
 			);
 		}

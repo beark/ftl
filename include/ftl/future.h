@@ -175,7 +175,7 @@ namespace ftl {
 		static std::future<U> bind(std::future<T>&& fa, F&& f) {
 			return std::async(
 				std::launch::deferred,
-				[](std::future<T>&& fa, plain_type<F> f) {
+				[](std::future<T>&& fa, ::std::decay_t<F> f) {
 					return f(fa.get()).get();
 				},
 				std::move(fa),

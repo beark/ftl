@@ -269,7 +269,7 @@ namespace ftl {
 	template<
 		typename F,
 		typename Fn,
-		typename F_ = plain_type<F>,
+		typename F_ = ::std::decay_t<F>,
 		typename = Requires<
 			Functor<F_>()
 #ifndef DOCUMENTATION_GENERATOR
@@ -286,7 +286,7 @@ namespace ftl {
 		typename F,
 		typename R,
 		typename Fn,
-		typename F_ = plain_type<F>,
+		typename F_ = ::std::decay_t<F>,
 		typename = Requires<
 			Functor<F_>()
 			&& !std::is_member_function_pointer<Fn>::value
@@ -301,7 +301,7 @@ namespace ftl {
 		typename F,
 		typename R,
 		typename Fn,
-		typename F_ = plain_type<F>,
+		typename F_ = ::std::decay_t<F>,
 		typename = Requires<
 			Functor<F_>()
 			&& !std::is_member_function_pointer<Fn>::value
@@ -317,7 +317,7 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename F,
-				typename F_ = plain_type<F>,
+				typename F_ = ::std::decay_t<F>,
 				typename = Requires<
 					!std::is_member_function_pointer<Fn>::value
 					&& !std::is_same<
@@ -337,7 +337,7 @@ namespace ftl {
 		template<
 				typename Fn,
 				typename F,
-				typename F_ = plain_type<F>,
+				typename F_ = ::std::decay_t<F>,
 				typename = Requires<
 					!std::is_member_function_pointer<Fn>::value
 					&& std::is_same<
@@ -356,7 +356,7 @@ namespace ftl {
 				typename R,
 				typename Fn,
 				typename F,
-				typename F_ = plain_type<F>,
+				typename F_ = ::std::decay_t<F>,
 				typename = Requires<
 					std::is_member_function_pointer<Fn>::value
 				>
@@ -371,7 +371,7 @@ namespace ftl {
 				typename R,
 				typename Fn,
 				typename F,
-				typename F_ = plain_type<F>,
+				typename F_ = ::std::decay_t<F>,
 				typename = Requires<
 					std::is_member_function_pointer<Fn>::value
 				>

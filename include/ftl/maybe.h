@@ -185,7 +185,7 @@ namespace ftl {
 
 #ifndef DOCUMENTATION_GENERATOR
 	constexpr struct just_ {
-		template<typename T, typename T0 = plain_type<T>>
+		template<typename T, typename T0 = ::std::decay_t<T>>
 		constexpr maybe<T0> operator()(T&& t) const
 		noexcept(std::is_nothrow_constructible<T0,T>::value) {
 			return maybe<T0>{type<T0>, std::forward<T>(t)};
@@ -419,8 +419,8 @@ namespace ftl {
 	struct foldable<maybe<T>>
 	: deriving_foldMap<maybe<T>>, deriving_fold<maybe<T>> {
 		template<typename F, typename U>
-		static constexpr plain_type<U> foldl(F&& f, U&& z, const maybe<T>& m)
-		noexcept(noexcept(f(std::declval<plain_type<U>>(), std::declval<T>())))
+		static constexpr ::std::decay_t<U> foldl(F&& f, U&& z, const maybe<T>& m)
+		noexcept(noexcept(f(std::declval<::std::decay_t<U>>(), std::declval<T>())))
 		{
 			static_assert(
 				std::is_convertible<
@@ -435,8 +435,8 @@ namespace ftl {
 		}
 
 		template<typename F, typename U>
-		static constexpr plain_type<U> foldr(F&& f, U&& z, const maybe<T>& m)
-		noexcept(noexcept(f(std::declval<T>(), std::declval<plain_type<U>>())))
+		static constexpr ::std::decay_t<U> foldr(F&& f, U&& z, const maybe<T>& m)
+		noexcept(noexcept(f(std::declval<T>(), std::declval<::std::decay_t<U>>())))
 		{
 			static_assert(
 				std::is_convertible<
