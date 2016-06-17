@@ -76,7 +76,7 @@ test_set list_tests{
 			std::function<bool()>([]() -> bool {
 
 				auto m1 = ftl::just(1);
-				auto m2 = ftl::nothing<int>();
+				ftl::maybe<int> m2 = ftl::nothing;
 
 				auto r1 = ftl::to_list(m1);
 				auto r2 = ftl::to_list(m2);

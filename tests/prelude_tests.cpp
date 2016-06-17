@@ -51,7 +51,7 @@ test_set prelude_tests{
 
 				return m.match(
 					[](int x){ return x == 10; },
-					[](ftl::Nothing){ return false; }
+					[](ftl::nothing_t){ return false; }
 				);
 			})
 		),
@@ -64,7 +64,7 @@ test_set prelude_tests{
 
 				return m.match(
 					[](int x){ return x == 42; },
-					[](ftl::Nothing){ return false; }
+					[](ftl::nothing_t){ return false; }
 				);
 			})
 		),

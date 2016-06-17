@@ -27,7 +27,8 @@
 #include "../sum_type.h"
 
 namespace ftl {
-	struct Nothing;
+	template<class T>
+	struct maybe;
 
 	namespace _dtl {
 
@@ -40,7 +41,7 @@ namespace ftl {
 			maybe_iterator(maybe_iterator&&) = default;
 			~maybe_iterator() = default;
 
-			explicit constexpr maybe_iterator(sum_type<T,Nothing>* m) noexcept
+			explicit constexpr maybe_iterator(maybe<T>* m) noexcept
 			: ref{m && m->template is<T>() ? m : nullptr} {}
 
 			maybe_iterator& operator++ () noexcept {
@@ -74,7 +75,7 @@ namespace ftl {
 			}
 
 		private:
-			sum_type<T,Nothing>* ref = nullptr;
+			maybe<T>* ref = nullptr;
 		};
 
 		template<typename T>
@@ -87,7 +88,7 @@ namespace ftl {
 			~const_maybe_iterator() = default;
 
 			explicit constexpr
-			const_maybe_iterator(const sum_type<T,Nothing>* m) noexcept
+			const_maybe_iterator(const maybe<T>* m) noexcept
 			: ref{m && m->template is<T>() ? m : nullptr} {}
 
 			const_maybe_iterator& operator++ () noexcept {
@@ -124,7 +125,7 @@ namespace ftl {
 			}
 
 		private:
-			const sum_type<T,Nothing>* ref = nullptr;
+			const maybe<T>* ref = nullptr;
 		};
 	}
 }

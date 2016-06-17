@@ -43,7 +43,7 @@ test_set maybe_tests{
 			std::function<bool()>([]() -> bool {
 				auto e1 = ftl::just(10);
 				auto e2 = ftl::just(12);
-				auto e3 = ftl::nothing<int>();
+				ftl::maybe<int> e3 = ftl::nothing;
 
 				return e1 < e2 && e3 < e1
 					&& e2 > e1 && e1 > e3;
@@ -53,7 +53,7 @@ test_set maybe_tests{
 			std::string("Copy assignable back and forth"),
 			std::function<bool()>([]() -> bool {
 				auto m1 = ftl::just(10);
-				auto m2 = ftl::nothing<int>();
+				ftl::maybe<int> m2 = ftl::nothing;
 				auto m3 = ftl::just(15);
 
 				ftl::maybe<int> mx(m1);
@@ -117,16 +117,16 @@ test_set maybe_tests{
 			std::string("Pattern matching"),
 			std::function<bool()>([]() -> bool {
 				auto m1 = ftl::just(10);
-				auto m2 = ftl::nothing<int>();
+				ftl::maybe<int> m2 = ftl::nothing;
 
 				auto r1 = m1.match(
 					[](int x) { return x; },
-					[](ftl::Nothing) { return -1; }
+					[](ftl::nothing_t) { return -1; }
 				);
 
 				auto r2 = m2.match(
 					[](int x) { return x; },
-					[](ftl::Nothing) { return -1; }
+					[](ftl::nothing_t) { return -1; }
 				);
 
 				return r1 == 10 && r2 == -1;

@@ -50,92 +50,80 @@ namespace ftl {
 	 */
 
 	/**
-	 * A type used to indicate the absence of a value in `maybe`s.
+	 * A type used to indicate the absence of a value in `maybe`.
 	 *
-	 * Note that the presence of this type is the one thing that uniquely
-	 * identifies a particular instance of `sum_type` as a `maybe`. Hence,
-	 * any sum type of a form equivalent to `sum_type<Nothing,T>`, for any type
-	 * `T`, will behave as if it were a `maybe<T>`.
-	 *
-	 * \par Concepts
+	 * \par Type Traits & Concepts
+	 * - Trivial, standard layout, pod
 	 * - \ref fullycons
 	 * - \ref eq
 	 *
 	 * \ingroup maybe
 	 */
-	struct Nothing;
+	struct nothing_t {};
+
+	/**
+	 * Constant instance of `nothing_t`.
+	 */
+	constexpr nothing_t nothing{};
+
 
 	/**
 	 * A data type that may hold a value, or nothing.
 	 *
-	 * Note that only the presence of `Nothing` distinguishes `maybe` from
-	 * other aliases of `sum_type`. In other words, if you were to create
-	 * additional aliases parameterised equivalently, they will be treated
-	 * identically to `maybe` with regards to concepts, and similar.
+	 * \par Type Traits & Concepts
 	 *
-	 * \par Concepts
-	 * - \ref copycons, if `T` is
-	 * - \ref movecons, if `T` is
-	 * - \ref assignable, if `T` is
+	 * `maybe<T>` satisfies every concept and trait that `sum_type<T,nothing_t>`
+	 *  does. In addition, it also satisfies the following concepts:
+	 *
 	 * - \ref fwditerable
-	 * - \ref eq, if `T` is
-	 * - \ref orderable, if `T` is (`Nothing` always compares less than anything
+	 * - \ref orderable, if `T` is (`nothing` always compares less than anything
 	 *        else)
 	 *
 	 *
 	 * Note that all iterators referencing a `just` instance of `maybe` are
-	 * rendered invalid if it is changed to `Nothing`.
+	 * rendered invalid if it is changed to `nothing`.
 	 *
 	 * \see sum_type
 	 *
 	 * \ingroup maybe
 	 */
 	template<class T>
-	class maybe : public sum_type<T,Nothing>
+	class maybe : public sum_type<T,nothing_t>
 	{
-		using sum_type<T,Nothing>::sum_type;
+	public:
+		using sum_type<T,nothing_t>::sum_type;
+
+		constexpr maybe(nothing_t) : sum_type<T,nothing_t>(type<nothing_t>) {}
 	};
 
-	/**
-	 * Empty sub-type of maybe.
-	 *
-	 * Can be implicitly casted to any maybe type.
-	 *
-	 * \par Concepts
-	 * - \ref fullycons
-	 * - \ref eq
-	 */
-	struct Nothing
+	template<class T>
+	constexpr bool operator== (const maybe<T>& m, nothing_t)
 	{
-		template<class T>
-		constexpr operator maybe<T>() const noexcept
-		{
-			return maybe<T>{type<Nothing>};
-		}
-	};
+		return m.template is<nothing_t>();
+	}
 
-	constexpr bool operator== (Nothing, Nothing) noexcept
+	constexpr bool operator== (nothing_t, nothing_t) noexcept
 	{
 		return true;
 	}
 
-	constexpr bool operator!= (Nothing, Nothing) noexcept
+	constexpr bool operator!= (nothing_t, nothing_t) noexcept
 	{
 		return false;
 	}
 
 	template<class T, class = Requires<Orderable<T>::value>>
-	bool operator< (sum_type<T,Nothing> m1, sum_type<T,Nothing> m2) noexcept
+	bool operator< (maybe<T> m1, maybe<T> m2) noexcept
 	{
 		return m1.match(
 			[m2](T lhs)
 			{
 				return m2.match(
 					[lhs](T rhs){ return lhs < rhs; },
-					[](Nothing){ return false; }
+					[](nothing_t){ return false; }
 				);
 			},
-			[m2](Nothing){ return true; }
+			[m2](nothing_t){ return true; }
 		);
 	}
 
@@ -210,17 +198,6 @@ namespace ftl {
 	just;
 #endif
 
-	// TODO: C++14: change to a constexpr template variable
-	/**
-	 * Convenience function to create an empty `maybe` value.
-	 *
-	 * \ingroup maybe
-	 */
-	template<typename T>
-	constexpr maybe<T> nothing() noexcept {
-		return maybe<T>{type<Nothing>};
-	}
-
 	template<typename T>
 	struct parametric_type_traits<maybe<T>> {
 		using value_type = T;
@@ -257,12 +234,11 @@ namespace ftl {
 			return just(std::move(t));
 		}
 
-		// TODO: C++14: capture f with forwarding instead of copy
 		/**
 		 * Maybe maps a function to a contained value.
 		 *
 		 * From the perspective of considering maybe a 0 or 1 element container,
-		 * behaves exactly as expected: if "empty" (`Nothing`), the function is
+		 * behaves exactly as expected: if "empty" (`nothing`), the function is
 		 * never called and the result is another "empty" container; if there is
 		 * an element, `f` is applied on it and the result is embedded as if by
 		 * `pure`.
@@ -284,19 +260,19 @@ namespace ftl {
 		 * \endcode
 		 */
 		template<typename F, typename U = result_of<F(T)>>
-		static constexpr maybe<U> map(F f, const maybe<T>& m) {
+		static constexpr maybe<U> map(F&& f, const maybe<T>& m) {
 			return m.match(
-				[f](const T& t){ return just(f(t)); },
-				[](Nothing){ return Nothing{}; }
+				[f = std::forward<F>(f)](const T& t){ return just(f(t)); },
+				[](nothing_t){ return nothing; }
 			);
 		}
 
 		/// \overload
 		template<typename F, typename U = result_of<F(T)>>
-		static constexpr maybe<U> map(F f, maybe<T>&& m) {
+		static constexpr maybe<U> map(F&& f, maybe<T>&& m) {
 			return m.match(
-				[f](T& t){ return just(f(std::move(t))); },
-				[](Nothing){ return Nothing{}; }
+				[f = std::forward<F>(f)](T& t){ return just(f(std::move(t))); },
+				[](nothing_t){ return nothing; }
 			);
 		}
 
@@ -329,7 +305,7 @@ namespace ftl {
 		static constexpr maybe<U> apply(const maybe<F>& mf, maybe<T> m) {
 			return mf.match(
 				[m](const F& f){ return fmap(f, m); },
-				[](Nothing){ return Nothing{}; }
+				[](nothing_t){ return nothing; }
 			);
 		}
 
@@ -338,13 +314,13 @@ namespace ftl {
 		static constexpr maybe<U> apply(maybe<F>&& mf, maybe<T> m) {
 			return mf.match(
 				[m](F& f){ return fmap(std::move(f), m); },
-				[](Nothing){ return Nothing{}; }
+				[](nothing_t){ return nothing; }
 			);
 		}
 
 		// TODO: C++14: capture f by forwarding
 		/**
-		 * Extract `m`'s value and forward to `f` if non-`Nothing`.
+		 * Extract `m`'s value and forward to `f` if non-`nothing`.
 		 *
 		 * \par Examples
 		 *
@@ -368,7 +344,7 @@ namespace ftl {
 		static constexpr maybe<U> bind(const maybe<T>& m, F f) {
 			return m.match(
 				[f](const T& t){ return f(t); },
-				[](Nothing){ return Nothing{}; }
+				[](nothing_t){ return nothing; }
 			);
 		}
 
@@ -377,7 +353,7 @@ namespace ftl {
 		static constexpr maybe<U> bind(maybe<T>&& m, F f) {
 			return m.match(
 				[f](T& t){ return f(std::move(t)); },
-				[](Nothing){ return Nothing{}; }
+				[](nothing_t){ return nothing; }
 			);
 		}
 
@@ -385,12 +361,12 @@ namespace ftl {
 		 * Flatten a nested maybe.
 		 *
 		 * Works in the obvious way: if an inner maybe exists, it is returned;
-		 * otherwise `Nothing` is returned.
+		 * otherwise `nothing` is returned.
 		 */
 		static constexpr maybe<T> join(const maybe<maybe<T>>& m) {
 			return m.match(
 				[](maybe<T> m){ return m; },
-				[](Nothing) { return Nothing{}; }
+				[](nothing_t) { return nothing; }
 			);
 		}
 
@@ -398,7 +374,7 @@ namespace ftl {
 		static constexpr maybe<T> join(maybe<maybe<T>>&& m) {
 			return m.match(
 				[](maybe<T>& m){ return std::move(m); },
-				[](Nothing) { return Nothing{}; }
+				[](nothing_t) { return nothing; }
 			);
 		}
 
@@ -409,7 +385,7 @@ namespace ftl {
 	 * Foldable implementation for `maybe`.
 	 *
 	 * Behaves as if `maybe` was a container of 0 or 1 elements. In other words,
-	 * folding `Nothing` is exactly the same as folding an empty list, and
+	 * folding `nothing` is exactly the same as folding an empty list, and
 	 * folding on `just(something)` is the same as folding a list with one
 	 * element.
 	 *
@@ -429,7 +405,7 @@ namespace ftl {
 				"The result of F(U,T) must be convertible to U"
 			);
 
-			return m.template is<Nothing>()
+			return m.template is<nothing_t>()
 				? z
 				: std::forward<F>(f)(std::forward<U>(z), m.template unsafe_get<T>());
 		}
@@ -445,7 +421,7 @@ namespace ftl {
 				"The result of F(T,U) must be convertible to U"
 			);
 
-			return m.template is<Nothing>()
+			return m.template is<nothing_t>()
 				? z
 				: std::forward<F>(f)(m.template unsafe_get<T>(), std::forward<U>(z));
 		}
@@ -478,7 +454,7 @@ namespace ftl {
 		static_assert(Monoid<T>{}, "T must be an instance of Monoid");
 
 		static constexpr maybe<T> id() noexcept {
-			return Nothing{};
+			return nothing;
 		}
 
 		static constexpr maybe<T> append(const maybe<T>& m1, const maybe<T>& m2)
@@ -531,7 +507,7 @@ namespace ftl {
 	 * An optional computation.
 	 *
 	 * If `f` fails, the `optional` computation as a whole "succeeds" but yields
-	 * `Nothing`, whereas it otherwise yields `just(x)` where `x` is the
+	 * `nothing`, whereas it otherwise yields `just(x)` where `x` is the
 	 * computed result of `f`.
 	 *
 	 * \tparam F must be an instance of `ftl::monoidA`
@@ -547,7 +523,7 @@ namespace ftl {
 	>
 	Rebind<F,maybe<T>> optional(const F& f) {
 		using Fm = Rebind<F,maybe<T>>;
-		return just % f | applicative<Fm>::pure(nothing<T>());
+		return just % f | applicative<Fm>::pure(nothing);
 	}
 }
 

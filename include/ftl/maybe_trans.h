@@ -69,7 +69,7 @@ namespace ftl {
 		 *
 		 * Initialises the wrapped value with monad::pure(nothing).
 		 */
-		maybeT() : mMaybe(monad<Mmt>::pure(nothing<T>())) {}
+		maybeT() : mMaybe(monad<Mmt>::pure(nothing)) {}
 
 		maybeT(const maybeT&)
 		noexcept(std::is_nothrow_copy_constructible<Mmt>::value) = default;
@@ -223,7 +223,7 @@ namespace ftl {
 						if(m.template is<T>())
 							return aPure<maybe<U>>() % f(m.template unsafe_get<T>());
 						else
-							return monad<M_<maybe<U>>>::pure(nothing<U>());
+							return monad<M_<maybe<U>>>::pure(nothing);
 					}
 				};
 			}
@@ -241,7 +241,7 @@ namespace ftl {
 						if(m.template is<T>())
 							return aPure<maybe<U>>() % f(std::move(m.template unsafe_get<T>()));
 						else
-							return monad<M_<maybe<U>>>::pure(nothing<U>());
+							return monad<M_<maybe<U>>>::pure(nothing);
 					}
 				};
 			}
@@ -262,7 +262,7 @@ namespace ftl {
 						if(m.template is<T>())
 							return *f(m.template unsafe_get<T>());
 						else
-							return monad<M_<maybe<U>>>::pure(nothing<U>());
+							return monad<M_<maybe<U>>>::pure(nothing);
 					}
 				};
 			}
@@ -277,7 +277,7 @@ namespace ftl {
 						if(m.template is<T>())
 							return *f(std::move(m.template unsafe_get<T>()));
 						else
-							return monad<M_<maybe<U>>>::pure(nothing<U>());
+							return monad<M_<maybe<U>>>::pure(nothing);
 					}
 				};
 			}
@@ -314,7 +314,7 @@ namespace ftl {
 			{
 				*mm1 >>= [mm2](const maybe<T>& m) -> Mmt
 				{
-					if(!m.template is<Nothing>())
+					if(!m.template is<nothing_t>())
 						return monad<Mmt>::pure(m);
 
 					else

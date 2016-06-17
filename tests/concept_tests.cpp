@@ -149,9 +149,9 @@ test_set concept_tests{
 
 				auto m1 = just(1);
 				auto m2 = just(2);
-				maybe<int> m3 = Nothing{};
+				maybe<int> m3 = nothing;
 
-				return (m1 >> m2) == just(2) && (m3 >> m1) == nothing<int>();
+				return (m1 >> m2) == just(2) && (m3 >> m1) == maybe<int>{nothing};
 			})
 		),
 		std::make_tuple(
@@ -161,9 +161,9 @@ test_set concept_tests{
 
 				auto m1 = just(1);
 				auto m2 = just(2);
-				maybe<int> m3 = Nothing{};
+				maybe<int> m3 = nothing;
 
-				return (m1 << m2) == just(1) && (m1 << m3) == nothing<int>();
+				return (m1 << m2) == just(1) && (m1 << m3) == maybe<int>{nothing};
 			})
 		),
 		std::make_tuple(
@@ -174,10 +174,10 @@ test_set concept_tests{
 				auto m1 = just(0.f);
 				auto m2 = just(2.f);
 				auto f = [](float x){
-					return x == 0 ? Nothing{} : just(8.f / x);
+					return x == 0 ? nothing : just(8.f / x);
 				};
 
-				return (f <<= f <<= m1) == nothing<float>()
+				return (f <<= f <<= m1) == nothing
 					&& (f <<= f <<= m2) == just(2.f);
 			})
 		),
