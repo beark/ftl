@@ -108,7 +108,7 @@ namespace ftl
 		{
 			constexpr bool compare(size_t, const recursive_union_&) const noexcept
 			{
-				return true;
+				return false;
 			}
 		};
 
@@ -118,19 +118,30 @@ namespace ftl
 			constexpr recursive_union_(const recursive_union_&, size_t) noexcept {}
 			constexpr recursive_union_(recursive_union_&&, size_t) noexcept {}
 
-			constexpr void copy(const recursive_union_&, size_t) noexcept {}
-			constexpr void copy(recursive_union_&&, size_t) noexcept {}
-			constexpr void move(recursive_union_&&, size_t) noexcept {}
+			void copy(const recursive_union_&, size_t)
+			{
+				throw invalid_sum_type_access();
+			}
+
+			void copy(recursive_union_&&, size_t)
+			{
+				throw invalid_sum_type_access();
+			}
+
+			void move(recursive_union_&&, size_t)
+			{
+				throw invalid_sum_type_access();
+			}
 
 			template<class T, class U>
-			constexpr void assign(type_t<T>, U&&)
+			void assign(type_t<T>, U&&)
 			{
 				throw invalid_sum_type_access();
 			}
 
 			constexpr bool compare(size_t, const recursive_union_&) const noexcept
 			{
-				return true;
+				return false;
 			}
 		};
 
@@ -140,20 +151,35 @@ namespace ftl
 			constexpr recursive_union_(const recursive_union_&, size_t) noexcept {}
 			constexpr recursive_union_(recursive_union_&&, size_t) noexcept {}
 
-			constexpr void destroy(size_t) noexcept {}
-			constexpr void copy(const recursive_union_&, size_t) noexcept {}
-			constexpr void copy(recursive_union_&&, size_t) noexcept {}
-			constexpr void move(recursive_union_&&, size_t) noexcept {}
+			void destroy(size_t)
+			{
+				throw invalid_sum_type_access();
+			}
+
+			void copy(const recursive_union_&, size_t)
+			{
+				throw invalid_sum_type_access();
+			}
+
+			void copy(recursive_union_&&, size_t)
+			{
+				throw invalid_sum_type_access();
+			}
+
+			void move(recursive_union_&&, size_t)
+			{
+				throw invalid_sum_type_access();
+			}
 
 			template<class T, class U>
-			constexpr void assign(type_t<T>, U&&)
+			void assign(type_t<T>, U&&)
 			{
 				throw invalid_sum_type_access();
 			}
 
 			constexpr bool compare(size_t, const recursive_union_&) const noexcept
 			{
-				return true;
+				return false;
 			}
 
 			template<class U>
@@ -230,6 +256,7 @@ namespace ftl
 
 			constexpr bool compare(size_t I, const recursive_union_& rhs) const noexcept
 			{
+				assert(I <= sizeof...(Ts) && "Type index out of range; illegal sum_type state");
 				return I == 0 ? val == rhs.val : rem.compare(I - 1, rhs.rem);
 			}
 
@@ -373,6 +400,7 @@ namespace ftl
 
 			constexpr bool compare(size_t I, const recursive_union_& rhs) const noexcept
 			{
+				assert(I <= sizeof...(Ts) && "Type index out of range; illegal sum_type state");
 				return I == 0 ? val == rhs.val : rem.compare(I - 1, rhs.rem);
 			}
 
@@ -528,6 +556,7 @@ namespace ftl
 
 			constexpr bool compare(size_t I, const recursive_union_& rhs) const noexcept
 			{
+				assert(I <= sizeof...(Ts) && "Type index out of range; illegal sum_type state");
 				return I == 0 ? val == rhs.val : rem.compare(I - 1, rhs.rem);
 			}
 
