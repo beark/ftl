@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@ test_set fwdlist_tests{
 	{
 		std::make_tuple(
 			std::string("concatMap[&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				std::forward_list<int> l{1,2,3,4};
 
 				auto l2 = ftl::concatMap(
@@ -38,12 +38,12 @@ test_set fwdlist_tests{
 					l
 				);
 
-				return l2 == std::forward_list<int>{2,1,4,3,6,5,8,7};
-			})
+				TEST_ASSERT( (l2 == std::forward_list<int>{2,1,4,3,6,5,8,7}) );
+			}
 		),
 		std::make_tuple(
 			std::string("concatMap[&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				auto l = ftl::concatMap(
 					[](int x){
@@ -52,107 +52,106 @@ test_set fwdlist_tests{
 					std::forward_list<int>{2,3,4}
 				);
 
-				return l == std::forward_list<int>{4,3,6,5,8,7};
-			})
+				TEST_ASSERT( (l == std::forward_list<int>{4,3,6,5,8,7}) );
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::id"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
-				return ftl::monoid<std::forward_list<float>>::id().empty();
-			})
+				TEST_ASSERT(ftl::monoid<std::forward_list<float>>::id().empty());
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append[&,&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator^;
 
 				auto l1 = std::forward_list<int>{1,2};
 				auto l2 = std::forward_list<int>{2,3};
 
-				return (l1 ^ l2) == std::forward_list<int>{1,2,2,3};
-			})
+				TEST_ASSERT( ((l1 ^ l2) == std::forward_list<int>{1,2,2,3}) );
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append[&,&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator^;
 
 				auto l1 = std::forward_list<int>{1,2};
 				auto l2 = std::forward_list<int>{2,3};
 
-				return (l1 ^ std::move(l2)) == std::forward_list<int>{1,2,2,3};
-			})
+				TEST_ASSERT( ((l1 ^ std::move(l2)) == std::forward_list<int>{1,2,2,3}) );
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append[&&,&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator^;
 
 				auto l1 = std::forward_list<int>{1,2};
 				auto l2 = std::forward_list<int>{2,3};
 
-				return (std::move(l1) ^ l2) == std::forward_list<int>{1,2,2,3};
-			})
+				TEST_ASSERT( ((std::move(l1) ^ l2) == std::forward_list<int>{1,2,2,3}) );
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append[&&,&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator^;
 
 				auto l1 = std::forward_list<int>{1,2};
 				auto l2 = std::forward_list<int>{2,3};
 
-				return
-					(std::move(l1) ^ std::move(l2)) == std::forward_list<int>{1,2,2,3};
-			})
+				TEST_ASSERT( ((std::move(l1) ^ std::move(l2)) == std::forward_list<int>{1,2,2,3}) );
+			}
 		),
 		std::make_tuple(
 			std::string("functor::map[a->b,&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto f = [](int x){ return float(x)+1.f; };
 				auto l = std::forward_list<int>{1,2,3};
 				auto l2 = f % l;
 
-				return l2 == std::forward_list<float>{2.f,3.f,4.f};
-			})
+				TEST_ASSERT( (l2 == std::forward_list<float>{2.f,3.f,4.f}) );
+			}
 		),
 		std::make_tuple(
 			std::string("functor::map[a->b,&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto f = [](int x){ return float(x)+1.f; };
 				auto l = f % std::forward_list<int>{1,2,3};
 
-				return l == std::forward_list<float>{2.f,3.f,4.f};
-			})
+				TEST_ASSERT( (l == std::forward_list<float>{2.f,3.f,4.f}) );
+			}
 		),
 		std::make_tuple(
 			std::string("functor::map[a->a,&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto f = [](int x){ return x+1; };
 				auto l = f % std::forward_list<int>{1,2,3};
 
-				return l == std::forward_list<int>{2,3,4};
-			})
+				TEST_ASSERT( (l == std::forward_list<int>{2,3,4}) );
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::pure"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				auto l = ftl::applicative<std::forward_list<int>>::pure(2);
 
-				return l == std::forward_list<int>{2};
-			})
+				TEST_ASSERT(l == std::forward_list<int>{2});
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator*;
 
 				std::forward_list<ftl::function<int(int)>> lf{
@@ -162,59 +161,56 @@ test_set fwdlist_tests{
 
 				std::forward_list<int> l = lf * std::forward_list<int>{1,2,3};
 
-				return l == std::forward_list<int>{0,1,2,2,3,4};
-			})
+				TEST_ASSERT( (l == std::forward_list<int>{0,1,2,2,3,4}) );
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator>>=;
 
 				std::forward_list<int> l{1,2,3};
 
 				auto f = [](int x){ return std::forward_list<int>{x,x+1}; };
 
-				return (l >>= f) == std::forward_list<int>{1,2,2,3,3,4};
-			})
+				TEST_ASSERT( ((l >>= f) == std::forward_list<int>{1,2,2,3,3,4}) );
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldl"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::forward_list<int> l{1,2,3};
 				auto f = [](int x, int y){ return x+y; };
 
-
-				return foldl(f, 0, l) == 6;
-			})
+				TEST_ASSERT( (foldl(f, 0, l) == 6) );
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldr"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::forward_list<float> l{4.f,4.f,2.f};
 				auto f = [](float x, float y){ return x/y; };
 
-
-				return foldr(f, 16.f, l) == .125f;
-			})
+				TEST_ASSERT( (foldr(f, 16.f, l) == .125f) );
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::fold"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::forward_list<prod_monoid<int>> l{prod(2),prod(3),prod(2)};
 
-
-				return fold(l) == 12;
-			})
+				TEST_ASSERT(fold(l) == 12);
+			}
 		),
 		std::make_tuple(
 			std::string("zippable::zipWith[3,3]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::forward_list<int> l1{1,2,3};
@@ -222,12 +218,12 @@ test_set fwdlist_tests{
 
 				auto l3 = ftl::zipWith([](int x, int y){ return x + y; }, l1, l2);
 
-				return l3 == std::forward_list<int>{3,4,5};
-			})
+				TEST_ASSERT( (l3 == std::forward_list<int>{3,4,5}) );
+			}
 		),
 		std::make_tuple(
 			std::string("zippable::zipWith[2,3]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::forward_list<int> l1{1,2};
@@ -235,12 +231,12 @@ test_set fwdlist_tests{
 
 				auto l3 = ftl::zipWith([](int x, int y){ return x + y; }, l1, l2);
 
-				return l3 == std::forward_list<int>{3,4};
-			})
+				TEST_ASSERT( (l3 == std::forward_list<int>{3,4}) );
+			}
 		),
 		std::make_tuple(
 			std::string("zippable::zipWith[3,2]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::forward_list<int> l1{1,2,3};
@@ -248,12 +244,12 @@ test_set fwdlist_tests{
 
 				auto l3 = ftl::zipWith([](int x, int y){ return x + y; }, l1, l2);
 
-				return l3 == std::forward_list<int>{3,4};
-			})
+				TEST_ASSERT( (l3 == std::forward_list<int>{3,4}) );
+			}
 		),
 		std::make_tuple(
 			std::string("zippable::zipWith[0,3]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::forward_list<int> l1{};
@@ -261,12 +257,12 @@ test_set fwdlist_tests{
 
 				auto l3 = ftl::zipWith([](int x, int y){ return x + y; }, l1, l2);
 
-				return l3 == std::forward_list<int>{};
-			})
+				TEST_ASSERT(l3 == std::forward_list<int>{});
+			}
 		),
 		std::make_tuple(
 			std::string("zippable::zipWith[3,0]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::forward_list<int> l1{1,2,3};
@@ -274,25 +270,24 @@ test_set fwdlist_tests{
 
 				auto l3 = ftl::zipWith([](int x, int y){ return x + y; }, l1, l2);
 
-				return l3 == std::forward_list<int>{};
-			})
+				TEST_ASSERT(l3 == std::forward_list<int>{});
+			}
 		),
 		std::make_tuple(
 			std::string("zippable::zip[3,3]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
+				using namespace std;
 
-				std::forward_list<int> l1{1,2,3};
-				std::forward_list<float> l2{3.f,2.f,1.f};
+				using ltup = forward_list<tuple<int,float>>;
+
+				forward_list<int> l1{1,2,3};
+				forward_list<float> l2{3.f,2.f,1.f};
 
 				auto l3 = ftl::zip(l1, l2);
 
-				return l3 == std::forward_list<std::tuple<int,float>>{
-					std::make_tuple(1,3.f),
-					std::make_tuple(2,2.f),
-					std::make_tuple(3,1.f)
-				};
-			})
+				TEST_ASSERT( (l3 == ltup{ make_tuple(1,3.f), make_tuple(2,2.f), make_tuple(3,1.f) }) );
+			}
 		)
 	}
 };

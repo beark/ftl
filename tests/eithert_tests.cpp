@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -32,7 +32,7 @@ test_set eithert_tests{
 	{
 		std::make_tuple(
 			std::string("functor::map[R]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using ftl::function;
 				using ef = ftl::eitherT<std::string,function<int(int)>>;
@@ -40,12 +40,12 @@ test_set eithert_tests{
 				auto f = ftl::applicative<ef>::pure(1);
 				auto g = [](int x){ return float(x)/4.f; } % f;
 
-				return (*g)(3) == ftl::make_right<std::string>(0.25f);
-			})
+				TEST_ASSERT((*g)(3) == ftl::make_right<std::string>(0.25f));
+			}
 		),
 		std::make_tuple(
 			std::string("functor::map[L]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using ftl::function;
 				using ef = ftl::eitherT<std::string,function<int(int)>>;
@@ -57,23 +57,23 @@ test_set eithert_tests{
 
 				auto g = [](int x){ return float(x)/4.f; } % f;
 
-				return (*g)(3) == ftl::make_left<float>(std::string("test"));
-			})
+				TEST_ASSERT((*g)(3) == ftl::make_left<float>(std::string("test")));
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::pure"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using ef = ftl::eitherT<float,function<int(int)>>;
 
 				auto f = ftl::applicative<ef>::pure(10);
 
-				return (*f)(50) == ftl::make_right<float>(10);
-			})
+				TEST_ASSERT((*f)(50) == ftl::make_right<float>(10));
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[R,R]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
@@ -83,12 +83,12 @@ test_set eithert_tests{
 
 				auto z = f % x * y;
 
-				return (*z)(6) == make_right<float>(15);
-			})
+				TEST_ASSERT((*z)(6) == make_right<float>(15));
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[L,R]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
@@ -98,12 +98,12 @@ test_set eithert_tests{
 
 				auto z = f % x * y;
 
-				return (*z)(6) == make_left<int>(0.f);
-			})
+				TEST_ASSERT((*z)(6) == make_left<int>(0.f));
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[R,L]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
@@ -113,12 +113,12 @@ test_set eithert_tests{
 
 				auto z = f % x * y;
 
-				return (*z)(6) == make_left<int>(0.f);
-			})
+				TEST_ASSERT((*z)(6) == make_left<int>(0.f));
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[L,L]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
@@ -128,12 +128,12 @@ test_set eithert_tests{
 
 				auto z = f % x * y;
 
-				return (*z)(6) == make_left<int>(0.f);
-			})
+				TEST_ASSERT((*z)(6) == make_left<int>(0.f));
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[R,->R]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
@@ -144,12 +144,12 @@ test_set eithert_tests{
 						[x](int y){ return make_right<float>(float(x+y)/4.f); }
 					};
 				};
-				return (*g)(2) == make_right<float>(1.f);
-			})
+				TEST_ASSERT((*g)(2) == make_right<float>(1.f));
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[L,->R]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
@@ -160,12 +160,12 @@ test_set eithert_tests{
 						[x](int y){ return make_right<float>(float(x+y)/4.f); }
 					};
 				};
-				return (*g)(2) == make_left<float>(0.f);
-			})
+				TEST_ASSERT((*g)(2) == make_left<float>(0.f));
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[R,->L]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
@@ -176,12 +176,12 @@ test_set eithert_tests{
 						[x](int){ return make_left<float>(0.f); }
 					};
 				};
-				return (*g)(2) == make_left<float>(0.f);
-			})
+				TEST_ASSERT((*g)(2) == make_left<float>(0.f));
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[lift]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
@@ -191,12 +191,12 @@ test_set eithert_tests{
 						[x](int y){ return float(x+y)/4.f; }
 					};
 				};
-				return (*g)(2) == make_right<float>(1.f);
-			})
+				TEST_ASSERT((*g)(2) == make_right<float>(1.f));
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[lift&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
@@ -206,12 +206,12 @@ test_set eithert_tests{
 						[x](int y){ return float(x+y)/4.f; }
 					};
 				};
-				return (*g)(2) == make_right<float>(1.f);
-			})
+				TEST_ASSERT((*g)(2) == make_right<float>(1.f));
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[L,->L]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ef = ftl::eitherT<float,ftl::function<int(int)>>;
 				using namespace ftl;
 
@@ -222,12 +222,12 @@ test_set eithert_tests{
 						[x](int){ return make_left<float>(0.f); }
 					};
 				};
-				return (*g)(2) == make_left<float>(0.f);
-			})
+				TEST_ASSERT((*g)(2) == make_left<float>(0.f));
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldl"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using eitherL = eitherT<char,std::list<int>>;
 
@@ -241,12 +241,12 @@ test_set eithert_tests{
 
 				auto r = foldl([](int x, int y){ return x/y; }, 64, el);
 
-				return r == 8;
-			})
+				TEST_ASSERT(r == 8);
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldr"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using eitherL = eitherT<char,std::list<float>>;
 
@@ -260,12 +260,12 @@ test_set eithert_tests{
 
 				auto r = foldr([](float x, float y){ return x/y; }, 16.f, el);
 
-				return r == .125f;
-			})
+				TEST_ASSERT(r == .125f);
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::fold"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using eitherL = eitherT<char,std::list<sum_monoid<int>>>;
 
@@ -279,13 +279,12 @@ test_set eithert_tests{
 
 				auto r = fold(el);
 
-				return r == 7;
-			})
+				TEST_ASSERT(r == 7);
+			}
 		),
-		/* Crashes gcc, works as it should in clang
 		std::make_tuple(
 			std::string("foldable::foldMap"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using eitherL = eitherT<char,std::list<int>>;
 
@@ -299,13 +298,12 @@ test_set eithert_tests{
 
 				auto r = foldMap(sum<int>, el);
 
-				return r == 7;
-			})
+				TEST_ASSERT(r == 7);
+			}
 		),
-		*/
 		std::make_tuple(
 			std::string("monoidA::fail"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using ef = eitherT<std::string,function<int(int)>>;
 
@@ -313,15 +311,15 @@ test_set eithert_tests{
 
 				auto e = (*f)(10);
 
-				return e.match(
-					[](Left<std::string> l){ return *l == std::string(""); },
-					[](Right<int>){ return false; }
+				e.match(
+					[](Left<std::string> l){ TEST_ASSERT(*l == std::string("")); },
+					[](Right<int>){ TEST_ASSERT(false); }
 				);
-			})
+			}
 		),
 		std::make_tuple(
 			std::string("monoidA::orDo"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using ef = eitherT<std::string,function<int(int)>>;
 
@@ -339,14 +337,16 @@ test_set eithert_tests{
 				auto x = (*h)(4);
 				auto y = (*i)(4);
 
-				return x.match(
-					[](Left<std::string>){ return false; },
-					[](Right<int> r) { return r == 8; }
-				) && y.match(
-					[](Left<std::string>){ return false; },
-					[](Right<int> r) { return r == 8; }
+				x.match(
+					[](Left<std::string>){ TEST_ASSERT(false); },
+					[](Right<int> r) { TEST_ASSERT(r == 8); }
 				);
-			})
+
+				y.match(
+					[](Left<std::string>){ TEST_ASSERT(false); },
+					[](Right<int> r) { TEST_ASSERT(r == 8); }
+				);
+			}
 		)
 	}
 };

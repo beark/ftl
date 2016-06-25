@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -30,28 +30,30 @@ test_set lazy_tests{
 	{
 		std::make_tuple(
 			std::string("assignment"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				ftl::lazy<int> l1{[](){ return 1; }};
 				ftl::lazy<int> l2{[](){ return 5; }};
 				auto l3(l2);
 				l2 = l1;
 
-				return *l1 == *l2 && *l3 == 5;
-			})
+				TEST_ASSERT(*l1 == *l2);
+				TEST_ASSERT(*l3 == 5);
+			}
 		),
 		std::make_tuple(
 			std::string("operator->"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				ftl::lazy<std::string> l1{[](){ return std::string("blah"); }};
 
-				return l1->size() == 4 && l1->at(0) == 'b';
-			})
+				TEST_ASSERT(l1->size() == 4);
+				TEST_ASSERT(l1->at(0) == 'b');
+			}
 		),
 		std::make_tuple(
 			std::string("mutable reference in deferred computation"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				std::string s("a");
 				auto l = ftl::defer(
 					[](std::string& x, std::string y) {
@@ -62,14 +64,14 @@ test_set lazy_tests{
 					std::string("c")
 				);
 
-				return s == std::string("a")
-					&& *l == std::string("abc")
-					&& s == std::string("ab");
-			})
+				TEST_ASSERT(s == std::string("a"));
+				TEST_ASSERT(*l == std::string("abc"));
+				TEST_ASSERT(s == std::string("ab"));
+			}
 		),
 		std::make_tuple(
 			std::string("Shared computations are performed once only"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				ftl::lazy<int> l1([](){ return 0; });
 				auto l2(l1);
 
@@ -77,41 +79,44 @@ test_set lazy_tests{
 						l1.status() == l2.status()
 						&& l1.status() == ftl::value_status::deferred
 				))
-					return false;
+				{
+					TEST_ASSERT(false);
+				}
 
 				int x = *l1;
-				return l1.status() == l2.status()
-					&& l1.status() == ftl::value_status::ready
-					&& *l1 == x;
-			})
+				TEST_ASSERT(l1.status() == l2.status());
+				TEST_ASSERT(l1.status() == ftl::value_status::ready);
+				TEST_ASSERT(*l1 == x);
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator^;
 
 				auto l1 = ftl::defer([](int x){return ftl::sum(x); }, 1);
 				auto l2(l1);
 				auto l3 = l1 ^ l2;
 
-				return static_cast<int>(*l3) == 2;
-			})
+				TEST_ASSERT(static_cast<int>(*l3) == 2);
+			}
 		),
 		std::make_tuple(
 			std::string("preserves eq"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto l1 = ftl::defer([](int x){ return x; }, 1);
 				auto l2(l1);
 				auto l3 = [](int x){ return x+1; } % l1;
 
-				return l1 == l2 && l1 != l3;
-			})
+				TEST_ASSERT(l1 == l2);
+				TEST_ASSERT(l1 != l3);
+			}
 		),
 		std::make_tuple(
 			std::string("eq is lazy"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto l1 = ftl::defer([](int x){ return x; }, 1);
@@ -121,25 +126,29 @@ test_set lazy_tests{
 				auto r1 = l1 == l3;
 				auto r2 = l1 != l2;
 
-				return r1.status() == ftl::value_status::deferred
-					&& r2.status() == ftl::value_status::deferred
-					&& !r1 && !r2;
-			})
+				TEST_ASSERT(r1.status() == ftl::value_status::deferred);
+				TEST_ASSERT(r2.status() == ftl::value_status::deferred);
+				TEST_ASSERT(!r1);
+				TEST_ASSERT(!r2);
+			}
 		),
 		std::make_tuple(
 			std::string("preserves lt and gt"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto l1 = ftl::defer([](int x){ return x; }, 1);
 				auto l2 = [](int x){ return x+1; } % l1;
 
-				return l1 < l2 && l2 > l1 && !(l2 < l1) && !(l1 > l2);
-			})
+				TEST_ASSERT(l1 < l2);
+				TEST_ASSERT(l2 > l1);
+				TEST_ASSERT(!(l2 < l1));
+				TEST_ASSERT(!(l1 > l2));
+			}
 		),
 		std::make_tuple(
 			std::string("lt and gt are lazy"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto l1 = ftl::defer([](int x){ return x; }, 1);
@@ -149,23 +158,24 @@ test_set lazy_tests{
 				auto r1 = l1 < l3;
 				auto r2 = l1 > l2;
 
-				return r1.status() == ftl::value_status::deferred
-					&& r2.status() == ftl::value_status::deferred
-					&& r1 && !r2;
-			})
+				TEST_ASSERT(r1.status() == ftl::value_status::deferred);
+				TEST_ASSERT(r2.status() == ftl::value_status::deferred);
+				TEST_ASSERT(r1);
+				TEST_ASSERT(!r2);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::pure"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				auto l = ftl::applicative<ftl::lazy<int>>::pure(10);
 
-				return *l == 10;
-			})
+				TEST_ASSERT(*l == 10);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				function<int(int,int)> fn = [](int x, int y){ return x+y; };
@@ -174,20 +184,20 @@ test_set lazy_tests{
 					% applicative<lazy<int>>::pure(1)
 					* applicative<lazy<int>>::pure(2);
 
-				return *l == 3;
-			})
+				TEST_ASSERT(*l == 3);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto f = [](int x){ return lazy<float>{[x](){ return float(x)/2.f; }}; };
 				auto l1 = applicative<lazy<int>>::pure(1);
 				auto l2 = l1 >>= f;
 
-				return *l2 == .5f;
-			})
+				TEST_ASSERT(*l2 == .5f);
+			}
 		)
 	}
 };

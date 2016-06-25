@@ -29,8 +29,9 @@
 #include <tuple>
 #include <string>
 #include <functional>
+#include <stdexcept>
 
-using test_t = std::tuple<std::string,std::function<bool()>>;
+using test_t = std::tuple<std::string,std::function<void()>>;
 using test_set = std::tuple<std::string,std::vector<test_t>>;
 
 struct NoCopy
@@ -49,6 +50,13 @@ bool run_test_set(test_set& ts, std::ostream& os);
  * Test if two floats are equal within `eps` margin of error.
  */
 bool fequal(float x, float y, float eps = 0.000001f);
+
+struct test_assert_failed : public std::logic_error
+{
+	test_assert_failed(const char* str) : std::logic_error(str) {};
+};
+
+#define TEST_ASSERT(expr) if (!(expr)) { throw test_assert_failed(#expr); }
 
 #endif
 

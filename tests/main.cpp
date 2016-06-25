@@ -54,16 +54,16 @@ bool run_test_set(test_set& ts, std::ostream& os)
 	{
 		try
 		{
-			if(!std::get<1>(t)())
-			{
-				if(nfail == 0)
-					os << std::endl;
+			std::get<1>(t)();
+			++nsuc;
+		}
+		catch(test_assert_failed e)
+		{
+			if(nfail == 0)
+				os << std::endl;
 
-				os << std::get<0>(t) << ": fail" << std::endl;
-				++nfail;
-			}
-			else
-				++nsuc;
+			os << std::get<0>(t) << ": property '" << e.what() << "' did not hold."  << std::endl;
+			++nfail;
 		}
 		catch(std::exception e)
 		{

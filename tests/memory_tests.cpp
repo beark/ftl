@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -28,18 +28,18 @@ test_set memory_tests{
 	{
 		std::make_tuple(
 			std::string("monoid::id"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using sptr = std::shared_ptr<sum_monoid<int>>;
 
 				auto p = monoid<sptr>::id();
 
-				return p == nullptr;
-			})
+				TEST_ASSERT(p == nullptr);
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using sptr = std::shared_ptr<sum_monoid<int>>;
 
@@ -49,33 +49,33 @@ test_set memory_tests{
 
 				auto pr = p1 ^ p2 ^ p1 ^ p3 ^ p1;
 
-				return *pr == sum(4);
-			})
+				TEST_ASSERT(*pr == sum(4));
+			}
 		),
 		std::make_tuple(
 			std::string("functor::map"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto p = std::make_shared<int>(3);
 				auto pr = [](int x){ return -x; } % p;
 
-				return *pr == -3;
-			})
+				TEST_ASSERT(*pr == -3);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::pure"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto p = applicative<std::shared_ptr<int>>::pure(2);
 
-				return *p == 2;
-			})
+				TEST_ASSERT(*p == 2);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[*,*]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto f = function<int(int,int)>(
@@ -87,12 +87,12 @@ test_set memory_tests{
 
 				auto pr = f % p1 * p2;
 
-				return *pr == -1;
-			})
+				TEST_ASSERT(*pr == -1);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[nullptr,*]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto f = function<int(int,int)>(
@@ -104,12 +104,12 @@ test_set memory_tests{
 
 				auto pr = f % p1 * p2;
 
-				return pr == nullptr;
-			})
+				TEST_ASSERT(pr == nullptr);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[*,nullptr]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto f = function<int(int,int)>(
@@ -121,12 +121,12 @@ test_set memory_tests{
 
 				auto pr = f % p1 * p2;
 
-				return pr == nullptr;
-			})
+				TEST_ASSERT(pr == nullptr);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[nullptr,nullptr]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto f = function<int(int,int)>(
@@ -138,12 +138,12 @@ test_set memory_tests{
 
 				auto pr = f % p1 * p2;
 
-				return pr == nullptr;
-			})
+				TEST_ASSERT(pr == nullptr);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[&,->&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto p = std::make_shared<int>(1);
@@ -151,12 +151,12 @@ test_set memory_tests{
 
 				auto pr = p >>= f;
 
-				return *pr == .5f;
-			})
+				TEST_ASSERT(*pr == .5f);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[nullptr,->&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::shared_ptr<int> p{};
@@ -164,12 +164,12 @@ test_set memory_tests{
 
 				auto pr = p >>= f;
 
-				return pr == nullptr;
-			})
+				TEST_ASSERT(pr == nullptr);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[&,->nullptr]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto p = std::make_shared<int>(1);
@@ -177,12 +177,12 @@ test_set memory_tests{
 
 				auto pr = p >>= f;
 
-				return pr == nullptr;
-			})
+				TEST_ASSERT(pr == nullptr);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[nullptr,->nullptr]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::shared_ptr<int> p{};
@@ -190,48 +190,48 @@ test_set memory_tests{
 
 				auto pr = p >>= f;
 
-				return pr == nullptr;
-			})
+				TEST_ASSERT(pr == nullptr);
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldl[&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto p = std::make_shared<int>(2);
 
-				return foldl([](int x, int y){ return x+y; }, 1, p) == 3;
-			})
+				TEST_ASSERT( (foldl([](int x, int y){ return x+y; }, 1, p) == 3) );
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldl[nullptr]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::shared_ptr<int> p{};
 
-				return foldl([](int x, int y){ return x+y; }, 1, p) == 1;
-			})
+				TEST_ASSERT( (foldl([](int x, int y){ return x+y; }, 1, p) == 1) );
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldr[&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto p = std::make_shared<int>(2);
 
-				return foldr([](int x, int y){ return x+y; }, 1, p) == 3;
-			})
+				TEST_ASSERT( (foldr([](int x, int y){ return x+y; }, 1, p) == 3) );
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldr[nullptr]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::shared_ptr<int> p{};
 
-				return foldr([](int x, int y){ return x+y; }, 1, p) == 1;
-			})
+				TEST_ASSERT( (foldr([](int x, int y){ return x+y; }, 1, p) == 1) );
+			}
 		)
 	}
 };

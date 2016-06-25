@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -30,47 +30,47 @@ test_set ord_tests{
 	{
 		std::make_tuple(
 			std::string("compare[lt]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto o = ftl::compare(1,2);
 
-				return o == ftl::ord::Lt;
-			})
+				TEST_ASSERT(o == ftl::ord::Lt);
+			}
 		),
 		std::make_tuple(
 			std::string("compare[eq]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto o = ftl::compare(1,1);
 
-				return o == ftl::ord::Eq;
-			})
+				TEST_ASSERT(o == ftl::ord::Eq);
+			}
 		),
 		std::make_tuple(
 			std::string("compare[gt]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto o = ftl::compare(2,1);
 
-				return o == ftl::ord::Gt;
-			})
+				TEST_ASSERT(o == ftl::ord::Gt);
+			}
 		),
 		std::make_tuple(
 			std::string("getComparator"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto cmp = ftl::getComparator<int>();
 
-				return cmp(2,1) == ftl::ord::Gt;
-			})
+				TEST_ASSERT( (cmp(2,1) == ftl::ord::Gt) );
+			}
 		),
 		std::make_tuple(
 			std::string("comparing[method]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto cmp = ftl::comparing(&std::list<int>::size);
 
-				return cmp(std::list<int>{1,2,3},std::list<int>{3,2}) == ftl::ord::Gt;
-			})
+				TEST_ASSERT( (cmp(std::list<int>{1,2,3},std::list<int>{3,2}) == ftl::ord::Gt) );
+			}
 		),
 		std::make_tuple(
 			std::string("comparing[fn]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using std::string;
 				ftl::function<int(const string&)> f{
 					[](const string& s){ return std::stoi(s); }
@@ -78,12 +78,12 @@ test_set ord_tests{
 
 				auto cmp = ftl::comparing(f);
 
-				return cmp(std::string("10"),std::string("5")) == ftl::ord::Gt;
-			})
+				TEST_ASSERT( (cmp(std::string("10"),std::string("5")) == ftl::ord::Gt) );
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::ord;
 				using ftl::operator^;
 
@@ -91,14 +91,14 @@ test_set ord_tests{
 				ord eq{ord::Eq};
 				ord gt{ord::Gt};
 
-				return (lt ^ gt) == ord::Lt
-					&& (lt ^ eq) == ord::Lt
-					&& (eq ^ lt) == ord::Lt
-					&& (eq ^ gt) == ord::Gt
-					&& (eq ^ eq) == ord::Eq
-					&& (gt ^ lt) == ord::Gt
-					&& (gt ^ eq) == ord::Gt;
-			})
+				TEST_ASSERT((lt ^ gt) == ord::Lt);
+				TEST_ASSERT((lt ^ eq) == ord::Lt);
+				TEST_ASSERT((eq ^ lt) == ord::Lt);
+				TEST_ASSERT((eq ^ gt) == ord::Gt);
+				TEST_ASSERT((eq ^ eq) == ord::Eq);
+				TEST_ASSERT((gt ^ lt) == ord::Gt);
+				TEST_ASSERT((gt ^ eq) == ord::Gt);
+			}
 		)
 	}
 };

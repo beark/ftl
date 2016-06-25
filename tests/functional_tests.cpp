@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -30,7 +30,7 @@ test_set functional_tests{
 	{
 		std::make_tuple(
 			std::string("function allows curried calling"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				ftl::function<int(int,int)> f =
 					[](int x, int y){ return x + y; };
@@ -38,15 +38,15 @@ test_set functional_tests{
 				ftl::function<int(int,int,int)> g =
 					[](int x, int y, int z){ return x + y + z; };
 
-				return f(1)(2) == 3 
-					&& g(1)(2,3) == g(1,2)(3)
-					&& g(1)(2)(3) == g(1,2,3)
-					&& g(1,2,3) == 6;
-			})
+				TEST_ASSERT(f(1)(2) == 3);
+				TEST_ASSERT( (g(1)(2,3) == g(1,2)(3)) );
+				TEST_ASSERT( (g(1)(2)(3) == g(1,2,3)) );
+				TEST_ASSERT( (g(1,2,3) == 6) );
+			}
 		),
 		std::make_tuple(
 			std::string("functor<function>::map"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				ftl::function<int(int)> unary = [](int x){ return 2*x; };
@@ -54,24 +54,25 @@ test_set functional_tests{
 
 				auto f = [](int x){ return float(x)/3.f; };
 
-				return fequal((f % unary)(2), 4.f/3.f)
-					&& fequal((f % binary)(2,2), 4.f/3.f)
-					&& fequal((unary % binary)(2,2), 8);
-				;
-			})
+				TEST_ASSERT( (fequal((f % unary)(2), 4.f/3.f)) );
+				TEST_ASSERT( (fequal((f % binary)(2,2), 4.f/3.f)) );
+				TEST_ASSERT( (fequal((unary % binary)(2,2), 8)) );
+			}
 		),
 		std::make_tuple(
 			std::string("applicative<function>::pure"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				auto f = ftl::applicative<ftl::function<int(int)>>::pure(10);
 
-				return f(-1) == 10 && f(1) == 10 && f(100) == 10;
-			})
+				TEST_ASSERT(f(-1) == 10);
+				TEST_ASSERT(f(1) == 10);
+				TEST_ASSERT(f(100) == 10);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative<function>::apply"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using ftl::applicative;
 				using ftl::operator*;
@@ -81,12 +82,12 @@ test_set functional_tests{
 
 				auto g = f_ * f;
 
-				return g(1) == 4;
-			})
+				TEST_ASSERT(g(1) == 4);
+			}
 		),
 		std::make_tuple(
 			std::string("monad<function>::bind"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using ftl::operator>>=;
 
@@ -99,25 +100,26 @@ test_set functional_tests{
 
 				auto h = f >>= g;
 
-				return h(1) == 4.5f;
-			})
+				TEST_ASSERT(h(1) == 4.5f);
+			}
 		),
 		std::make_tuple(
 			std::string("monoid<function>::append"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using ftl::operator^;
 
-				auto f = ftl::comparing(&std::vector<int>::size);
-				auto g = ftl::getComparator<std::vector<int>>();
+				using vec = std::vector<int>;
 
-				return (f ^ g)(std::vector<int>{1,2}, std::vector<int>{1,3})
-					== ftl::ord::Lt;
-			})
+				auto f = ftl::comparing(&vec::size);
+				auto g = ftl::getComparator<vec>();
+
+				TEST_ASSERT( ((f ^ g)(vec{1,2}, vec{1,3}) == ftl::ord::Lt) );
+			}
 		),
 		std::make_tuple(
 			std::string("functor<std::function>::map"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				std::function<int(int)> unary = [](int x){ return 2*x; };
@@ -125,23 +127,24 @@ test_set functional_tests{
 
 				auto f = [](int x){ return float(x)/3.f; };
 
-				return fequal((f % unary)(2), 4.f/3.f)
-					&& fequal((f % binary)(2,2), 4.f/3.f);
-				;
-			})
+				TEST_ASSERT( (fequal((f % unary)(2), 4.f/3.f)) );
+				TEST_ASSERT( (fequal((f % binary)(2,2), 4.f/3.f)) );
+			}
 		),
 		std::make_tuple(
 			std::string("applicative<std::function>::pure"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				auto f = ftl::applicative<std::function<int(int)>>::pure(10);
 
-				return f(-1) == 10 && f(1) == 10 && f(100) == 10;
-			})
+				TEST_ASSERT(f(-1) == 10);
+				TEST_ASSERT(f(1) == 10);
+				TEST_ASSERT(f(100) == 10);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative<std::function>::apply"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using std::function;
 				using ftl::applicative;
 				using ftl::operator*;
@@ -151,12 +154,12 @@ test_set functional_tests{
 
 				auto g = f_ * f;
 
-				return g(1) == 4;
-			})
+				TEST_ASSERT(g(1) == 4);
+			}
 		),
 		std::make_tuple(
 			std::string("monad<std::function>::bind"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using std::function;
 				using ftl::operator>>=;
 
@@ -169,12 +172,12 @@ test_set functional_tests{
 
 				auto h = f >>= g;
 
-				return h(1) == 4.5f;
-			})
+				TEST_ASSERT(h(1) == 4.5f);
+			}
 		),
 		std::make_tuple(
 			std::string("monoid<std::function>::append"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using std::function;
 				using ftl::operator^;
 
@@ -186,8 +189,8 @@ test_set functional_tests{
 					[](int x){ return ftl::sum(2+x); }
 				};
 
-				return static_cast<int>((f ^ g)(2)) == 7;
-			})
+				TEST_ASSERT(static_cast<int>((f ^ g)(2)) == 7);
+			}
 		)
 	}
 };

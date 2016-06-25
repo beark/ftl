@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -30,7 +30,7 @@ test_set maybet_tests{
 	{
 		std::make_tuple(
 			std::string("functor::map[value]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using ftl::function;
 				using ftl::just;
@@ -39,12 +39,12 @@ test_set maybet_tests{
 				auto f = ftl::applicative<mf>::pure(1);
 				auto g = [](int x){ return float(x)/4.f; } % f;
 
-				return (*g)(3) == just(0.25f);
-			})
+				TEST_ASSERT( ((*g)(3) == just(0.25f)) );
+			}
 		),
 		std::make_tuple(
 			std::string("functor::map[nothing]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
@@ -52,23 +52,23 @@ test_set maybet_tests{
 				mf f{ftl::inplace_tag(), [](int){ return ftl::nothing; }};
 				auto g = [](int x){ return float(x)/4.f; } % f;
 
-				return (*g)(3) == ftl::nothing;
-			})
+				TEST_ASSERT((*g)(3) == ftl::nothing);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::pure"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 
 				auto f = ftl::applicative<mf>::pure(10);
 
-				return (*f)(50) == ftl::just(10);
-			})
+				TEST_ASSERT((*f)(50) == ftl::just(10));
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[value,value]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator%;
@@ -80,12 +80,12 @@ test_set maybet_tests{
 
 				auto z = f % x * y;
 
-				return (*z)(6) == ftl::just(15);
-			})
+				TEST_ASSERT((*z)(6) == ftl::just(15));
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[nothing,value]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator%;
@@ -97,12 +97,12 @@ test_set maybet_tests{
 
 				auto z = f % x * y;
 
-				return (*z)(6) == ftl::nothing;
-			})
+				TEST_ASSERT((*z)(6) == ftl::nothing);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[value,nothing]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator%;
@@ -114,12 +114,12 @@ test_set maybet_tests{
 
 				auto z = f % x * y;
 
-				return (*z)(6) == ftl::nothing;
-			})
+				TEST_ASSERT((*z)(6) == ftl::nothing);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply[nothing,nothing]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator%;
@@ -131,12 +131,12 @@ test_set maybet_tests{
 
 				auto z = f % x * y;
 
-				return (*z)(6) == ftl::nothing;
-			})
+				TEST_ASSERT((*z)(6) == ftl::nothing);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[value,->value]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
@@ -148,12 +148,12 @@ test_set maybet_tests{
 						[x](int y){ return ftl::just(float(x+y)/4.f); }
 					};
 				};
-				return (*g)(2) == ftl::just(1.f);
-			})
+				TEST_ASSERT((*g)(2) == ftl::just(1.f));
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[nothing,->value]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
@@ -165,12 +165,12 @@ test_set maybet_tests{
 						[x](int y){ return ftl::just(float(x+y)/4.f); }
 					};
 				};
-				return (*g)(2) == ftl::nothing;
-			})
+				TEST_ASSERT((*g)(2) == ftl::nothing);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[value,->nothing]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
@@ -182,12 +182,12 @@ test_set maybet_tests{
 						[](int){ return ftl::nothing; }
 					};
 				};
-				return (*g)(2) == ftl::nothing;
-			})
+				TEST_ASSERT((*g)(2) == ftl::nothing);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[nothing,->nothing]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
@@ -199,12 +199,12 @@ test_set maybet_tests{
 						[](int){ return ftl::nothing; }
 					};
 				};
-				return (*g)(2) == ftl::nothing;
-			})
+				TEST_ASSERT((*g)(2) == ftl::nothing);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[lift]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
@@ -215,12 +215,12 @@ test_set maybet_tests{
 						[x](int y){ return float(x+y)/4.f; }
 					};
 				};
-				return (*g)(2) == ftl::just(1.f);
-			})
+				TEST_ASSERT((*g)(2) == ftl::just(1.f));
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[lift&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::function;
 				using mf = ftl::maybeT<function<int(int)>>;
 				using ftl::operator>>=;
@@ -231,12 +231,12 @@ test_set maybet_tests{
 						[x](int y){ return float(x+y)/4.f; }
 					};
 				};
-				return (*g)(2) == ftl::just(1.f);
-			})
+				TEST_ASSERT((*g)(2) == ftl::just(1.f));
+			}
 		),
 		std::make_tuple(
 			std::string("monoidA::orDo[value,value]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto m1 = monad<maybeT<std::vector<int>>>::pure(2);
@@ -244,12 +244,12 @@ test_set maybet_tests{
 
 				auto m3 = m1 | m2;
 
-				return *m1 == *m3;
-			})
+				TEST_ASSERT(*m1 == *m3);
+			}
 		),
 		std::make_tuple(
 			std::string("monoidA::orDo[value,nothing]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto m1 = monad<maybeT<std::vector<int>>>::pure(2);
@@ -257,12 +257,12 @@ test_set maybet_tests{
 
 				auto m3 = m1 | m2;
 
-				return *m1 == *m3;
-			})
+				TEST_ASSERT(*m1 == *m3);
+			}
 		),
 		std::make_tuple(
 			std::string("monoidA::orDo[nothing,value]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				maybeT<std::vector<int>> m1;
@@ -270,12 +270,12 @@ test_set maybet_tests{
 
 				auto m3 = m1 | m2;
 
-				return *m2 == *m3;
-			})
+				TEST_ASSERT(*m2 == *m3);
+			}
 		),
 		std::make_tuple(
 			std::string("monoidA::orDo[nothing,nothing]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				maybeT<std::vector<int>> m1;
@@ -283,12 +283,12 @@ test_set maybet_tests{
 
 				auto m3 = m1 | m2;
 
-				return *m3 == *(maybeT<std::vector<int>>{});
-			})
+				TEST_ASSERT(*m3 == *(maybeT<std::vector<int>>{}));
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldl"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				maybeT<std::vector<int>> m1{
@@ -301,12 +301,12 @@ test_set maybet_tests{
 
 				auto r = foldl([](int x, int y){ return x+y; }, 0, m1);
 
-				return r == 7;
-			})
+				TEST_ASSERT(r == 7);
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldr"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				maybeT<std::vector<float>> m1{
@@ -319,12 +319,12 @@ test_set maybet_tests{
 
 				auto r = foldr([](float x, float y){ return x/y; }, 16.f, m1);
 
-				return r == .125f;
-			})
+				TEST_ASSERT(r == .125f);
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::fold"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				maybeT<std::vector<sum_monoid<int>>> m1{
@@ -335,28 +335,25 @@ test_set maybet_tests{
 					just(sum(4))
 				};
 
-				return fold(m1) == 7;
-			})
-		)
-		/* Crashed gcc, works as it should in clang
-		,
+				TEST_ASSERT(fold(m1) == 7);
+			}
+		),
 		std::make_tuple(
 			std::string("foldable::foldMap"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				maybeT<std::vector<int>> m1{
 					inplace_tag(),
-					value(1),
-					value(2),
-					maybe<int>{},
-					value(4)
+					just(1),
+					just(2),
+					nothing,
+					just(4)
 				};
 
-				return foldMap(sum<int>, m1) == 7;
-			})
+				TEST_ASSERT( (foldMap(sum<int>, m1) == 7) );
+			}
 		)
-		*/
 	}
 };
 

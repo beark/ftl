@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@ test_set map_tests{
 	{
 		std::make_tuple(
 			std::string("functor::map[a->a,&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using std::make_pair;
 
@@ -39,16 +39,13 @@ test_set map_tests{
 					make_pair(2, 3)
 				};
 
-				return s == std::map<int,int>{
-					make_pair(0, 2),
-					make_pair(1, 3),
-					make_pair(2, 4)
-				};
-			})
+				std::map<int,int> expected{ make_pair(0, 2), make_pair(1, 3), make_pair(2, 4) };
+				TEST_ASSERT(s == expected);
+			}
 		),
 		std::make_tuple(
 			std::string("functor::map[a->a,&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using std::make_pair;
 
@@ -60,16 +57,13 @@ test_set map_tests{
 				};
 				auto s = f % s1;
 
-				return s == std::map<int,int>{
-					make_pair(0,2),
-					make_pair(1,3),
-					make_pair(2,4)
-				};
-			})
+				std::map<int,int> expected{ make_pair(0, 2), make_pair(1, 3), make_pair(2, 4) };
+				TEST_ASSERT(s == expected);
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldl"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using std::make_pair;
 
 				auto s = std::map<int,int>{
@@ -80,12 +74,12 @@ test_set map_tests{
 
 				auto f = [](float x, int y){ return x + float(y); };
 
-				return ftl::foldl(f, 0.5f, s) == .5f + 1.f + 2.f + 3.f;
-			})
+				TEST_ASSERT( (ftl::foldl(f, 0.5f, s) == .5f + 1.f + 2.f + 3.f) );
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::foldr"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using std::make_pair;
 
@@ -97,12 +91,12 @@ test_set map_tests{
 				auto f = [](float x, float y){ return x/y; };
 
 
-				return fequal(foldr(f, 16.f, s), .15625f);
-			})
+				TEST_ASSERT( (fequal(foldr(f, 16.f, s), .15625f)) );
+			}
 		),
 		std::make_tuple(
 			std::string("foldable::fold"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using std::make_pair;
 
@@ -112,8 +106,8 @@ test_set map_tests{
 					make_pair(2, prod(4))
 				};
 
-				return fold(m) == 24;
-			})
+				TEST_ASSERT(fold(m) == 24);
+			}
 		)
 	}
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -31,29 +31,29 @@ test_set lazyt_tests{
 	{
 		std::make_tuple(
 			std::string("functor::map"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using lazyM = ftl::lazyT<ftl::maybe<int>>;
 
 				auto a = ftl::applicative<lazyM>::pure(1);
 				auto b = [](int x){ return float(x)/4.f; } % a;
 
-				return *b->template unsafe_get<ftl::lazy<float>>() == .25f;
-			})
+				TEST_ASSERT(*b->template unsafe_get<ftl::lazy<float>>() == .25f);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::pure"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using lazyM = ftl::lazyT<ftl::maybe<int>>;
 
 				auto x = ftl::applicative<lazyM>::pure(10);
 
-				return *x->template unsafe_get<ftl::lazy<int>>() == 10;
-			})
+				TEST_ASSERT(*x->template unsafe_get<ftl::lazy<int>>() == 10);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using lazyF = lazyT<function<int(int)>>;
 
@@ -69,12 +69,12 @@ test_set lazyt_tests{
 
 				auto z = f % x * y;
 
-				return *(*z)(6) == 15;
-			})
+				TEST_ASSERT(*(*z)(6) == 15);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using lazyM = lazyT<maybe<int>>;
 
@@ -83,12 +83,12 @@ test_set lazyt_tests{
 					return aPure<lazyM>()(x*2);
 				};
 
-				return *b->template unsafe_get<lazy<int>>() == 6;
-			})
+				TEST_ASSERT(*b->template unsafe_get<lazy<int>>() == 6);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[lift]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using lazyM = lazyT<maybe<int>>;
 
@@ -97,12 +97,12 @@ test_set lazyt_tests{
 					return aPure<maybe<int>>()(x*2);
 				};
 
-				return *b->template unsafe_get<lazy<int>>() == 6;
-			})
+				TEST_ASSERT(*b->template unsafe_get<lazy<int>>() == 6);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind[lift&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using lazyM = lazyT<maybe<int>>;
 
@@ -111,8 +111,8 @@ test_set lazyt_tests{
 					return aPure<maybe<int>>()(x*2);
 				};
 
-				return *b->template unsafe_get<lazy<int>>() == 6;
-			})
+				TEST_ASSERT(*b->template unsafe_get<lazy<int>>() == 6);
+			}
 		)
 	}
 };

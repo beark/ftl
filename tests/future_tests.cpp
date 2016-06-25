@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -29,27 +29,27 @@ test_set future_tests{
 	{
 		std::make_tuple(
 			std::string("functor::map"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto fb = [](int x) { return std::to_string(x); } %
 					std::async(std::launch::async, []() { return 1; });
 
-				return fb.get() == std::string("1");
-			})
+				TEST_ASSERT(fb.get() == std::string("1"));
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::pure"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				auto f = ftl::applicative<std::future<int>>::pure(10);
 
-				return f.get() == 10;
-			})
+				TEST_ASSERT(f.get() == 10);
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using ftl::operator*;
 
@@ -59,12 +59,12 @@ test_set future_tests{
 					% std::async(std::launch::async, [](){ return 1; })
 					* std::async(std::launch::async, [](){ return 1; });
 
-				return f.get() == 2;
-			})
+				TEST_ASSERT(f.get() == 2);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::bind"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator>>=;
 
 				auto f = std::async(std::launch::async, [](){ return 1; });
@@ -77,12 +77,12 @@ test_set future_tests{
 
 				auto g = ftl::monad<std::future<int>>::bind(std::move(f), fn);
 
-				return g.get() == 2;
-			})
+				TEST_ASSERT(g.get() == 2);
+			}
 		),
 		std::make_tuple(
 			std::string("monad::join"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator>>=;
 
 				auto f = std::async(std::launch::deferred, [](){
@@ -92,13 +92,12 @@ test_set future_tests{
 				});
 
 
-				return ftl::monad<std::future<int>>
-					::join(std::move(f)).get() == 1;
-			})
+				TEST_ASSERT(ftl::monad<std::future<int>>::join(std::move(f)).get() == 1);
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator^;
 
 				auto f =
@@ -106,8 +105,8 @@ test_set future_tests{
 					^
 					std::async(std::launch::async, [](){ return ftl::sum(1); });
 
-				return static_cast<int>(f.get()) == 2;
-			})
+				TEST_ASSERT(static_cast<int>(f.get()) == 2);
+			}
 		),
 	}
 };

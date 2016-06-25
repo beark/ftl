@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -28,47 +28,48 @@ test_set tuple_tests{
 	{
 		std::make_tuple(
 			std::string("monoid::id"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
-				return monoid<std::tuple<sum_monoid<int>,prod_monoid<float>>>::id()
-					== std::make_tuple(sum(0), prod(1.f));
-			})
+				using tup_monoid = monoid<std::tuple<sum_monoid<int>,prod_monoid<float>>>;
+
+				TEST_ASSERT( (tup_monoid::id() == std::make_tuple(sum(0), prod(1.f))) );
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto t1 = std::make_tuple(sum(2), prod(2));
 				auto t2 = std::make_tuple(sum(1), prod(3));
 
-				return (t1 ^ t2) == std::make_tuple(sum(3), prod(6));
-			})
+				TEST_ASSERT( ((t1 ^ t2) == std::make_tuple(sum(3), prod(6))) );
+			}
 		),
 		std::make_tuple(
 			std::string("functor::map"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto f = [](int x){ return x+1; };
 				auto t = f % std::make_tuple(2, 3.f, true);
 
-				return t == std::make_tuple(3, 3.f, true);
-			})
+				TEST_ASSERT( (t == std::make_tuple(3, 3.f, true)) );
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::pure"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				auto t = ftl::applicative<std::tuple<int,ftl::sum_monoid<int>>>::pure(2);
 
-				return t == std::make_tuple(2, ftl::sum(0));
-			})
+				TEST_ASSERT(t == std::make_tuple(2, ftl::sum(0)));
+			}
 		),
 		std::make_tuple(
 			std::string("applicative::apply"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 				using std::make_tuple;
 
@@ -76,8 +77,8 @@ test_set tuple_tests{
 				auto t = tf * make_tuple(3, sum(2), prod(3));
 
 
-				return t == make_tuple(6, sum(5), prod(6));
-			})
+				TEST_ASSERT(t == make_tuple(6, sum(5), prod(6)));
+			}
 		)
 	}
 };

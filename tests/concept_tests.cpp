@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -36,7 +36,7 @@ test_set concept_tests{
 	{
 		std::make_tuple(
 			std::string("Monoid: curried mappend"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto m1 = just(sum(2));
@@ -45,11 +45,11 @@ test_set concept_tests{
 				auto m3 = mappend % m1 * m2;
 
 				return m3 == just(sum(4));
-			})
+			}
 		),
 		std::make_tuple(
 			std::string("Functor: curried fmap"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto f = [](int x){ return x+1; };
@@ -57,12 +57,13 @@ test_set concept_tests{
 
 				auto m = fm(just(2));
 
-				return m == just(3) && m == fmap(f)(just(2));
-			})
+				TEST_ASSERT(m == just(3));
+				TEST_ASSERT(m == fmap(f)(just(2)));
+			}
 		),
 		std::make_tuple(
 			std::string("Functor: fmap [member fn]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				struct test {
@@ -77,12 +78,12 @@ test_set concept_tests{
 
 				auto r = &test::foo % just(test{3});
 
-				return r.template unsafe_get<int>() == 6;
-			})
+				TEST_ASSERT(r.unsafe_get<int>() == 6);
+			}
 		),
 		std::make_tuple(
 			std::string("Applicative: curried aapply"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto mf = just(function<int(int)>([](int x){
@@ -91,25 +92,25 @@ test_set concept_tests{
 
 				auto ap = aapply(mf);
 
-				return ap(just(2)) == just(3)
-					&& aapply(mf)(just(2)) == just(3);
-			})
+				TEST_ASSERT(ap(just(2)) == just(3));
+				TEST_ASSERT(aapply(mf)(just(2)) == just(3));
+			}
 		),
 		std::make_tuple(
 			std::string("Monad: curried mbind"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto m = just(2);
 				auto cbind = mbind(m);
 				auto f = [](int x){ return just(x+1); };
 
-				return cbind(f) == just(3);
-			})
+				TEST_ASSERT(cbind(f) == just(3));
+			}
 		),
 		std::make_tuple(
 			std::string("Monad: >>="),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto m1 = just(2);
@@ -117,13 +118,12 @@ test_set concept_tests{
 				auto f1 = [](int x){ return just(float(x)*0.5f); };
 				auto f2 = [](float x){ return just(int(x*3.33f)); };
 
-				return
-					((m1 >>= f1) >>= f2) == just(3);
-			})
+				TEST_ASSERT( ((m1 >>= f1) >>= f2) == just(3) );
+			}
 		),
 		std::make_tuple(
 			std::string("Monad: >>= [member fn]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				struct foo {
@@ -138,37 +138,38 @@ test_set concept_tests{
 
 				auto m = just(foo{3});
 
-				return
-					(m >>= &foo::bar) == just(6);
-			})
+				TEST_ASSERT( (m >>= &foo::bar) == just(6) );
+			}
 		),
 		std::make_tuple(
 			std::string("Monad: >>"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto m1 = just(1);
 				auto m2 = just(2);
 				maybe<int> m3 = nothing;
 
-				return (m1 >> m2) == just(2) && (m3 >> m1) == maybe<int>{nothing};
-			})
+				TEST_ASSERT((m1 >> m2) == just(2));
+				TEST_ASSERT((m3 >> m1) == nothing);
+			}
 		),
 		std::make_tuple(
 			std::string("Monad: <<"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto m1 = just(1);
 				auto m2 = just(2);
 				maybe<int> m3 = nothing;
 
-				return (m1 << m2) == just(1) && (m1 << m3) == maybe<int>{nothing};
-			})
+				TEST_ASSERT((m1 << m2) == just(1));
+				TEST_ASSERT((m1 << m3) == nothing);
+			}
 		),
 		std::make_tuple(
 			std::string("Monad: <<="),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto m1 = just(0.f);
@@ -177,13 +178,13 @@ test_set concept_tests{
 					return x == 0 ? nothing : just(8.f / x);
 				};
 
-				return (f <<= f <<= m1) == nothing
-					&& (f <<= f <<= m2) == just(2.f);
-			})
+				TEST_ASSERT((f <<= f <<= m1) == nothing);
+				TEST_ASSERT((f <<= f <<= m2) == just(2.f));
+			}
 		),
 		std::make_tuple(
 			std::string("Monad: mixed, non-trivial sequence"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto plusOne = [](int x){ return just(x+1); };
@@ -193,24 +194,24 @@ test_set concept_tests{
 
 				auto m1 = ((mOne >>= plusOne) >>= mulTwo) << (mulTwo <<= mOne);
 
-				return m1 == just(4);
-			})
+				TEST_ASSERT(m1 == just(4));
+			}
 		),
 		std::make_tuple(
 			std::string("Foldable: curried foldMap"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto foldmap = foldMap(&sum<int>);
 
 				std::vector<int> v{3,3,4};
 
-				return foldmap(v) == 10;
-			})
+				TEST_ASSERT(foldmap(v) == 10);
+			}
 		),
 		std::make_tuple(
 			std::string("Foldable: curried foldr"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto foldr2 = foldr(std::plus<int>());
@@ -218,16 +219,15 @@ test_set concept_tests{
 
 				std::vector<int> v{3,3,4};
 
-				return
-					foldr(std::plus<int>(), 0, v) == 10
-					&& foldr2(0, v) == 10
-					&& foldr1(v) == 10
-					&& foldr(std::plus<int>())(0)(v) == 10;
-			})
+				TEST_ASSERT(foldr(std::plus<int>(), 0, v) == 10);
+				TEST_ASSERT(foldr2(0, v) == 10);
+				TEST_ASSERT(foldr1(v) == 10);
+				TEST_ASSERT(foldr(std::plus<int>())(0)(v) == 10);
+			}
 		),
 		std::make_tuple(
 			std::string("Foldable: curried foldl"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto f = [](int x, int y){ return x+y; };
@@ -237,16 +237,15 @@ test_set concept_tests{
 
 				std::vector<int> v{3,3,4};
 
-				return
-					foldl(f, 0, v) == 10
-					&& foldl2(0, v) == 10
-					&& foldl1(v) == 10
-					&& foldl(f, 0)(v) == 10;
-			})
+				TEST_ASSERT(foldl(f, 0, v) == 10);
+				TEST_ASSERT(foldl2(0, v) == 10);
+				TEST_ASSERT(foldl1(v) == 10);
+				TEST_ASSERT(foldl(f, 0)(v) == 10);
+			}
 		),
 		std::make_tuple(
 			std::string("Foldable: foldl associativity"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto rCons = [](std::list<int> xs, int x){
@@ -256,13 +255,14 @@ test_set concept_tests{
 
 				std::list<int> l{2,3,4};
 
-				return foldl(rCons, std::list<int>{}, l)
-					== std::list<int>{4,3,2};
-			})
+				TEST_ASSERT(
+					(foldl(rCons, std::list<int>{}, l) == std::list<int>{4,3,2})
+				);
+			}
 		),
 		std::make_tuple(
 			std::string("Zippable: curried zipWith"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto f = [](int x, int y){ return x+y; };
@@ -276,13 +276,13 @@ test_set concept_tests{
 
 				std::vector<int> expected{4,6,9};
 
-				return zipWithF(v1, v2) == expected
-					&& zipWithFV1(v2) == expected;
-			})
+				TEST_ASSERT(zipWithF(v1, v2) == expected);
+				TEST_ASSERT(zipWithFV1(v2) == expected);
+			}
 		),
 		std::make_tuple(
 			std::string("Zippable: zip"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::vector<int> v1{3,3,4};
@@ -300,13 +300,13 @@ test_set concept_tests{
 					std::make_tuple(5,4)
 				};
 
-				return zip(v1, v2) == expected1
-					&& zip(v2, v1) == expected2;
-			})
+				TEST_ASSERT(zip(v1, v2) == expected1);
+				TEST_ASSERT(zip(v2, v1) == expected2);
+			}
 		),
 		std::make_tuple(
 			std::string("fmap(fold, v)"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				std::vector<std::vector<sum_monoid<int>>> v{
@@ -316,8 +316,8 @@ test_set concept_tests{
 
 				auto r = fmap(fold, v);
 
-				return r == std::vector<sum_monoid<int>>{sum(3), sum(7)};
-			})
+				TEST_ASSERT((r == std::vector<sum_monoid<int>>{sum(3), sum(7)}));
+			}
 		)
 	}
 };

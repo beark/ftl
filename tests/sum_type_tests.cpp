@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -61,6 +61,23 @@ maybe<std::decay_t<T>> just(T&& t)
 		ftl::type<Just<decay_t<T>>>, std::forward<T>(t)
 	};
 }
+
+struct Trivial
+{
+	Trivial() = default;
+	Trivial(const Trivial&) = default;
+	Trivial(Trivial&&) = default;
+
+	constexpr Trivial(int i, char c) noexcept : integer(i), character(c) {}
+
+	~Trivial() = default;
+
+	Trivial& operator= (const Trivial&) = default;
+	Trivial& operator= (Trivial&&) = default;
+
+	int integer;
+	char character;
+};
 
 // Used to test "complex" sum types, ie ones containing types that are
 // not trivially destructible
@@ -132,7 +149,7 @@ test_set sum_type_tests{
 	{
 		std::make_tuple(
 			std::string("Static assertions"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				static_assert(std::is_standard_layout<sum_type<int,char>>::value, "Sum type of trivial types should be guaranteed standard layout");
@@ -165,13 +182,11 @@ test_set sum_type_tests{
 					z.match(wasNotNothing, wasInt),
 					"Match expressions with constexpr case clauses should be constexpr"
 				);
-
-				return true;
-			})
+			}
 		),
 		std::make_tuple(
 			std::string("Construct using constructor tag"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				int i = 1;
@@ -187,49 +202,84 @@ test_set sum_type_tests{
 				// Complex sum type
 				sum_type<int,NonTrivial> a{type<int>, 12};
 				sum_type<int,NonTrivial> b{type<NonTrivial>, 12};
-
-				return true;
-			})
+			}
 		),
 		std::make_tuple(
 			std::string("is<T> [trivial]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,char> x{type<int>, 10};
 				sum_type<int,char> y{type<char>, 'b'};
 
-				return x.is<int>() && !x.is<char>()
-					&& !y.is<int>() && y.is<char>();
-			})
+				TEST_ASSERT(x.is<int>());
+				TEST_ASSERT(!x.is<char>());
+				TEST_ASSERT(!y.is<int>());
+				TEST_ASSERT(y.is<char>());
+			}
 		),
 		std::make_tuple(
 			std::string("is<T> [trivial destructor]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,CopyThrow> x{type<int>, 10};
 				sum_type<CopyThrow,char> y{type<CopyThrow>};
 
-				return x.is<int>() && !x.is<CopyThrow>()
-					&& !y.is<char>() && y.is<CopyThrow>();
-			})
+				TEST_ASSERT(x.is<int>());
+				TEST_ASSERT(!x.is<CopyThrow>());
+				TEST_ASSERT(!y.is<char>());
+				TEST_ASSERT(y.is<CopyThrow>());
+			}
 		),
 		std::make_tuple(
 			std::string("is<T> [complex]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,NonTrivial> x{type<int>, 10};
 				sum_type<NonTrivial,char> y{type<NonTrivial>, 1};
 
-				return x.is<int>() && !x.is<NonTrivial>()
-					&& !y.is<char>() && y.is<NonTrivial>();
-			})
+				TEST_ASSERT(x.is<int>());
+				TEST_ASSERT(!x.is<NonTrivial>());
+				TEST_ASSERT(!y.is<char>());
+				TEST_ASSERT(y.is<NonTrivial>());
+			}
+		),
+		std::make_tuple(
+			std::string("emplace [trivial]"),
+			[] {
+				using namespace ftl;
+
+				sum_type<Trivial,int> v{type<int>};
+
+				v.emplace(type<Trivial>, 5, 'c');
+
+				TEST_ASSERT(v.is<Trivial>());
+				v.match(
+					[](Trivial t)
+					{
+						TEST_ASSERT(t.integer == 5);
+						TEST_ASSERT(t.character == 'c');
+					},
+					[](match_all) { TEST_ASSERT(false); }
+				);
+
+				v.emplace(type<int>, 3);
+
+				TEST_ASSERT(v.is<int>());
+				v.match(
+					[](int i)
+					{
+						TEST_ASSERT(i == 3);
+					},
+					[](match_all) { TEST_ASSERT(false); }
+				);
+			}
 		),
 		std::make_tuple(
 			std::string("Eq [trivial]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,char> w{type<int>, 12};
@@ -237,12 +287,15 @@ test_set sum_type_tests{
 				sum_type<int,char> y{type<char>, 'b'};
 				sum_type<int,char> z{type<int>, 10};
 
-				return w != x && x != y && x == z && w != y;
-			})
+				TEST_ASSERT( w != x );
+				TEST_ASSERT( x != y );
+				TEST_ASSERT( x == z );
+				TEST_ASSERT( w != y );
+			}
 		),
 		std::make_tuple(
 			std::string("Eq [trivial destructor]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,CopyThrow> w{type<int>, 12};
@@ -250,12 +303,15 @@ test_set sum_type_tests{
 				sum_type<int,CopyThrow> y{type<CopyThrow>};
 				sum_type<int,CopyThrow> z{type<int>, 10};
 
-				return w != x && x != y && x == z && w != y;
-			})
+				TEST_ASSERT( w != x );
+				TEST_ASSERT( x != y );
+				TEST_ASSERT( x == z );
+				TEST_ASSERT( w != y );
+			}
 		),
 		std::make_tuple(
 			std::string("Eq [complex]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,NonTrivial> w{type<int>, 12};
@@ -263,12 +319,15 @@ test_set sum_type_tests{
 				sum_type<int,NonTrivial> y{type<NonTrivial>, 1};
 				sum_type<int,NonTrivial> z{type<int>, 10};
 
-				return w != x && x != y && x == z && w != y;
-			})
+				TEST_ASSERT( w != x );
+				TEST_ASSERT( x != y );
+				TEST_ASSERT( x == z );
+				TEST_ASSERT( w != y );
+			}
 		),
 		std::make_tuple(
 			std::string("Copy assign [trivial]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,char> x{type<int>, 1};
@@ -278,13 +337,13 @@ test_set sum_type_tests{
 				x = y;
 				y = z;
 
-				return x.unsafe_get<int>() == 5
-					&& y.unsafe_get<char>() == 'a';
-			})
+				TEST_ASSERT(x.unsafe_get<int>() == 5);
+				TEST_ASSERT(y.unsafe_get<char>() == 'a');
+			}
 		),
 		std::make_tuple(
 			std::string("Copy assign [trivial destructor]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,TrivialDestructor> x{type<TrivialDestructor>};
@@ -294,13 +353,13 @@ test_set sum_type_tests{
 				x = y;
 				y = z;
 
-				return x.unsafe_get<int>() == 5
-					&& y.unsafe_get<int>() == 15;
-			})
+				TEST_ASSERT(x.unsafe_get<int>() == 5);
+				TEST_ASSERT(y.unsafe_get<int>() == 15);
+			}
 		),
 		std::make_tuple(
 			std::string("Copy assign [complex]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,NonTrivial> x{type<NonTrivial>};
@@ -310,13 +369,13 @@ test_set sum_type_tests{
 				x = y;
 				y = z;
 
-				return x.unsafe_get<int>() == 5
-					&& y.unsafe_get<int>() == 15;
-			})
+				TEST_ASSERT(x.unsafe_get<int>() == 5);
+				TEST_ASSERT(y.unsafe_get<int>() == 15);
+			}
 		),
 		std::make_tuple(
 			std::string("Copy assign element types [trivial]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,char> x{type<int>, 1};
@@ -325,13 +384,13 @@ test_set sum_type_tests{
 				x = 5;
 				y = 'a';
 
-				return x.unsafe_get<int>() == 5
-					&& y.unsafe_get<char>() == 'a';
-			})
+				TEST_ASSERT(x.unsafe_get<int>() == 5);
+				TEST_ASSERT(y.unsafe_get<char>() == 'a');
+			}
 		),
 		std::make_tuple(
 			std::string("Copy assign element types [trivial destructor]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,TrivialDestructor> x{type<int>, 1};
@@ -342,13 +401,13 @@ test_set sum_type_tests{
 				x = 5;
 				y = var;
 
-				return x.unsafe_get<int>() == 5
-					&& y.is<TrivialDestructor>();
-			})
+				TEST_ASSERT(x.unsafe_get<int>() == 5);
+				TEST_ASSERT(y.is<TrivialDestructor>());
+			}
 		),
 		std::make_tuple(
 			std::string("Copy assign element types [complex]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<std::shared_ptr<int>,NonTrivial> x{type<NonTrivial>, 1};
@@ -357,13 +416,13 @@ test_set sum_type_tests{
 				x = NonTrivial{10};
 				y = std::shared_ptr<int>(new int(15));
 
-				return x.unsafe_get<NonTrivial>() == NonTrivial(10)
-					&& *y.unsafe_get<std::shared_ptr<int>>() == 15;
-			})
+				TEST_ASSERT(x.unsafe_get<NonTrivial>() == NonTrivial(10));
+				TEST_ASSERT(*y.unsafe_get<std::shared_ptr<int>>() == 15);
+			}
 		),
 		std::make_tuple(
 			std::string("Copy assign with throwing constructor"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto x = sum_type<CopyThrow, int>{type<CopyThrow>};
@@ -375,12 +434,12 @@ test_set sum_type_tests{
 						[](match_all) { return 0; }
 					);
 
-				return x.unsafe_get<int>() == 5;
-			})
+				TEST_ASSERT(x.unsafe_get<int>() == 5);
+			}
 		),
 		std::make_tuple(
 			std::string("Move assign [trivial]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,char> w{type<int>, 1};
@@ -391,13 +450,13 @@ test_set sum_type_tests{
 				x = std::move(y);
 				w = std::move(z);
 
-				return x.unsafe_get<int>() == 5
-					&& w.unsafe_get<char>() == 'a';
-			})
+				TEST_ASSERT(x.unsafe_get<int>() == 5);
+				TEST_ASSERT(w.unsafe_get<char>() == 'a');
+			}
 		),
 		std::make_tuple(
 			std::string("Move assign [trivial destructor]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				// Move assign trivial sum types
@@ -409,13 +468,13 @@ test_set sum_type_tests{
 				x = std::move(y);
 				w = std::move(z);
 
-				return x.unsafe_get<int>() == 5
-					&& w.is<TrivialDestructor>();
-			})
+				TEST_ASSERT(x.unsafe_get<int>() == 5);
+				TEST_ASSERT(w.is<TrivialDestructor>());
+			}
 		),
 		std::make_tuple(
 			std::string("Move assign [complex]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,NonTrivial> w{type<NonTrivial>, 1};
@@ -426,13 +485,13 @@ test_set sum_type_tests{
 				x = std::move(y);
 				w = std::move(z);
 
-				return x.unsafe_get<NonTrivial>() == NonTrivial(10)
-					&& w.unsafe_get<int>() == 15;
-			})
+				TEST_ASSERT(x.unsafe_get<NonTrivial>() == NonTrivial(10));
+				TEST_ASSERT(w.unsafe_get<int>() == 15);
+			}
 		),
 		std::make_tuple(
 			std::string("Get by type"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				sum_type<int,char> x{type<int>, 10};
@@ -441,12 +500,13 @@ test_set sum_type_tests{
 				auto s1 = x.unsafe_get<int>();
 				auto s2 = y.unsafe_get<char>();
 
-				return s1 == 10 && s2 == 'b';
-			})
+				TEST_ASSERT(s1 == 10);
+				TEST_ASSERT(s2 == 'b');
+			}
 		),
 		std::make_tuple(
 			std::string("Match expressions [trivial]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				struct A {};
@@ -475,12 +535,14 @@ test_set sum_type_tests{
 					[](C){ return 2; }
 				);
 
-				return s1 == 0 && s2 == 1 && s3 == 2;
-			})
+				TEST_ASSERT(s1 == 0);
+				TEST_ASSERT(s2 == 1);
+				TEST_ASSERT(s3 == 2);
+			}
 		),
 		std::make_tuple(
 			std::string("Match expressions (non-trivial types)"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				struct A {};
@@ -508,12 +570,14 @@ test_set sum_type_tests{
 					[](NonTrivial){ return 2; }
 				);
 
-				return s1 == 2 && s2 == 0 && s3 == 1;
-			})
+				TEST_ASSERT(s1 == 2);
+				TEST_ASSERT(s2 == 0);
+				TEST_ASSERT(s3 == 1);
+			}
 		),
 		std::make_tuple(
 			std::string("Match with match_all (trivial types)"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				struct A {};
@@ -540,11 +604,11 @@ test_set sum_type_tests{
 				);
 
 				return s1 == 0 && s2 == 1 && s3 == 1;
-			})
+			}
 		),
 		std::make_tuple(
 			std::string("Match expressions [&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				struct A {};
@@ -557,11 +621,11 @@ test_set sum_type_tests{
 				);
 
 				return r == x.unsafe_get<int>();
-			})
+			}
 		),
 		std::make_tuple(
 			std::string("Match expressions [void]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				struct A {};
@@ -581,12 +645,13 @@ test_set sum_type_tests{
 					[&](const int&){ ++i2; }
 				);
 
-				return i1 == 6 && i2 == 11;
-			})
+				TEST_ASSERT(i1 == 6);
+				TEST_ASSERT(i2 == 11);
+			}
 		),
 		std::make_tuple(
 			std::string("Maybe mockup"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using namespace ftl;
 
 				auto x = just(12);
@@ -597,8 +662,14 @@ test_set sum_type_tests{
 					[](Nothing){ return 0; }
 				);
 
-				return s1 == 12;
-			})
+				auto s2 = y.match(
+					[](Just<int>) { return 0; },
+					[](Nothing) { return 1; }
+				);
+
+				TEST_ASSERT(s1 == 12);
+				TEST_ASSERT(s2 == 1);
+			}
 		),
 	}
 };

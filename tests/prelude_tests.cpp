@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -44,65 +44,69 @@ test_set prelude_tests{
 	{
 		std::make_tuple(
 			std::string("identity function object"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto m = ftl::id % ftl::just(10);
 
-				return m.match(
-					[](int x){ return x == 10; },
-					[](ftl::nothing_t){ return false; }
+				m.match(
+					[](int x){ TEST_ASSERT(x == 10); },
+					[](ftl::nothing_t){ TEST_ASSERT(false); }
 				);
-			})
+			}
 		),
 		std::make_tuple(
 			std::string("const_ function object"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 
 				auto m = ftl::const_(42) % ftl::just(3);
 
-				return m.match(
-					[](int x){ return x == 42; },
-					[](ftl::nothing_t){ return false; }
+				m.match(
+					[](int x){ TEST_ASSERT(x == 42); },
+					[](ftl::nothing_t){ TEST_ASSERT(false); }
 				);
-			})
+			}
 		),
 		std::make_tuple(
 			std::string("Eq<Identity>"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				ftl::Identity<int> x{10};
 				ftl::Identity<int> y{12};
 
-				return x == x && x != y;
-			})
+				TEST_ASSERT(x == x);
+				TEST_ASSERT(x != y);
+			}
 		),
 		std::make_tuple(
 			std::string("Orderable<Identity>"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				ftl::Identity<int> x{10};
 				ftl::Identity<int> y{12};
 				ftl::Identity<int> z{4};
 
-				return x > z && x < y && x >= x && x <= x;
-			})
+				TEST_ASSERT(x > z);
+				TEST_ASSERT(x < y);
+				TEST_ASSERT(x >= x);
+				TEST_ASSERT(x <= x);
+			}
 		),
 		std::make_tuple(
 			std::string("Functor<Identity>"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				ftl::Identity<int> x{10};
 
 				auto y = ftl::fmap([](int x){ return x/2; }, x);
 
-				return y.val == 5;
-			})
+				TEST_ASSERT(y.val == 5);
+			}
 		),
 		std::make_tuple(
 			std::string("Applicative<Identity>"),
-			std::function<bool()>([]() -> bool {
+			[] {
 
 				ftl::Identity<int> x{10};
 				auto f = [](int x, int y){ return x+y; };
@@ -110,46 +114,46 @@ test_set prelude_tests{
 				auto y = ftl::fmap(ftl::curry<2>(f), x);
 				auto z = ftl::aapply(y, x);
 
-				return z.val == 20;
-			})
+				TEST_ASSERT(z.val == 20);
+			}
 		),
 		std::make_tuple(
 			std::string("Monad<Identity>::join"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::Identity;
 
 				Identity<int> x{10};
 				auto y = Identity<Identity<int>>{x};
 				auto z = ftl::monad<Identity<int>>::join(y);
 
-				return x == z;
-			})
+				TEST_ASSERT(x == z);
+			}
 		),
 		std::make_tuple(
 			std::string("Monad<Identity>::bind"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::Identity;
 
 				Identity<int> x{10};
 				auto f = [](int x){ return Identity<int>{x/2}; };
 
-				return (x >>= f).val == 5;
-			})
+				TEST_ASSERT((x >>= f).val == 5);
+			}
 		),
 		std::make_tuple(
 			std::string("tuple_apply[&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto f = [](int x, int y){ return x+y; };
 				auto t = std::make_tuple(4,4);
 
 				auto r = ftl::tuple_apply(f,t);
 
-				return r == 8;
-			})
+				TEST_ASSERT(r == 8);
+			}
 		),
 		std::make_tuple(
 			std::string("curried tuple_apply"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto f = [](int x, int y){ return x+y; };
 				auto t = std::make_tuple(4,4);
 
@@ -157,92 +161,95 @@ test_set prelude_tests{
 				auto r = tup_ap(t);
 
 				return r == 8;
-			})
+			}
 		),
 		std::make_tuple(
 			std::string("tuple_apply[&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto f = [](int x, int y){ return x+y; };
 
 				auto r = ftl::tuple_apply(f,std::make_tuple(4,4));
 
-				return r == 8;
-			})
+				TEST_ASSERT(r == 8);
+			}
 		),
 		std::make_tuple(
 			std::string("currying regular functions"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto f = ftl::curry(curry_me);
-				return f(2)(2) == f(2,2) && f(2,2) == curry_me(2,2);
-			})
+
+				TEST_ASSERT( (f(2)(2) == f(2,2)) );
+				TEST_ASSERT( (f(2,2) == curry_me(2,2)) );
+			}
 		),
 		std::make_tuple(
 			std::string("currying std::function"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				std::function<int(int,int)> f = [](int x, int y) { return x+y; };
 				auto g = ftl::curry(f);
 
-				return g(2)(2) == g(2,2) && g(2,2) == f(2,2);
-			})
+				TEST_ASSERT( (g(2)(2) == g(2,2)) );
+				TEST_ASSERT( (g(2,2) == f(2,2)) );
+			}
 		),
 		std::make_tuple(
 			std::string("currying generic function object"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto f = [](int x, int y, int z){ return x+y+z; };
 				auto g = ftl::curry(f);
 
-				return g(2)(2)(2) == g(2,2)(2)
-					&& g(3,3)(3) == g(3,3,3)
-					&& g(2,3,4) == f(2,3,4);
-			})
+				TEST_ASSERT( (g(2)(2)(2) == g(2,2)(2)) );
+				TEST_ASSERT( (g(3,3)(3) == g(3,3,3)) );
+				TEST_ASSERT( (g(2,3,4) == f(2,3,4)) );
+			}
 		),
 		std::make_tuple(
 			std::string("currying n-ary function"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto f = [](int x, int y, int z){ return x+y+z; };
 				auto g = ftl::curry<3>(f);
 
-				return g(2)(2)(2) == g(2,2)(2)
-					&& g(3,3)(3) == g(3,3,3)
-					&& g(2,3,4) == f(2,3,4);
-			})
+				TEST_ASSERT( (g(2)(2)(2) == g(2,2)(2)) );
+				TEST_ASSERT( (g(3,3)(3) == g(3,3,3)) );
+				TEST_ASSERT( (g(2,3,4) == f(2,3,4)) );
+			}
 		),
 		std::make_tuple(
 			std::string("curried n-ary function object"),
-			std::function<bool()>([]() -> bool {
-				return curry5(1)(2,3)(4,5)  == curry5(1,2)(3,4)(5)
-					&& curry5(1,2)(3)(4)(5) == curry5(1)(2)(3,4)(5)
-					&& curry5(1,2,3,4,5)    == curry5(1)(2)(3)(4)(5);
-			})
+			[] {
+				TEST_ASSERT( (curry5(1)(2,3)(4,5)  == curry5(1,2)(3,4)(5)) );
+				TEST_ASSERT( (curry5(1,2)(3)(4)(5) == curry5(1)(2)(3,4)(5)) );
+				TEST_ASSERT( (curry5(1,2,3,4,5)    == curry5(1)(2)(3)(4)(5)) );
+			}
 		),
 		std::make_tuple(
 			std::string("compose[...,R(*)(Ps...)]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto f = [](int x){ return 2*x; };
 				auto g = [](int x){ return float(x)/3.f; };
 				auto h = ftl::compose(g, f, curry_me);
 
-				return h(2,2) == 8.f/3.f;
-			})
+				TEST_ASSERT(h(2,2) == 8.f/3.f);
+			}
 		),
 		std::make_tuple(
 			std::string("compose[...,function<R,Ps...>]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				auto f = [](int x){ return 2*x; };
 				auto g = [](int x){ return float(x)/3.f; };
 				auto h = ftl::compose(g, f, ftl::curry(curry_me));
 
-				return h(2,2) == 8.f/3.f;
-			})
+				TEST_ASSERT(h(2,2) == 8.f/3.f);
+			}
 		),
 		std::make_tuple(
 			std::string("flip[function<R,A,B>]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				ftl::function<int(int,int)> f = [](int x, int y){ return x/y; };
 				auto g = ftl::flip(f);
 
-				return g(2,4) == 2;
-			})
+				TEST_ASSERT(g(2,4) == 2);
+			}
 		)
 	}
 };

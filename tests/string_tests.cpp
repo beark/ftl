@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -28,53 +28,53 @@ test_set string_tests{
 	{
 		std::make_tuple(
 			std::string("monoid::id"),
-			std::function<bool()>([]() -> bool {
-				return ftl::monoid<std::string>::id() == std::string("");
-			})
+			[] {
+				TEST_ASSERT(ftl::monoid<std::string>::id() == std::string(""));
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append[&,&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator^;
 
 				auto s1 = std::string("ab");
 				auto s2 = std::string("cd");
 
-				return (s1 ^ s2) == std::string("abcd");
-			})
+				TEST_ASSERT((s1 ^ s2) == std::string("abcd"));
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append[&,&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator^;
 
 				auto s1 = std::string("ab");
 				auto s2 = std::string("cd");
 
-				return (s1 ^ std::move(s2)) == std::string("abcd");
-			})
+				TEST_ASSERT((s1 ^ std::move(s2)) == std::string("abcd"));
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append[&&,&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator^;
 
 				auto s1 = std::string("ab");
 				auto s2 = std::string("cd");
 
-				return (std::move(s1) ^ s2) == std::string("abcd");
-			})
+				TEST_ASSERT((std::move(s1) ^ s2) == std::string("abcd"));
+			}
 		),
 		std::make_tuple(
 			std::string("monoid::append[&&,&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator^;
 
 				auto s1 = std::string("ab");
 				auto s2 = std::string("cd");
 
-				return (std::move(s1) ^ std::move(s2)) == std::string("abcd");
-			})
+				TEST_ASSERT((std::move(s1) ^ std::move(s2)) == std::string("abcd"));
+			}
 		)
 	}
 };

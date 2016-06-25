@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Björn Aili
+ * Copyright (c) 2013, 2016 Björn Aili
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@ test_set unordered_map_tests{
 	{
 		std::make_tuple(
 			std::string("functor::map[a->a,&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using std::make_pair;
 
@@ -39,16 +39,16 @@ test_set unordered_map_tests{
 					make_pair(2, 3)
 				};
 
-				return s == std::unordered_map<int,int>{
+				TEST_ASSERT((s == std::unordered_map<int,int>{
 					make_pair(0, 2),
 					make_pair(1, 3),
-					make_pair(2, 4)
-				};
-			})
+					make_pair(2, 4) })
+				);
+			}
 		),
 		std::make_tuple(
 			std::string("functor::map[a->b,&&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using std::make_pair;
 
@@ -60,16 +60,16 @@ test_set unordered_map_tests{
 				};
 				auto s = f % s1;
 
-				return s == std::unordered_map<int,float>{
+				TEST_ASSERT((s == std::unordered_map<int,float>{
 					make_pair(0,1.f*1.5f),
 					make_pair(1,2.f*1.5f),
-					make_pair(2,3.f*1.5f)
-				};
-			})
+					make_pair(2,3.f*1.5f) })
+				);
+			}
 		),
 		std::make_tuple(
 			std::string("functor::map[a->a,&]"),
-			std::function<bool()>([]() -> bool {
+			[] {
 				using ftl::operator%;
 				using std::make_pair;
 
@@ -81,12 +81,12 @@ test_set unordered_map_tests{
 				};
 				auto s = f % s1;
 
-				return s == std::unordered_map<int,int>{
+				TEST_ASSERT((s == std::unordered_map<int,int>{
 					make_pair(0,2),
 					make_pair(1,3),
-					make_pair(2,4)
-				};
-			})
+					make_pair(2,4) })
+				);
+			}
 		)
 	}
 };
