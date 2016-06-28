@@ -389,9 +389,9 @@ namespace ftl {
 
 			constexpr void swap(sum_type_& other) noexcept
 			{
-				auto tempCons = other.cons;
-				other.cons = cons;
-				cons = tempCons;
+				using std::swap;
+
+				swap(cons, other.cons);
 
 				auto temp = ::std::move(other.data);
 				other.data = ::std::move(data);
@@ -418,12 +418,6 @@ namespace ftl {
 			recursive_union_<type_layout::trivially_copyable, Ts...> data;
 			size_t cons;
 		};
-
-		template<class...Ts>
-		constexpr void swap(sum_type_<type_layout::trivially_copyable,Ts...>& a, sum_type_<type_layout::trivially_copyable,Ts...>& b) noexcept
-		{
-			a.swap(b);
-		}
 
 		template<class...Ts>
 		struct sum_type_<type_layout::trivial_destructor,Ts...>
@@ -641,6 +635,20 @@ namespace ftl {
 			constexpr bool operator!= (const sum_type_& rhs) const noexcept
 			{
 				return !operator== (rhs);
+			}
+
+			auto swap(sum_type_& other) noexcept
+			-> ::std::enable_if_t<All<::std::is_nothrow_move_constructible, Ts...>::value>
+			{
+				using std::swap;
+				using recursive_union = recursive_union_<type_layout::trivial_destructor, Ts...>;
+
+				sum_type_ temp{::std::move(*this)};
+
+				swap(cons, other.cons);
+
+				new (&data) recursive_union{::std::move(other.data), cons};
+				new (&other.data) recursive_union{::std::move(temp.data), other.cons};
 			}
 
 		private:
@@ -891,10 +899,37 @@ namespace ftl {
 				return !operator== (rhs);
 			}
 
+			auto swap(sum_type_& other) noexcept
+			-> ::std::enable_if_t<
+				All<::std::is_nothrow_move_constructible, Ts...>::value
+				&& All<::std::is_nothrow_destructible, Ts...>::value>
+			{
+				using std::swap;
+				using recursive_union = recursive_union_<type_layout::complex, Ts...>;
+
+				sum_type_ temp{::std::move(*this)};
+
+				data.destroy(cons);
+
+				new (&data) recursive_union{::std::move(other.data), other.cons};
+
+				other.data.destroy(other.cons);
+
+				swap(cons, other.cons);
+
+				new (&other.data) recursive_union{::std::move(temp.data), other.cons};
+			}
+
 		private:
 			recursive_union_<type_layout::complex, Ts...> data;
 			size_t cons;
 		};
+
+		template<type_layout Layout, class...Ts>
+		constexpr void swap(sum_type_<Layout,Ts...>& a, sum_type_<Layout,Ts...>& b) noexcept
+		{
+			a.swap(b);
+		}
 	}
 
 	/**
