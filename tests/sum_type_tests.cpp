@@ -86,7 +86,7 @@ struct NonTrivial
 	constexpr NonTrivial() noexcept : field(0) {}
 	NonTrivial(const NonTrivial&) = default;
 	NonTrivial(NonTrivial&&) = default;
-	explicit constexpr NonTrivial(int x) : field(x) {}
+	explicit NonTrivial(int x) noexcept : field(x) {}
 	~NonTrivial() {}
 
 	NonTrivial& operator= (const NonTrivial& other) = default;
@@ -274,6 +274,148 @@ test_set sum_type_tests{
 						TEST_ASSERT(i == 3);
 					},
 					[](match_all) { TEST_ASSERT(false); }
+				);
+			}
+		),
+		std::make_tuple(
+			std::string("emplace [trivial destructor]"),
+			[] {
+				using namespace ftl;
+
+				sum_type<CopyThrow,int> v{type<CopyThrow>};
+
+				v.emplace(type<int>, 5);
+
+				TEST_ASSERT(v.is<int>());
+				v.match(
+					[](CopyThrow&)
+					{
+						TEST_ASSERT(false);
+					},
+					[](int x) { TEST_ASSERT(x == 5); }
+				);
+
+				v.emplace(type<CopyThrow>, CopyThrow{});
+
+				TEST_ASSERT(v.is<CopyThrow>());
+			}
+		),
+		std::make_tuple(
+			std::string("emplace [complex]"),
+			[] {
+				using namespace ftl;
+
+				sum_type<NonTrivial,int> v{type<NonTrivial>, 1};
+
+				v.emplace(type<int>, 5);
+
+				TEST_ASSERT(v.is<int>());
+				v.match(
+					[](NonTrivial) { TEST_ASSERT(false); },
+					[](int x) { TEST_ASSERT(x == 5); }
+				);
+
+				v.emplace(type<NonTrivial>, 10);
+
+				TEST_ASSERT(v.is<NonTrivial>());
+				v.match(
+					[](NonTrivial t) { TEST_ASSERT(t.field == 10); },
+					[](int) { TEST_ASSERT(false); }
+				);
+			}
+		),
+		std::make_tuple(
+			std::string("swap [trivial]"),
+			[] {
+				using namespace ftl;
+
+				sum_type<float,int> a{type<int>, 1};
+				sum_type<float,int> b{type<float>, 10.f};
+				sum_type<float,int> c{type<int>, 100};
+
+				using std::swap;
+
+				swap(a, b);
+				swap(b, c);
+
+				TEST_ASSERT(a.is<float>());
+				a.match(
+					[](float x){ TEST_ASSERT(x == 10.f); },
+					[](int){ TEST_ASSERT(false); }
+				);
+
+				TEST_ASSERT(b.is<int>());
+				b.match(
+					[](float){ TEST_ASSERT(false); },
+					[](int x){ TEST_ASSERT(x == 100); }
+				);
+
+				TEST_ASSERT(c.is<int>());
+				c.match(
+					[](float){ TEST_ASSERT(false); },
+					[](int x){ TEST_ASSERT(x == 1); }
+				);
+			}
+		),
+		std::make_tuple(
+			std::string("swap [trivial destructor]"),
+			[] {
+				using namespace ftl;
+
+				sum_type<CopyThrow,int> a{type<int>, 1};
+				sum_type<CopyThrow,int> b{type<CopyThrow>};
+				sum_type<CopyThrow,int> c{type<int>, 100};
+
+				using std::swap;
+
+				swap(a, b);
+				swap(b, c);
+
+				TEST_ASSERT(a.is<CopyThrow>());
+
+				TEST_ASSERT(b.is<int>());
+				b.match(
+					[](CopyThrow&){ TEST_ASSERT(false); },
+					[](int x){ TEST_ASSERT(x == 100); }
+				);
+
+				TEST_ASSERT(c.is<int>());
+				c.match(
+					[](CopyThrow&){ TEST_ASSERT(false); },
+					[](int x){ TEST_ASSERT(x == 1); }
+				);
+			}
+		),
+		std::make_tuple(
+			std::string("swap [complex]"),
+			[] {
+				using namespace ftl;
+
+				sum_type<NonTrivial,int> a{type<int>, 1};
+				sum_type<NonTrivial,int> b{type<NonTrivial>, 10};
+				sum_type<NonTrivial,int> c{type<int>, 100};
+
+				using std::swap;
+
+				swap(a, b);
+				swap(b, c);
+
+				TEST_ASSERT(a.is<NonTrivial>());
+				a.match(
+					[](NonTrivial t){ TEST_ASSERT(t.field == 10); },
+					[](int){ TEST_ASSERT(false); }
+				);
+
+				TEST_ASSERT(b.is<int>());
+				b.match(
+					[](NonTrivial){ TEST_ASSERT(false); },
+					[](int x){ TEST_ASSERT(x == 100); }
+				);
+
+				TEST_ASSERT(c.is<int>());
+				c.match(
+					[](NonTrivial){ TEST_ASSERT(false); },
+					[](int x){ TEST_ASSERT(x == 1); }
 				);
 			}
 		),
