@@ -10,15 +10,13 @@ set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb3 -DDEBUG")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra -std=c++14")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -DDEBUG -fsanitize=address")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 
 	execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 	if(GCC_VERSION VERSION_LESS 5)
 		message(WARNING "${PROJECT_NAME} only supports g++ 5 or later, but ${GCC_VERSION} was detected")
@@ -26,11 +24,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -ggdb3 -DDEBUG")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra -std=c++14")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -DDEBUG -fsanitize=undefined")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 	execute_process(
 		COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE CLANG_VERSION_STRING)
@@ -43,7 +40,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 
-	message(WARNING "${PROJECT_NAME} does not support Visual Studio, expect errors")
+	message("Visual Studio is not a supported compiler, expect errors")
 
 else()
 
@@ -51,7 +48,7 @@ else()
 
 endif()
 
-set(SOURCES 
+set(SOURCES
 	static_tests.cpp
 	sum_type_tests.cpp
 	maybe_tests.cpp
