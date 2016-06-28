@@ -27,6 +27,7 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.8
           packages:
+            - libstdc++-5-dev
             - clang-3.8
       env: COMPILER=clang++-3.8
 
@@ -36,7 +37,7 @@ script:
   - export CXX=$COMPILER
   - cmake ./
   - make -j 2
-  - if [[ "`echo $COMPILER`" == g++* ]]; then ./ftl_tests; fi
+  - ./ftl_tests
   - cd should_fail
   - ctest
 
