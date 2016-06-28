@@ -93,11 +93,18 @@ namespace ftl
 		template<class...Ts>
 		constexpr type_layout get_layout()
 		{
-			return All<::std::is_trivially_copyable, Ts...>::value
-				? type_layout::trivially_copyable
-				: (All<::std::is_trivially_destructible, Ts...>::value
-					? type_layout::trivial_destructor
-					: type_layout::complex);
+			if (!All<::std::is_trivially_destructible, Ts...>::value)
+			{
+				return type_layout::complex;
+			}
+			else if (!All<::std::is_trivially_copyable, Ts...>::value)
+			{
+				return type_layout::trivial_destructor;
+			}
+			else
+			{
+				return type_layout::trivially_copyable;
+			}
 		}
 
 		template<type_layout, class...Ts>
