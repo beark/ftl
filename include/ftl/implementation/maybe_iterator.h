@@ -28,7 +28,7 @@
 
 namespace ftl {
 	template<class T>
-	struct maybe;
+	class maybe;
 
 	namespace _dtl {
 
@@ -113,7 +113,7 @@ namespace ftl {
 			const_maybe_iterator& operator= (const const_maybe_iterator&)
 			   	= default;
 			const_maybe_iterator& operator= (const_maybe_iterator&&) = default;
-		
+
 			constexpr bool operator== (const const_maybe_iterator& m)
 			const noexcept {
 				return ref == m.ref;
