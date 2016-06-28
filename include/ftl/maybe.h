@@ -93,7 +93,8 @@ namespace ftl {
 	public:
 		using sum_type<T,nothing_t>::sum_type;
 
-		constexpr maybe(nothing_t) : sum_type<T,nothing_t>(type<nothing_t>) {}
+		constexpr maybe(nothing_t) noexcept
+			: sum_type<T,nothing_t>(type<nothing_t>) {}
 	};
 
 	template<class T>
