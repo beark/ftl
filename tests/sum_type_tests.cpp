@@ -26,6 +26,8 @@
 #include <ftl/sum_type.h>
 #include "sum_type_tests.h"
 
+using ftl::sum_type;
+
 template<typename T>
 struct Just
 {
@@ -49,7 +51,7 @@ private:
 struct Nothing {};
 
 template<typename T>
-using maybe = ftl::sum_type<Just<T>,Nothing>;
+using maybe = sum_type<Just<T>,Nothing>;
 
 template<typename T>
 maybe<std::decay_t<T>> just(T&& t)
@@ -144,23 +146,76 @@ constexpr bool wasNotNothing(Nothing)
 	return false;
 }
 
+static_assert(
+	std::is_standard_layout<sum_type<int,char>>::value,
+	"Sum type of trivial types should be guaranteed standard layout");
+static_assert(
+	std::is_literal_type<sum_type<int,char>>::value,
+	"Sum type of trivial types should be guaranteed literal");
+static_assert(
+	std::is_trivial<sum_type<int,char>>::value,
+	"Sum type of trivial types should be guaranteed trivial");
+
+static_assert(
+	std::is_nothrow_copy_constructible<sum_type<int,char>>::value,
+	"Trivial sum type should be guaranteed nothrow copy constructible");
+static_assert(
+	std::is_nothrow_move_constructible<sum_type<int,char>>::value,
+	"Trivial sum type should be guaranteed nothrow move constructible");
+static_assert(
+	std::is_nothrow_copy_assignable<sum_type<int,char>>::value,
+	"Trivial sum type should be guaranteed nothrow copy assignable");
+static_assert(
+	std::is_nothrow_move_assignable<sum_type<int,char>>::value,
+	"Trivial sum type should be guaranteed nothrow move assignable");
+
+static_assert(
+	std::is_literal_type<sum_type<TrivialDestructor,int>>::value,
+	"Sum types with trivially destructible types should be guaranteed literal");
+static_assert(
+	!std::is_trivial<sum_type<TrivialDestructor,int>>::value,
+	"Sum types with non-trivially copyable types cannot be trivial");
+
+static_assert(
+	std::is_nothrow_copy_constructible<sum_type<TrivialDestructor,int>>::value,
+	"Sum types must have nothrow copy constructors if all element types do");
+static_assert(
+	std::is_nothrow_move_constructible<sum_type<TrivialDestructor,int>>::value,
+	"Sum types must have nothrow move constructors if all element types do");
+static_assert(
+	std::is_nothrow_copy_assignable<sum_type<TrivialDestructor,int>>::value,
+	"Sum types must have nothrow copy assignment if all element types do");
+static_assert(
+	std::is_nothrow_move_assignable<sum_type<TrivialDestructor,int>>::value,
+	"Sum types must have nothrow move assignment if all element types do");
+
+static_assert(
+	!std::is_literal_type<sum_type<NonTrivial,char>>::value,
+	"Sum types containing non-trivial types should not be literal");
+static_assert(
+	!std::is_trivial<sum_type<NonTrivial,char>>::value,
+	"Sum types containing non-trivial types should not be trivial");
+
+static_assert(
+	std::is_nothrow_copy_constructible<sum_type<NonTrivial,char>>::value,
+	"Complex sum type should be guaranteed nothrow copy constructible if element types are");
+static_assert(
+	std::is_nothrow_move_constructible<sum_type<NonTrivial,char>>::value,
+	"Complex sum type should be guaranteed nothrow move constructible if element types are");
+static_assert(
+	std::is_nothrow_copy_assignable<sum_type<NonTrivial,char>>::value,
+	"Complex sum type should be guaranteed nothrow copy assignable if element types are");
+static_assert(
+	std::is_nothrow_move_assignable<sum_type<NonTrivial,char>>::value,
+	"Complex sum type should be guaranteed nothrow move assignable if element types are");
+
 test_set sum_type_tests{
 	std::string("sum_type"),
 	{
 		std::make_tuple(
-			std::string("Static assertions"),
+			std::string("More static assertions"),
 			[] {
 				using namespace ftl;
-
-				static_assert(std::is_standard_layout<sum_type<int,char>>::value, "Sum type of trivial types should be guaranteed standard layout");
-				static_assert(std::is_literal_type<sum_type<int,char>>::value, "Sum type of trivial types should be guaranteed literal");
-				static_assert(std::is_trivial<sum_type<int,char>>::value, "Sum type of trivial types should be guaranteed trivial");
-
-				static_assert(std::is_literal_type<sum_type<CopyThrow,int>>::value, "Sum types with trivially destructible types should be guaranteed literal");
-				static_assert(!std::is_trivial<sum_type<CopyThrow,int>>::value, "Sum types with non-trivially copyable types cannot be trivial");
-
-				static_assert(!std::is_literal_type<sum_type<NonTrivial,char>>::value, "Sum types containing non-trivial types should not be literal");
-				static_assert(!std::is_trivial<sum_type<NonTrivial,char>>::value, "Sum types containing non-trivial types should not be trivial");
 
 				constexpr sum_type<int,char> x{type<int>, 5};
 
@@ -305,21 +360,21 @@ test_set sum_type_tests{
 			[] {
 				using namespace ftl;
 
-				sum_type<NonTrivial,int> v{type<NonTrivial>, 1};
+				sum_type<std::shared_ptr<int>,int> v{type<std::shared_ptr<int>>, new int(1)};
 
 				v.emplace(type<int>, 5);
 
 				TEST_ASSERT(v.is<int>());
 				v.match(
-					[](NonTrivial) { TEST_ASSERT(false); },
+					[](std::shared_ptr<int>) { TEST_ASSERT(false); },
 					[](int x) { TEST_ASSERT(x == 5); }
 				);
 
-				v.emplace(type<NonTrivial>, 10);
+				v.emplace(type<std::shared_ptr<int>>, std::make_shared<int>(10));
 
-				TEST_ASSERT(v.is<NonTrivial>());
+				TEST_ASSERT(v.is<std::shared_ptr<int>>());
 				v.match(
-					[](NonTrivial t) { TEST_ASSERT(t.field == 10); },
+					[](std::shared_ptr<int> i) { TEST_ASSERT(*i == 10); },
 					[](int) { TEST_ASSERT(false); }
 				);
 			}
@@ -552,14 +607,20 @@ test_set sum_type_tests{
 			[] {
 				using namespace ftl;
 
-				sum_type<std::shared_ptr<int>,NonTrivial> x{type<NonTrivial>, 1};
-				sum_type<std::shared_ptr<int>,NonTrivial> y{type<NonTrivial>, 10};
+				sum_type<int,NonTrivial> x{type<NonTrivial>, 1};
+				sum_type<int,NonTrivial> y{type<NonTrivial>, 10};
 
-				x = NonTrivial{10};
-				y = std::shared_ptr<int>(new int(15));
+				auto t = NonTrivial{10};
+				x = t;
 
+				TEST_ASSERT(x.is<NonTrivial>());
 				TEST_ASSERT(x.unsafe_get<NonTrivial>() == NonTrivial(10));
-				TEST_ASSERT(*y.unsafe_get<std::shared_ptr<int>>() == 15);
+
+				auto i = 15;
+				y = i;
+
+				TEST_ASSERT(y.is<int>());
+				TEST_ASSERT(y.unsafe_get<int>() == 15);
 			}
 		),
 		std::make_tuple(
@@ -619,31 +680,19 @@ test_set sum_type_tests{
 			[] {
 				using namespace ftl;
 
-				sum_type<int,NonTrivial> w{type<NonTrivial>, 1};
-				sum_type<int,NonTrivial> x{type<NonTrivial>, 1};
-				sum_type<int,NonTrivial> y{type<NonTrivial>, 10};
-				sum_type<int,NonTrivial> z{type<int>, 15};
+				sum_type<std::shared_ptr<int>,NonTrivial> w{type<NonTrivial>, 1};
+				sum_type<std::shared_ptr<int>,NonTrivial> x{type<NonTrivial>, 1};
+				sum_type<std::shared_ptr<int>,NonTrivial> y{type<NonTrivial>, 10};
+				sum_type<std::shared_ptr<int>,NonTrivial> z{type<std::shared_ptr<int>>, new int(15)};
 
 				x = std::move(y);
 				w = std::move(z);
 
+				TEST_ASSERT(x.is<NonTrivial>());
 				TEST_ASSERT(x.unsafe_get<NonTrivial>() == NonTrivial(10));
-				TEST_ASSERT(w.unsafe_get<int>() == 15);
-			}
-		),
-		std::make_tuple(
-			std::string("Get by type"),
-			[] {
-				using namespace ftl;
 
-				sum_type<int,char> x{type<int>, 10};
-				sum_type<int,char> y{type<char>, 'b'};
-
-				auto s1 = x.unsafe_get<int>();
-				auto s2 = y.unsafe_get<char>();
-
-				TEST_ASSERT(s1 == 10);
-				TEST_ASSERT(s2 == 'b');
+				TEST_ASSERT(w.is<std::shared_ptr<int>>());
+				TEST_ASSERT(*w.unsafe_get<std::shared_ptr<int>>() == 15);
 			}
 		),
 		std::make_tuple(
@@ -675,6 +724,41 @@ test_set sum_type_tests{
 					[](A){ return 0; },
 					[](B){ return 1; },
 					[](C){ return 2; }
+				);
+
+				TEST_ASSERT(s1 == 0);
+				TEST_ASSERT(s2 == 1);
+				TEST_ASSERT(s3 == 2);
+			}
+		),
+		std::make_tuple(
+			std::string("Match expressions [trivial destructor]"),
+			[] {
+				using namespace ftl;
+
+				struct A {};
+				struct B {};
+
+				sum_type<A,B,TrivialDestructor> x{type<A>};
+				sum_type<A,B,TrivialDestructor> y{type<B>};
+				sum_type<A,B,TrivialDestructor> z{type<TrivialDestructor>};
+
+				auto s1 = x.match(
+					[](A){ return 0; },
+					[](B){ return 1; },
+					[](TrivialDestructor){ return 2; }
+				);
+
+				auto s2 = y.match(
+					[](const A&){ return 0; },
+					[](const B&){ return 1; },
+					[](const TrivialDestructor&){ return 2; }
+				);
+
+				auto s3 = z.match(
+					[](A){ return 0; },
+					[](B){ return 1; },
+					[](TrivialDestructor){ return 2; }
 				);
 
 				TEST_ASSERT(s1 == 0);
