@@ -354,11 +354,18 @@ namespace ftl
 				}
 			}
 
-			template<class U, class V>
-			void assign(type_t<U>, V&& v)
+			template<class U>
+			void assign(type_t<U>, const U& u)
 			{
 				assert(sizeof...(Ts) > 0 && "Invalid sum type access");
-				rem.assign(type<U>, ::std::forward<V>(v));
+				rem.assign(type<U>, u);
+			}
+
+			template<class U>
+			void assign(type_t<U>, U&& u)
+			{
+				assert(sizeof...(Ts) > 0 && "Invalid sum type access");
+				rem.assign(type<U>, ::std::move(u));
 			}
 
 			void assign(type_t<T>, const T& v)
@@ -497,11 +504,18 @@ namespace ftl
 				}
 			}
 
-			template<class U, class V>
-			void assign(type_t<U>, V&& v)
+			template<class U>
+			void assign(type_t<U>, const U& u)
 			{
 				assert(sizeof...(Ts) > 0 && "Invalid sum type access");
-				rem.assign(type<U>, ::std::forward<V>(v));
+				rem.assign(type<U>, u);
+			}
+
+			template<class U>
+			void assign(type_t<U>, U&& u)
+			{
+				assert(sizeof...(Ts) > 0 && "Invalid sum type access");
+				rem.assign(type<U>, ::std::move(u));
 			}
 
 			void assign(type_t<T>, const T& v)
