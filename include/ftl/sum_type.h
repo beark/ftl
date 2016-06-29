@@ -181,11 +181,11 @@ namespace ftl {
 			}
 		};
 
-		template<type_layout Layout, size_t I, size_t J, size_t...Is, class T, class...Ts>
+		template<type_layout Layout, type_index_t I, type_index_t J, type_index_t...Is, class T, class...Ts>
 		struct match_selector<Layout,::std::index_sequence<I,J,Is...>,T,Ts...>
 		{
 			template<class...Fs> static constexpr auto
-			invoke(const recursive_union_<Layout,T,Ts...>& s, size_t i, Fs&&...fs)
+			invoke(const recursive_union_<Layout,T,Ts...>& s, type_index_t i, Fs&&...fs)
 			{
 				return i == I
 					? match_selector<Layout>::invoke(type<T>, s.val, ::std::forward<Fs>(fs)...)
@@ -195,7 +195,7 @@ namespace ftl {
 			}
 
 			template<class...Fs> static constexpr auto
-			invoke(recursive_union_<Layout,T,Ts...>& s, size_t i, Fs&&...fs)
+			invoke(recursive_union_<Layout,T,Ts...>& s, type_index_t i, Fs&&...fs)
 			{
 				return i == I
 					? match_selector<Layout>::invoke(type<T>, s.val, ::std::forward<Fs>(fs)...)
@@ -205,7 +205,7 @@ namespace ftl {
 			}
 
 			template<class...Fs> static constexpr auto
-			invoke(recursive_union_<Layout,T,Ts...>&& s, size_t i, Fs&&...fs)
+			invoke(recursive_union_<Layout,T,Ts...>&& s, type_index_t i, Fs&&...fs)
 			{
 				return i == I
 					? match_selector<Layout>::invoke(
@@ -217,11 +217,11 @@ namespace ftl {
 			}
 		};
 
-		template<type_layout Layout, size_t I, typename T, typename...Ts>
+		template<type_layout Layout, type_index_t I, typename T, typename...Ts>
 		struct match_selector<Layout, ::std::index_sequence<I>,T,Ts...>
 		{
 			template<typename...Fs> static constexpr auto
-			invoke(const recursive_union_<Layout,T,Ts...>& s, size_t i, Fs&&...fs)
+			invoke(const recursive_union_<Layout,T,Ts...>& s, type_index_t i, Fs&&...fs)
 			{
 				assert(i == I);
 
@@ -231,7 +231,7 @@ namespace ftl {
 			}
 
 			template<typename...Fs> static constexpr auto
-			invoke(recursive_union_<Layout,T,Ts...>& s, size_t i, Fs&&...fs)
+			invoke(recursive_union_<Layout,T,Ts...>& s, type_index_t i, Fs&&...fs)
 			{
 				assert(i == I);
 
@@ -241,7 +241,7 @@ namespace ftl {
 			}
 
 			template<typename...Fs> static constexpr auto
-			invoke(recursive_union_<Layout,T,Ts...>&& s, size_t i, Fs&&...fs)
+			invoke(recursive_union_<Layout,T,Ts...>&& s, type_index_t i, Fs&&...fs)
 			{
 				assert(i == I);
 
@@ -416,7 +416,7 @@ namespace ftl {
 
 		private:
 			recursive_union_<type_layout::trivially_copyable, Ts...> data;
-			size_t cons;
+			type_index_t cons;
 		};
 
 		template<class...Ts>
@@ -653,7 +653,7 @@ namespace ftl {
 
 		private:
 			recursive_union_<type_layout::trivial_destructor, Ts...> data;
-			size_t cons;
+			type_index_t cons;
 		};
 
 		template<class...Ts>
@@ -922,7 +922,7 @@ namespace ftl {
 
 		private:
 			recursive_union_<type_layout::complex, Ts...> data;
-			size_t cons;
+			type_index_t cons;
 		};
 
 		template<type_layout Layout, class...Ts>
@@ -946,10 +946,27 @@ namespace ftl {
 	 * name is used, it should not be possible to violate any invariants (for
 	 * example, to access a value as if it were a type it is not).
 	 *
-	 * Further, sum types in FTL are guaranteed not to have an invalid/partially
-	 * constructed state. The \em only states it can take on, are as valid values
-	 * of its component types. Note that this may include, eg, "moved from"
-	 * states.
+	 * Further, sum types in FTL are guaranteed not to have an invalid/empty
+	 * state of its own. The \em only states it can take on, are as values of its
+	 * component types. Note that this may include, eg, "moved from"
+	 * states&mdash;or any invalid state that these sub-typee may end up in.
+	 *
+	 * \par Throwing Constructors and Assignment Operators
+	 *
+	 * If any of the element types have copy or move constructors or assignment
+	 * operators that are neither trivial nor `noexcept`, several operations of
+	 * the `sum_type` will be hidden from overload resolution. This is typically
+	 * to prevent potential empty-state scenarios.
+	 *
+	 * For example, move assigning an element type to a `sum_type` is not possible
+	 * unless both the move constructor and move assignment operator are trivial
+	 * or otherwise `noexcept`.
+	 *
+	 * It is still possible to use a possibly throwing constructor of an element
+	 * type upon construction of the `sum_type` itself. This is because such an
+	 * operation will never leave the `sum_type` in an invalid state: either the
+	 * exception is propagated (and the scope of the invalid `sum_type` ends), or
+	 * it is caught (and again, the scope of the invalid `sum_type` is ended).
 	 *
 	 * \par "Pattern Matching"
 	 *
@@ -961,7 +978,16 @@ namespace ftl {
 	 *   auto x = sum_type<A,B>{type<A>};
 	 *   x.match(
 	 *     [](A a) { do_stuff_with_a(a); },
-	 *     [](B b) { do_stuff_with_b(b); },
+	 *     [](B b) { do_stuff_with_b(b); }
+	 *   );
+	 * \endcode
+	 *
+	 * You can also have `match` return a value:
+	 *
+	 * \code
+	 *   char alt = x.match(
+	 *     [](A) { return 'A'; },
+	 *     [](B) { return 'B'; }
 	 *   );
 	 * \endcode
 	 *
@@ -972,7 +998,8 @@ namespace ftl {
 	 *
 	 * One exception is that `match` also allows a visitor with an argument of
 	 * type `match_all`. This function will act as a catch-all for any types that
-	 * have not been matched earlier in the list.
+	 * have not been matched earlier in the list (matches are done in the order of
+	 * definition).
 	 *
 	 * `match` is a `constexpr` operation if all the given matching functions are.
 	 *
@@ -982,26 +1009,28 @@ namespace ftl {
 	 *   `TriviallyCopyable`
 	 * - A `sum_type<T1..TN>` is literal, iff all of `T1..TN` are
 	 * - A `sum_type<T1..TN>` is standard layout, iff all of `T1..TN` are
-	 * - A `sum_type<T1..TN>` is \ref copycons, iff all of `T1..TN` are
+	 * - A `sum_type<T1..TN>` is copy constructible, iff all of `T1..TN` are
 	 *   - Additionally, it is `noexcept` iff all of `T1..TN` are
-	 * - A `sum_type<T1..TN>` is \ref movecons, iff all of `T1..TN` are
+	 * - A `sum_type<T1..TN>` is move constructible, iff all of `T1..TN` are
 	 *   - Additionally, it is `noexcept` iff all of `T1..TN` are
-	 * - A `sum_type<T1..TN>` is \ref copyassignable, iff all of `T1..TN` are
+	 * - A `sum_type<T1..TN>` is copy assignable, iff all of `T1..TN` are
 	 *   \em noexcept copy assignable. Assignment, if available, is always
-	 *   noexcept.
-	 * - A `sum_type<T1..TN>` is \ref moveassignable, iff all of `T1..TN` are
+	 *   `noexcept`.
+	 * - A `sum_type<T1..TN>` is move assignable, iff all of `T1..TN` are
 	 *   \em noexcept move assignable. Assignment, if available, is always
-	 *   noexcept.
-	 * - For any `T` in `T1..TN` that is noexcept \ref copyassignable,
-	 *   `sum_type<T1..TN>` is noexcept copy assignable to values of that type.
-	 * - For any `T` in `T1..TN` that is noexcept \ref moveassignable,
-	 *   `sum_type<T1..TN>` is noexcept move assignable to values of that type.
-	 * - A `sum_type<T1..TN>` is \ref eq, iff all of `T1..TN` are
+	 *   `noexcept`.
+	 * - For all `T` in `T1..TN` that are `noexcept` copy assignable,
+	 *   `sum_type<T1..TN>` is `noexcept` copy assignable to values of that type.
+	 * - For all `T` in `T1..TN` that are `noexcept` move assignable,
+	 *   `sum_type<T1..TN>` is `noexcept` move assignable to values of that type.
+	 * - A `sum_type<T1..TN>` is equality comparable, iff all of `T1..TN` are
+	 * - A `sume_type<T1..TN>` is swappable, iff all of `T1..TN` are nothrow
+	 *   destructible and nothrow copy constructible.
 	 *
 	 * Note that a `sum_type` is never default constructible, since this would
 	 * by necessity entail some kind of empty or invalid state.
 	 *
-	 * \see either, maybe
+	 * \see either, maybe, match_all
 	 *
 	 * \ingroup sum_type
 	 */

@@ -90,6 +90,8 @@ namespace ftl
 			complex							// No constraints
 		};
 
+		using type_index_t = std::size_t;
+
 		template<class...Ts>
 		constexpr type_layout get_layout()
 		{
@@ -113,7 +115,7 @@ namespace ftl
 		template<>
 		struct recursive_union_<type_layout::trivially_copyable>
 		{
-			constexpr bool compare(size_t, const recursive_union_&) const noexcept
+			constexpr bool compare(type_index_t, const recursive_union_&) const noexcept
 			{
 				return false;
 			}
@@ -122,20 +124,20 @@ namespace ftl
 		template<>
 		struct recursive_union_<type_layout::trivial_destructor>
 		{
-			constexpr recursive_union_(const recursive_union_&, size_t) noexcept {}
-			constexpr recursive_union_(recursive_union_&&, size_t) noexcept {}
+			constexpr recursive_union_(const recursive_union_&, type_index_t) noexcept {}
+			constexpr recursive_union_(recursive_union_&&, type_index_t) noexcept {}
 
-			void copy(const recursive_union_&, size_t)
+			void copy(const recursive_union_&, type_index_t)
 			{
 				throw invalid_sum_type_access();
 			}
 
-			void copy(recursive_union_&&, size_t)
+			void copy(recursive_union_&&, type_index_t)
 			{
 				throw invalid_sum_type_access();
 			}
 
-			void move(recursive_union_&&, size_t)
+			void move(recursive_union_&&, type_index_t)
 			{
 				throw invalid_sum_type_access();
 			}
@@ -146,7 +148,7 @@ namespace ftl
 				throw invalid_sum_type_access();
 			}
 
-			constexpr bool compare(size_t, const recursive_union_&) const noexcept
+			constexpr bool compare(type_index_t, const recursive_union_&) const noexcept
 			{
 				return false;
 			}
@@ -155,25 +157,25 @@ namespace ftl
 		template<>
 		struct recursive_union_<type_layout::complex>
 		{
-			constexpr recursive_union_(const recursive_union_&, size_t) noexcept {}
-			constexpr recursive_union_(recursive_union_&&, size_t) noexcept {}
+			constexpr recursive_union_(const recursive_union_&, type_index_t) noexcept {}
+			constexpr recursive_union_(recursive_union_&&, type_index_t) noexcept {}
 
-			void destroy(size_t)
+			void destroy(type_index_t)
 			{
 				throw invalid_sum_type_access();
 			}
 
-			void copy(const recursive_union_&, size_t)
+			void copy(const recursive_union_&, type_index_t)
 			{
 				throw invalid_sum_type_access();
 			}
 
-			void copy(recursive_union_&&, size_t)
+			void copy(recursive_union_&&, type_index_t)
 			{
 				throw invalid_sum_type_access();
 			}
 
-			void move(recursive_union_&&, size_t)
+			void move(recursive_union_&&, type_index_t)
 			{
 				throw invalid_sum_type_access();
 			}
@@ -184,7 +186,7 @@ namespace ftl
 				throw invalid_sum_type_access();
 			}
 
-			constexpr bool compare(size_t, const recursive_union_&) const noexcept
+			constexpr bool compare(type_index_t, const recursive_union_&) const noexcept
 			{
 				return false;
 			}
@@ -261,7 +263,7 @@ namespace ftl
 				return ::std::move(val);
 			}
 
-			constexpr bool compare(size_t I, const recursive_union_& rhs) const noexcept
+			constexpr bool compare(type_index_t I, const recursive_union_& rhs) const noexcept
 			{
 				assert(I <= sizeof...(Ts) && "Type index out of range; illegal sum_type state");
 				return I == 0 ? val == rhs.val : rem.compare(I - 1, rhs.rem);
@@ -298,7 +300,7 @@ namespace ftl
 			: rem(s, std::forward<Args>(args)...)
 			{}
 
-			recursive_union_(const recursive_union_& other, size_t i)
+			recursive_union_(const recursive_union_& other, type_index_t i)
 			{
 				if (i == 0)
 				{
@@ -311,7 +313,7 @@ namespace ftl
 				}
 			}
 
-			recursive_union_(recursive_union_&& other, size_t i)
+			recursive_union_(recursive_union_&& other, type_index_t i)
 			{
 				if (i == 0)
 				{
@@ -326,7 +328,7 @@ namespace ftl
 
 			~recursive_union_() = default;
 
-			void copy(const recursive_union_& u, size_t i)
+			void copy(const recursive_union_& u, type_index_t i)
 			{
 				if (i == 0)
 				{
@@ -339,7 +341,7 @@ namespace ftl
 				}
 			}
 
-			void move(recursive_union_&& u, size_t i)
+			void move(recursive_union_&& u, type_index_t i)
 			{
 				if (i == 0)
 				{
@@ -405,7 +407,7 @@ namespace ftl
 				return ::std::move(val);
 			}
 
-			constexpr bool compare(size_t I, const recursive_union_& rhs) const noexcept
+			constexpr bool compare(type_index_t I, const recursive_union_& rhs) const noexcept
 			{
 				assert(I <= sizeof...(Ts) && "Type index out of range; illegal sum_type state");
 				return I == 0 ? val == rhs.val : rem.compare(I - 1, rhs.rem);
@@ -441,7 +443,7 @@ namespace ftl
 			: rem(s, std::forward<Args>(args)...)
 			{}
 
-			recursive_union_(const recursive_union_& other, size_t i)
+			recursive_union_(const recursive_union_& other, type_index_t i)
 			{
 				if (i == 0)
 				{
@@ -454,7 +456,7 @@ namespace ftl
 				}
 			}
 
-			recursive_union_(recursive_union_&& other, size_t i)
+			recursive_union_(recursive_union_&& other, type_index_t i)
 			{
 				if (i == 0)
 				{
@@ -469,7 +471,7 @@ namespace ftl
 
 			~recursive_union_() {}
 
-			void copy(const recursive_union_& u, size_t i)
+			void copy(const recursive_union_& u, type_index_t i)
 			{
 				if (i == 0)
 				{
@@ -482,7 +484,7 @@ namespace ftl
 				}
 			}
 
-			void move(recursive_union_&& u, size_t i)
+			void move(recursive_union_&& u, type_index_t i)
 			{
 				if (i == 0)
 				{
@@ -512,7 +514,7 @@ namespace ftl
 				val = ::std::move(v);
 			}
 
-			void destroy(size_t i)
+			void destroy(type_index_t i)
 			{
 				if (i == 0)
 				{
@@ -561,7 +563,7 @@ namespace ftl
 				return ::std::move(val);
 			}
 
-			constexpr bool compare(size_t I, const recursive_union_& rhs) const noexcept
+			constexpr bool compare(type_index_t I, const recursive_union_& rhs) const noexcept
 			{
 				assert(I <= sizeof...(Ts) && "Type index out of range; illegal sum_type state");
 				return I == 0 ? val == rhs.val : rem.compare(I - 1, rhs.rem);
