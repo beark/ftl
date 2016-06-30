@@ -120,14 +120,13 @@ namespace ftl {
 
 		template<typename F, typename...Fs, typename T, typename...Ts>
 		struct is_match_exhaustive<type_seq<F,Fs...>,type_seq<T,Ts...>>
-		{
-			static constexpr bool value =
-				( is_match<T,argument_type<F,0>>::value
-					&& is_match_exhaustive<type_seq<Fs...>,type_seq<Ts...>>::value)
-				||
-				( is_match_exhaustive<type_seq<F,Fs...>,type_seq<Ts...>>::value
-					&& is_match_exhaustive<type_seq<Fs...>,type_seq<T>>::value);
-		};
+			: disjunction<
+				conjunction<
+					is_match<T,argument_type<F,0>>,
+					is_match_exhaustive<type_seq<Fs...>,type_seq<Ts...>>>,
+				conjunction<
+					is_match_exhaustive<type_seq<F,Fs...>,type_seq<Ts...>>,
+					is_match_exhaustive<type_seq<Fs...>,type_seq<T>>>> {};
 
 		template<class, class...>
 		struct match_cases_are_in_type : ::std::false_type{};

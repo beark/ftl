@@ -560,11 +560,11 @@ namespace ftl {
 	 * Check that a variadic list of compile time predicates all hold.
 	 *
 	 * \tparam Ps must contain a static, compile time member named `value`, of
-	 *            type `bool` (or is convertible to it).
+	 *            type `bool` (or be convertible to it).
 	 *
 	 * \par Examples
 	 *
-	 * Statically enforce equality comparable on a variadic type list:
+	 * Statically enforce equality comparability on a variadic type list:
 	 * \code
 	 *   template<typename...Ts>
 	 *   void example() {
@@ -572,7 +572,7 @@ namespace ftl {
 	 *   }
 	 * \endcode
 	 *
-	 * \see conjunction_v
+	 * \see conjunction_v, disjunction, disjunction_v
 	 *
 	 * \ingroup type_traits
 	 */
@@ -586,17 +586,57 @@ namespace ftl {
 
 	template<class P, class...Ps>
 	struct conjunction<P, Ps...>
-		: if_<P::value, conjunction<Ps...>, ::std::false_type> {};
+		: if_<P::value, conjunction<Ps...>, P> {};
 
 	/**
 	 * Static convenience instance of `conjunction`.
 	 *
-	 * \see conjunction
+	 * \see conjunction, disjunction, disjunction_v
 	 *
 	 * \ingroup type_traits
 	 */
 	template<class...Ps>
 	static constexpr bool conjunction_v = conjunction<Ps...>::value;
+
+	/**
+	 * Check that at least one of a variadic list of compile time predicates hold.
+	 *
+	 * \tparam Ps must contain a static, compile time member named `value`, of
+	 *            type `bool` (or be convertible to it).
+	 *
+	 * \par Examples
+	 *
+	 * Statically enforce equality comparability on at least one type
+	 * \code
+	 *   template<typename...Ts>
+	 *   void example() {
+	 *       static_assert(disjunction<Eq<Ts>...>::value, "One of Ts must satisfy Eq");
+	 *   }
+	 * \endcode
+	 *
+	 * \see conjunction_v, disjunction, disjunction_v
+	 *
+	 * \ingroup type_traits
+	 */
+	template<class...Ps>
+	struct disjunction;
+
+	template<>
+	struct disjunction<> : ::std::false_type {};
+
+	template<class P, class...Ps>
+	struct disjunction<P, Ps...>
+		: if_<P::value, P, disjunction<Ps...>> {};
+
+	/**
+	 * Static convenience instance of `disjunction`.
+	 *
+	 * \see conjunction, conjunction_v, disjunction
+	 *
+	 * \ingroup type_traits
+	 */
+	template<class...Ps>
+	static constexpr bool disjunction_v = disjunction<Ps...>::value;
 }
 
 #endif
