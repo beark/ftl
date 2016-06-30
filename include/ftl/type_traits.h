@@ -26,6 +26,7 @@
 #include <utility>
 #include <iterator>
 #include <functional>
+#include "type_functions.h"
 
 #define FTL_GEN_PREUNOP_TEST(op, name)\
 	template<typename T>\
@@ -122,6 +123,7 @@ namespace ftl {
 	 * - <utility>
 	 * - <iterator>
 	 * - <functional>
+	 * - \ref typelevel
 	 */
 
 	namespace _dtl {
@@ -160,7 +162,7 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct has_eq {
-		static constexpr bool value = 
+		static constexpr bool value =
 			std::is_convertible<
 				decltype(_dtl::test_eq<T>(nullptr)),
 				bool
@@ -188,7 +190,7 @@ namespace ftl {
 	 */
 	template<typename T>
 	struct has_neq {
-		static constexpr bool value = 
+		static constexpr bool value =
 			std::is_convertible<
 				decltype(_dtl::test_neq<T>(nullptr)),
 				bool
@@ -477,7 +479,7 @@ namespace ftl {
 		static _dtl::no check(...);
 
 	public:
-		static constexpr bool value = 
+		static constexpr bool value =
 			!std::is_same<
 				_dtl::no,
 				decltype(check(std::declval<F>(), std::declval<Args>()...))
@@ -554,6 +556,47 @@ namespace ftl {
 	using argument_type =
 		typename fn_traits<::std::remove_reference_t<F>>::template argument_type<I>;
 
+	/**
+	 * Check that a variadic list of compile time predicates all hold.
+	 *
+	 * \tparam Ps must contain a static, compile time member named `value`, of
+	 *            type `bool` (or is convertible to it).
+	 *
+	 * \par Examples
+	 *
+	 * Statically enforce equality comparable on a variadic type list:
+	 * \code
+	 *   template<typename...Ts>
+	 *   void example() {
+	 *       static_assert(conjunction<Eq<Ts>...>::value, "All types in Ts must satisfy Eq");
+	 *   }
+	 * \endcode
+	 *
+	 * \see conjunction_v
+	 *
+	 * \ingroup type_traits
+	 */
+	template<class...Ps>
+	struct conjunction;
+
+	// TODO: c++17 should have a built-in conjunction
+
+	template<>
+	struct conjunction<> : ::std::true_type {};
+
+	template<class P, class...Ps>
+	struct conjunction<P, Ps...>
+		: if_<P::value, conjunction<Ps...>, ::std::false_type> {};
+
+	/**
+	 * Static convenience instance of `conjunction`.
+	 *
+	 * \see conjunction
+	 *
+	 * \ingroup type_traits
+	 */
+	template<class...Ps>
+	static constexpr bool conjunction_v = conjunction<Ps...>::value;
 }
 
 #endif
