@@ -26,7 +26,6 @@
 #include <tuple>
 #include "static.h"
 #include "function.h"
-#include "concepts/basic.h"
 #include "concepts/orderable.h"
 
 #include "implementation/currying.h"
@@ -46,7 +45,6 @@ namespace ftl {
 	 * - `<tuple>`
 	 * - \ref static
 	 * - \ref function
-	 * - \ref concepts_basic
 	 * - \ref orderable
 	 */
 
@@ -368,7 +366,7 @@ namespace ftl {
 	 * \note Because this version of `curry` works on arbitrary function objects
 	 *       with unknown and possibly multiple, overloaded `operator()`s,
 	 *       there is no way to force the result of `curry` to accept only
-	 *       matching types. 
+	 *       matching types.
 	 *
 	 * \ingroup prelude
 	 */
@@ -554,13 +552,13 @@ namespace ftl {
 	 *   auto y = add3(1,2)(3);
 	 *   auto z = add3(1)(2,3);
 	 * \endcode
-	 * 
+	 *
 	 * \ingroup prelude
 	 */
 	template<size_t N, typename F>
 	struct make_curried_n {
 		template<typename...Args>
-		using partial_move = decltype( 
+		using partial_move = decltype(
 			_dtl::part(std::declval<F&&>(), std::declval<Args>()...)
 		);
 
@@ -570,7 +568,7 @@ namespace ftl {
 		);
 
 		template<typename...Args>
-		using partial_const = decltype( 
+		using partial_const = decltype(
 			_dtl::part(std::declval<const F&>(), std::declval<Args>()...)
 		);
 
@@ -580,7 +578,7 @@ namespace ftl {
 		);
 
 		template<
-			typename...Args, 
+			typename...Args,
 			size_t M = sizeof...(Args),
 			typename = Requires< (N > M) >
 		>
@@ -594,7 +592,7 @@ namespace ftl {
 		}
 
 		template<
-			typename...Args, 
+			typename...Args,
 			size_t M = sizeof...(Args),
 			typename = Requires< (N > M) >
 		>

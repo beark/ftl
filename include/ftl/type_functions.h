@@ -767,7 +767,7 @@ namespace ftl {
 	 *   std::cout << std::boolalpha;
 	 *   std::cout << is_base_template<maybe<int>,maybe>::value << std::endl;
 	 *   std::cout << is_base_template<either<int,int>,maybe>::value << std::endl;
-	 *   
+	 *
 	 *   // The above outputs:
 	 *   // true
 	 *   // false

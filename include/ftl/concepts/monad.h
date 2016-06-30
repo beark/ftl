@@ -41,7 +41,7 @@ namespace ftl {
 	 * While this is technically already possible in C++, the abstraction is
 	 * useful none the less, because monads also have the power to implicitly
 	 * pass state or other useful context information forward, without the user
-	 * having to bother with it. 
+	 * having to bother with it.
 	 *
 	 * The easiest example of the above is probably the maybe monad, where the
 	 * user does not need to manually check for nothingness except at the very
@@ -226,7 +226,7 @@ namespace ftl {
 	 *   void myFunc(const M& m) {
 	 *       // Use bind, join, apply, etc on m
 	 *   }
-	 * \endcode 
+	 * \endcode
 	 *
 	 * \ingroup monad
 	 */
@@ -368,7 +368,7 @@ namespace ftl {
 	template<typename M>
 	struct deriving_join<in_terms_of_bind<M>> {
 		using T = Value_type<M>;
-		
+
 		template<typename U>
 		using M_ = Rebind<M,U>;
 
@@ -408,7 +408,7 @@ namespace ftl {
 	template<typename M>
 	struct deriving_map<in_terms_of_bind<M>> {
 		using T = Value_type<M>;
-		
+
 		template<typename U>
 		using M_ = Rebind<M,U>;
 
@@ -549,7 +549,7 @@ namespace ftl {
 		>
 		static M<U> bind(const M<T>& m, F&& f) {
 			static_assert(
-				DefaultConstructible<M<U>>(),
+				std::is_default_constructible<M<U>>::value,
 				"Rebind<M_,U> must result in a DefaultConstructible type"
 			);
 
@@ -576,7 +576,7 @@ namespace ftl {
 		>
 		static M<U> bind(M<T>&& m, F&& f) {
 			static_assert(
-				DefaultConstructible<M<U>>(),
+				std::is_default_constructible<M<U>>::value,
 				"Rebind<M_,U> must result in a DefaultConstructible type"
 			);
 
@@ -863,7 +863,7 @@ namespace ftl {
 	 * Unlike what might be exptected, this operator is used to perform the
 	 * computations `m1` and `m2` in _left-to-right_ order, and then return the
 	 * result of `m1`.
-	 * 
+	 *
 	 * Use case is when we have two computations that must be done in sequence,
 	 * but it's only the first one that yields an interesting result. Most
 	 * likely, the second one is only needed for a side effect of some kind. In

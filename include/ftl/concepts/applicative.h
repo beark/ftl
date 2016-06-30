@@ -23,7 +23,6 @@
 #ifndef FTL_APPLICATIVE_H
 #define FTL_APPLICATIVE_H
 
-#include "basic.h"
 #include "functor.h"
 
 namespace ftl {
