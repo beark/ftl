@@ -79,7 +79,6 @@ namespace ftl {
 	 * - \ref orderable, if `T` is (`nothing` always compares less than anything
 	 *        else)
 	 *
-	 *
 	 * Note that all iterators referencing a `just` instance of `maybe` are
 	 * rendered invalid if it is changed to `nothing`.
 	 *

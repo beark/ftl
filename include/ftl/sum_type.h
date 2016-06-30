@@ -84,11 +84,7 @@ namespace ftl {
 
 		template<class T, class U, class...Ts>
 		struct is_type_set<T,U,Ts...>
-		{
-			static constexpr bool value =
-				is_type_set<T,Ts...>::value
-				&& is_type_set<U,Ts...>::value;
-		};
+			: conjunction<is_type_set<T,Ts>..., is_type_set<U,Ts>...> {};
 
 		// We have a match if the decayed function argument type matches
 		template<class T, class FnArg>
@@ -141,11 +137,8 @@ namespace ftl {
 
 		template<class F, class...Fs, class...Ts>
 		struct match_cases_are_in_type<type_seq<F,Fs...>,Ts...>
-		{
-			static constexpr bool value =
-				type_is_in_v<::std::decay_t<argument_type<F,0>>,Ts...>
-				&& match_cases_are_in_type<type_seq<Fs...>,Ts...>::value;
-		};
+			: conjunction<type_is_in<::std::decay_t<argument_type<F,0>>, Ts...>
+			, match_cases_are_in_type<type_seq<Fs...>, Ts...>> {};
 
 		template<type_layout Layout, typename...Ts>
 		struct sum_type_;
