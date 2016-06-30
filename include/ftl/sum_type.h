@@ -24,8 +24,7 @@
 #define FTL_SUM_TYPE_H
 
 #include <cassert>
-#include "type_functions.h"
-#include "concepts/basic.h"
+#include "type_traits.h"
 #include "concepts/orderable.h"
 #include "implementation/recursive_union.h"
 
@@ -41,11 +40,9 @@ namespace ftl {
 	 * \endcode
 	 *
 	 * \par Dependencies
+	 * - `<cassert>`
 	 * - `<stdexcept>`
-	 * - `<memory>`
-	 * - `<string>`
-	 * - \ref typelevel
-	 * - \ref concepts_basic
+	 * - \ref type_traits
 	 * - \ref orderablepg
 	 */
 
@@ -432,12 +429,12 @@ namespace ftl {
 			sum_type_() = delete;
 
 			constexpr sum_type_(const sum_type_& other)
-			noexcept(All<std::is_nothrow_copy_constructible, Ts...>::value)
+			noexcept(conjunction_v<std::is_nothrow_copy_constructible<Ts>...>)
 			: data(other.data, other.cons), cons(other.cons)
 			{}
 
 			sum_type_(sum_type_&& other)
-			noexcept(All<std::is_nothrow_move_constructible, Ts...>::value)
+			noexcept(conjunction_v<std::is_nothrow_move_constructible<Ts>...>)
 			: data(other.data, other.cons), cons(other.cons)
 			{}
 
@@ -555,8 +552,8 @@ namespace ftl {
 			sum_type_& operator= (const sum_type_& other) noexcept
 			{
 				static_assert(
-					All<std::is_nothrow_copy_constructible,Ts...>::value
-					&& All<std::is_nothrow_copy_assignable,Ts...>::value,
+					conjunction_v<std::is_nothrow_copy_constructible<Ts>...>
+					&& conjunction_v<std::is_nothrow_copy_assignable<Ts>...>,
 					"Cannot copy assign a sum_type unless all element types are nothrow "
 					"copyable (constructible & assignable)."
 				);
@@ -577,8 +574,8 @@ namespace ftl {
 			sum_type_& operator= (sum_type_&& other) noexcept
 			{
 				static_assert(
-					All<::std::is_nothrow_move_constructible, Ts...>::value
-					&& All<::std::is_nothrow_move_assignable, Ts...>::value,
+					conjunction_v<::std::is_nothrow_move_constructible<Ts>...>
+					&& conjunction_v<::std::is_nothrow_move_assignable<Ts>...>,
 					"Cannot move assign sum_type unless all element types are nothrow "
 					"movable (constructible & assignable)."
 				);
@@ -638,7 +635,7 @@ namespace ftl {
 			}
 
 			auto swap(sum_type_& other) noexcept
-			-> ::std::enable_if_t<All<::std::is_nothrow_move_constructible, Ts...>::value>
+			-> ::std::enable_if_t<conjunction_v<::std::is_nothrow_move_constructible<Ts>...>>
 			{
 				using std::swap;
 				using recursive_union = recursive_union_<type_layout::trivial_destructor, Ts...>;
@@ -669,12 +666,12 @@ namespace ftl {
 			sum_type_() = delete;
 
 			constexpr sum_type_(const sum_type_& other)
-			noexcept(All<std::is_nothrow_copy_constructible, Ts...>::value)
+			noexcept(conjunction_v<std::is_nothrow_copy_constructible<Ts>...>)
 			: data(other.data, other.cons), cons(other.cons)
 			{}
 
 			sum_type_(sum_type_&& other)
-			noexcept(All<std::is_nothrow_move_constructible, Ts...>::value)
+			noexcept(conjunction_v<std::is_nothrow_move_constructible<Ts>...>)
 			: data(other.data, other.cons), cons(other.cons)
 			{}
 
@@ -698,7 +695,7 @@ namespace ftl {
 			template<typename T, typename...Args>
 			auto emplace(type_t<T> s, Args&&... args) noexcept
 			-> ::std::enable_if_t<
-				All<::std::is_nothrow_destructible,Ts...>::value
+				conjunction_v<::std::is_nothrow_destructible<Ts>...>
 				&& ::std::is_nothrow_constructible<T,Args...>::value>
 			{
 				data.destroy(cons);
@@ -796,14 +793,14 @@ namespace ftl {
 			sum_type_& operator= (const sum_type_& other) noexcept
 			{
 				static_assert(
-					All<std::is_nothrow_destructible,Ts...>::value,
+					conjunction_v<std::is_nothrow_destructible<Ts>...>,
 					"Cannot copy assign a sum_type unless all element types are nothrow "
 					"destructible."
 				);
 
 				static_assert(
-					All<std::is_nothrow_copy_constructible,Ts...>::value
-					&& All<std::is_nothrow_copy_assignable,Ts...>::value,
+					conjunction_v<std::is_nothrow_copy_constructible<Ts>...>
+					&& conjunction_v<std::is_nothrow_copy_assignable<Ts>...>,
 					"Cannot copy assign a sum_type unless all element types are nothrow "
 					"copyable (constructible & assignable)."
 				);
@@ -825,14 +822,14 @@ namespace ftl {
 			sum_type_& operator= (sum_type_&& other) noexcept
 			{
 				static_assert(
-					All<::std::is_nothrow_destructible, Ts...>::value,
+					conjunction_v<::std::is_nothrow_destructible<Ts>...>,
 					"Cannot move assign sum types unless all element types are nothrow "
 					"destructible."
 				);
 
 				static_assert(
-					All<::std::is_nothrow_move_constructible, Ts...>::value
-					&& All<::std::is_nothrow_move_assignable, Ts...>::value,
+					conjunction_v<::std::is_nothrow_move_constructible<Ts>...>
+					&& conjunction_v<::std::is_nothrow_move_assignable<Ts>...>,
 					"Cannot move assign sum_type unless all element types are nothrow "
 					"movable (constructible & assignable)."
 				);
@@ -857,7 +854,7 @@ namespace ftl {
 			const sum_type_& operator= (T&& t) noexcept
 			{
 				static_assert(
-					All<::std::is_nothrow_destructible,Ts...>::value,
+					conjunction_v<::std::is_nothrow_destructible<Ts>...>,
 					"Cannot assign to a sum type unless all element types are nothrow "
 					"destructible."
 				);
@@ -901,8 +898,8 @@ namespace ftl {
 
 			auto swap(sum_type_& other) noexcept
 			-> ::std::enable_if_t<
-				All<::std::is_nothrow_move_constructible, Ts...>::value
-				&& All<::std::is_nothrow_destructible, Ts...>::value>
+				conjunction_v<::std::is_nothrow_move_constructible<Ts>...>
+				&& conjunction_v<::std::is_nothrow_destructible<Ts>...>>
 			{
 				using std::swap;
 				using recursive_union = recursive_union_<type_layout::complex, Ts...>;
@@ -1004,6 +1001,11 @@ namespace ftl {
 	 * `match` is a `constexpr` operation if all the given matching functions are.
 	 *
 	 * \par Type Traits & Concepts
+	 *
+	 * Short story: A `sum_type` has the layout and properties of the least common
+	 * denominator of all its element types.
+	 *
+	 * More formally:
 	 *
 	 * - A `sum_type<T1..TN>` is a trivial type, iff all of `T1..TN` are
 	 *   `TriviallyCopyable`

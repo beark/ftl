@@ -95,11 +95,11 @@ namespace ftl
 		template<class...Ts>
 		constexpr type_layout get_layout()
 		{
-			if (!All<::std::is_trivially_destructible, Ts...>::value)
+			if (!conjunction_v<::std::is_trivially_destructible<Ts>...>)
 			{
 				return type_layout::complex;
 			}
-			else if (!All<::std::is_trivially_copyable, Ts...>::value)
+			else if (!conjunction_v<::std::is_trivially_copyable<Ts>...>)
 			{
 				return type_layout::trivial_destructor;
 			}
