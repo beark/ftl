@@ -3,9 +3,11 @@ FTL - The Functional Template Library
 
 [![Build Status](https://travis-ci.org/beark/ftl.png?branch=master)](https://travis-ci.org/beark/ftl)
 
-C++ template library for fans of functional programming. The goal of this project is to implement a useful subset of the Haskell Prelude (and a couple of other libraries) in C++. Presently, this subset is small, but rapidly growing. Note, however, that the library and its API are still in heavy flux and the interface of any data type or concept may yet change without notice.
+C++ template library for fans of functional programming.
 
-To use the FTL, you need a compiler that implements at least as much of C++11 as gcc-4.8. As of this time, known compatible compilers include&mdash;obviously&mdash;gcc 4.8 and clang 3.2 with libc++. Unfortunately clang with libstdc++ does not appear to work. While it would be a lovely thing, MSVC is not currently compatible, including the recent 2013 CTP.
+This project is currently on hiatus. Not sure when/if I'll resume work on it.
+
+If you want to play around with it anyway, you need to compile in C++11 mode with gcc-4.8 or later or clang-3.2 or later. Not sure if newer MSVC versions would work or not.
 
 Tutorials
 ---------
