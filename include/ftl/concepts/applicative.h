@@ -423,7 +423,7 @@ namespace ftl {
 			typename F1,
 			typename F2,
 			typename F = plain_type<F1>,
-			typename = Requires<
+			typename G = Requires<
 				MonoidAlt<F>()
 				&& std::is_same<F,plain_type<F2>>::value
 			>

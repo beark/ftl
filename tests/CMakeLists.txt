@@ -22,7 +22,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 		message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.8 or later")
 	endif()
 
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -pedantic -Wall -Wextra")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
@@ -43,10 +43,14 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		message(FATAL_ERROR "${PROJECT_NAME} requires clang 3.3 or later")
 	endif()
 
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 
-	# As soon as visual studio supports the required feature set, hopefully
-	message(FATAL_ERROR "${PROJECT_NAME} is not yet compatible with visual studio")
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "19.16")
+        message(FATAL_ERROR "You'll need Visual Studio 2017 Version 15.9.4+ to build FTL")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+	    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Od")
+    endif()
 
 else()
 

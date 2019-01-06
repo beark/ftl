@@ -648,9 +648,10 @@ namespace ftl {
 		: data(t, l), cons(index_of<T,Ts...>::value)
 		{}
 
-		~sum_type() noexcept(
-			noexcept(std::declval<_dtl::recursive_union<Ts...>>().destruct(0))
-		)
+		~sum_type() 
+#ifndef _MSC_VER  //  error with VS2017 compiler
+                        noexcept(noexcept(std::declval<_dtl::recursive_union<Ts...>>().destruct(0)))
+#endif
 		{
 			data.destruct(cons);
 		}

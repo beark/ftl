@@ -234,6 +234,7 @@ test_set maybet_tests{
 				return (*g)(2) == ftl::just(1.f);
 			})
 		),
+#if !defined(_MSC_VER)  // error with VS2017 compiler because of the | operator (orDo)
 		std::make_tuple(
 			std::string("monoidA::orDo[value,value]"),
 			std::function<bool()>([]() -> bool {
@@ -280,12 +281,12 @@ test_set maybet_tests{
 
 				maybeT<std::vector<int>> m1;
 				maybeT<std::vector<int>> m2;
-
 				auto m3 = m1 | m2;
 
 				return *m3 == *(maybeT<std::vector<int>>{});
 			})
 		),
+#endif
 		std::make_tuple(
 			std::string("foldable::foldl"),
 			std::function<bool()>([]() -> bool {

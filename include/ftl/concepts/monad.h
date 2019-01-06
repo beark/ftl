@@ -367,17 +367,17 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct deriving_join<in_terms_of_bind<M>> {
-		using T = Value_type<M>;
-		
+		using Tj = Value_type<M>;
+
 		template<typename U>
 		using M_ = Rebind<M,U>;
 
-		static constexpr M_<T> join(const M_<M_<T>>& m) {
-			return monad<M_<M_<T>>>::bind(m, id);
+		static constexpr M_<Tj> join(const M_<M_<Tj>>& m) {
+			return monad<M_<M_<Tj>>>::bind(m, id);
 		}
 
-		static constexpr M_<T> join(M_<M_<T>>&& m) {
-			return monad<M_<M_<T>>>::bind(std::move(m), id);
+		static constexpr M_<Tj> join(M_<M_<Tj>>&& m) {
+			return monad<M_<M_<Tj>>>::bind(std::move(m), id);
 		}
 	};
 
@@ -408,7 +408,7 @@ namespace ftl {
 	template<typename M>
 	struct deriving_map<in_terms_of_bind<M>> {
 		using T = Value_type<M>;
-		
+
 		template<typename U>
 		using M_ = Rebind<M,U>;
 
@@ -622,8 +622,8 @@ namespace ftl {
 	 */
 	template<typename M>
 	struct deriving_apply<in_terms_of_bind<M>> {
-		using T = Value_type<M>;
-
+		using Ta = Value_type<M>;
+                
 		template<typename U>
 		using M_ = Rebind<M,U>;
 
@@ -631,7 +631,7 @@ namespace ftl {
 				typename Mf,
 				typename Mf_ = plain_type<Mf>,
 				typename F = Value_type<Mf_>,
-				typename U = result_of<F(T)>
+				typename U = result_of<F(Ta)>
 		>
 		static M_<U> apply(Mf&& f, M m) {
 			return monad<Mf_>::bind(
@@ -639,7 +639,7 @@ namespace ftl {
 				[m] (F fn) {
 					return monad<M>::bind(
 						m,
-						[fn] (const T& t) { return monad<M_<U>>::pure(fn(t)); }
+						[fn] (const Ta& t) { return monad<M_<U>>::pure(fn(t)); }
 					);
 				}
 			);
