@@ -25,6 +25,10 @@ matrix:
 dist: trusty
 sudo: false
 
+# command to run tests
 script: 
-  cd tests &&  cmake ./ && make CXX=$COMPILER && ./ftl_tests
+  - cd tests
+  - cmake -D CMAKE_CXX_COMPILER=$COMPILER ./
+  - make CXX=$COMPILER
+  - ./ftl_tests
 
