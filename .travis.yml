@@ -1,34 +1,41 @@
 language: cpp
 matrix:
   include:
+  - os: linux
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-8
+    env:
+    - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+    - LINKER_FLAGS=""
 
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources: 
-            - ubuntu-toolchain-r-test
-          packages: 
-            - g++-8
-      env: COMPILER='g++-8' CXXSTD='c++17'
+  - os: linux
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - llvm-toolchain-trusty-6.0
+        - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-6.0 main'
+          key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+        packages:
+        - clang-6.0
+        - libstdc++6
+    env:
+    - MATRIX_EVAL="CC=clang-6.0 && CXX=clang-6.0"
+    - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
 
-    - os: linux
-      compiler: clang
-      addons:
-        apt:
-          sources: 
-            - llvm-toolchain-trusty-6.0
-          packages:
-            - clang-6.0
-      env: COMPILER='clang++-6.0' CXXSTD='c++17'
+before_install:
+- eval "${MATRIX_EVAL}"
 
 dist: trusty
 sudo: false
 
-# command to run tests
-script: 
+script:
   - cd tests
-  - cmake -D CMAKE_CXX_COMPILER=$COMPILER ./
-  - make
+  - cmake -DCMAKE_EXE_LINKER_FLAGS=${LINKER_FLAGS} ./
+  - cmake --build . -- VERBOSE=1
   - ./ftl_tests
 
