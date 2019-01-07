@@ -170,10 +170,10 @@ test_set eithert_tests{
 				using namespace ftl;
 
 				ef f{inplace_tag(), [](int x){ return make_right<float>(x); }};
-				auto g = f >>= [](int x){
+				auto g = f >>= [](int ){
 					return eitherT<float,function<float(int)>>{
 						inplace_tag(),
-						[x](int){ return make_left<float>(0.f); }
+						[](int){ return make_left<float>(0.f); }
 					};
 				};
 				return (*g)(2) == make_left<float>(0.f);
@@ -216,10 +216,10 @@ test_set eithert_tests{
 				using namespace ftl;
 
 				ef f{inplace_tag(), [](int){ return make_left<int>(0.f); }};
-				auto g = f >>= [](int x){
+				auto g = f >>= [](int ){
 					return eitherT<float,function<float(int)>>{
 						inplace_tag(),
-						[x](int){ return make_left<float>(0.f); }
+						[](int){ return make_left<float>(0.f); }
 					};
 				};
 				return (*g)(2) == make_left<float>(0.f);
