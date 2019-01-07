@@ -29,6 +29,6 @@ sudo: false
 script: 
   - cd tests
   - cmake ./
-  - make
+  - make CXX=$COMPILER
   - ./ftl_tests
 
