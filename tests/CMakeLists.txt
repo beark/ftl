@@ -6,36 +6,15 @@ include_directories("../include")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra -std=c++17 -DFTL_CPP14")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 
-	execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-	if(GCC_VERSION VERSION_GREATER 7.1)
-		message("-- g++ > 7.1 detected, enabling C++17 features")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -DFTL_CPP14")
-	else()
-		message(FATAL_ERROR "${PROJECT_NAME} requires g++ 7.1 or later")
-	endif()
-
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -pedantic -Wall -Wextra")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -pedantic -Wall -Wextra -std=c++17 -DFTL_CPP14")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread -lc++")
-
-	execute_process(
-		COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE CLANG_VERSION_STRING)
-	string(
-		REGEX REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" CLANG_VERSION ${CLANG_VERSION_STRING})
-
-	if(CLANG_VERSION VERSION_GREATER 5.0)
-		message("-- Clang > 5.0 detected, enabling C++17 features")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -DFTL_CPP14")
-	else()
-		message(FATAL_ERROR "${PROJECT_NAME} requires clang 5.0 or later")
-	endif()
 
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 

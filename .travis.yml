@@ -30,5 +30,5 @@ script:
   - cd tests
   - cmake ./
   - make
-  - if [ "`echo $CXX`" == "g++-8" ]; then ./ftl_tests; fi
+  - ./ftl_tests
 
