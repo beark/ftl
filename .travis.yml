@@ -22,10 +22,9 @@ matrix:
           key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
         packages:
         - clang-6.0
-        - libstdc++6
+        - libstdc++7-dev
     env:
-    - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0 && CXXFLAGS=-stdlib=libc++"
-    - LINKER_FLAGS="-stdlib=libc++ -lc++abi"
+    - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
 
 before_install:
 - eval "${MATRIX_EVAL}"
